@@ -1,0 +1,35 @@
+
+VERILATOR       = $(VERILATOR_ROOT)/bin/verilator
+
+VL_DIR   = $(FRV_WORK)/verilator
+VL_OUT   = $(FRV_WORK)/verilator/verilated
+
+VL_WAVES    = $(VL_DIR)/waves.vcd
+VL_TIMEOUT  = 1000
+VL_ARGS     = +IMEM=$(FRV_WORK)/riscv-compliance/rv32imc/C-ADD.elf.srec
+
+VL_CSRC_DIR=$(FRV_HOME)/flow/verilator
+VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
+           $(VL_CSRC_DIR)/dut_wrapper.cpp \
+           $(VL_CSRC_DIR)/sram_agent.cpp \
+           $(VL_CSRC_DIR)/memory_device.cpp \
+           $(VL_CSRC_DIR)/srec.cpp
+
+VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 \
+            -I$(CPU_RTL_DIR) -DFRV_VERIF_TRACE \
+            --exe --trace \
+            --top-module mrv_cpu $(VL_BUILD_FLAGS)
+
+.PHONY: $(VL_CSRC)
+
+$(VL_OUT) : $(CPU_RTL_SRCS) $(VL_CSRC)
+	$(VERILATOR) $(VL_FLAGS) -o $@ $^
+	$(MAKE) -C $(VL_DIR) -f Vmrv_cpu.mk
+
+verilator_build: $(VL_OUT)
+
+verilator_run_waves: $(VL_OUT)
+	$(VL_OUT) $(VL_ARGS) +WAVES=$(VL_WAVES) +TIMEOUT=$(VL_TIMEOUT)
+
+verilator_clean:
+	rm -rf $(VL_DIR)

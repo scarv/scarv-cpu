@@ -1,0 +1,24 @@
+
+RVFML   = $(FRV_HOME)/external/riscv-formal/cores/mrv
+FMLWORK = $(FRV_WORK)/riscv-formal
+
+CFG     = $(FRV_HOME)/verif/rvfi/checks.cfg
+WRAPPER = $(FRV_HOME)/verif/rvfi/rvfi_wrapper.sv
+
+NJOBS   = 1
+CHECKS  = 
+
+riscv-formal-clean:
+	rm -rf $(RVFML)
+	rm -rf $(FMLWORK)
+
+riscv-formal-prepare: $(CFG) $(WRAPPER) $(CPU_RTL_SRCS)
+	mkdir -p $(RVFML)
+	cp $(CFG) $(RVFML)/checks.cfg
+	cd $(RVFML) && \
+        python3 ../../checks/genchecks.py
+	mv $(RVFML)/checks $(FMLWORK)
+
+riscv-formal-run:
+	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(CHECKS)
+	rm -rf $(RVFML)

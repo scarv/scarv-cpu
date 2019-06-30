@@ -1,0 +1,25 @@
+
+FSBL_SRC    = $(FRV_HOME)/src/fsbl/boot.S \
+              $(FRV_HOME)/src/fsbl/fsbl.c
+
+FSBL_OBJ    = $(FRV_WORK)/fsbl/fsbl.elf
+FSBL_OBJDUMP= $(FRV_WORK)/fsbl/fsbl.objdump
+FSBL_HEX    = $(FRV_WORK)/fsbl/fsbl.mem
+
+FSBL_CFLAGS = -nostartfiles -Os -O2 -Wall -fPIC \
+              -T$(FRV_HOME)/src/fsbl/link.ld
+FSBL_CFLAGS += -march=rv32imc -mabi=ilp32
+
+$(FSBL_OBJ) : $(FSBL_SRC)
+	@mkdir -p $(dir $@)
+	$(CC) $(FSBL_CFLAGS) -o $@ $^
+
+$(FSBL_OBJDUMP) : $(FSBL_OBJ)
+	@mkdir -p $(dir $@)
+	$(OBJDUMP) -D $< > $@
+
+$(FSBL_HEX) : $(FSBL_OBJ)
+	@mkdir -p $(dir $@)
+	$(OBJCOPY) -O verilog $< $@
+
+fsbl: $(FSBL_OBJ) $(FSBL_OBJDUMP) $(FSBL_HEX)

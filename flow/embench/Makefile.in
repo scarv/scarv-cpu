@@ -1,0 +1,40 @@
+
+EMBENCH_ROOT=$(FRV_HOME)/external/embench-iot
+EMBENCH_BUILD=$(FRV_WORK)/embench-iot
+EMBENCH_OUT=$(EMBENCH_BUILD)/build
+EMBENCH_EXES_OLD=$(addprefix $(FRV_HOME)/,$(shell find -P work/embench-iot -executable -type f -path "*src*"))
+EMBENCH_EXES=$(shell find -P $(EMBENCH_OUT) -executable -type f)
+EMBENCH_DIS=$(addsuffix .dis,$(EMBENCH_EXES))
+EMBENCH_SREC=$(addsuffix .srec,$(EMBENCH_EXES))
+
+embench-configure:
+	mkdir -p $(EMBENCH_BUILD)
+	cd $(EMBENCH_BUILD) && ../../external/embench-iot/configure \
+        --host=riscv32-unknown-elf \
+        --with-chip=speed-test \
+        --with-board=ri5cyverilator
+
+$(EMBENCH_BUILD)/%.dis : $(EMBENCH_BUILD)/%
+	riscv32-unknown-elf-objdump -D $< > $@
+
+embench-build:
+	cd $(EMBENCH_BUILD) && make
+	rm -rf $(EMBENCH_OUT)/*
+	mkdir -p $(EMBENCH_OUT)
+	cp $(EMBENCH_EXES_OLD) $(EMBENCH_OUT)/.
+
+$(EMBENCH_OUT)/%.dis : $(EMBENCH_OUT)/%
+	riscv32-unknown-elf-objdump -D $< > $@
+
+$(EMBENCH_OUT)/%.srec: $(EMBENCH_OUT)/%
+	riscv32-unknown-elf-objcopy -O srec --srec-forceS3  $< $@
+	@chmod -x $@
+
+$(EMBENCH_DIS)  : embench-build
+$(EMBENCH_SREC) : embench-build
+
+embench-disasm: $(EMBENCH_DIS)
+
+embench-srec: $(EMBENCH_SREC)
+
+embench: embench-disasm embench-srec
