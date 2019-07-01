@@ -1,0 +1,29 @@
+
+digraph G {
+
+    reset;
+
+    reset -> bd_0;
+    
+    bd_0;
+
+    bd_0 -> bd_4;
+
+    bd_2;
+    
+    bd_2 -> bd_0;
+    bd_2 -> bd_4;
+    bd_2 -> bd_6;
+    
+    bd_4;
+
+    bd_4 -> bd_0;
+    bd_4 -> bd_2;
+    bd_4 -> bd_4;
+
+    bd_6;
+
+    bd_6 -> bd_2;
+    bd_6 -> bd_4;
+
+}

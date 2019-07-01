@@ -29,7 +29,7 @@ void sram_agent::clear_reset(){
 //! Compute any *next* signal values
 void sram_agent::posedge_clk(){
 
-    n_mem_stall = this -> rand_chance(5,10);  // Next Memory stall
+    n_mem_stall = 0;//this -> rand_chance(5,10);  // Next Memory stall
 
 }
 

@@ -5,7 +5,7 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
-#include "Vmrv_cpu.h"
+#include "Vfrv_core.h"
 
 #include "memory_device.hpp"
 #include "sram_agent.hpp"
@@ -80,7 +80,7 @@ protected:
     uint64_t sim_time;
     
     //! The DUT object being wrapped.
-    Vmrv_cpu * dut;
+    Vfrv_core * dut;
 
     //! Called on every rising edge of the main clock.
     void posedge_gclk();
