@@ -144,8 +144,12 @@ This can be due to one of:
 - Interrupt Trap.
 - An `mret` instruction.
 
+The destination addresses for conditional branch instructions
+are computed in the dispatch stage.
+
 The destination addresses for jump instructions are computed in
 the execute stage.
+Whether or not to perform a branch is also computed in the execute stage.
 
 The destination address for a trap is held in the `mtvec` CSR.
 
@@ -172,21 +176,47 @@ Signal     | Size  | Description
 
 Signal     | Size  | Description
 -----------|-------|-------------------------------------------------------
-`rd`       |  5    | 
-`rs1`      |  5    | 
-`rs2`      |  5    | 
-`imm`      |  32   | 
+`rd`       |  5    | Destination register address
+`rs1`      |  5    | Source register address 1
+`rs2`      |  5    | Source register address 2
+`imm`      |  32   | Decoded immediate
+`pc`       |  32   | Program counter
+`uop`      |  5    | Micro-op code
+`fu`       |  5    | Functional Unit (alu/mem/jump/mul/csr)
+`trap`     |  1    | Raise a trap?
+`size`     |  2    | Size of the instruction.
 
 
 ### Dispatch Execute Pipeline Register
 
-- Signals from decode stage into register are prefixed with `c1_`.
-- Signals from register into dispatch are prefixed with `r2_`.
+- Signals from dispatch stage into register are prefixed with `c2_`.
+- Signals from register into execute are prefixed with `r3_`.
 
 Signal     | Size  | Description
 -----------|-------|-------------------------------------------------------
-`rd`       |  5    | 
-`opr_a`    |  32   | 
-`opr_b`    |  32   | 
-`opr_c`    |  32   | 
+`rd`       |  5    | Destination register address
+`opr_a`    |  32   | Operand A
+`opr_b`    |  32   | Operand B
+`opr_c`    |  32   | Operand C
+`uop`      |  5    | Micro-op code
+`fu`       |  5    | Functional Unit (alu/mem/jump/mul/csr)
+`trap`     |  1    | Raise a trap?
+`size`     |  2    | Size of the instruction.
+
+
+### Execute Writeback Pipeline register.
+
+- Signals from Execute stage into register are prefixed with `c3_`.
+- Signals from register into Writeback are prefixed with `r4_`.
+
+Signal     | Size  | Description
+-----------|-------|-------------------------------------------------------
+`rd`       |  5    | Destination register address
+`opr_a`    |  32   | Operand A
+`opr_b`    |  32   | Operand B
+`opr_c`    |  32   | Operand C
+`uop`      |  5    | Micro-op code
+`fu`       |  5    | Functional Unit (alu/mem/jump/mul/csr)
+`trap`     |  1    | Raise a trap?
+`size`     |  2    | Size of the instruction.
 
