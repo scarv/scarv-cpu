@@ -15,7 +15,7 @@ input  wire             cf_req      , // Control flow change request
 input  wire [XLEN-1:0]  cf_target   , // Control flow change destination
 output wire             cf_ack      , // Control flow change acknolwedge
 
-output wire             imem_cen    , // Chip enable
+output reg              imem_cen    , // Chip enable
 output wire             imem_wen    , // Write enable
 input  wire             imem_error  , // Error
 input  wire             imem_stall  , // Memory stall
@@ -45,9 +45,11 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Pipeline events
 // -------------------------------------------------------------------------
 
-assign o_valid = a_recv_word;
+assign o_valid = a_recv_word && buf_can_load ||
+                 buf_depth >= 1 && prev_2b ||
+                 buf_depth >= 2 && prev_4b ;
 
-assign o_data  = {imem_error, n_decode_data};
+assign o_data  = {imem_error, n_buffer[1], n_buffer[0]};
 
 wire   a_pipe_progress = i_ready && o_valid;
 
@@ -86,7 +88,7 @@ always @(posedge g_clk) begin
         fetch_addr <= FRV_PC_RESET_VALUE;
     end else if(a_cf_change) begin
         fetch_addr <= cf_target;
-    end else if(a_pipe_progress) begin
+    end else if(a_recv_word) begin
         fetch_addr <= n_fetch_addr;
     end
 end
@@ -95,7 +97,7 @@ end
 // Memory Bus control
 // -------------------------------------------------------------------------
 
-wire    a_recv_word     = imem_cen     && !imem_stall;
+wire    a_recv_word     = imem_cen     && !imem_stall && buf_can_load;
 wire    a_recv_error    = a_recv_word  &&  imem_error;
 
 wire    a_recv_32       = a_recv_word  && imem_rdata[1:0] == 2'b11;
@@ -104,7 +106,18 @@ wire    a_recv_16       = a_recv_word  && imem_rdata[1:0] != 2'b11;
 assign  imem_addr       = fetch_addr;
 
 // Enable fetching iff the decode stage is ready to accept a new word.
-assign  imem_cen        = i_ready;
+wire    n_imem_cen      = i_ready && g_resetn && 
+                          (n_buf_depth <= 2 ||
+                           buf_depth == 2 && a_eat_2 ||
+                           buf_depth == 3 && a_eat_4 );
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        imem_cen <= 1'b0;
+    end else begin
+        imem_cen <= n_imem_cen;
+    end
+end
 
 //
 // 16-bit buffer control
@@ -112,35 +125,101 @@ assign  imem_cen        = i_ready;
 
 // Is the current instruction stream halfword aligned?
 reg         misaligned  ;
+reg  [15:0] aux_buf     ;
+reg  [15:0] n_buffer [2:0];
+wire [15:0]   buffer [2:0];
+
+assign buffer[0] = p_data[15: 0];
+assign buffer[1] = p_data[31:16];
+assign buffer[2] = aux_buf      ;
+
+wire [31:0] d_prev_data   = {a_eat_4 ? p_data[31:16] : 16'b0, p_data[15:0]};
+wire        d_prev_valid  = buf_depth >= 1 && p_data[1:0] != 2'b11 ||
+                            buf_depth >= 2 && p_data[1:0] == 2'b11  ;
 
 wire [31:0] prev_data   = p_data[XLEN-1:0];
+wire        prev_2b     = buf_depth >= 1 && prev_data[1:0] != 2'b11;
+wire        prev_4b     = buf_depth >= 2 && prev_data[1:0] == 2'b11;
+wire        load_aux_buf= a_pipe_progress;
 
-wire [31:0] n_decode_data = 
-    misaligned && !n_misaligned ? {aux_buf,prev_data[31:16] }    :
-    misaligned &&  n_misaligned ? {imem_rdata[15:0], aux_buf}    :
-                                  {imem_rdata               }    ;
+wire        buf_can_load = (buf_depth <= 1 ||
+                           buf_depth <= 2 && (a_eat_2) ||
+                                              a_eat_4)  ;
 
-reg  [15:0] aux_buf     ;
-wire [15:0] n_aux_buf   = imem_rdata[31:16];
-wire        load_aux_buf= n_misaligned;
+// Are we eating 2 or 4 bytes from the buffer this cycle? 
+wire        a_eat_2     = prev_2b;
+wire        a_eat_4     = prev_4b;
 
-wire n_misaligned = a_cf_change && cf_target[1] ||
-                    misaligned  && a_recv_32    ||
-                    !misaligned && a_recv_16     ;
+reg  [ 1:0] buf_depth   ;
+wire [ 1:0] n_buf_depth = buf_depth + {a_recv_word,1'b0} - {a_eat_4, a_eat_2};
+
+reg case_1;
+
+always @(*) begin
+    n_buffer[0] = buffer[0];
+    n_buffer[1] = buffer[1];
+    n_buffer[2] = buffer[2];
+    case_1 =  0;
+
+    case(buf_depth)
+        0 : if(a_recv_word) begin
+                {n_buffer[1],n_buffer[0]} = imem_rdata;
+            end
+        1 : if(a_recv_word) begin
+                if(a_eat_2) begin
+                    {n_buffer[1],n_buffer[0]} = imem_rdata;
+                end else begin
+                    {n_buffer[2],n_buffer[1]} = imem_rdata;
+                end
+            end else begin
+                if(a_eat_2) begin
+                    n_buffer[0] = n_buffer[1];
+                end
+            end
+        2 : if(a_recv_word) begin
+                if(a_eat_2) begin
+                    case_1 =1;
+                    n_buffer[0] = buffer[1];
+                    {n_buffer[2],n_buffer[1]} = imem_rdata;
+                end else if(a_eat_4) begin
+                    {n_buffer[1],n_buffer[0]} = imem_rdata;
+                end
+            end else begin
+                if(a_eat_2) begin
+                    n_buffer[0] = buffer[1];
+                end
+            end
+        3 : if(a_recv_word) begin
+                if(a_eat_4) begin
+                    n_buffer[0] = buffer[2];
+                    {n_buffer[2],n_buffer[1]} = imem_rdata;
+                end
+            end else begin
+                if(a_eat_4) begin
+                    n_buffer[0] = buffer[2];
+                end else if(a_eat_2) begin
+                    {n_buffer[1],n_buffer[0]} = {buffer[2],buffer[1]};
+                end
+            end
+    endcase
+
+end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        aux_buf <= 16'b0;
-    end else if(load_aux_buf) begin
-        aux_buf <= n_aux_buf;
+        buf_depth <= 2'b0;
+    end else if(a_cf_change) begin
+        buf_depth <= 2'b0;
+    end else if(a_pipe_progress) begin
+        buf_depth <= n_buf_depth;
     end
 end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        misaligned <= FRV_PC_RESET_VALUE[1];
-    end else if(a_pipe_progress) begin
-        misaligned <= n_misaligned;
+        aux_buf <= 16'b0;
+    end else if(load_aux_buf) begin
+        aux_buf <= n_buffer[2];
     end
 end
 

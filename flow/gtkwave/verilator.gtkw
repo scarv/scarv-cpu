@@ -1,0 +1,114 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Tue Jul  2 20:09:37 2019
+[*]
+[dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.vcd"
+[dumpfile_mtime] "Tue Jul  2 20:08:55 2019"
+[dumpfile_size] 832358
+[savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
+[timestart] 1
+[size] 1920 1025
+[pos] -1 -1
+*-5.106236 80 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.frv_core.
+[treeopen] TOP.frv_core.i_pipeline.
+[sst_width] 223
+[signals_width] 357
+[sst_expanded] 1
+[sst_vpaned_height] 301
+@800200
+-Pipe - FETCH
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.g_clk
+TOP.frv_core.i_pipeline.i_core_fetch.g_resetn
+@800200
+-Control Flow Change
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.a_cf_change
+TOP.frv_core.i_pipeline.i_core_fetch.cf_ack
+TOP.frv_core.i_pipeline.i_core_fetch.cf_req
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.cf_target[31:0]
+@1000200
+-Control Flow Change
+@800200
+-Events
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.a_pipe_progress
+TOP.frv_core.i_pipeline.i_core_fetch.a_recv_16
+TOP.frv_core.i_pipeline.i_core_fetch.a_recv_32
+TOP.frv_core.i_pipeline.i_core_fetch.a_recv_error
+TOP.frv_core.i_pipeline.i_core_fetch.a_recv_word
+TOP.frv_core.i_pipeline.i_core_fetch.a_eat_2
+TOP.frv_core.i_pipeline.i_core_fetch.a_eat_4
+TOP.frv_core.i_pipeline.i_core_fetch.misaligned
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.aux_buf[15:0]
+@1000200
+-Events
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.fetch_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.i_ready
+@800200
+-Instruction Memory Bus
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.imem_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.imem_cen
+TOP.frv_core.i_pipeline.i_core_fetch.imem_error
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.imem_rdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.imem_stall
+@1000200
+-Instruction Memory Bus
+@24
+TOP.frv_core.i_pipeline.i_core_fetch.buf_depth[1:0]
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.o_data[32:0]
+@28
+TOP.frv_core.i_pipeline.i_core_fetch.o_valid
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(0)[15:0]
+TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(1)[15:0]
+TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(2)[15:0]
+@2023
+^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
+TOP.frv_core.i_pipeline.i_core_fetch.d_prev_data[31:0]
+@22
+TOP.frv_core.i_pipeline.i_core_fetch.d_prev_data[31:0]
+@1000200
+-Pipe - FETCH
+@800200
+-Pipeline Register Outputs
+@28
+TOP.frv_core.i_pipeline.c0_valid
+TOP.frv_core.i_pipeline.c1_valid
+TOP.frv_core.i_pipeline.c2_valid
+TOP.frv_core.i_pipeline.c3_valid
+@22
+TOP.frv_core.i_pipeline.r1_data[32:0]
+@28
+TOP.frv_core.i_pipeline.r1_ready
+TOP.frv_core.i_pipeline.r1_valid
+@22
+TOP.frv_core.i_pipeline.r2_data[32:0]
+@28
+TOP.frv_core.i_pipeline.r2_ready
+TOP.frv_core.i_pipeline.r2_valid
+@22
+TOP.frv_core.i_pipeline.r3_data[32:0]
+@28
+TOP.frv_core.i_pipeline.r3_ready
+TOP.frv_core.i_pipeline.r3_valid
+@22
+TOP.frv_core.i_pipeline.r4_data[32:0]
+@28
+TOP.frv_core.i_pipeline.r4_ready
+TOP.frv_core.i_pipeline.r4_valid
+@1000200
+-Pipeline Register Outputs
+[pattern_trace] 1
+[pattern_trace] 0
