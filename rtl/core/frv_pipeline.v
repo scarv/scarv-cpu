@@ -156,6 +156,24 @@ frv_pipeline_register #(
 .i_ready (r1_ready )  // Stage N+1 ready to continue?
 );
 
+//
+// frv_core_decode
+//
+//  Decode stage of the CPU
+//
+frv_core_decode #(
+.RLEN(RLEN_DD)
+) i_core_decode (
+.g_clk   (g_clk    ), // global clock
+.g_resetn(g_resetn ), // synchronous reset
+.i_data  (r1_data  ), // Input data to the decoder
+.i_valid (r1_valid ), // Is fetch stage output valid? 
+.o_ready (r1_ready ), // Is the decode stage ready?
+.o_data  (c1_data  ), // Output data to dispatch
+.o_valid (c1_valid ), // Is decode stage output valid? 
+.i_ready (c1_ready )  // Is the dispatch stage ready?
+);
+
 
 //
 // Decode -> Dispatch Pipeline Register

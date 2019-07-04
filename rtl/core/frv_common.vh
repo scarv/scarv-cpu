@@ -10,6 +10,67 @@ parameter  ILEN = 32        ; // Maximum instruction length (bits)
 localparam XL   = XLEN-1    ; // Register signal high bit
 localparam IL   = ILEN-1    ; // Instruction signal high bit
 
+localparam REG_ZERO = 5'd0;
+localparam REG_RA   = 5'd1;
+localparam REG_SP   = 5'd2;
+
+//
+// Pipeline encoding fields
+// ------------------------------------------------------------------------
+//
+
+localparam P_FU_ALU     = 0;
+localparam P_FU_MUL     = 1;
+localparam P_FU_LSU     = 2;
+localparam P_FU_CFU     = 3;
+localparam P_FU_CSR     = 4;
+
+localparam ALU_ADD      = {2'b00, 3'b001};
+localparam ALU_SUB      = {2'b00, 3'b000};
+localparam ALU_AND      = {2'b01, 3'b001};
+localparam ALU_OR       = {2'b01, 3'b010};
+localparam ALU_XOR      = {2'b01, 3'b100};
+localparam ALU_SLT      = {2'b10, 3'b001};
+localparam ALU_SLTU     = {2'b10, 3'b010};
+localparam ALU_SRA      = {2'b11, 3'b001};
+localparam ALU_SRL      = {2'b11, 3'b010};
+localparam ALU_SLL      = {2'b11, 3'b100};
+
+localparam CFU_BEQ      = {2'b00, 3'b001};
+localparam CFU_BGE      = {2'b00, 3'b010};
+localparam CFU_BGEU     = {2'b00, 3'b011};
+localparam CFU_BLT      = {2'b00, 3'b100};
+localparam CFU_BLTU     = {2'b00, 3'b101};
+localparam CFU_BNE      = {2'b00, 3'b110};
+localparam CFU_EBREAK   = {2'b01, 3'b000};
+localparam CFU_ECALL    = {2'b01, 3'b000};
+localparam CFU_JMP      = {2'b10, 3'b001};
+localparam CFU_JALI     = {2'b10, 3'b010};
+localparam CFU_JALR     = {2'b10, 3'b100};
+localparam CFU_MRET     = {2'b11, 3'b000};
+
+localparam LSU_SIGNED   = 0;
+localparam LSU_LOAD     = 3;
+localparam LSU_STORE    = 4;
+localparam LSU_BYTE     = 2'b01;
+localparam LSU_HALF     = 2'b10;
+localparam LSU_WORD     = 2'b11;
+
+localparam MUL_DIV      = {2'b11, 3'b000};
+localparam MUL_DIVU     = {2'b11, 3'b001};
+localparam MUL_MUL      = {2'b01, 3'b000};
+localparam MUL_MULH     = {2'b01, 3'b100};
+localparam MUL_MULHSU   = {2'b01, 3'b111};
+localparam MUL_MULHU    = {2'b01, 3'b101};
+localparam MUL_REM      = {2'b10, 3'b000};
+localparam MUL_REMU     = {2'b10, 3'b001};
+
+localparam CSR_READ     = 4;
+localparam CSR_WRITE    = 3;
+localparam CSR_SET      = 2;
+localparam CSR_CLEAR    = 1;
+localparam CSR_SWAP     = 0;
+
 //
 // Exception codes
 // ------------------------------------------------------------------------
