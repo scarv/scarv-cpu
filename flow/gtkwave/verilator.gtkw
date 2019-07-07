@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu Jul  4 18:38:21 2019
+[*] Sun Jul  7 18:06:21 2019
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.vcd"
-[dumpfile_mtime] "Thu Jul  4 18:32:46 2019"
-[dumpfile_size] 822271
+[dumpfile_mtime] "Sun Jul  7 18:05:20 2019"
+[dumpfile_size] 677218
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-6.369812 266 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.242557 90 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -47,10 +47,6 @@ TOP.frv_core.i_pipeline.i_core_fetch.misaligned
 TOP.frv_core.i_pipeline.i_core_fetch.aux_buf[15:0]
 @1000200
 -Events
-@22
-TOP.frv_core.i_pipeline.i_core_fetch.fetch_addr[31:0]
-@28
-TOP.frv_core.i_pipeline.i_core_fetch.i_ready
 @800200
 -Instruction Memory Bus
 @22
@@ -67,10 +63,6 @@ TOP.frv_core.i_pipeline.i_core_fetch.imem_stall
 @24
 TOP.frv_core.i_pipeline.i_core_fetch.buf_depth[1:0]
 @22
-TOP.frv_core.i_pipeline.i_core_fetch.o_data[32:0]
-@28
-TOP.frv_core.i_pipeline.i_core_fetch.o_valid
-@22
 TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(0)[15:0]
 TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(1)[15:0]
 TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(2)[15:0]
@@ -81,167 +73,5 @@ TOP.frv_core.i_pipeline.i_core_fetch.d_prev_data[31:0]
 TOP.frv_core.i_pipeline.i_core_fetch.d_prev_data[31:0]
 @1000200
 -Pipe - FETCH
-@800200
--Pipeline Register Outputs
-@28
-TOP.frv_core.i_pipeline.c0_valid
-TOP.frv_core.i_pipeline.c1_valid
-TOP.frv_core.i_pipeline.c2_valid
-TOP.frv_core.i_pipeline.c3_valid
-@22
-TOP.frv_core.i_pipeline.r1_data[32:0]
-@28
-TOP.frv_core.i_pipeline.r1_ready
-TOP.frv_core.i_pipeline.r1_valid
-@22
-TOP.frv_core.i_pipeline.r2_data[32:0]
-@28
-TOP.frv_core.i_pipeline.r2_ready
-TOP.frv_core.i_pipeline.r2_valid
-@22
-TOP.frv_core.i_pipeline.r3_data[32:0]
-@28
-TOP.frv_core.i_pipeline.r3_ready
-TOP.frv_core.i_pipeline.r3_valid
-@22
-TOP.frv_core.i_pipeline.r4_data[32:0]
-@28
-TOP.frv_core.i_pipeline.r4_ready
-TOP.frv_core.i_pipeline.r4_valid
-@1000200
--Pipeline Register Outputs
-@800200
--Pipe - DECODE
-@c00201
--One hot decode
-@28
-TOP.frv_core.i_pipeline.i_core_decode.dec_add
-TOP.frv_core.i_pipeline.i_core_decode.dec_addi
-TOP.frv_core.i_pipeline.i_core_decode.dec_and
-TOP.frv_core.i_pipeline.i_core_decode.dec_andi
-TOP.frv_core.i_pipeline.i_core_decode.dec_auipc
-TOP.frv_core.i_pipeline.i_core_decode.dec_beq
-TOP.frv_core.i_pipeline.i_core_decode.dec_bge
-TOP.frv_core.i_pipeline.i_core_decode.dec_bgeu
-TOP.frv_core.i_pipeline.i_core_decode.dec_blt
-TOP.frv_core.i_pipeline.i_core_decode.dec_bltu
-TOP.frv_core.i_pipeline.i_core_decode.dec_bne
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_add
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_addi
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_addi4spn
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_addi16sp
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_and
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_andi
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_beqz
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_bnez
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_ebreak
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_j
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_jal
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_jalr
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_jr
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_li
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_lui
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_lw
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_lwsp
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_mv
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_nop
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_or
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_slli
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_srai
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_srli
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_sub
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_sw
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_swsp
-TOP.frv_core.i_pipeline.i_core_decode.dec_c_xor
-TOP.frv_core.i_pipeline.i_core_decode.dec_csrrc
-TOP.frv_core.i_pipeline.i_core_decode.dec_csrrci
-TOP.frv_core.i_pipeline.i_core_decode.dec_csrrs
-TOP.frv_core.i_pipeline.i_core_decode.dec_csrrsi
-TOP.frv_core.i_pipeline.i_core_decode.dec_csrrw
-TOP.frv_core.i_pipeline.i_core_decode.dec_csrrwi
-TOP.frv_core.i_pipeline.i_core_decode.dec_div
-TOP.frv_core.i_pipeline.i_core_decode.dec_divu
-TOP.frv_core.i_pipeline.i_core_decode.dec_ebreak
-TOP.frv_core.i_pipeline.i_core_decode.dec_ecall
-TOP.frv_core.i_pipeline.i_core_decode.dec_fence
-TOP.frv_core.i_pipeline.i_core_decode.dec_fence_i
-TOP.frv_core.i_pipeline.i_core_decode.dec_jal
-TOP.frv_core.i_pipeline.i_core_decode.dec_jalr
-TOP.frv_core.i_pipeline.i_core_decode.dec_lb
-TOP.frv_core.i_pipeline.i_core_decode.dec_lbu
-TOP.frv_core.i_pipeline.i_core_decode.dec_lh
-TOP.frv_core.i_pipeline.i_core_decode.dec_lhu
-TOP.frv_core.i_pipeline.i_core_decode.dec_lui
-TOP.frv_core.i_pipeline.i_core_decode.dec_lw
-TOP.frv_core.i_pipeline.i_core_decode.dec_mret
-TOP.frv_core.i_pipeline.i_core_decode.dec_mul
-TOP.frv_core.i_pipeline.i_core_decode.dec_mulh
-TOP.frv_core.i_pipeline.i_core_decode.dec_mulhsu
-TOP.frv_core.i_pipeline.i_core_decode.dec_mulhu
-TOP.frv_core.i_pipeline.i_core_decode.dec_or
-TOP.frv_core.i_pipeline.i_core_decode.dec_ori
-TOP.frv_core.i_pipeline.i_core_decode.dec_rem
-TOP.frv_core.i_pipeline.i_core_decode.dec_remu
-TOP.frv_core.i_pipeline.i_core_decode.dec_sb
-TOP.frv_core.i_pipeline.i_core_decode.dec_sh
-TOP.frv_core.i_pipeline.i_core_decode.dec_sll
-TOP.frv_core.i_pipeline.i_core_decode.dec_slli
-TOP.frv_core.i_pipeline.i_core_decode.dec_slt
-TOP.frv_core.i_pipeline.i_core_decode.dec_slti
-TOP.frv_core.i_pipeline.i_core_decode.dec_sltiu
-TOP.frv_core.i_pipeline.i_core_decode.dec_sltu
-TOP.frv_core.i_pipeline.i_core_decode.dec_sra
-TOP.frv_core.i_pipeline.i_core_decode.dec_srai
-TOP.frv_core.i_pipeline.i_core_decode.dec_srl
-TOP.frv_core.i_pipeline.i_core_decode.dec_srli
-TOP.frv_core.i_pipeline.i_core_decode.dec_sub
-TOP.frv_core.i_pipeline.i_core_decode.dec_sw
-TOP.frv_core.i_pipeline.i_core_decode.dec_wfi
-TOP.frv_core.i_pipeline.i_core_decode.dec_xor
-TOP.frv_core.i_pipeline.i_core_decode.dec_xori
-@1401201
--One hot decode
-@22
-TOP.frv_core.i_pipeline.i_core_decode.i_data[32:0]
-@28
-TOP.frv_core.i_pipeline.i_core_decode.i_valid
-TOP.frv_core.i_pipeline.i_core_decode.o_ready
-@22
-TOP.frv_core.i_pipeline.i_core_decode.o_data[32:0]
-@28
-TOP.frv_core.i_pipeline.i_core_decode.o_valid
-TOP.frv_core.i_pipeline.i_core_decode.i_ready
-@c00200
--Register Addresses
-@24
-TOP.frv_core.i_pipeline.i_core_decode.dec_rd_16[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.dec_rd_32[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.dec_rs1_16[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.dec_rs1_32[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.dec_rs2_16[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.dec_rs2_32[4:0]
-@1401200
--Register Addresses
-@c00200
--Pipeline Fields
-@28
-TOP.frv_core.i_pipeline.i_core_decode.p_fu[4:0]
-@22
-TOP.frv_core.i_pipeline.i_core_decode.p_imm[31:0]
-TOP.frv_core.i_pipeline.i_core_decode.p_imm_pc[31:0]
-TOP.frv_core.i_pipeline.i_core_decode.p_pc[31:0]
-@24
-TOP.frv_core.i_pipeline.i_core_decode.p_rd[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.p_rs1[4:0]
-TOP.frv_core.i_pipeline.i_core_decode.p_rs2[4:0]
-@28
-TOP.frv_core.i_pipeline.i_core_decode.p_size[1:0]
-TOP.frv_core.i_pipeline.i_core_decode.p_trap
-@22
-TOP.frv_core.i_pipeline.i_core_decode.p_uop[4:0]
-@1401200
--Pipeline Fields
-@1000200
--Pipe - DECODE
 [pattern_trace] 1
 [pattern_trace] 0

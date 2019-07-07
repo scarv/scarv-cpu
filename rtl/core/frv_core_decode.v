@@ -13,16 +13,13 @@ input  wire             g_resetn    , // synchronous reset
 
 output wire [ RLEN-1:0] i_data      , // Input data to the decoder
 output wire             i_valid     , // Is fetch stage output valid? 
-input  wire             o_ready     , // Is the decode stage ready?
+input  wire             o_busy      , // Is the decode stage busy 
 
 output wire [ RLEN-1:0] o_data      , // Output data to dispatch
 output wire             o_valid     , // Is decode stage output valid? 
-input  wire             i_ready       // Is the dispatch stage ready?
+input  wire             i_busy        // Is the dispatch stage busy 
 
 );
-
-// Width of the fetch->decode pipeline register.
-parameter RLEN             = 33;
 
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
@@ -35,7 +32,8 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // -------------------------------------------------------------------------
 
 wire        fetch_error = i_data[       RLEN-1];
-wire [31:0] d_data      = i_data[RLEN-2:     0];
+wire        d_in_valid  = i_data[       RLEN-2];
+wire [31:0] d_data      = i_data[RLEN-3:     0];
 
 //
 // Instruction Decoding

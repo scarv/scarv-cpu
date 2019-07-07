@@ -12,28 +12,27 @@ input  wire             g_clk       , // global clock
 input  wire             g_resetn    , // synchronous reset
 
 input  wire             cf_req      , // Control flow change request
-input  wire [XLEN-1:0]  cf_target   , // Control flow change destination
+input  wire [ XLEN-1:0] cf_target   , // Control flow change destination
 output wire             cf_ack      , // Control flow change acknolwedge
-
+              
 output reg              imem_cen    , // Chip enable
 output wire             imem_wen    , // Write enable
 input  wire             imem_error  , // Error
 input  wire             imem_stall  , // Memory stall
-output wire [    3 :0]  imem_strb   , // Write strobe
-output wire [    31:0]  imem_addr   , // Read/Write address
-input  wire [    31:0]  imem_rdata  , // Read data
-output wire [    31:0]  imem_wdata  , // Write data
+output wire [     3 :0] imem_strb   , // Write strobe
+output wire [     31:0] imem_addr   , // Read/Write address
+input  wire [     31:0] imem_rdata  , // Read data
+output wire [     31:0] imem_wdata  , // Write data
 
-input  wire [ RLEN-1:0] p_data      , // Data previously sent to decode
+input  wire [     31:0] s1_data     , // Data previously sent to decode
 
-output wire [ RLEN-1:0] o_data      , // Output data to pipeline register.
-output wire             o_valid     , // Is fetch stage output valid? 
-input  wire             i_ready       // Is the decode stage ready?
+output wire [     31:0] s0_data     , // Output data to pipeline register.
+output wire             s0_error    , // Fetch error occured.
+output wire             s0_d_valid  , // Output data is valid
+output wire             s0_valid    , // Is fetch stage output valid? 
+input  wire             s1_busy       // Is the decode stage busy? 
 
 );
-
-// Width of the fetch->decode pipeline register.
-parameter RLEN             = 33;
 
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
@@ -45,13 +44,15 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Pipeline events
 // -------------------------------------------------------------------------
 
-assign o_valid = a_recv_word && buf_can_load ||
+assign s0_valid = a_recv_word && buf_can_load ||
                  buf_depth >= 1 && prev_2b ||
                  buf_depth >= 2 && prev_4b ;
 
-assign o_data  = {imem_error, n_buffer[1], n_buffer[0]};
+assign s0_data      = {n_buffer[1], n_buffer[0]};
+assign s0_error     = a_recv_error;
+assign s0_d_valid   = buf_depth >= 1 || a_recv_word && a_pipe_progress;
 
-wire   a_pipe_progress = i_ready && o_valid;
+wire   a_pipe_progress = !s1_busy && s0_valid;
 
 //
 // Control flow acknolwedgement
@@ -106,7 +107,7 @@ wire    a_recv_16       = a_recv_word  && imem_rdata[1:0] != 2'b11;
 assign  imem_addr       = fetch_addr;
 
 // Enable fetching iff the decode stage is ready to accept a new word.
-wire    n_imem_cen      = i_ready && g_resetn && 
+wire    n_imem_cen      = !s1_busy && g_resetn && 
                           (n_buf_depth <= 2 ||
                            buf_depth == 2 && a_eat_2 ||
                            buf_depth == 3 && a_eat_4 );
@@ -129,15 +130,15 @@ reg  [15:0] aux_buf     ;
 reg  [15:0] n_buffer [2:0];
 wire [15:0]   buffer [2:0];
 
-assign buffer[0] = p_data[15: 0];
-assign buffer[1] = p_data[31:16];
+assign buffer[0] = s1_data[15: 0];
+assign buffer[1] = s1_data[31:16];
 assign buffer[2] = aux_buf      ;
 
-wire [31:0] d_prev_data   = {a_eat_4 ? p_data[31:16] : 16'b0, p_data[15:0]};
-wire        d_prev_valid  = buf_depth >= 1 && p_data[1:0] != 2'b11 ||
-                            buf_depth >= 2 && p_data[1:0] == 2'b11  ;
+wire [31:0] d_prev_data   = {a_eat_4 ? s1_data[31:16] : 16'b0, s1_data[15:0]};
+wire        d_prev_valid  = buf_depth >= 1 && s1_data[1:0] != 2'b11 ||
+                            buf_depth >= 2 && s1_data[1:0] == 2'b11  ;
 
-wire [31:0] prev_data   = p_data[XLEN-1:0];
+wire [31:0] prev_data   = s1_data[XLEN-1:0];
 wire        prev_2b     = buf_depth >= 1 && prev_data[1:0] != 2'b11;
 wire        prev_4b     = buf_depth >= 2 && prev_data[1:0] == 2'b11;
 wire        load_aux_buf= a_pipe_progress;
