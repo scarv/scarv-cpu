@@ -1,36 +1,33 @@
 
-
 //
 // module: frv_core_fetch
 //
-//  Fetch stage of the CPU, responsible for delivering instructions to
-//  the decoder in a timely fashion.
+//  Fetch pipeline stage.
 //
-module frv_core_fetch(
+module frv_core_fetch (
 
-input  wire             g_clk       , // global clock
-input  wire             g_resetn    , // synchronous reset
+input               g_clk           , // global clock
+input               g_resetn        , // synchronous reset
 
-input  wire             cf_req      , // Control flow change request
-input  wire [ XLEN-1:0] cf_target   , // Control flow change destination
-output wire             cf_ack      , // Control flow change acknolwedge
-              
-output reg              imem_cen    , // Chip enable
-output wire             imem_wen    , // Write enable
-input  wire             imem_error  , // Error
-input  wire             imem_stall  , // Memory stall
-output wire [     3 :0] imem_strb   , // Write strobe
-output wire [     31:0] imem_addr   , // Read/Write address
-input  wire [     31:0] imem_rdata  , // Read data
-output wire [     31:0] imem_wdata  , // Write data
+input  wire         cf_req          , // Control flow change
+input  wire [XL:0]  cf_target       , // Control flow change target
+output wire         cf_ack          , // Acknowledge control flow change
 
-input  wire [     31:0] s1_data     , // Data previously sent to decode
+output reg          imem_cen        , // Chip enable
+output wire         imem_wen        , // Write enable
+input  wire         imem_error      , // Error
+input  wire         imem_stall      , // Memory stall
+output wire [3:0]   imem_strb       , // Write strobe
+output reg  [XL:0]  imem_addr       , // Read/Write address
+input  wire [XL:0]  imem_rdata      , // Read data
+output wire [XL:0]  imem_wdata      , // Write data
 
-output wire [     31:0] s0_data     , // Output data to pipeline register.
-output wire             s0_error    , // Fetch error occured.
-output wire             s0_d_valid  , // Output data is valid
-output wire             s0_valid    , // Is fetch stage output valid? 
-input  wire             s1_busy       // Is the decode stage busy? 
+input  wire         fe_flush        , // Flush stage
+input  wire         fe_stall        , // Stall stage
+output wire         fe_ready        , // Stage ready to progress
+
+output wire [XL:0]  d_data          , // Data to be decoded.
+output wire         d_error 
 
 );
 
@@ -40,77 +37,84 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Common core parameters and constants
 `include "frv_common.vh"
 
+wire        f_4byte      ; // Input data valid
+wire        f_2byte      ; // Load only the 2 MS bytes
+wire        f_ready      ; // buffer ready for data
+
+wire [XL:0] buf_data     ; // Output data
+wire        buf_out_2    ; // 
+wire        buf_out_4    ; // 
+wire        buf_err      ; // Output error bit
+wire        buf_valid    ; // D output data is valid
+wire        buf_ready    ; // Eat 2/4 bytes
+
+assign      d_data       = buf_data;
+assign      d_error      = buf_err;
+
+wire [XL:0] dbg_buf_out = {buf_out_2 ? 16'b0 : buf_data[31:16], buf_data[15:0]};
+
+// Decode stage can eat fetched bytes
+assign      buf_ready = !fe_stall;
+
+// Fetch / decode are ready to progress.
+assign      fe_ready= buf_valid;
+
+// Ignore recieved data
+wire        txn_ign = !f_ready;
+
+// Recieve 4 bytes from memory
+wire        txn_recv= imem_cen && !imem_stall && !txn_ign;
+
+// Store 4 bytes of fetch data to the buffer.
+assign      f_4byte = txn_recv && !misaligned_fetch;
+
+// Store upper 2 bytes of fetch data to the buffer.
+assign      f_2byte = txn_recv &&  misaligned_fetch;
+
+wire progress_fe = !fe_stall && fe_ready;
+
 //
-// Pipeline events
-// -------------------------------------------------------------------------
+// Fetch address computation
+wire [XL:0] n_fetch_addr           = imem_addr + 4;
 
-assign s0_valid = a_recv_word && buf_can_load ||
-                 buf_depth >= 1 && prev_2b ||
-                 buf_depth >= 2 && prev_4b ;
+reg         misaligned_fetch;
 
-assign s0_data      = {n_buffer[1], n_buffer[0]};
-assign s0_error     = a_recv_error;
-assign s0_d_valid   = buf_depth >= 1 || a_recv_word && a_pipe_progress;
+wire      n_misaligned_fetch = 
+    (cf_req && cf_ack && cf_target[1] || misaligned_fetch) &&
+    !f_2byte;
 
-wire   a_pipe_progress = !s1_busy && s0_valid;
-
-//
-// Control flow acknolwedgement
-// -------------------------------------------------------------------------
-
-// Acknowledge a control flow change on the boundary of a memory request,
-// or if no request is currently active.
-assign  cf_ack      = !imem_cen || a_recv_word;
-
-// Control flow change occuring this cycle.
-wire    a_cf_change = cf_req && cf_ack;
-
-//
-// Constant assignments
-// -------------------------------------------------------------------------
-
-// No write functionality used by instruction memory bus.
-assign imem_wen     =  1'b0;
-assign imem_strb    =  4'b0;
-assign imem_wdata   = 32'b0;
-
-//
-// Fetch address control
-// -------------------------------------------------------------------------
-
-reg  [31:0] fetch_addr;
-
-wire [31:0] fetch_addr_4 = fetch_addr + 4;
-
-wire [31:0] n_fetch_addr = cf_req ? cf_target  : fetch_addr_4;
+assign      cf_ack = !imem_cen || txn_recv;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        fetch_addr <= FRV_PC_RESET_VALUE;
-    end else if(a_cf_change) begin
-        fetch_addr <= cf_target;
-    end else if(a_recv_word) begin
-        fetch_addr <= n_fetch_addr;
+        misaligned_fetch <= 1'b0;
+    end else begin
+        misaligned_fetch <= n_misaligned_fetch;
     end
 end
 
-//
-// Memory Bus control
-// -------------------------------------------------------------------------
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        imem_addr <= FRV_PC_RESET_VALUE;
+    end else if(cf_req && cf_ack) begin
+        imem_addr <= {cf_target[XL:2],2'b00};
+    end else if(txn_recv) begin
+        imem_addr <= n_fetch_addr;
+    end
+end
 
-wire    a_recv_word     = imem_cen     && !imem_stall && buf_can_load;
-wire    a_recv_error    = a_recv_word  &&  imem_error;
+assign imem_wdata = 0;
+assign imem_strb  = 0;
+assign imem_wen   = 0;
 
-wire    a_recv_32       = a_recv_word  && imem_rdata[1:0] == 2'b11;
-wire    a_recv_16       = a_recv_word  && imem_rdata[1:0] != 2'b11;
+reg  p_txn_finish;
 
-assign  imem_addr       = fetch_addr;
+always @(posedge g_clk) p_txn_finish<= !g_resetn? 1'b0 : txn_recv;
 
-// Enable fetching iff the decode stage is ready to accept a new word.
-wire    n_imem_cen      = !s1_busy && g_resetn && 
-                          (n_buf_depth <= 2 ||
-                           buf_depth == 2 && a_eat_2 ||
-                           buf_depth == 3 && a_eat_4 );
+// Keep fetching so long as there are no valid instructions in the
+// fetch buffer.
+wire n_imem_cen = f_ready ||
+                 !f_ready && progress_fe;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -120,108 +124,25 @@ always @(posedge g_clk) begin
     end
 end
 
-//
-// 16-bit buffer control
-// -------------------------------------------------------------------------
+// ---------------------- Submodules -------------------------
 
-// Is the current instruction stream halfword aligned?
-reg         misaligned  ;
-reg  [15:0] aux_buf     ;
-reg  [15:0] n_buffer [2:0];
-wire [15:0]   buffer [2:0];
 
-assign buffer[0] = s1_data[15: 0];
-assign buffer[1] = s1_data[31:16];
-assign buffer[2] = aux_buf      ;
+frv_core_fetch_buffer i_core_fetch_buffer (
+.g_clk    (g_clk        ), // Global clock
+.g_resetn (g_resetn     ), // Global negative level triggered reset
+.flush    (fe_flush     ),
+.f_ready  (f_ready      ),
+.f_4byte  (f_4byte      ), // Input data valid
+.f_2byte  (f_2byte      ), // Load only the 2 MS bytes
+.f_err    (imem_error   ), // Input error
+.f_in     (imem_rdata   ), // Input data
+.buf_out  (buf_data     ), // Output data
+.buf_out_2(buf_out_2    ), // Output data
+.buf_out_4(buf_out_4    ), // Output data
+.buf_err  (buf_err      ), // Output error bit
+.buf_valid(buf_valid    ), // D output data is valid
+.buf_ready(buf_ready    )  // Eat 2/4 bytes
+);
 
-wire [31:0] d_prev_data   = {a_eat_4 ? s1_data[31:16] : 16'b0, s1_data[15:0]};
-wire        d_prev_valid  = buf_depth >= 1 && s1_data[1:0] != 2'b11 ||
-                            buf_depth >= 2 && s1_data[1:0] == 2'b11  ;
-
-wire [31:0] prev_data   = s1_data[XLEN-1:0];
-wire        prev_2b     = buf_depth >= 1 && prev_data[1:0] != 2'b11;
-wire        prev_4b     = buf_depth >= 2 && prev_data[1:0] == 2'b11;
-wire        load_aux_buf= a_pipe_progress;
-
-wire        buf_can_load = (buf_depth <= 1 ||
-                           buf_depth <= 2 && (a_eat_2) ||
-                                              a_eat_4)  ;
-
-// Are we eating 2 or 4 bytes from the buffer this cycle? 
-wire        a_eat_2     = prev_2b;
-wire        a_eat_4     = prev_4b;
-
-reg  [ 1:0] buf_depth   ;
-wire [ 1:0] n_buf_depth = buf_depth + {a_recv_word,1'b0} - {a_eat_4, a_eat_2};
-
-reg case_1;
-
-always @(*) begin
-    n_buffer[0] = buffer[0];
-    n_buffer[1] = buffer[1];
-    n_buffer[2] = buffer[2];
-    case_1 =  0;
-
-    case(buf_depth)
-        0 : if(a_recv_word) begin
-                {n_buffer[1],n_buffer[0]} = imem_rdata;
-            end
-        1 : if(a_recv_word) begin
-                if(a_eat_2) begin
-                    {n_buffer[1],n_buffer[0]} = imem_rdata;
-                end else begin
-                    {n_buffer[2],n_buffer[1]} = imem_rdata;
-                end
-            end else begin
-                if(a_eat_2) begin
-                    n_buffer[0] = n_buffer[1];
-                end
-            end
-        2 : if(a_recv_word) begin
-                if(a_eat_2) begin
-                    case_1 =1;
-                    n_buffer[0] = buffer[1];
-                    {n_buffer[2],n_buffer[1]} = imem_rdata;
-                end else if(a_eat_4) begin
-                    {n_buffer[1],n_buffer[0]} = imem_rdata;
-                end
-            end else begin
-                if(a_eat_2) begin
-                    n_buffer[0] = buffer[1];
-                end
-            end
-        3 : if(a_recv_word) begin
-                if(a_eat_4) begin
-                    n_buffer[0] = buffer[2];
-                    {n_buffer[2],n_buffer[1]} = imem_rdata;
-                end
-            end else begin
-                if(a_eat_4) begin
-                    n_buffer[0] = buffer[2];
-                end else if(a_eat_2) begin
-                    {n_buffer[1],n_buffer[0]} = {buffer[2],buffer[1]};
-                end
-            end
-    endcase
-
-end
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        buf_depth <= 2'b0;
-    end else if(a_cf_change) begin
-        buf_depth <= 2'b0;
-    end else if(a_pipe_progress) begin
-        buf_depth <= n_buf_depth;
-    end
-end
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        aux_buf <= 16'b0;
-    end else if(load_aux_buf) begin
-        aux_buf <= n_buffer[2];
-    end
-end
 
 endmodule

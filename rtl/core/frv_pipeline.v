@@ -69,94 +69,70 @@ parameter BUFFER_HANDSHAKE = 0;
 
 // -------------------------------------------------------------------------
 
-wire             cf_req     ; // Control flow change request
-wire [XLEN-1:0]  cf_target  ; // Control flow change destination
-wire             cf_ack     ; // Control flow change acknolwedge
+wire        cf_req     ; // Control flow change request
+wire [XL:0] cf_target  ; // Control flow change destination
+wire        cf_ack     ; // Control flow change acknolwedge
 
-wire             fd_flush   ; // Flush FD pipeline register.
-wire             dd_flush   ; // Flush DD pipeline register.
-wire             de_flush   ; // Flush DE pipeline register.
-wire             ew_flush   ; // Flush EW pipeline register.
+wire        flush_front; // Flush FD pipeline register.
 
-localparam RLEN_FD = 34;
+//
+// Front-end register pipeline control.
+wire        s2_p_valid ; // Pipeline control signals
+wire        s2_p_busy  ; // Pipeline control signals
 
-wire [     31:0]    s0_data    ; // Output data to pipeline register.
-wire                s0_error   ; // Fetch error occured.
-wire                s0_d_valid ; // Output data is valid
-wire                s0_valid   ; // Is fetch stage output valid? 
+//
+// Outputs from front-end pipeline register.
+wire [ 4:0] s2_rd      ; // Destination register address
+wire [ 4:0] s2_rs1     ; // Source register address 1
+wire [ 4:0] s2_rs2     ; // Source register address 2
+wire [31:0] s2_imm     ; // Decoded immediate
+wire [31:0] s2_pc      ; // Program counter
+wire [ 4:0] s2_uop     ; // Micro-op code
+wire [ 4:0] s2_fu      ; // Functional Unit
+wire        s2_trap    ; // Raise a trap?
+wire [ 1:0] s2_size    ; // Size of the instruction.
+wire [31:0] s2_instr   ; // The instruction word
 
-// Pack up outputs of fetch stage for input to pipeline register
-wire [RLEN_FD-1:0]  s0_pipe_in = {
-    s0_error, s0_d_valid, s0_data
-};
-
-wire [RLEN_FD-1:0]  mr_s1_data ;
-wire [RLEN_FD-1:0]  s1_pipe_out;
-
-wire                s0_s1_busy      ; // Is decode stage busy?  S0 aligned
-wire                s1_s1_busy      ; // Is decode stage busy?  S1 aligned
-
-// Most recently register'd values
-wire [     31:0]    s1_mr_data      ; // Output data to pipeline register.
-wire                s1_mr_d_valid   ; // Output data is valid
-wire                s1_mr_error     ; // Fetch error occured.
-
-// Current inputs to decode stage
-wire [     31:0]    s1_data         ; // Output data to pipeline register.
-wire                s1_d_valid      ; // Output data is valid
-wire                s1_error        ; // Fetch error occured.
-wire                s1_valid        ; // Is fetch stage output valid? 
-
-// Unpack s0 -> s1 pipeline.
-assign {s1_error   , s1_d_valid   , s1_data   } = s1_pipe_out;
-assign {s1_mr_error, s1_mr_d_valid, s1_mr_data} = mr_s1_data;
+//
+// TEMPORARY assignments for bring-up
+assign cf_req   = 1'b0;
+assign cf_target= {XLEN{1'b0}};
 
 // -------------------------------------------------------------------------
 
 
 //
-// module: frv_core_fetch
+// instance : frv_pipeline_front
 //
-//  Fetch stage of the CPU, responsible for delivering instructions to
-//  the decoder in a timely fashion.
+//  Front-end of the pipeline. Responsible for instruction fetch and decode.
 //
-frv_core_fetch i_core_fetch(
-.g_clk     (g_clk           ), // global clock
-.g_resetn  (g_resetn        ), // synchronous reset
-.cf_req    (cf_req          ), // Control flow change request
-.cf_target (cf_target       ), // Control flow change destination
-.cf_ack    (cf_ack          ), // Control flow change acknolwedge
-.imem_cen  (imem_cen        ), // Chip enable
-.imem_wen  (imem_wen        ), // Write enable
-.imem_error(imem_error      ), // Error
-.imem_stall(imem_stall      ), // Memory stall
-.imem_strb (imem_strb       ), // Write strobe
-.imem_addr (imem_addr       ), // Read/Write address
-.imem_rdata(imem_rdata      ), // Read data
-.imem_wdata(imem_wdata      ), // Write data
-.s1_data   (s1_mr_data      ), // Data previously sent to decode
-.s0_data   (s0_data         ), // Output data to pipeline register.
-.s0_error  (s0_error        ), // Fetch error occured.
-.s0_d_valid(s0_d_valid      ), // Output data is valid
-.s0_valid  (s0_valid        ), // Is fetch stage output valid? 
-.s1_busy   (s0_s1_busy      )  // Is the decode stage busy? 
-);
-
-
-frv_pipeline_register #(
-.RLEN(RLEN_FD),
-.BUFFER_HANDSHAKE(BUFFER_HANDSHAKE)
-) i_pipereg_fd (
-.g_clk   (g_clk             ) , // global clock
-.g_resetn(g_resetn          ) , // synchronous reset
-.i_data  (s0_pipe_in        ) , // Input data from stage N
-.i_valid (s0_valid          ) , // Input data valid?
-.o_busy  (s0_s1_busy        ) , // Stage N+1 ready to continue?
-.mr_data (mr_s1_data        ) , // Most recent data into the stage.
-.flush   (fd_flush          ) , // Flush the contents of the pipeline
-.o_data  (s1_pipe_out       ) , // Output data for stage N+1
-.o_valid (s1_valid          ) , // Input data from stage N valid?
-.i_busy  (s1_s1_busy        )   // Stage N+1 ready to continue?
+frv_pipeline_front i_pipeline_front(
+.g_clk       (g_clk       ), // global clock
+.g_resetn    (g_resetn    ), // synchronous reset
+.cf_req      (cf_req      ), // Control flow change request
+.cf_target   (cf_target   ), // Control flow change destination
+.cf_ack      (cf_ack      ), // Control flow change acknolwedge
+.flush       (flush_front ), // Flush stages.
+.imem_cen    (imem_cen    ), // Chip enable
+.imem_wen    (imem_wen    ), // Write enable
+.imem_error  (imem_error  ), // Error
+.imem_stall  (imem_stall  ), // Memory stall
+.imem_strb   (imem_strb   ), // Write strobe
+.imem_addr   (imem_addr   ), // Read/Write address
+.imem_rdata  (imem_rdata  ), // Read data
+.imem_wdata  (imem_wdata  ), // Write data
+.s2_p_valid  (s2_p_valid  ), // Pipeline control signals
+.s2_p_busy   (s2_p_busy   ), // Pipeline control signals
+.s2_rd       (s2_rd       ), // Destination register address
+.s2_rs1      (s2_rs1      ), // Source register address 1
+.s2_rs2      (s2_rs2      ), // Source register address 2
+.s2_imm      (s2_imm      ), // Decoded immediate
+.s2_pc       (s2_pc       ), // Program counter
+.s2_uop      (s2_uop      ), // Micro-op code
+.s2_fu       (s2_fu       ), // Functional Unit
+.s2_trap     (s2_trap     ), // Raise a trap?
+.s2_size     (s2_size     ), // Size of the instruction.
+.s2_instr    (s2_instr    )  // The instruction word.
 );
 
 endmodule

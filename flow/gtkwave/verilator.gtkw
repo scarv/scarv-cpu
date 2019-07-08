@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jul  7 18:06:21 2019
+[*] Mon Jul  8 18:03:36 2019
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.vcd"
-[dumpfile_mtime] "Sun Jul  7 18:05:20 2019"
-[dumpfile_size] 677218
+[dumpfile_mtime] "Mon Jul  8 18:03:01 2019"
+[dumpfile_size] 794375
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
-[timestart] 1
+[timestart] 33
 [size] 1920 1025
 [pos] -1 -1
-*-6.242557 90 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.583282 103 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -17,61 +17,158 @@
 [signals_width] 357
 [sst_expanded] 1
 [sst_vpaned_height] 301
-@800200
--Pipe - FETCH
 @28
-TOP.frv_core.i_pipeline.i_core_fetch.g_clk
-TOP.frv_core.i_pipeline.i_core_fetch.g_resetn
+TOP.frv_core.g_clk
+TOP.frv_core.g_resetn
 @800200
--Control Flow Change
-@28
-TOP.frv_core.i_pipeline.i_core_fetch.a_cf_change
-TOP.frv_core.i_pipeline.i_core_fetch.cf_ack
-TOP.frv_core.i_pipeline.i_core_fetch.cf_req
+-Instruction Memory
 @22
-TOP.frv_core.i_pipeline.i_core_fetch.cf_target[31:0]
+TOP.frv_core.imem_addr[31:0]
+@28
+TOP.frv_core.imem_cen
+TOP.frv_core.imem_error
+@22
+TOP.frv_core.imem_rdata[31:0]
+@28
+TOP.frv_core.imem_stall
+@22
+TOP.frv_core.imem_strb[3:0]
+TOP.frv_core.imem_wdata[31:0]
+@28
+TOP.frv_core.imem_wen
 @1000200
--Control Flow Change
+-Instruction Memory
+@c00200
+-Data Memory
+@22
+TOP.frv_core.dmem_addr[31:0]
+@28
+TOP.frv_core.dmem_cen
+TOP.frv_core.dmem_error
+@22
+TOP.frv_core.dmem_rdata[31:0]
+@28
+TOP.frv_core.dmem_stall
+@22
+TOP.frv_core.dmem_strb[3:0]
+TOP.frv_core.dmem_wdata[31:0]
+@28
+TOP.frv_core.dmem_wen
+@1401200
+-Data Memory
+@c00200
+-Interrupts
+@28
+TOP.frv_core.int_external
+TOP.frv_core.int_software
+@1401200
+-Interrupts
 @800200
--Events
+-Pipeline
 @28
-TOP.frv_core.i_pipeline.i_core_fetch.a_pipe_progress
-TOP.frv_core.i_pipeline.i_core_fetch.a_recv_16
-TOP.frv_core.i_pipeline.i_core_fetch.a_recv_32
-TOP.frv_core.i_pipeline.i_core_fetch.a_recv_error
-TOP.frv_core.i_pipeline.i_core_fetch.a_recv_word
-TOP.frv_core.i_pipeline.i_core_fetch.a_eat_2
-TOP.frv_core.i_pipeline.i_core_fetch.a_eat_4
-TOP.frv_core.i_pipeline.i_core_fetch.misaligned
-@22
-TOP.frv_core.i_pipeline.i_core_fetch.aux_buf[15:0]
-@1000200
--Events
+TOP.frv_core.i_pipeline.g_clk
+TOP.frv_core.i_pipeline.g_resetn
 @800200
--Instruction Memory Bus
-@22
-TOP.frv_core.i_pipeline.i_core_fetch.imem_addr[31:0]
+-Control FLow
 @28
-TOP.frv_core.i_pipeline.i_core_fetch.imem_cen
-TOP.frv_core.i_pipeline.i_core_fetch.imem_error
+TOP.frv_core.i_pipeline.cf_ack
+TOP.frv_core.i_pipeline.cf_req
 @22
-TOP.frv_core.i_pipeline.i_core_fetch.imem_rdata[31:0]
+TOP.frv_core.i_pipeline.cf_target[31:0]
 @28
-TOP.frv_core.i_pipeline.i_core_fetch.imem_stall
+TOP.frv_core.i_pipeline.flush_front
 @1000200
--Instruction Memory Bus
+-Control FLow
+@c00200
+-Instruction Memory
+@22
+TOP.frv_core.i_pipeline.imem_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.imem_cen
+TOP.frv_core.i_pipeline.imem_error
+@22
+TOP.frv_core.i_pipeline.imem_rdata[31:0]
+@28
+TOP.frv_core.i_pipeline.imem_stall
+@1401200
+-Instruction Memory
+@800200
+-Front end
+@22
+TOP.frv_core.i_pipeline.i_pipeline_front.d_data[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_front.d_error
+TOP.frv_core.i_pipeline.i_pipeline_front.fe_flush
+TOP.frv_core.i_pipeline.i_pipeline_front.fe_ready
+TOP.frv_core.i_pipeline.i_pipeline_front.fe_stall
+TOP.frv_core.i_pipeline.i_pipeline_front.flush
+@800200
+-Instruction Memory
+@22
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_cen
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_error
+@22
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_rdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_stall
+@22
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_strb[3:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_wdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_front.imem_wen
+@1000200
+-Instruction Memory
+@800200
+-Decoder Outputs
+@22
+TOP.frv_core.i_pipeline.i_pipeline_front.p_fu[4:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_imm[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_pc[31:0]
 @24
-TOP.frv_core.i_pipeline.i_core_fetch.buf_depth[1:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_rd[4:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_rs1[4:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_rs2[4:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_front.p_size[1:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_trap
 @22
-TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(0)[15:0]
-TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(1)[15:0]
-TOP.frv_core.i_pipeline.i_core_fetch.n_buffer(2)[15:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_uop[4:0]
 @2022
 ^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_core_fetch.d_prev_data[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_instr[31:0]
 @22
-TOP.frv_core.i_pipeline.i_core_fetch.d_prev_data[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_front.p_instr[31:0]
 @1000200
--Pipe - FETCH
+-Decoder Outputs
+-Front end
+@800200
+-Front-end Outputs
+@22
+TOP.frv_core.i_pipeline.s2_fu[4:0]
+TOP.frv_core.i_pipeline.s2_imm[31:0]
+@28
+TOP.frv_core.i_pipeline.s2_p_busy
+TOP.frv_core.i_pipeline.s2_p_valid
+@22
+TOP.frv_core.i_pipeline.s2_pc[31:0]
+@24
+TOP.frv_core.i_pipeline.s2_rd[4:0]
+TOP.frv_core.i_pipeline.s2_rs1[4:0]
+TOP.frv_core.i_pipeline.s2_rs2[4:0]
+@28
+TOP.frv_core.i_pipeline.s2_size[1:0]
+TOP.frv_core.i_pipeline.s2_trap
+@22
+TOP.frv_core.i_pipeline.s2_uop[4:0]
+@2023
+^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
+TOP.frv_core.i_pipeline.s2_instr[31:0]
+@22
+TOP.frv_core.i_pipeline.s2_instr[31:0]
+@1000200
+-Front-end Outputs
+-Pipeline
 [pattern_trace] 1
 [pattern_trace] 0

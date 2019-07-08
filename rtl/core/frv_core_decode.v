@@ -8,16 +8,19 @@
 //
 module frv_core_decode(
 
-input  wire             g_clk       , // global clock
-input  wire             g_resetn    , // synchronous reset
+input  wire [31:0] d_data       , // Data word to decode.
+input  wire        d_error      , // Is d_data associated with a fetch error?
 
-output wire [ RLEN-1:0] i_data      , // Input data to the decoder
-output wire             i_valid     , // Is fetch stage output valid? 
-input  wire             o_busy      , // Is the decode stage busy 
-
-output wire [ RLEN-1:0] o_data      , // Output data to dispatch
-output wire             o_valid     , // Is decode stage output valid? 
-input  wire             i_busy        // Is the dispatch stage busy 
+output wire [ 4:0] p_rd         , // Destination register address
+output wire [ 4:0] p_rs1        , // Source register address 1
+output wire [ 4:0] p_rs2        , // Source register address 2
+output wire [31:0] p_imm        , // Decoded immediate
+output wire [31:0] p_pc         , // Program counter
+output wire [ 4:0] p_uop        , // Micro-op code
+output wire [ 4:0] p_fu         , // Functional Unit (alu/mem/jump/mul/csr)
+output wire        p_trap       , // Raise a trap?
+output wire [ 1:0] p_size       , // Size of the instruction.
+output wire [31:0] p_instr        // The instruction word
 
 );
 
@@ -28,34 +31,11 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 `include "frv_common.vh"
 
 //
-// Input unpacking
-// -------------------------------------------------------------------------
-
-wire        fetch_error = i_data[       RLEN-1];
-wire        d_in_valid  = i_data[       RLEN-2];
-wire [31:0] d_data      = i_data[RLEN-3:     0];
-
-//
 // Instruction Decoding
 // -------------------------------------------------------------------------
 
 // Includes individual instruction decoding.
 `include "frv_core_decode.vh"
-
-
-//
-// Pipeline Field declarations
-// -------------------------------------------------------------------------
-
-wire  [ 4:0] p_rd  ; // Destination register address
-wire  [ 4:0] p_rs1 ; // Source register address 1
-wire  [ 4:0] p_rs2 ; // Source register address 2
-wire  [31:0] p_imm ; // Decoded immediate
-wire  [31:0] p_pc  ; // Program counter
-wire  [ 4:0] p_uop ; // Micro-op code
-wire  [ 4:0] p_fu  ; // Functional Unit (alu/mem/jump/mul/csr)
-wire         p_trap; // Raise a trap?
-wire  [ 1:0] p_size; // Size of the instruction.
 
 //
 // Functional Unit Decoding / Selection
@@ -106,6 +86,9 @@ wire       instr_32bit= d_data[1:0] == 2'b11;
 
 assign     p_size[0]  = instr_16bit;
 assign     p_size[1]  = instr_32bit;
+
+assign     p_instr    = instr_16bit ? {16'b0, d_data[15:0]} :
+                                      d_data                ;
 
 //
 // Micro-OP Decoding / Selection
@@ -420,10 +403,10 @@ assign p_imm =
 
 wire [5:0] trap_cause =
     invalid_instr   ? TRAP_IOPCODE  :
-    fetch_error     ? TRAP_IACCESS  :
+    d_error         ? TRAP_IACCESS  :
                       0             ;
 
-assign p_trap         = fetch_error || invalid_instr;
+assign p_trap         = d_error || invalid_instr;
 
 endmodule
 
