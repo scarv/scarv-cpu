@@ -68,13 +68,13 @@ wire         d_error                ; // Data was subject to an ifetch error.
 
 
 //
-// instance : frv_core_fetch
+// instance : frv_pipeline_fetch
 //
 //  Fetch pipeline stage.
 //
-frv_core_fetch #(
+frv_pipeline_fetch #(
 .FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
-) i_core_fetch (
+) i_pipeline_fetch (
 .g_clk          (g_clk          ), // global clock
 .g_resetn       (g_resetn       ), // synchronous reset
 .cf_req         (cf_req         ), // Control flow change
@@ -141,12 +141,12 @@ assign {
 } = p_pipe_output;
 
 //
-// instance : frv_core_decode
+// instance : frv_pipeline_decode
 //
 //  Decode stage of the CPU, responsible for turning RISC-V encoded
 //  instructions into wider pipeline encodings.
 //
-frv_core_decode i_core_decode (
+frv_pipeline_decode i_pipeline_decode (
 .d_data      (d_data      ), // Data word to decode.
 .d_error     (d_error     ), // Is d_data associated with a fetch error?
 .p_rd        (p_rd        ), // Destination register address

@@ -1,12 +1,12 @@
 
 
 //
-// module: frv_core_decode
+// module: frv_pipeline_decode
 //
 //  Decode stage of the CPU, responsible for turning RISC-V encoded
 //  instructions into wider pipeline encodings.
 //
-module frv_core_decode(
+module frv_pipeline_decode(
 
 input  wire [31:0] d_data       , // Data word to decode.
 input  wire        d_error      , // Is d_data associated with a fetch error?
@@ -35,7 +35,7 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // -------------------------------------------------------------------------
 
 // Includes individual instruction decoding.
-`include "frv_core_decode.vh"
+`include "frv_pipeline_decode.vh"
 
 //
 // Functional Unit Decoding / Selection

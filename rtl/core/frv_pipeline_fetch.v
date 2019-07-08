@@ -1,10 +1,10 @@
 
 //
-// module: frv_core_fetch
+// module: frv_pipeline_fetch
 //
 //  Fetch pipeline stage.
 //
-module frv_core_fetch (
+module frv_pipeline_fetch (
 
 input               g_clk           , // global clock
 input               g_resetn        , // synchronous reset
