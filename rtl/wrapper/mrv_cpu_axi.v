@@ -1,16 +1,19 @@
 
 //
-// module: mrv_cpu_axi
+// module: frv_cpu_axi
 //
-//  A wrapper around the mrv_cpu core module, which bridges the SRAM
+//  A wrapper around the frv_cpu core module, which bridges the SRAM
 //  memory interfaces with AXI bus interfaces.
 //
-module mrv_cpu_axi (
+module frv_cpu_axi (
 
 input               g_clk           , // global clock
 input               g_resetn        , // synchronous reset
 
-`ifdef FRV_VERIF_TRACE
+input  wire         int_external    , // External interrupt trigger line.
+input  wire         int_software    , // Software interrupt trigger line.
+
+`ifdef MRV_VERIF_TRACE
 output wire         trs_valid       , // Trace output valid.
 output wire [XL:0]  trs_pc          , // Trace program counter object.
 output wire [31:0]  trs_instr       , // Instruction traced out.
@@ -140,23 +143,15 @@ wire [31:0]  dsram_wdata      ; // Write data
 //
 // CPU core instance
 //
-mrv_cpu #(
+frv_core #(
 .BRAM_REGFILE         (BRAM_REGFILE         ),
-.FRV_PC_RESET_VALUE   (FRV_PC_RESET_VALUE   ),
-.CSR_MTVEC_RESET_VALUE(CSR_MTVEC_RESET_VALUE),
-.CSR_MVENDORID        (CSR_MVENDORID        ),
-.CSR_MARCHID          (CSR_MARCHID          ),
-.CSR_MIMPID           (CSR_MIMPID           ),
-.CSR_MHARTID          (CSR_MHARTID          ),
-.MMIO_BASE_ADDR       (MMIO_BASE_ADDR       ),
-.MMIO_BASE_MASK       (MMIO_BASE_MASK       ),
-.MMIO_MTIME_ADDR      (MMIO_MTIME_ADDR      ),
-.MMIO_MTIMECMP_ADDR   (MMIO_MTIMECMP_ADDR   ),
-.MMIO_MTIMECMP_RESET  (MMIO_MTIMECMP_RESET  ) 
-) i_mrv_cpu (
+.FRV_PC_RESET_VALUE   (FRV_PC_RESET_VALUE   ) 
+) i_frv_cpu (
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset
-`ifdef FRV_VERIF_TRACE
+.int_external    (int_external    ), // External interrupt trigger line.
+.int_software    (int_software    ), // Software interrupt trigger line.
+`ifdef MRV_VERIF_TRACE
 .trs_valid       (trs_valid       ), // Trace output valid.
 .trs_pc          (trs_pc          ), // Trace program counter object.
 .trs_instr       (trs_instr       ), // Instruction traced out.

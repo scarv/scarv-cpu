@@ -24,9 +24,9 @@ input  wire [ 1:0] s2_size         , // Size of the instruction.
 input  wire [31:0] s2_instr        , // The instruction word
 
 input  wire        flush           , // Flush this pipeline stage.
-output wire [ 4:0] s4_rd           , // Writeback stage destination reg.
-output wire        s4_load         , // Writeback stage has load in it.
-output wire        s4_csr          , // Writeback stage has CSR op in it.
+input  wire [ 4:0] s4_rd           , // Writeback stage destination reg.
+input  wire        s4_load         , // Writeback stage has load in it.
+input  wire        s4_csr          , // Writeback stage has CSR op in it.
 
 input  wire        gpr_wen         , // GPR write enable.
 input  wire [ 4:0] gpr_rd          , // GPR destination register.
@@ -51,6 +51,17 @@ output wire        s3_p_valid        // Is this input valid?
 `include "frv_common.vh"
 
 // -------------------------------------------------------------------------
+
+wire [ 4:0] n_s3_rd      = s2_rd    ; // Destination register address
+wire [31:0] n_s3_pc      = s2_pc    ; // Program counter
+wire [ 4:0] n_s3_uop     = s2_uop   ; // Micro-op code
+wire [ 4:0] n_s3_fu      = s2_fu    ; // Functional Unit
+wire [ 1:0] n_s3_size    = s2_size  ; // Size of the instruction.
+wire [31:0] n_s3_instr   = s2_instr ; // The instruction word
+wire [XL:0] n_s3_opr_a              ; // Operand A
+wire [XL:0] n_s3_opr_b              ; // Operand B
+wire [XL:0] n_s3_opr_c              ; // Operand C
+wire        n_s3_trap               ; // Raise a trap?
 
 
 endmodule
