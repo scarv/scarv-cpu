@@ -93,11 +93,6 @@ wire        s2_trap    ; // Raise a trap?
 wire [ 1:0] s2_size    ; // Size of the instruction.
 wire [31:0] s2_instr   ; // The instruction word
 
-//
-// TEMPORARY assignments for bring-up
-assign cf_req   = 1'b0;
-assign cf_target= {XLEN{1'b0}};
-
 // -------------------------------------------------------------------------
 
 
@@ -133,6 +128,42 @@ frv_pipeline_front i_pipeline_front(
 .s2_trap     (s2_trap     ), // Raise a trap?
 .s2_size     (s2_size     ), // Size of the instruction.
 .s2_instr    (s2_instr    )  // The instruction word.
+);
+
+
+//
+// instance: frv_pipeline_back
+//
+//  The backend of the instruction execution pipeline. Responsible for
+//  gathering instruction operands, dispatching them to execute and
+//  writing back their results.
+//
+frv_pipeline_back i_pipeline_back(
+.g_clk        (g_clk        ), // global clock
+.g_resetn     (g_resetn     ), // synchronous reset
+.s2_p_busy    (s2_p_busy    ), // Can this stage accept new inputs?
+.s2_p_valid   (s2_p_valid   ), // Is this input valid?
+.s2_rd        (s2_rd        ), // Destination register address
+.s2_rs1       (s2_rs1       ), // Source register address 1
+.s2_rs2       (s2_rs2       ), // Source register address 2
+.s2_imm       (s2_imm       ), // Decoded immediate
+.s2_pc        (s2_pc        ), // Program counter
+.s2_uop       (s2_uop       ), // Micro-op code
+.s2_fu        (s2_fu        ), // Functional Unit
+.s2_trap      (s2_trap      ), // Raise a trap?
+.s2_size      (s2_size      ), // Size of the instruction.
+.s2_instr     (s2_instr     ), // The instruction word
+.cf_req       (cf_req       ), // Control flow change request
+.cf_target    (cf_target    ), // Control flow change target
+.cf_ack       (cf_ack       ), // Control flow change acknowledge.
+.dmem_cen     (dmem_cen     ), // Chip enable
+.dmem_wen     (dmem_wen     ), // Write enable
+.dmem_error   (dmem_error   ), // Error
+.dmem_stall   (dmem_stall   ), // Memory stall
+.dmem_strb    (dmem_strb    ), // Write strobe
+.dmem_addr    (dmem_addr    ), // Read/Write address
+.dmem_rdata   (dmem_rdata   ), // Read data
+.dmem_wdata   (dmem_wdata   )  // Write data
 );
 
 endmodule
