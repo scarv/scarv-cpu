@@ -50,6 +50,12 @@ end else begin
     reg [RLEN-1:0] b_data;
     reg            b_full;
 
+    reg            ro_busy ;
+    reg            ro_valid;
+    
+    assign o_busy  = ro_busy ;
+    assign o_valid = ro_valid;
+
     assign mr_data = b_full ? b_data : o_data;
 
     always @(posedge g_clk) begin
@@ -57,15 +63,15 @@ end else begin
         if(!g_resetn) begin
             
             b_full  <= 0;
-            o_busy  <= 0;
-            o_valid <= 0;
+            ro_busy  <= 0;
+            ro_valid <= 0;
             o_data  <= 0;
 
         end else if(flush) begin
 
             b_full  <= 0;
-            o_busy  <= 0;
-            o_valid <= 0;
+            ro_busy  <= 0;
+            ro_valid <= 0;
             o_data  <= 0;
 
         end else if(!i_busy) begin
@@ -77,48 +83,48 @@ end else begin
                 
                 // Nothing in the buffer, so propagate previous stage to
                 // next stage directly.
-                o_valid <= i_valid;
+                ro_valid <= i_valid;
                 o_data  <= i_data ;
 
             end else begin
                     
                 // Propagate buffered content to the next stage.
-                o_valid <= 1'b1;
+                ro_valid <= 1'b1;
                 o_data  <= b_data;
 
             end
 
             // Clear the stall condition
-            o_busy <= 1'b0;
+            ro_busy <= 1'b0;
 
             // Declare the buffer empty.
             b_full <= 1'b0;
 
-        end else if(!o_valid) begin
+        end else if(!ro_valid) begin
             
             // This stage is empty. n_busy = 1'b1
 
             // We can't be busy, as there's no data to work on.
-            o_busy  <= 1'b0;
+            ro_busy  <= 1'b0;
 
             // Propagate previous stage inputs to next stage outputs.
-            o_valid <= i_valid;
+            ro_valid <= i_valid;
             o_data  <= i_data;
 
             // Buffer is empty.
             b_full  <= 1'b0;
 
 
-        end else if(i_valid && !o_busy) begin
+        end else if(i_valid && !ro_busy) begin
             
             // Next stage is busy with data, and this stage is recieving
             // something.
-            // n_busy = 1'b1, o_valid = 1'b1
+            // n_busy = 1'b1, ro_valid = 1'b1
 
             // The buffer will fill up now, since the next stage is busy
             // and the previous stage is also sending us new data.
-            b_full  <= i_valid && o_valid;
-            o_busy  <= i_valid && o_valid;
+            b_full  <= i_valid && ro_valid;
+            ro_busy  <= i_valid && ro_valid;
 
         end
 

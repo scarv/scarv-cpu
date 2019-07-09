@@ -8,6 +8,7 @@
 //
 module frv_pipeline_decode(
 
+input  wire        d_valid      , // Is the input data valid?
 input  wire [31:0] d_data       , // Data word to decode.
 input  wire        d_error      , // Is d_data associated with a fetch error?
 
@@ -81,8 +82,8 @@ wire [4:0] dec_rs1_32 = d_data[19:15];
 wire [4:0] dec_rs2_32 = d_data[24:20];
 wire [4:0] dec_rd_32  = d_data[11: 7];
 
-wire       instr_16bit= d_data[1:0] != 2'b11;
-wire       instr_32bit= d_data[1:0] == 2'b11;
+wire       instr_16bit= d_data[1:0] != 2'b11 && d_valid;
+wire       instr_32bit= d_data[1:0] == 2'b11 && d_valid;
 
 assign     p_size[0]  = instr_16bit;
 assign     p_size[1]  = instr_32bit;
@@ -406,7 +407,7 @@ wire [5:0] trap_cause =
     d_error         ? TRAP_IACCESS  :
                       0             ;
 
-assign p_trap         = d_error || invalid_instr;
+assign p_trap         = d_valid && (d_error || invalid_instr);
 
 endmodule
 

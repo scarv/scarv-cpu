@@ -43,7 +43,11 @@ output wire [     31:0] s2_instr      // The instruction word.
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
+// Width in bits of the front-end output pipeline register
 parameter FRONT_PIPE_REG_WIDTH = 124;
+
+// Use a buffered handshake for the front-end output pipeline register.
+parameter FRONT_PIPE_REG_BUFFERED = 1;
 
 // Common core parameters and constants
 `include "frv_common.vh"
@@ -147,6 +151,7 @@ assign {
 //  instructions into wider pipeline encodings.
 //
 frv_pipeline_decode i_pipeline_decode (
+.d_valid     (fe_ready    ), // Is the input data valid.
 .d_data      (d_data      ), // Data word to decode.
 .d_error     (d_error     ), // Is d_data associated with a fetch error?
 .p_rd        (p_rd        ), // Destination register address
@@ -167,7 +172,8 @@ frv_pipeline_decode i_pipeline_decode (
 //  Represents a single pipeline stage register in the CPU core.
 //
 frv_pipeline_register #(
-.RLEN(FRONT_PIPE_REG_WIDTH)
+.RLEN(FRONT_PIPE_REG_WIDTH),
+.BUFFER_HANDSHAKE(FRONT_PIPE_REG_BUFFERED)
 ) i_core_front_register (
 .g_clk    (g_clk            ), // global clock
 .g_resetn (g_resetn         ), // synchronous reset
