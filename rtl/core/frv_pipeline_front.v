@@ -35,6 +35,7 @@ output wire [     31:0] s2_pc       , // Program counter
 output wire [      4:0] s2_uop      , // Micro-op code
 output wire [      4:0] s2_fu       , // Functional Unit
 output wire             s2_trap     , // Raise a trap?
+output wire [      7:0] s2_opr_src  , // Operand sources for dispatch stage.
 output wire [      1:0] s2_size     , // Size of the instruction.
 output wire [     31:0] s2_instr      // The instruction word.
 
@@ -44,7 +45,7 @@ output wire [     31:0] s2_instr      // The instruction word.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
 // Width in bits of the front-end output pipeline register
-parameter FRONT_PIPE_REG_WIDTH = 124;
+parameter FRONT_PIPE_REG_WIDTH = 132;
 
 // Use a buffered handshake for the front-end output pipeline register.
 parameter FRONT_PIPE_REG_BUFFERED = 1;
@@ -115,6 +116,7 @@ wire [31:0] p_pc         ; // Program counter
 wire [ 4:0] p_uop        ; // Micro-op code
 wire [ 4:0] p_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
 wire        p_trap       ; // Raise a trap?
+wire [ 7:0] p_opr_src    ; // Operand sources for dispatch stage.
 wire [ 1:0] p_size       ; // Size of the instruction.
 wire [31:0] p_instr      ; // The instruction word
 
@@ -127,6 +129,7 @@ assign p_pipe_input = {
     p_uop        , // Micro-op code
     p_fu         , // Functional Unit (alu/mem/jump/mul/csr)
     p_trap       , // Raise a trap?
+    p_opr_src    , // Operand sources for dispatch stage.
     p_size       , // Size of the instruction.
     p_instr        // The instruction word
 };
@@ -140,6 +143,7 @@ assign {
     s2_uop        , // Micro-op code
     s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
     s2_trap       , // Raise a trap?
+    s2_opr_src    , // Operand sources for dispatch stage.
     s2_size       , // Size of the instruction.
     s2_instr        // The instruction word
 } = p_pipe_output;
@@ -162,6 +166,7 @@ frv_pipeline_decode i_pipeline_decode (
 .p_uop       (p_uop       ), // Micro-op code
 .p_fu        (p_fu        ), // Functional Unit (alu/mem/jump/mul/csr)
 .p_trap      (p_trap      ), // Raise a trap?
+.p_opr_src   (p_opr_src   ), // Operand sources for dispatch stage.
 .p_size      (p_size      ), // Size of the instruction.
 .p_instr     (p_instr     )  // The instruction word.
 );

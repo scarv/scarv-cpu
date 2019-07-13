@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Jul  9 17:00:53 2019
+[*] Sat Jul 13 10:49:19 2019
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.vcd"
-[dumpfile_mtime] "Tue Jul  9 16:59:42 2019"
-[dumpfile_size] 1132992
+[dumpfile_mtime] "Sat Jul 13 10:48:03 2019"
+[dumpfile_size] 1163338
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
@@ -133,6 +133,7 @@ TOP.frv_core.i_pipeline.i_pipeline_front.p_rs2[4:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_front.p_size[1:0]
 TOP.frv_core.i_pipeline.i_pipeline_front.p_trap
+TOP.frv_core.i_pipeline.i_pipeline_front.p_opr_src[7:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_front.p_uop[4:0]
 @2022
@@ -161,6 +162,7 @@ TOP.frv_core.i_pipeline.s2_rs2[4:0]
 @28
 TOP.frv_core.i_pipeline.s2_size[1:0]
 TOP.frv_core.i_pipeline.s2_trap
+TOP.frv_core.i_pipeline.i_pipeline_front.s2_opr_src[7:0]
 @22
 TOP.frv_core.i_pipeline.s2_uop[4:0]
 @2022
@@ -179,8 +181,9 @@ TOP.frv_core.i_pipeline.i_pipeline_back.g_clk
 TOP.frv_core.i_pipeline.i_pipeline_back.g_resetn
 @800200
 -Control Flow
-@28
+@29
 TOP.frv_core.i_pipeline.i_pipeline_back.cf_ack
+@28
 TOP.frv_core.i_pipeline.i_pipeline_back.cf_req
 @22
 TOP.frv_core.i_pipeline.i_pipeline_back.cf_target[31:0]
@@ -212,14 +215,14 @@ TOP.frv_core.i_pipeline.i_pipeline_back.flush_execute
 TOP.frv_core.i_pipeline.i_pipeline_back.flush_writeback
 @1401200
 -Stage Flushing
-@c00201
+@c00200
 -GPRs and Forwarding
 @22
 TOP.frv_core.i_pipeline.i_pipeline_back.gpr_rd[4:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.gpr_wdata[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_back.gpr_wen
-@1401201
+@1401200
 -GPRs and Forwarding
 @1000200
 -Backend

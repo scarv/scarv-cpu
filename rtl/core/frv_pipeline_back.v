@@ -21,6 +21,7 @@ input  wire [31:0] s2_pc           , // Program counter
 input  wire [ 4:0] s2_uop          , // Micro-op code
 input  wire [ 4:0] s2_fu           , // Functional Unit
 input  wire        s2_trap         , // Raise a trap?
+output wire [ 7:0] s2_opr_src      , // Operand sources for dispatch stage.
 input  wire [ 1:0] s2_size         , // Size of the instruction.
 input  wire [31:0] s2_instr        , // The instruction word
 

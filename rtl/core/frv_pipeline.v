@@ -90,6 +90,7 @@ wire [31:0] s2_pc      ; // Program counter
 wire [ 4:0] s2_uop     ; // Micro-op code
 wire [ 4:0] s2_fu      ; // Functional Unit
 wire        s2_trap    ; // Raise a trap?
+wire [ 7:0] s2_opr_src ; // Operand sources for dispatch stage.
 wire [ 1:0] s2_size    ; // Size of the instruction.
 wire [31:0] s2_instr   ; // The instruction word
 
@@ -126,6 +127,7 @@ frv_pipeline_front i_pipeline_front(
 .s2_uop      (s2_uop      ), // Micro-op code
 .s2_fu       (s2_fu       ), // Functional Unit
 .s2_trap     (s2_trap     ), // Raise a trap?
+.s2_opr_src  (s2_opr_src  ), // Operand sources for dispatch stage.
 .s2_size     (s2_size     ), // Size of the instruction.
 .s2_instr    (s2_instr    )  // The instruction word.
 );
@@ -151,6 +153,7 @@ frv_pipeline_back i_pipeline_back(
 .s2_uop       (s2_uop       ), // Micro-op code
 .s2_fu        (s2_fu        ), // Functional Unit
 .s2_trap      (s2_trap      ), // Raise a trap?
+.s2_opr_src   (s2_opr_src   ), // Operand sources for dispatch stage.
 .s2_size      (s2_size      ), // Size of the instruction.
 .s2_instr     (s2_instr     ), // The instruction word
 .cf_req       (cf_req       ), // Control flow change request

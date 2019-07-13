@@ -20,6 +20,7 @@ output wire [31:0] p_pc         , // Program counter
 output wire [ 4:0] p_uop        , // Micro-op code
 output wire [ 4:0] p_fu         , // Functional Unit (alu/mem/jump/mul/csr)
 output wire        p_trap       , // Raise a trap?
+output wire [ 7:0] p_opr_src    , // Operand sources for dispatch stage.
 output wire [ 1:0] p_size       , // Size of the instruction.
 output wire [31:0] p_instr        // The instruction word
 
@@ -397,6 +398,71 @@ assign p_imm =
     {32{use_imm_csr   }} & {imm_csr_a, 20'b0} |
     {32{dec_fence_i   }} & 32'd4        |
     {32{use_imm_shfi  }} & {27'b0, d_data[24:20]} ;
+
+//
+// Operand Sourcing.
+// -------------------------------------------------------------------------
+
+assign p_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
+    dec_add        || dec_addi       || dec_c_add      || dec_c_addi     ||
+    dec_c_addi16sp || dec_c_addi4spn || dec_c_mv       || dec_c_sub      ||
+    dec_sub        || dec_and        || dec_andi       || dec_c_and      ||
+    dec_c_andi     || dec_or         || dec_ori        || dec_c_or       ||
+    dec_c_xor      || dec_xor        || dec_xori       || dec_slt        ||
+    dec_slti       || dec_sltu       || dec_sltiu      || dec_sra        ||
+    dec_srai       || dec_c_srai     || dec_c_srli     || dec_srl        ||
+    dec_srli       || dec_sll        || dec_slli       || dec_c_slli     ||
+    dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
+    dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
+    dec_c_jr       || dec_jal        || dec_c_jalr     || dec_jalr       ||
+    dec_lb         || dec_lbu        || dec_lh         || dec_lhu        ||
+    dec_lw         || dec_c_lw       || dec_c_lwsp     || dec_c_sw       ||
+    dec_c_swsp     || dec_sb         || dec_sh         || dec_sw         ||
+    dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
+    dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
+    dec_mulhu      || dec_rem        || dec_remu       ;
+
+assign p_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
+    dec_auipc       ;
+
+assign p_opr_src[DIS_OPRA_CSRI] = // Operand A sources CSR mask immediate
+    dec_csrrci     || dec_csrrsi     || dec_csrrwi     ;
+
+
+assign p_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
+    dec_add        || dec_c_add      || dec_c_addi16sp || dec_c_addi4spn ||
+    dec_c_sub      || dec_sub        || dec_and        || dec_c_and      ||
+    dec_or         || dec_c_or       || dec_c_xor      || dec_xor        ||
+    dec_slt        || dec_sltu       || dec_sra        || dec_srl        ||
+    dec_sll        || dec_beq        || dec_c_beqz     || dec_bge        ||
+    dec_bgeu       || dec_blt        || dec_bltu       || dec_bne        ||
+    dec_c_bnez     || dec_div        || dec_divu       || dec_mul        ||
+    dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
+    dec_remu        ;
+
+assign p_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
+    dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
+    dec_lui        || dec_c_li       || dec_c_lui      || dec_ori        ||
+    dec_xori       || dec_slti       || dec_sltiu      || dec_srai       ||
+    dec_c_srai     || dec_c_srli     || dec_srli       || dec_slli       ||
+    dec_c_slli     || dec_jal        || dec_jalr       || dec_lb         ||
+    dec_lbu        || dec_lh         || dec_lhu        || dec_lw         ||
+    dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
+    dec_sb         || dec_sh         || dec_sw          ;
+
+
+assign p_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
+    dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
+    dec_sw          ;
+
+assign p_opr_src[DIS_OPRC_CSRA] = // Operand C sources CSR address immediate
+    dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
+    dec_csrrw      || dec_csrrwi      ;
+
+assign p_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
+    dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
+    dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
+    dec_c_j        || dec_c_jal       ;
 
 //
 // Trap catching

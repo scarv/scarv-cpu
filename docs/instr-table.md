@@ -1,8 +1,6 @@
 
 # Instruction Table
 
----
-
 **Integer ALU Instructions:**
 
 Instruction  | Action                   | uOP code
@@ -112,4 +110,118 @@ Instruction  | Action                   | uOP code
 `mulhu      `| rd <= rs1 * rs2          | {01, 101}
 `rem        `| rd <= rs1 % rs2          | {10, 000}
 `remu       `| rd <= rs1 % rs2          | {10, 001}
+
+---
+
+# Dispatch Stage Operand Assignment.
+
+**Integer ALU Instructions:**
+
+Instruction  | `opr_a`      | `opr_b`       | `opr_c`
+-------------|--------------|---------------|-----------------
+`add        `|  rs1         |  rs2          |  0
+`addi       `|  rs1         |  imm          |  0
+`c_add      `|  rs1         |  rs2          |  0
+`c_addi     `|  rs1         |  imm          |  0
+`c_addi16sp `|  rs1         |  rs2          |  0
+`c_addi4spn `|  rs1         |  rs2          |  0
+`c_mv       `|  rs1         |  0            |  0
+`auipc      `|  PC+imm      |  0            |  0
+`c_sub      `|  rs1         |  rs2          |  0
+`sub        `|  rs1         |  rs2          |  0
+`and        `|  rs1         |  rs2          |  0
+`andi       `|  rs1         |  imm          |  0
+`c_and      `|  rs1         |  rs2          |  0
+`c_andi     `|  rs1         |  imm          |  0
+`lui        `|  0           |  imm          |  0
+`c_li       `|  0           |  imm          |  0
+`c_lui      `|  0           |  imm          |  0
+`c_nop      `|  0           |  0            |  0
+`or         `|  rs1         |  rs2          |  0
+`ori        `|  rs1         |  imm          |  0
+`c_or       `|  rs1         |  rs2          |  0
+`c_xor      `|  rs1         |  rs2          |  0
+`xor        `|  rs1         |  rs2          |  0
+`xori       `|  rs1         |  imm          |  0
+`slt        `|  rs1         |  rs2          |  0
+`slti       `|  rs1         |  imm          |  0
+`sltu       `|  rs1         |  rs2          |  0
+`sltiu      `|  rs1         |  imm          |  0
+`sra        `|  rs1         |  rs2          |  0
+`srai       `|  rs1         |  imm          |  0
+`c_srai     `|  rs1         |  imm          |  0
+`c_srli     `|  rs1         |  imm          |  0
+`srl        `|  rs1         |  rs2          |  0
+`srli       `|  rs1         |  imm          |  0
+`sll        `|  rs1         |  rs2          |  0
+`slli       `|  rs1         |  imm          |  0
+`c_slli     `|  rs1         |  imm          |  0
+
+
+**Control Flow Instructions:**
+
+Instruction  | `opr_a`      | `opr_b`       | `opr_c`
+-------------|--------------|---------------|-----------------
+`beq        `|  rs1         |  rs2          | PC+imm
+`c_beqz     `|  rs1         |  rs2          | PC+imm
+`bge        `|  rs1         |  rs2          | PC+imm
+`bgeu       `|  rs1         |  rs2          | PC+imm
+`blt        `|  rs1         |  rs2          | PC+imm
+`bltu       `|  rs1         |  rs2          | PC+imm
+`bne        `|  rs1         |  rs2          | PC+imm
+`c_bnez     `|  rs1         |  rs2          | PC+imm
+`c_ebreak   `|  0           |  0            | 0
+`ebreak     `|  0           |  0            | 0
+`ecall      `|  0           |  0            | 0                  
+`c_j        `|  0           |  0            | PC+imm
+`c_jal      `|  0           |  0            | PC+imm
+`c_jr       `|  rs1         |  0            | 0
+`jal        `|  rs1         |  imm          | 0
+`c_jalr     `|  rs1         |  0            | 0
+`jalr       `|  rs1         |  imm          | 0
+`mret       `|  0           |  0            | 0
+
+
+**Memory Instructions:**
+
+Instruction  | `opr_a`      | `opr_b`       | `opr_c`
+-------------|--------------|---------------|-----------------
+`lb         `|  rs1         |  imm          | 0
+`lbu        `|  rs1         |  imm          | 0
+`lh         `|  rs1         |  imm          | 0
+`lhu        `|  rs1         |  imm          | 0
+`lw         `|  rs1         |  imm          | 0
+`c_lw       `|  rs1         |  imm          | 0
+`c_lwsp     `|  rs1         |  imm          | 0
+`c_sw       `|  rs1         |  imm          | rs2
+`c_swsp     `|  rs1         |  imm          | rs2
+`sb         `|  rs1         |  imm          | rs2
+`sh         `|  rs1         |  imm          | rs2
+`sw         `|  rs1         |  imm          | rs2
+
+
+**CSR Instructions:**
+
+Instruction  | `opr_a`      | `opr_b`       | `opr_c`
+-------------|--------------|---------------|-----------------
+`csrrc      `|  rs1         |  o            | csraddr
+`csrrci     `|  imm         |  o            | csraddr
+`csrrs      `|  rs1         |  o            | csraddr
+`csrrsi     `|  imm         |  o            | csraddr
+`csrrw      `|  rs1         |  o            | csraddr
+`csrrwi     `|  imm         |  o            | csraddr
+
+
+**Mul/Div Instructions:**
+
+Instruction  | `opr_a`      | `opr_b`       | `opr_c`
+-------------|--------------|---------------|-----------------
+`div        `|  rs1         |  rs2          | 0
+`divu       `|  rs1         |  rs2          | 0
+`mul        `|  rs1         |  rs2          | 0
+`mulh       `|  rs1         |  rs2          | 0
+`mulhsu     `|  rs1         |  rs2          | 0
+`mulhu      `|  rs1         |  rs2          | 0
+`rem        `|  rs1         |  rs2          | 0
+`remu       `|  rs1         |  rs2          | 0
 

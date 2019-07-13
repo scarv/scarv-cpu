@@ -72,6 +72,20 @@ localparam CSR_CLEAR    = 1;
 localparam CSR_SWAP     = 0;
 
 //
+// Dispatch stage operand register sources
+
+localparam DIS_OPRA_RS1 = 0;  // Operand A sources RS1
+localparam DIS_OPRA_PCIM= 1;  // Operand A sources PC+immediate
+localparam DIS_OPRA_CSRI= 2;  // Operand A sources CSR mask immediate
+
+localparam DIS_OPRB_RS2 = 3;  // Operand B sources RS2
+localparam DIS_OPRB_IMM = 4;  // Operand B sources immediate
+
+localparam DIS_OPRC_RS2 = 5;  // Operand C sources RS2
+localparam DIS_OPRC_CSRA= 6;  // Operand C sources CSR address immediate
+localparam DIS_OPRC_PCIM= 7;  // Operand C sources PC+immediate
+
+//
 // Exception codes
 // ------------------------------------------------------------------------
 //
