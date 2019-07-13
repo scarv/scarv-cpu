@@ -86,9 +86,11 @@ wire   dis_bubble   =
     ((               fwd_s4_csr) && (s2_rs1 == fwd_s4_rd || s2_rs2 == fwd_s4_rd))  ||
     ((fwd_s3_load || fwd_s3_csr) && (s2_rs1 == fwd_s3_rd || s2_rs2 == fwd_s3_rd))   ;
 
-assign s2_p_busy    = dis_bubble || s3_p_busy;
+wire      p_busy    ;
 
-assign s3_p_valid   = dis_bubble || s2_p_valid;
+assign s2_p_busy    = dis_bubble || p_busy;
+
+wire      p_valid   = dis_bubble || s2_p_valid;
 
 //
 // GPR data sourcing
@@ -165,6 +167,56 @@ frv_gprs i_gprs (
 .rd_wen     (gpr_wen    ), // Destination register write enable
 .rd_addr    (gpr_rd     ), // Destination register address
 .rd_data    (gpr_wdata  )  // Destination register write data
+);
+
+//
+// Pipeline Register
+// -------------------------------------------------------------------------
+
+localparam PIPE_REG_W = 178;
+
+wire [PIPE_REG_W-1:0] pipe_reg_out;
+
+wire [PIPE_REG_W-1:0] pipe_reg_in = {
+    n_s3_rd   ,
+    n_s3_pc   ,
+    n_s3_uop  ,
+    n_s3_fu   ,
+    n_s3_size ,
+    n_s3_instr,
+    n_s3_opr_a,
+    n_s3_opr_b,
+    n_s3_opr_c,
+    n_s3_trap 
+};
+
+assign {
+    s3_rd   ,
+    s3_pc   ,
+    s3_uop  ,
+    s3_fu   ,
+    s3_size ,
+    s3_instr,
+    s3_opr_a,
+    s3_opr_b,
+    s3_opr_c,
+    s3_trap 
+} = pipe_reg_out;
+
+frv_pipeline_register #(
+.RLEN(PIPE_REG_W),
+.BUFFER_HANDSHAKE(1'b0)
+) i_dispatch_pipe_reg(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (pipe_reg_in      ), // Input data from stage N
+.i_valid  (p_valid          ), // Input data valid?
+.o_busy   (p_busy           ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Most recent data into the stage.
+.flush    (flush            ), // Flush the contents of the pipeline
+.o_data   (pipe_reg_out     ), // Output data for stage N+1
+.o_valid  (s3_p_valid       ), // Input data from stage N valid?
+.i_busy   (s3_p_busy        )  // Stage N+1 ready to continue?
 );
 
 endmodule
