@@ -16,7 +16,6 @@ output wire [ 4:0] p_rd         , // Destination register address
 output wire [ 4:0] p_rs1        , // Source register address 1
 output wire [ 4:0] p_rs2        , // Source register address 2
 output wire [31:0] p_imm        , // Decoded immediate
-output wire [31:0] p_pc         , // Program counter
 output wire [ 4:0] p_uop        , // Micro-op code
 output wire [ 4:0] p_fu         , // Functional Unit (alu/mem/jump/mul/csr)
 output wire        p_trap       , // Raise a trap?
@@ -25,9 +24,6 @@ output wire [ 1:0] p_size       , // Size of the instruction.
 output wire [31:0] p_instr        // The instruction word
 
 );
-
-// Value taken by the PC on a reset.
-parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
 // Common core parameters and constants
 `include "frv_common.vh"

@@ -21,7 +21,7 @@ input  wire [31:0] s2_pc           , // Program counter
 input  wire [ 4:0] s2_uop          , // Micro-op code
 input  wire [ 4:0] s2_fu           , // Functional Unit
 input  wire        s2_trap         , // Raise a trap?
-output wire [ 7:0] s2_opr_src      , // Operand sources for dispatch stage.
+input  wire [ 7:0] s2_opr_src      , // Operand sources for dispatch stage.
 input  wire [ 1:0] s2_size         , // Size of the instruction.
 input  wire [31:0] s2_instr        , // The instruction word
 
@@ -64,9 +64,15 @@ wire        flush_dispatch  ; // Flush dispatch pipeline stage.
 wire        flush_execute   ; // Flush dispatch pipeline stage.
 wire        flush_writeback ; // Flush dispatch pipeline stage.
 
-wire [ 4:0] s4_rd           ; // Writeback stage destination reg.
-wire        s4_load         ; // Writeback stage has load in it.
-wire        s4_csr          ; // Writeback stage has CSR op in it.
+wire [ 4:0] fwd_s4_rd       ; // Writeback stage destination reg.
+wire [XL:0] fwd_s4_wdata    ; // Write data for writeback stage.
+wire        fwd_s4_load     ; // Writeback stage has load in it.
+wire        fwd_s4_csr      ; // Writeback stage has CSR op in it.
+
+wire [ 4:0] fwd_s3_rd       ; // Writeback stage destination reg.
+wire [XL:0] fwd_s3_wdata    ; // Write data for writeback stage.
+wire        fwd_s3_load     ; // Writeback stage has load in it.
+wire        fwd_s3_csr      ; // Writeback stage has CSR op in it.
 
 wire        gpr_wen         ; // GPR write enable.
 wire [ 4:0] gpr_rd          ; // GPR destination register.
@@ -108,12 +114,18 @@ frv_pipeline_dispatch i_pipeline_dispatch (
 .s2_uop          (s2_uop          ), // Micro-op code
 .s2_fu           (s2_fu           ), // Functional Unit
 .s2_trap         (s2_trap         ), // Raise a trap?
+.s2_opr_src      (s2_opr_src      ), // Operand sourcing.
 .s2_size         (s2_size         ), // Size of the instruction.
 .s2_instr        (s2_instr        ), // The instruction word
 .flush           (flush_dispatch  ), // Flush this pipeline stage.
-.s4_rd           (s4_rd           ), // Writeback stage destination reg.
-.s4_load         (s4_load         ), // Writeback stage has load in it.
-.s4_csr          (s4_csr          ), // Writeback stage has CSR op in it.
+.fwd_s4_rd       (fwd_s4_rd       ), // Writeback stage destination reg.
+.fwd_s4_wdata    (fwd_s4_wdata    ), // Write data for writeback stage.
+.fwd_s4_load     (fwd_s4_load     ), // Writeback stage has load in it.
+.fwd_s4_csr      (fwd_s4_csr      ), // Writeback stage has CSR op in it.
+.fwd_s3_rd       (fwd_s3_rd       ), // Writeback stage destination reg.
+.fwd_s3_wdata    (fwd_s3_wdata    ), // Write data for writeback stage.
+.fwd_s3_load     (fwd_s3_load     ), // Writeback stage has load in it.
+.fwd_s3_csr      (fwd_s3_csr      ), // Writeback stage has CSR op in it.
 .gpr_wen         (gpr_wen         ), // GPR write enable.
 .gpr_rd          (gpr_rd          ), // GPR destination register.
 .gpr_wdata       (gpr_wdata       ), // GPR write data.

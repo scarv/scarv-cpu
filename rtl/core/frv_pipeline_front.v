@@ -149,6 +149,30 @@ assign {
 } = p_pipe_output;
 
 //
+// Program Counter - Decode stage aligned
+// -------------------------------------------------------------------------
+
+reg  [XL:0] program_counter;
+wire [XL:0] n_program_counter;
+
+wire size_16 = p_size[0];
+wire size_32 = p_size[1];
+
+assign n_program_counter =
+    program_counter +
+    {29'b0, size_32, size_16, 1'b0};
+
+assign p_pc = program_counter;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        program_counter <= FRV_PC_RESET_VALUE   ;
+    end else begin
+        program_counter <= n_program_counter    ;
+    end
+end
+
+//
 // instance : frv_pipeline_decode
 //
 //  Decode stage of the CPU, responsible for turning RISC-V encoded
@@ -162,7 +186,6 @@ frv_pipeline_decode i_pipeline_decode (
 .p_rs1       (p_rs1       ), // Source register address 1
 .p_rs2       (p_rs2       ), // Source register address 2
 .p_imm       (p_imm       ), // Decoded immediate
-.p_pc        (p_pc        ), // Program counter
 .p_uop       (p_uop       ), // Micro-op code
 .p_fu        (p_fu        ), // Functional Unit (alu/mem/jump/mul/csr)
 .p_trap      (p_trap      ), // Raise a trap?
