@@ -222,7 +222,6 @@ Signal     | Size  | Description
 `rd`       |  5    | Destination register address
 `opr_a`    |  32   | Operand A
 `opr_b`    |  32   | Operand B
-`opr_c`    |  32   | Operand C
 `uop`      |  5    | Micro-op code
 `fu`       |  5    | Functional Unit (alu/mem/jump/mul/csr)
 `trap`     |  1    | Raise a trap?
