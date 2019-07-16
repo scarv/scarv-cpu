@@ -169,12 +169,14 @@ assign n_program_counter =
 
 assign p_pc = program_counter;
 
+wire progress_pc = s2_p_valid && !s2_p_busy;
+
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         program_counter <= FRV_PC_RESET_VALUE   ;
     end else if(cf_change_now) begin
         program_counter <= cf_target;
-    end else begin
+    end else if(progress_pc) begin
         program_counter <= n_program_counter    ;
     end
 end

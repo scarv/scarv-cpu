@@ -79,14 +79,13 @@ wire [4:0] dec_rs1_32 = d_data[19:15];
 wire [4:0] dec_rs2_32 = d_data[24:20];
 wire [4:0] dec_rd_32  = d_data[11: 7];
 
-wire       instr_16bit= d_data[1:0] != 2'b11 && d_valid;
-wire       instr_32bit= d_data[1:0] == 2'b11 && d_valid;
+wire       instr_16bit= d_data[1:0] != 2'b11;
+wire       instr_32bit= d_data[1:0] == 2'b11;
 
 assign     p_size[0]  = instr_16bit;
 assign     p_size[1]  = instr_32bit;
 
-assign     p_instr    = instr_16bit ? {16'b0, d_data[15:0]} :
-                                      d_data                ;
+assign     p_instr    = 32'b0;//instr_16bit ? {16'b0, d_data[15:0]} : d_data ;
 
 //
 // Micro-OP Decoding / Selection
@@ -260,21 +259,21 @@ wire [4:0] dec_rs2_16 =
 
 // Destination register, given a 16-bit instruction
 wire [4:0] dec_rd_16 = 
-    {5{dec_c_add     }} & {d_data[11:7]} |
-    {5{dec_c_addi    }} & {d_data[11:7]} |
     {5{dec_c_addi16sp}} & {REG_SP} |
     {5{dec_c_addi4spn}} & {2'b01, d_data[4:2]} |
     {5{dec_c_and     }} & {2'b01, d_data[9:7]} |
     {5{dec_c_andi    }} & {2'b01, d_data[9:7]} |
     {5{dec_c_jal     }} & {REG_RA} |
     {5{dec_c_jalr    }} & {REG_RA} |
+    {5{dec_c_add     }} & {d_data[11:7]} |
+    {5{dec_c_addi    }} & {d_data[11:7]} |
     {5{dec_c_li      }} & {d_data[11:7]} |
     {5{dec_c_lui     }} & {d_data[11:7]} |
-    {5{dec_c_lw      }} & {2'b01, d_data[4:2]} |
     {5{dec_c_lwsp    }} & {d_data[11:7]} |
     {5{dec_c_mv      }} & {d_data[11:7]} |
-    {5{dec_c_or      }} & {2'b01, d_data[9:7]} |
     {5{dec_c_slli    }} & {d_data[11:7]} |
+    {5{dec_c_lw      }} & {2'b01, d_data[4:2]} |
+    {5{dec_c_or      }} & {2'b01, d_data[9:7]} |
     {5{dec_c_srai    }} & {2'b01, d_data[9:7]} |
     {5{dec_c_srli    }} & {2'b01, d_data[9:7]} |
     {5{dec_c_sub     }} & {2'b01, d_data[9:7]} |
@@ -285,10 +284,9 @@ assign p_rs1 = instr_16bit ? dec_rs1_16 : dec_rs1_32;
 assign p_rs2 = instr_16bit ? dec_rs2_16 : dec_rs2_32;
 
 // Destination register address carries trap cause if need be.
-assign p_rd    = p_trap         ? trap_cause[4:0]   :
-                 instr_16bit    ? dec_rd_16         : 
-                 instr_32bit    ? dec_rd_32         :
-                                  0                 ;
+assign p_rd    = p_trap           ? trap_cause[4:0]   :
+                 {5{instr_16bit}} & dec_rd_16 | 
+                 {5{instr_32bit}} & dec_rd_32 ;
 
 //
 // Immediate Decoding
