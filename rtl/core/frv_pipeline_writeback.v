@@ -81,8 +81,7 @@ assign cf_target    =
 
 // CFU operation finished, but pipeline still stalled.
 reg     cfu_done;
-wire    n_cfu_done = (!pipe_progress && cfu_done) || 
-                     (!pipe_progress && cfu_finish_now) ;
+wire    n_cfu_done = !pipe_progress && (cfu_done || cfu_finish_now) ;
 
 // The CFU operation is complete and the pipeline can progress.
 wire    cfu_busy = fu_cfu && !(cfu_done || cfu_finish_now);
@@ -90,7 +89,7 @@ wire    cfu_busy = fu_cfu && !(cfu_done || cfu_finish_now);
 always @(posedge g_clk) if(!g_resetn) begin
     cfu_done <= 1'b0;
 end else begin
-    cfu_done <= 1'b1;
+    cfu_done <= n_cfu_done;
 end
 
 //

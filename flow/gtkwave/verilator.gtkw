@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Jul 16 16:53:38 2019
+[*] Tue Jul 16 17:46:42 2019
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.vcd"
-[dumpfile_mtime] "Tue Jul 16 16:51:50 2019"
-[dumpfile_size] 1033979
+[dumpfile_mtime] "Tue Jul 16 17:44:46 2019"
+[dumpfile_size] 4784184
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-6.982476 198 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.982476 1134 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -78,8 +78,6 @@ TOP.frv_core.i_pipeline.cf_ack
 TOP.frv_core.i_pipeline.cf_req
 @22
 TOP.frv_core.i_pipeline.cf_target[31:0]
-@28
-TOP.frv_core.i_pipeline.flush_front
 @1000200
 -Control FLow
 @c00200
@@ -104,7 +102,6 @@ TOP.frv_core.i_pipeline.i_pipeline_front.d_error
 TOP.frv_core.i_pipeline.i_pipeline_front.fe_flush
 TOP.frv_core.i_pipeline.i_pipeline_front.fe_ready
 TOP.frv_core.i_pipeline.i_pipeline_front.fe_stall
-TOP.frv_core.i_pipeline.i_pipeline_front.flush
 @800200
 -Instruction Memory
 @22
@@ -177,6 +174,8 @@ TOP.frv_core.i_pipeline.s2_instr[31:0]
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @1401200
 -Front-end Outputs
+@200
+-
 @800200
 -Backend
 @28
@@ -187,7 +186,7 @@ TOP.frv_core.i_pipeline.i_pipeline_back.g_resetn
 @28
 TOP.frv_core.i_pipeline.i_pipeline_back.cf_ack
 TOP.frv_core.i_pipeline.i_pipeline_back.cf_req
-@22
+@23
 TOP.frv_core.i_pipeline.i_pipeline_back.cf_target[31:0]
 @1000200
 -Control Flow
@@ -214,7 +213,6 @@ TOP.frv_core.i_pipeline.i_pipeline_back.dmem_wen
 @28
 TOP.frv_core.i_pipeline.i_pipeline_back.flush_dispatch
 TOP.frv_core.i_pipeline.i_pipeline_back.flush_execute
-TOP.frv_core.i_pipeline.i_pipeline_back.flush_writeback
 @1401200
 -Stage Flushing
 @c00200
@@ -385,9 +383,8 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_uop[4:0]
 -Execute
 @800200
 -Writeback
-@29
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_clk
 @28
+TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_clk
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_resetn
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.pipe_progress
 @800200
