@@ -91,6 +91,18 @@ wire [31:0] s3_instr        ; // The instruction word
 wire        s3_p_busy       ; // Can this stage accept new inputs?
 wire        s3_p_valid      ; // Is this input valid?
 
+wire [ 4:0] s4_rd           ; // Destination register address
+wire [XL:0] s4_opr_a        ; // Operand A
+wire [XL:0] s4_opr_b        ; // Operand B
+wire [31:0] s4_pc           ; // Program counter
+wire [ 4:0] s4_uop          ; // Micro-op code
+wire [ 4:0] s4_fu           ; // Functional Unit
+wire        s4_trap         ; // Raise a trap?
+wire [ 1:0] s4_size         ; // Size of the instruction.
+wire [31:0] s4_instr        ; // The instruction word
+wire        s4_p_busy       ; // Can this stage accept new inputs?
+wire        s4_p_valid      ; // Is this input valid?
+
 //
 // Sub-module instances.
 // -------------------------------------------------------------------------
@@ -141,6 +153,53 @@ frv_pipeline_dispatch i_pipeline_dispatch (
 .s3_instr        (s3_instr        ), // The instruction word
 .s3_p_busy       (s3_p_busy       ), // Can this stage accept new inputs?
 .s3_p_valid      (s3_p_valid      )  // Is this input valid?
+);
+
+
+//
+// instance: frv_pipeline_execute
+//
+//  Execute stage of the pipeline, responsible for ALU / LSU / Branch compare.
+//
+frv_pipeline_execute i_pipeline_execute (
+.g_clk          (g_clk          ) , // global clock
+.g_resetn       (g_resetn       ) , // synchronous reset
+.s3_rd          (s3_rd          ) , // Destination register address
+.s3_opr_a       (s3_opr_a       ) , // Operand A
+.s3_opr_b       (s3_opr_b       ) , // Operand B
+.s3_opr_c       (s3_opr_c       ) , // Operand C
+.s3_pc          (s3_pc          ) , // Program counter
+.s3_uop         (s3_uop         ) , // Micro-op code
+.s3_fu          (s3_fu          ) , // Functional Unit
+.s3_trap        (s3_trap        ) , // Raise a trap?
+.s3_size        (s3_size        ) , // Size of the instruction.
+.s3_instr       (s3_instr       ) , // The instruction word
+.s3_p_busy      (s3_p_busy      ) , // Can this stage accept new inputs?
+.s3_p_valid     (s3_p_valid     ) , // Is this input valid?
+.flush          (flush_execute  ) , // Flush this pipeline stage.
+.fwd_s3_rd      (fwd_s3_rd      ) , // Writeback stage destination reg.
+.fwd_s3_wdata   (fwd_s3_wdata   ) , // Write data for writeback stage.
+.fwd_s3_load    (fwd_s3_load    ) , // Writeback stage has load in it.
+.fwd_s3_csr     (fwd_s3_csr     ) , // Writeback stage has CSR op in it.
+.s4_rd          (s4_rd          ) , // Destination register address
+.s4_opr_a       (s4_opr_a       ) , // Operand A
+.s4_opr_b       (s4_opr_b       ) , // Operand B
+.s4_pc          (s4_pc          ) , // Program counter
+.s4_uop         (s4_uop         ) , // Micro-op code
+.s4_fu          (s4_fu          ) , // Functional Unit
+.s4_trap        (s4_trap        ) , // Raise a trap?
+.s4_size        (s4_size        ) , // Size of the instruction.
+.s4_instr       (s4_instr       ) , // The instruction word
+.s4_p_busy      (s4_p_busy      ) , // Can this stage accept new inputs?
+.s4_p_valid     (s4_p_valid     ) , // Is this input valid?
+.dmem_cen       (dmem_cen       ) , // Chip enable
+.dmem_wen       (dmem_wen       ) , // Write enable
+.dmem_error     (dmem_error     ) , // Error
+.dmem_stall     (dmem_stall     ) , // Memory stall
+.dmem_strb      (dmem_strb      ) , // Write strobe
+.dmem_addr      (dmem_addr      ) , // Read/Write address
+.dmem_rdata     (dmem_rdata     ) , // Read data
+.dmem_wdata     (dmem_wdata     )   // Write data
 );
 
 endmodule

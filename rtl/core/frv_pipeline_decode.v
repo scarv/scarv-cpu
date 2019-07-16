@@ -410,7 +410,7 @@ assign p_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_srli       || dec_sll        || dec_slli       || dec_c_slli     ||
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
     dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
-    dec_c_jr       || dec_jal        || dec_c_jalr     || dec_jalr       ||
+    dec_c_jr                         || dec_c_jalr     || dec_jalr       ||
     dec_lb         || dec_lbu        || dec_lh         || dec_lhu        ||
     dec_lw         || dec_c_lw       || dec_c_lwsp     || dec_c_sw       ||
     dec_c_swsp     || dec_sb         || dec_sh         || dec_sw         ||
@@ -441,7 +441,7 @@ assign p_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_lui        || dec_c_li       || dec_c_lui      || dec_ori        ||
     dec_xori       || dec_slti       || dec_sltiu      || dec_srai       ||
     dec_c_srai     || dec_c_srli     || dec_srli       || dec_slli       ||
-    dec_c_slli     || dec_jal        || dec_jalr       || dec_lb         ||
+    dec_c_slli                       || dec_jalr       || dec_lb         ||
     dec_lbu        || dec_lh         || dec_lhu        || dec_lw         ||
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
     dec_sb         || dec_sh         || dec_sw          ;
@@ -458,7 +458,7 @@ assign p_opr_src[DIS_OPRC_CSRA] = // Operand C sources CSR address immediate
 assign p_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
     dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
-    dec_c_j        || dec_c_jal       ;
+    dec_c_j        || dec_c_jal      || dec_jal         ;
 
 //
 // Trap catching

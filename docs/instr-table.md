@@ -175,8 +175,8 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `ecall      `|  0           |  0            | 0                  
 `c_j        `|  0           |  0            | PC+imm
 `c_jal      `|  0           |  0            | PC+imm
+`jal        `|  0           |  0            | PC+imm
 `c_jr       `|  rs1         |  0            | 0
-`jal        `|  rs1         |  imm          | 0
 `c_jalr     `|  rs1         |  0            | 0
 `jalr       `|  rs1         |  imm          | 0
 `mret       `|  0           |  0            | 0

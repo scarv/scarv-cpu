@@ -24,15 +24,20 @@ input  wire        s3_p_valid      , // Is this input valid?
 
 input  wire        flush           , // Flush this pipeline stage.
 
-input  wire [ 4:0] s4_rd           , // Destination register address
-input  wire [XL:0] s4_opr_a        , // Operand A
-input  wire [XL:0] s4_opr_b        , // Operand B
-input  wire [31:0] s4_pc           , // Program counter
-input  wire [ 4:0] s4_uop          , // Micro-op code
-input  wire [ 4:0] s4_fu           , // Functional Unit
-input  wire        s4_trap         , // Raise a trap?
-input  wire [ 1:0] s4_size         , // Size of the instruction.
-input  wire [31:0] s4_instr        , // The instruction word
+output wire [ 4:0] fwd_s3_rd       , // Writeback stage destination reg.
+output wire [XL:0] fwd_s3_wdata    , // Write data for writeback stage.
+output wire        fwd_s3_load     , // Writeback stage has load in it.
+output wire        fwd_s3_csr      , // Writeback stage has CSR op in it.
+
+output wire [ 4:0] s4_rd           , // Destination register address
+output wire [XL:0] s4_opr_a        , // Operand A
+output wire [XL:0] s4_opr_b        , // Operand B
+output wire [31:0] s4_pc           , // Program counter
+output wire [ 4:0] s4_uop          , // Micro-op code
+output wire [ 4:0] s4_fu           , // Functional Unit
+output wire        s4_trap         , // Raise a trap?
+output wire [ 1:0] s4_size         , // Size of the instruction.
+output wire [31:0] s4_instr        , // The instruction word
 input  wire        s4_p_busy       , // Can this stage accept new inputs?
 output wire        s4_p_valid      , // Is this input valid?
 
@@ -55,11 +60,11 @@ output wire [31:0] dmem_wdata        // Write data
 // Operation Decoding
 // -------------------------------------------------------------------------
 
-wire fu_alu = s3_fu[P_FU_ALU] && s3_p_valid;
-wire fu_mul = s3_fu[P_FU_MUL] && s3_p_valid;
-wire fu_lsu = s3_fu[P_FU_LSU] && s3_p_valid;
-wire fu_cfu = s3_fu[P_FU_CFU] && s3_p_valid;
-wire fu_csr = s3_fu[P_FU_CSR] && s3_p_valid;
+wire fu_alu = s3_fu[P_FU_ALU];
+wire fu_mul = s3_fu[P_FU_MUL];
+wire fu_lsu = s3_fu[P_FU_LSU];
+wire fu_cfu = s3_fu[P_FU_CFU];
+wire fu_csr = s3_fu[P_FU_CSR];
 
 //
 // Functional Unit Interfacing: ALU
@@ -95,6 +100,9 @@ wire [XL:0] alu_lhs         = s3_opr_a  ; // left hand operand
 wire [XL:0] alu_rhs         = s4_opr_b  ; // right hand operand
 wire [XL:0] alu_result                  ; // result of the ALU operation
 
+wire [XL:0] n_s4_opr_a_alu = alu_result;
+wire [XL:0] n_s4_opr_b_alu = 32'b0;
+
 //
 // Functional Unit Interfacing: LSU
 // -------------------------------------------------------------------------
@@ -114,36 +122,58 @@ wire        lsu_half   = s3_uop[2:1] == LSU_HALF;
 wire        lsu_word   = s3_uop[2:1] == LSU_WORD;
 wire        lsu_signed = s3_uop[LSU_SIGNED]  ;
 
+wire [XL:0] n_s4_opr_a_lsu = lsu_rdata ;
+wire [XL:0] n_s4_opr_b_lsu = 32'b0;
+
 //
 // Functional Unit Interfacing: CFU
 // -------------------------------------------------------------------------
 
-wire        cfu_valid  = fu_cfu         ; // Inputs are valid.
-wire        cfu_ready                   ; // Instruction complete.
+wire        cfu_valid   = fu_cfu        ; // Inputs are valid.
+wire        cfu_ready   = cfu_valid     ; // Instruction complete. TODO
+
+wire        cfu_cond    = cfu_valid && s3_uop[4:3] == 2'b00;
+wire        cfu_uncond  = cfu_valid && s3_uop[4:3] == 2'b10;
+wire        cfu_jali    = cfu_valid && s3_uop      == CFU_JALI;
+wire        cfu_jalr    = cfu_valid && s3_uop      == CFU_JALR;
+
+wire [XL:0] n_s4_opr_a_cfu = 
+    cfu_jalr    ? alu_add_result : s3_opr_c;
+
+wire [XL:0] n_s4_opr_b_cfu = 32'b0;
 
 //
 // Functional Unit Interfacing: MUL/DIV
 // -------------------------------------------------------------------------
 
 wire        mul_valid  = fu_mul         ; // Inputs are valid.
-wire        mul_ready                   ; // Instruction complete.
+wire        mul_ready  = mul_valid      ; // Instruction complete. TODO
+
+wire [XL:0] n_s4_opr_a_mul = 32'b0;
+wire [XL:0] n_s4_opr_b_mul = 32'b0;
 
 //
 // Functional Unit Interfacing: CSR
 // -------------------------------------------------------------------------
 
 wire        csr_valid  = fu_csr         ; // Inputs are valid.
-wire        csr_ready                   ; // Instruction complete.
+wire        csr_ready  = csr_valid      ; // Instruction complete. TODO
+
+wire [XL:0] n_s4_opr_a_csr = 32'b0;
+wire [XL:0] n_s4_opr_b_csr = 32'b0;
 
 //
 // Stalling / Pipeline Progression
 // -------------------------------------------------------------------------
 
 // Input into pipeline register, which then drives s4_p_valid;
-wire   p_valid = 1'b1;
+wire   p_valid   = s3_p_valid;
 
 // Is this stage currently busy?
-assign s3_p_busy = 1'b0;
+assign s3_p_busy = p_busy;
+
+// Is the next stage currently busy?
+wire   p_busy    ;
 
 //
 // Submodule instances
@@ -203,6 +233,81 @@ frv_lsu i_lsu (
 //
 // Pipeline Register
 // -------------------------------------------------------------------------
+
+localparam PIPE_REG_W = 146;
+
+wire [ 4:0] n_s4_rd    = s3_rd   ; // Destination register address
+wire [31:0] n_s4_pc    = s3_pc   ; // Program counter
+wire [ 4:0] n_s4_uop   = s3_uop  ; // Micro-op code
+wire [ 4:0] n_s4_fu    = s3_fu   ; // Functional Unit
+wire [ 1:0] n_s4_size  = s3_size ; // Size of the instruction.
+wire [31:0] n_s4_instr = s3_instr; // The instruction word
+
+wire        n_s4_trap  = 1'b0    ; // Raise a trap? TODO
+
+wire [XL:0] n_s4_opr_a = 
+    {XLEN{fu_alu}} & n_s4_opr_a_alu |
+    {XLEN{fu_mul}} & n_s4_opr_a_mul |
+    {XLEN{fu_lsu}} & n_s4_opr_a_lsu |
+    {XLEN{fu_cfu}} & n_s4_opr_a_cfu |
+    {XLEN{fu_csr}} & n_s4_opr_a_csr ;
+
+wire [XL:0] n_s4_opr_b =
+    {XLEN{fu_alu}} & n_s4_opr_b_alu |
+    {XLEN{fu_mul}} & n_s4_opr_b_mul |
+    {XLEN{fu_lsu}} & n_s4_opr_b_lsu |
+    {XLEN{fu_cfu}} & n_s4_opr_b_cfu |
+    {XLEN{fu_csr}} & n_s4_opr_b_csr ;
+
+
+// Forwaring / bubbling signals.
+assign fwd_s3_rd    = s3_rd             ; // Writeback stage destination reg.
+assign fwd_s3_wdata = n_s4_opr_a        ; // Write data for writeback stage.
+assign fwd_s3_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
+assign fwd_s3_csr   = fu_csr            ; // Writeback stage has CSR op in it.
+
+wire [PIPE_REG_W-1:0] pipe_reg_out;
+
+wire [PIPE_REG_W-1:0] pipe_reg_in = {
+    n_s4_rd           , // Destination register address
+    n_s4_opr_a        , // Operand A
+    n_s4_opr_b        , // Operand B
+    n_s4_pc           , // Program counter
+    n_s4_uop          , // Micro-op code
+    n_s4_fu           , // Functional Unit
+    n_s4_trap         , // Raise a trap?
+    n_s4_size         , // Size of the instruction.
+    n_s4_instr          // The instruction word
+};
+
+
+assign {
+    s4_rd             , // Destination register address
+    s4_opr_a          , // Operand A
+    s4_opr_b          , // Operand B
+    s4_pc             , // Program counter
+    s4_uop            , // Micro-op code
+    s4_fu             , // Functional Unit
+    s4_trap           , // Raise a trap?
+    s4_size           , // Size of the instruction.
+    s4_instr            // The instruction word
+} = pipe_reg_out;
+
+frv_pipeline_register #(
+.RLEN(PIPE_REG_W),
+.BUFFER_HANDSHAKE(1'b0)
+) i_dispatch_pipe_reg(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (pipe_reg_in      ), // Input data from stage N
+.i_valid  (p_valid          ), // Input data valid?
+.o_busy   (p_busy           ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Most recent data into the stage.
+.flush    (flush            ), // Flush the contents of the pipeline
+.o_data   (pipe_reg_out     ), // Output data for stage N+1
+.o_valid  (s4_p_valid       ), // Input data from stage N valid?
+.i_busy   (s4_p_busy        )  // Stage N+1 ready to continue?
+);
 
 endmodule
 

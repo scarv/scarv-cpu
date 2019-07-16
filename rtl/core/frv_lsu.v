@@ -35,6 +35,9 @@ output wire [31:0] dmem_wdata    // Write data
 
 );
 
+// Common core parameters and constants
+`include "frv_common.vh"
+
 assign lsu_ready = lsu_valid;
 assign lsu_rdata = 0;
 assign lsu_a_error = 0;

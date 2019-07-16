@@ -42,12 +42,14 @@ localparam CFU_BGEU     = {2'b00, 3'b011};
 localparam CFU_BLT      = {2'b00, 3'b100};
 localparam CFU_BLTU     = {2'b00, 3'b101};
 localparam CFU_BNE      = {2'b00, 3'b110};
-localparam CFU_EBREAK   = {2'b01, 3'b000};
-localparam CFU_ECALL    = {2'b01, 3'b000};
+localparam CFU_EBREAK   = {2'b01, 3'b001};
+localparam CFU_ECALL    = {2'b01, 3'b010};
+localparam CFU_MRET     = {2'b01, 3'b100};
 localparam CFU_JMP      = {2'b10, 3'b001};
 localparam CFU_JALI     = {2'b10, 3'b010};
 localparam CFU_JALR     = {2'b10, 3'b100};
-localparam CFU_MRET     = {2'b11, 3'b000};
+localparam CFU_TAKEN    = {2'b11, 3'b001};
+localparam CFU_NOT_TAKEN= {2'b11, 3'b001};
 
 localparam LSU_SIGNED   = 0;
 localparam LSU_LOAD     = 3;

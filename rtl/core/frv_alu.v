@@ -50,7 +50,7 @@ wire [  XL:0] adder_ci      = {{XL{1'b0}},alu_op_sub};
 
 wire [XLEN:0] adder_result  = adder_lhs + adder_rhs + adder_ci;
 
-assign alu_add_result       = adder_result;
+assign alu_add_result       = adder_result[XL:0];
 
 wire   alu_lt_signed        = $signed(alu_lhs) < $signed(alu_rhs);
 
