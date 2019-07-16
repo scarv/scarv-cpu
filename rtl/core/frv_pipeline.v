@@ -92,6 +92,25 @@ wire [ 7:0] s2_opr_src ; // Operand sources for dispatch stage.
 wire [ 1:0] s2_size    ; // Size of the instruction.
 wire [31:0] s2_instr   ; // The instruction word
 
+wire        csr_en     ; // CSR Access Enable
+wire        csr_wr     ; // CSR Write Enable
+wire        csr_wr_set ; // CSR Write - Set
+wire        csr_wr_clr ; // CSR Write - Clear
+wire [11:0] csr_addr   ; // Address of the CSR to access.
+wire [XL:0] csr_wdata  ; // Data to be written to a CSR
+wire [XL:0] csr_rdata  ; // CSR read data
+
+wire [XL:0] csr_mepc   ; // Current MEPC.
+wire [XL:0] csr_mtvec  ; // Current MTVEC.
+
+wire        exec_mret  ; // MRET instruction executed.
+
+wire        trap_cpu   ; // A trap occured due to CPU
+wire        trap_int   ; // A trap occured due to interrupt
+wire [ 5:0] trap_cause ; // Cause code for the trap.
+wire [XL:0] trap_mtval ; // Value associated with the trap.
+wire [XL:0] trap_pc    ; // PC value associated with the trap.
+
 // -------------------------------------------------------------------------
 
 
@@ -156,6 +175,11 @@ frv_pipeline_back i_pipeline_back(
 .cf_req       (cf_req       ), // Control flow change request
 .cf_target    (cf_target    ), // Control flow change target
 .cf_ack       (cf_ack       ), // Control flow change acknowledge.
+.trap_cpu     (trap_cpu     ), // A trap occured due to CPU
+.trap_int     (trap_int     ), // A trap occured due to interrupt
+.trap_cause   (trap_cause   ), // Cause of a trap.
+.trap_mtval   (trap_mtval   ), // Value associated with the trap.
+.trap_pc      (trap_pc      ), // PC value associated with the trap.
 .dmem_cen     (dmem_cen     ), // Chip enable
 .dmem_wen     (dmem_wen     ), // Write enable
 .dmem_error   (dmem_error   ), // Error
@@ -164,6 +188,31 @@ frv_pipeline_back i_pipeline_back(
 .dmem_addr    (dmem_addr    ), // Read/Write address
 .dmem_rdata   (dmem_rdata   ), // Read data
 .dmem_wdata   (dmem_wdata   )  // Write data
+);
+
+//
+// instance: frv_csrs
+//
+//  Responsible for keeping control/status registers up to date.
+//
+frv_csrs i_csrs (
+.g_clk            (g_clk            ), // global clock
+.g_resetn         (g_resetn         ), // synchronous reset
+.csr_en           (csr_en           ), // CSR Access Enable
+.csr_wr           (csr_wr           ), // CSR Write Enable
+.csr_wr_set       (csr_wr_set       ), // CSR Write - Set
+.csr_wr_clr       (csr_wr_clr       ), // CSR Write - Clear
+.csr_addr         (csr_addr         ), // Address of the CSR to access.
+.csr_wdata        (csr_wdata        ), // Data to be written to a CSR
+.csr_rdata        (csr_rdata        ), // CSR read data
+.csr_mepc         (csr_mepc         ), // Current MEPC.
+.csr_mtvec        (csr_mtvec        ), // Current MTVEC.
+.exec_mret        (exec_mret        ), // MRET instruction executed.
+.trap_cpu         (trap_cpu         ), // A trap occured due to CPU
+.trap_int         (trap_int         ), // A trap occured due to interrupt
+.trap_cause       (trap_cause       ), // Cause of a trap.
+.trap_mtval       (trap_mtval       ), // Value associated with the trap.
+.trap_pc          (trap_pc          )  // PC value associated with the trap.
 );
 
 endmodule

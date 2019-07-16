@@ -29,6 +29,12 @@ output wire        cf_req          , // Control flow change request
 output wire [XL:0] cf_target       , // Control flow change target
 input  wire        cf_ack          , // Control flow change acknowledge.
 
+output wire        trap_cpu        , // A trap occured due to CPU
+output wire        trap_int        , // A trap occured due to interrupt
+output wire [ 5:0] trap_cause      , // A trap occured due to interrupt
+output wire [XL:0] trap_mtval      , // Value associated with the trap.
+output wire [XL:0] trap_pc         , // PC value associated with the trap.
+
 output wire        dmem_cen        , // Chip enable
 output wire        dmem_wen        , // Write enable
 input  wire        dmem_error      , // Error
@@ -222,6 +228,11 @@ frv_pipeline_writeback i_pipeline_writeback(
 .gpr_wen       (gpr_wen        ) , // GPR write enable.
 .gpr_rd        (gpr_rd         ) , // GPR destination register.
 .gpr_wdata     (gpr_wdata      ) , // GPR write data.
+.trap_cpu      (trap_cpu       ), // A trap occured due to CPU
+.trap_int      (trap_int       ), // A trap occured due to interrupt
+.trap_cause    (trap_cause     ), // Cause of a trap.
+.trap_mtval    (trap_mtval     ), // Value associated with the trap.
+.trap_pc       (trap_pc        ), // PC value associated with the trap.
 .cf_req        (cf_req         ) , // Control flow change request
 .cf_target     (cf_target      ) , // Control flow change target
 .cf_ack        (cf_ack         )   // Control flow change acknowledge.
