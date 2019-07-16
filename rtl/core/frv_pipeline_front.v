@@ -13,8 +13,6 @@ input  wire             cf_req      , // Control flow change request
 input  wire [     XL:0] cf_target   , // Control flow change destination
 output wire             cf_ack      , // Control flow change acknolwedge
 
-input  wire             flush       , // Flush stages.
-
 output wire             imem_cen    , // Chip enable
 output wire             imem_wen    , // Write enable
 input  wire             imem_error  , // Error
@@ -53,6 +51,13 @@ parameter FRONT_PIPE_REG_BUFFERED = 1;
 // Common core parameters and constants
 `include "frv_common.vh"
 
+//
+// Event detection
+// -------------------------------------------------------------------------
+
+// A control flow change has completed this cycle.
+wire cf_change_now = cf_req && cf_ack;
+
 // -------------------------------------------------------------------------
 
 wire         s1_p_busy              ; // Next Pipeline stage busy output.
@@ -60,9 +65,9 @@ wire         s1_p_busy              ; // Next Pipeline stage busy output.
 wire [FRONT_PIPE_REG_WIDTH-1:0] p_pipe_input;
 wire [FRONT_PIPE_REG_WIDTH-1:0] p_pipe_output;
 
-wire         fe_flush = flush       ; // Flush stage
-wire         fe_stall = s1_p_busy   ; // Stall stage
-wire         fe_ready               ; // Stage ready to progress
+wire         fe_flush = cf_change_now; // Flush stage
+wire         fe_stall = s1_p_busy    ; // Stall stage
+wire         fe_ready                ; // Stage ready to progress
 
 wire [XL:0]  d_data                 ; // Data to be decoded.
 wire         d_error                ; // Data was subject to an ifetch error.
@@ -167,6 +172,8 @@ assign p_pc = program_counter;
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         program_counter <= FRV_PC_RESET_VALUE   ;
+    end else if(cf_change_now) begin
+        program_counter <= cf_target;
     end else begin
         program_counter <= n_program_counter    ;
     end
@@ -209,7 +216,7 @@ frv_pipeline_register #(
 .i_valid  (fe_ready         ), // Input data valid?
 .o_busy   (s1_p_busy        ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Unconnected.
-.flush    (flush            ), // Flush the contents of the pipeline
+.flush    (fe_flush         ), // Flush the contents of the pipeline
 .o_data   (p_pipe_output    ), // Output data for stage N+1
 .o_valid  (s2_p_valid       ), // Input data from stage N valid?
 .i_busy   (s2_p_busy        )  // Stage N+1 ready to continue?

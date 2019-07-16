@@ -134,8 +134,17 @@ wire        cfu_ready   = cfu_valid     ; // Instruction complete. TODO
 
 wire        cfu_cond    = cfu_valid && s3_uop[4:3] == 2'b00;
 wire        cfu_uncond  = cfu_valid && s3_uop[4:3] == 2'b10;
+wire        cfu_jmp     = cfu_valid && s3_uop      == CFU_JMP ;
 wire        cfu_jali    = cfu_valid && s3_uop      == CFU_JALI;
 wire        cfu_jalr    = cfu_valid && s3_uop      == CFU_JALR;
+
+wire        cfu_cond_taken = 1'b0;
+wire        cfu_always_take= cfu_jalr || cfu_jali || cfu_jalr;
+
+wire [4:0]  n_s4_uop_cfu   =
+    cfu_cond        ? (cfu_cond_taken ? CFU_TAKEN : CFU_NOT_TAKEN)  :
+    cfu_always_take ? CFU_TAKEN                                     :
+                      s3_uop                                        ;
 
 wire [XL:0] n_s4_opr_a_cfu = 
     cfu_jalr    ? alu_add_result : s3_opr_c;
@@ -238,10 +247,11 @@ localparam PIPE_REG_W = 146;
 
 wire [ 4:0] n_s4_rd    = s3_rd   ; // Destination register address
 wire [31:0] n_s4_pc    = s3_pc   ; // Program counter
-wire [ 4:0] n_s4_uop   = s3_uop  ; // Micro-op code
 wire [ 4:0] n_s4_fu    = s3_fu   ; // Functional Unit
 wire [ 1:0] n_s4_size  = s3_size ; // Size of the instruction.
 wire [31:0] n_s4_instr = s3_instr; // The instruction word
+
+wire [ 4:0] n_s4_uop   = cfu_valid ? n_s4_uop_cfu : s3_uop  ; // Micro-op code
 
 wire        n_s4_trap  = 1'b0    ; // Raise a trap? TODO
 

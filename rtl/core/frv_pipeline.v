@@ -73,8 +73,6 @@ wire        cf_req     ; // Control flow change request
 wire [XL:0] cf_target  ; // Control flow change destination
 wire        cf_ack     ; // Control flow change acknolwedge
 
-wire        flush_front; // Flush FD pipeline register.
-
 //
 // Front-end register pipeline control.
 wire        s2_p_valid ; // Pipeline control signals
@@ -108,7 +106,6 @@ frv_pipeline_front i_pipeline_front(
 .cf_req      (cf_req      ), // Control flow change request
 .cf_target   (cf_target   ), // Control flow change destination
 .cf_ack      (cf_ack      ), // Control flow change acknolwedge
-.flush       (flush_front ), // Flush stages.
 .imem_cen    (imem_cen    ), // Chip enable
 .imem_wen    (imem_wen    ), // Write enable
 .imem_error  (imem_error  ), // Error

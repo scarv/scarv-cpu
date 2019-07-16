@@ -43,26 +43,19 @@ output wire [31:0] dmem_wdata        // Write data
 // Common core parameters and constants
 `include "frv_common.vh"
 
+//
+// Event detection
 // -------------------------------------------------------------------------
 
-//
-// TEMPORARY assignments for bring-up
-assign cf_req       = 1'b0;
-assign cf_target    = {XLEN{1'b0}};
-
-assign dmem_cen     = 1'b0;
-assign dmem_wen     = 1'b0;
-assign dmem_addr    = 32'b0;
-assign dmem_strb    =  4'b0;
-assign dmem_wdata   = 32'b0;
+// A control flow change has completed this cycle.
+wire cf_change_now = cf_req && cf_ack;
 
 //
 // Inter-stage wiring
 // -------------------------------------------------------------------------
 
-wire        flush_dispatch  ; // Flush dispatch pipeline stage.
-wire        flush_execute   ; // Flush dispatch pipeline stage.
-wire        flush_writeback ; // Flush dispatch pipeline stage.
+wire        flush_dispatch  = cf_change_now;
+wire        flush_execute   = cf_change_now;
 
 wire [ 4:0] fwd_s4_rd       ; // Writeback stage destination reg.
 wire [XL:0] fwd_s4_wdata    ; // Write data for writeback stage.
@@ -200,6 +193,38 @@ frv_pipeline_execute i_pipeline_execute (
 .dmem_addr      (dmem_addr      ) , // Read/Write address
 .dmem_rdata     (dmem_rdata     ) , // Read data
 .dmem_wdata     (dmem_wdata     )   // Write data
+);
+
+
+
+//
+// instance: frv_pipeline_writeback
+//
+//  Responsible for finalising all instruction writeback behaviour.
+//  - Jumps/control flow changes
+//  - CSR accesses
+//  - GPR writeback.
+//
+frv_pipeline_writeback i_pipeline_writeback(
+.g_clk         (g_clk          ) , // global clock
+.g_resetn      (g_resetn       ) , // synchronous reset
+.s4_rd         (s4_rd          ) , // Destination register address
+.s4_opr_a      (s4_opr_a       ) , // Operand A
+.s4_opr_b      (s4_opr_b       ) , // Operand B
+.s4_pc         (s4_pc          ) , // Program counter
+.s4_uop        (s4_uop         ) , // Micro-op code
+.s4_fu         (s4_fu          ) , // Functional Unit
+.s4_trap       (s4_trap        ) , // Raise a trap?
+.s4_size       (s4_size        ) , // Size of the instruction.
+.s4_instr      (s4_instr       ) , // The instruction word
+.s4_p_busy     (s4_p_busy      ) , // Can this stage accept new inputs?
+.s4_p_valid    (s4_p_valid     ) , // Is this input valid?
+.gpr_wen       (gpr_wen        ) , // GPR write enable.
+.gpr_rd        (gpr_rd         ) , // GPR destination register.
+.gpr_wdata     (gpr_wdata      ) , // GPR write data.
+.cf_req        (cf_req         ) , // Control flow change request
+.cf_target     (cf_target      ) , // Control flow change target
+.cf_ack        (cf_ack         )   // Control flow change acknowledge.
 );
 
 endmodule
