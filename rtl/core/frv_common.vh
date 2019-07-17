@@ -49,7 +49,7 @@ localparam CFU_JMP      = {2'b10, 3'b001};
 localparam CFU_JALI     = {2'b10, 3'b010};
 localparam CFU_JALR     = {2'b10, 3'b100};
 localparam CFU_TAKEN    = {2'b11, 3'b001};
-localparam CFU_NOT_TAKEN= {2'b11, 3'b001};
+localparam CFU_NOT_TAKEN= {2'b11, 3'b000};
 
 localparam LSU_SIGNED   = 0;
 localparam LSU_LOAD     = 3;

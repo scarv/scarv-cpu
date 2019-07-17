@@ -90,7 +90,9 @@ reg     cfu_done;
 wire    n_cfu_done = !pipe_progress && (cfu_done || cfu_finish_now) ;
 
 // The CFU operation is complete and the pipeline can progress.
-wire    cfu_busy = fu_cfu && !(cfu_done || cfu_finish_now);
+wire    cfu_busy = fu_cfu && 
+                   !(cfu_done || cfu_finish_now) &&
+                   (cfu_cf_taken ||cfu_trap || cfu_mret);
 
 always @(posedge g_clk) if(!g_resetn) begin
     cfu_done <= 1'b0;
