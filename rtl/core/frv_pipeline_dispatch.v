@@ -83,8 +83,8 @@ wire [31:0] csr_imm  = {{27{s2_rs1[4]}}, s2_rs1};
 // -------------------------------------------------------------------------
 
 wire   dis_bubble   =
-    ((               fwd_s4_csr) && (s2_rs1 == fwd_s4_rd || s2_rs2 == fwd_s4_rd))  ||
-    ((fwd_s3_load || fwd_s3_csr) && (s2_rs1 == fwd_s3_rd || s2_rs2 == fwd_s3_rd))   ;
+((               fwd_s4_csr) && (s2_rs1 == fwd_s4_rd || s2_rs2 == fwd_s4_rd))  ||
+((fwd_s3_load || fwd_s3_csr) && (s2_rs1 == fwd_s3_rd || s2_rs2 == fwd_s3_rd))   ;
 
 wire      p_busy    ;
 
@@ -175,6 +175,8 @@ frv_gprs i_gprs (
 
 localparam PIPE_REG_W = 178;
 
+wire pipe_reg_flush = flush || (p_valid && !p_busy && dis_bubble);
+
 wire [PIPE_REG_W-1:0] pipe_reg_out;
 
 wire [PIPE_REG_W-1:0] pipe_reg_in = {
@@ -213,7 +215,7 @@ frv_pipeline_register #(
 .i_valid  (p_valid          ), // Input data valid?
 .o_busy   (p_busy           ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
-.flush    (flush            ), // Flush the contents of the pipeline
+.flush    (pipe_reg_flush   ), // Flush the contents of the pipeline
 .o_data   (pipe_reg_out     ), // Output data for stage N+1
 .o_valid  (s3_p_valid       ), // Input data from stage N valid?
 .i_busy   (s3_p_busy        )  // Stage N+1 ready to continue?

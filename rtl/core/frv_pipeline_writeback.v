@@ -24,6 +24,11 @@ input  wire [31:0] s4_instr        , // The instruction word
 output wire        s4_p_busy       , // Can this stage accept new inputs?
 input  wire        s4_p_valid      , // Are the stage inputs valid?
 
+output wire [ 4:0] fwd_s4_rd       , // Writeback stage destination reg.
+output wire [XL:0] fwd_s4_wdata    , // Write data for writeback stage.
+output wire        fwd_s4_load     , // Writeback stage has load in it.
+output wire        fwd_s4_csr      , // Writeback stage has CSR op in it.
+
 output wire        gpr_wen         , // GPR write enable.
 output wire [ 4:0] gpr_rd          , // GPR destination register.
 output wire [XL:0] gpr_wdata       , // GPR write data.
@@ -101,12 +106,17 @@ end else begin
 end
 
 //
-// GPR writeback
+// GPR writeback and forwarding
 // -------------------------------------------------------------------------
 
 assign gpr_rd   = s4_rd;
 assign gpr_wen  = 1'b0;
 assign gpr_wdata= s4_opr_a;
+
+assign fwd_s4_rd    = gpr_rd;
+assign fwd_s4_wdata = gpr_wdata;
+assign fwd_s4_load  = 1'b0;
+assign fwd_s4_csr   = fu_csr;
 
 //
 // It's a trap!

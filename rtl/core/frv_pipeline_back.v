@@ -225,6 +225,10 @@ frv_pipeline_writeback i_pipeline_writeback(
 .s4_instr      (s4_instr       ) , // The instruction word
 .s4_p_busy     (s4_p_busy      ) , // Can this stage accept new inputs?
 .s4_p_valid    (s4_p_valid     ) , // Is this input valid?
+.fwd_s4_rd     (fwd_s4_rd      ), // Writeback stage destination reg.
+.fwd_s4_wdata  (fwd_s4_wdata   ), // Write data for writeback stage.
+.fwd_s4_load   (fwd_s4_load    ), // Writeback stage has load in it.
+.fwd_s4_csr    (fwd_s4_csr     ), // Writeback stage has CSR op in it.
 .gpr_wen       (gpr_wen        ) , // GPR write enable.
 .gpr_rd        (gpr_rd         ) , // GPR destination register.
 .gpr_wdata     (gpr_wdata      ) , // GPR write data.
