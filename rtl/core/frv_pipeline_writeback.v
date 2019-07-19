@@ -64,11 +64,21 @@ wire fu_cfu = s4_fu[P_FU_CFU];
 wire fu_csr = s4_fu[P_FU_CSR];
 
 //
+// Functional Unit: ALU
+// -------------------------------------------------------------------------
+
+wire        alu_gpr_wen     = fu_alu;
+wire [XL:0] alu_gpr_wdata   = s4_opr_a;
+
+//
 // Functional Unit: CSR
 // -------------------------------------------------------------------------
 
 wire [XL:0] csr_mepc = 32'b0;
 wire [XL:0] csr_mtvec= 32'b0;
+
+wire        csr_gpr_wen     = fu_csr && s4_uop[CSR_READ];
+wire [XL:0] csr_gpr_wdata   = 32'b0; // TODO
 
 //
 // Functional Unit: CFU
@@ -110,8 +120,11 @@ end
 // -------------------------------------------------------------------------
 
 assign gpr_rd   = s4_rd;
-assign gpr_wen  = 1'b0;
-assign gpr_wdata= s4_opr_a;
+
+assign gpr_wen  = csr_gpr_wen || alu_gpr_wen;
+
+assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
+                  {32{alu_gpr_wen}} & alu_gpr_wdata ;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;

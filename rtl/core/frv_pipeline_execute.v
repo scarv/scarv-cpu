@@ -97,7 +97,7 @@ wire        alu_eq                      ; // Is LHS = RHS?
 wire [XL:0] alu_add_result              ; // Result of adding LHS,RHS.
 
 wire [XL:0] alu_lhs         = s3_opr_a  ; // left hand operand
-wire [XL:0] alu_rhs         = s4_opr_b  ; // right hand operand
+wire [XL:0] alu_rhs         = s3_opr_b  ; // right hand operand
 wire [XL:0] alu_result                  ; // result of the ALU operation
 
 wire [XL:0] n_s4_opr_a_alu = alu_result;
