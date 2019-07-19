@@ -180,6 +180,15 @@ frv_pipeline_back i_pipeline_back(
 .trap_cause   (trap_cause   ), // Cause of a trap.
 .trap_mtval   (trap_mtval   ), // Value associated with the trap.
 .trap_pc      (trap_pc      ), // PC value associated with the trap.
+.csr_mepc     (csr_mepc     ), // Current MEPC.
+.csr_mtvec    (csr_mtvec    ), // Current MTVEC.
+.csr_en       (csr_en       ), // CSR Access Enable
+.csr_wr       (csr_wr       ), // CSR Write Enable
+.csr_wr_set   (csr_wr_set   ), // CSR Write - Set
+.csr_wr_clr   (csr_wr_clr   ), // CSR Write - Clear
+.csr_addr     (csr_addr     ), // Address of the CSR to access.
+.csr_wdata    (csr_wdata    ), // Data to be written to a CSR
+.csr_rdata    (csr_rdata    ), // CSR read data
 .dmem_cen     (dmem_cen     ), // Chip enable
 .dmem_wen     (dmem_wen     ), // Write enable
 .dmem_error   (dmem_error   ), // Error

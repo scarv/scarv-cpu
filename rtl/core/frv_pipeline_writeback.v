@@ -39,6 +39,17 @@ output wire [ 5:0] trap_cause      , // A trap occured due to interrupt
 output wire [XL:0] trap_mtval      , // Value associated with the trap.
 output wire [XL:0] trap_pc         , // PC value associated with the trap.
 
+input  wire [XL:0] csr_mepc        ,
+input  wire [XL:0] csr_mtvec       ,
+
+output wire        csr_en          , // CSR Access Enable
+output wire        csr_wr          , // CSR Write Enable
+output wire        csr_wr_set      , // CSR Write - Set
+output wire        csr_wr_clr      , // CSR Write - Clear
+output wire [11:0] csr_addr        , // Address of the CSR to access.
+output wire [XL:0] csr_wdata       , // Data to be written to a CSR
+input  wire [XL:0] csr_rdata       , // CSR read data
+
 output wire        cf_req          , // Control flow change request
 output wire [XL:0] cf_target       , // Control flow change target
 input  wire        cf_ack            // Control flow change acknowledge.
@@ -74,11 +85,15 @@ wire [XL:0] alu_gpr_wdata   = s4_opr_a;
 // Functional Unit: CSR
 // -------------------------------------------------------------------------
 
-wire [XL:0] csr_mepc = 32'b0;
-wire [XL:0] csr_mtvec= 32'b0;
+assign      csr_en          = fu_csr;
+assign      csr_wr          = fu_csr && s4_uop[CSR_WRITE];
+assign      csr_wr_set      = fu_csr && s4_uop[CSR_SET  ];
+assign      csr_wr_clr      = fu_csr && s4_uop[CSR_CLEAR];
+assign      csr_addr        = s4_opr_b[11:0];
+assign      csr_wdata       = s4_opr_a;
 
 wire        csr_gpr_wen     = fu_csr && s4_uop[CSR_READ];
-wire [XL:0] csr_gpr_wdata   = 32'b0; // TODO
+wire [XL:0] csr_gpr_wdata   = csr_rdata;
 
 //
 // Functional Unit: CFU

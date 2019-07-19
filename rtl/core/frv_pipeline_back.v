@@ -35,6 +35,17 @@ output wire [ 5:0] trap_cause      , // A trap occured due to interrupt
 output wire [XL:0] trap_mtval      , // Value associated with the trap.
 output wire [XL:0] trap_pc         , // PC value associated with the trap.
 
+input  wire [XL:0] csr_mepc        ,
+input  wire [XL:0] csr_mtvec       ,
+
+output wire        csr_en          , // CSR Access Enable
+output wire        csr_wr          , // CSR Write Enable
+output wire        csr_wr_set      , // CSR Write - Set
+output wire        csr_wr_clr      , // CSR Write - Clear
+output wire [11:0] csr_addr        , // Address of the CSR to access.
+output wire [XL:0] csr_wdata       , // Data to be written to a CSR
+input  wire [XL:0] csr_rdata       , // CSR read data
+
 output wire        dmem_cen        , // Chip enable
 output wire        dmem_wen        , // Write enable
 input  wire        dmem_error      , // Error
@@ -237,9 +248,18 @@ frv_pipeline_writeback i_pipeline_writeback(
 .trap_cause    (trap_cause     ), // Cause of a trap.
 .trap_mtval    (trap_mtval     ), // Value associated with the trap.
 .trap_pc       (trap_pc        ), // PC value associated with the trap.
-.cf_req        (cf_req         ) , // Control flow change request
-.cf_target     (cf_target      ) , // Control flow change target
-.cf_ack        (cf_ack         )   // Control flow change acknowledge.
+.csr_mepc      (csr_mepc       ), // Current MEPC.
+.csr_mtvec     (csr_mtvec      ), // Current MTVEC.
+.csr_en        (csr_en         ), // CSR Access Enable
+.csr_wr        (csr_wr         ), // CSR Write Enable
+.csr_wr_set    (csr_wr_set     ), // CSR Write - Set
+.csr_wr_clr    (csr_wr_clr     ), // CSR Write - Clear
+.csr_addr      (csr_addr       ), // Address of the CSR to access.
+.csr_wdata     (csr_wdata      ), // Data to be written to a CSR
+.csr_rdata     (csr_rdata      ), // CSR read data
+.cf_req        (cf_req         ), // Control flow change request
+.cf_target     (cf_target      ), // Control flow change target
+.cf_ack        (cf_ack         )  // Control flow change acknowledge.
 );
 
 endmodule
