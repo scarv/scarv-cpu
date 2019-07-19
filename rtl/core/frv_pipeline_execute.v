@@ -88,9 +88,11 @@ wire        alu_op_shf_left = fu_alu && s3_uop == ALU_SLL;
 wire        alu_op_shf_arith= fu_alu && s3_uop == ALU_SRA;
 
 wire        alu_op_cmp      = fu_alu && (s3_uop == ALU_SLT  ||
-                                         s3_uop == ALU_SLTU );
+                                         s3_uop == ALU_SLTU )   ||
+                              cfu_cond;
 
-wire        alu_op_unsigned = fu_alu && (s3_uop == ALU_SLTU);
+wire        alu_op_unsigned = fu_alu && (s3_uop == ALU_SLTU) ||
+                              cond_bgeu || cond_bltu        ;
 
 wire        alu_lt                      ; // Is LHS < RHS?
 wire        alu_eq                      ; // Is LHS = RHS?
@@ -138,7 +140,22 @@ wire        cfu_jmp     = cfu_valid && s3_uop      == CFU_JMP ;
 wire        cfu_jali    = cfu_valid && s3_uop      == CFU_JALI;
 wire        cfu_jalr    = cfu_valid && s3_uop      == CFU_JALR;
 
-wire        cfu_cond_taken = 1'b0;
+
+wire        cond_beq    = cfu_valid && s3_uop == CFU_BEQ ;
+wire        cond_bge    = cfu_valid && s3_uop == CFU_BGE ;
+wire        cond_bgeu   = cfu_valid && s3_uop == CFU_BGEU;
+wire        cond_blt    = cfu_valid && s3_uop == CFU_BLT ;
+wire        cond_bltu   = cfu_valid && s3_uop == CFU_BLTU;
+wire        cond_bne    = cfu_valid && s3_uop == CFU_BNE ;
+
+wire        cfu_cond_taken =
+    cond_beq  &&  alu_eq    ||
+    cond_bge  && !alu_lt    ||  // Same signal for (un)signed inputs.
+    cond_bgeu && !alu_lt    ||  // - see alu_op_unsigned signal.
+    cond_blt  &&  alu_lt    ||
+    cond_bltu &&  alu_lt    ||
+    cond_bne  && !alu_eq    ;
+
 wire        cfu_always_take= cfu_jalr || cfu_jali || cfu_jalr;
 
 wire [4:0]  n_s4_uop_cfu   =
