@@ -169,7 +169,7 @@ assign n_program_counter =
 
 assign p_pc = program_counter;
 
-wire progress_pc = s2_p_valid && !s2_p_busy;
+wire progress_pc = fe_ready && !s1_p_busy;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
