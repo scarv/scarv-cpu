@@ -168,8 +168,8 @@ wire [XL:0] n_s4_opr_b_mul = 32'b0;
 wire        csr_valid  = fu_csr         ; // Inputs are valid.
 wire        csr_ready  = csr_valid      ; // Instruction complete. TODO
 
-wire [XL:0] n_s4_opr_a_csr = 32'b0;
-wire [XL:0] n_s4_opr_b_csr = 32'b0;
+wire [XL:0] n_s4_opr_a_csr = s3_opr_a;
+wire [XL:0] n_s4_opr_b_csr = s3_opr_c;
 
 //
 // Stalling / Pipeline Progression

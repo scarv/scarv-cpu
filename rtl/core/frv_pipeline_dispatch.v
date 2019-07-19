@@ -75,7 +75,7 @@ wire        n_s3_trap               ; // Raise a trap?
 // Any extra decode / operand packing/unpacking.
 // -------------------------------------------------------------------------
 
-wire [31:0] csr_addr = {20'b0, s2_imm[11:0]};
+wire [31:0] csr_addr = {20'b0, s2_imm[31:20]};
 wire [31:0] csr_imm  = {{27{s2_rs1[4]}}, s2_rs1};
 
 //
@@ -103,15 +103,21 @@ wire [XL:0] s2_rs2_data             ; //
 wire [XL:0] dis_rs1                 ; // Dispatch stage value of RS1
 wire [XL:0] dis_rs2                 ; // Dispatch stage value of RS2
 
+wire        fwd_s3_rs1 = s2_rs1 == fwd_s3_rd && |s2_rs1;
+wire        fwd_s4_rs1 = s2_rs1 == fwd_s4_rd && |s2_rs1;
+;
+wire        fwd_s3_rs2 = s2_rs2 == fwd_s3_rd && |s2_rs2;
+wire        fwd_s4_rs2 = s2_rs2 == fwd_s4_rd && |s2_rs2;
+
 assign dis_rs1 =
-    s2_rs1 == fwd_s3_rd && |s2_rs1 ? fwd_s3_wdata   :
-    s2_rs1 == fwd_s4_rd && |s2_rs1 ? fwd_s4_wdata   :
-                                     s2_rs1_data    ;
+     fwd_s3_rs1 ? fwd_s3_wdata   :
+     fwd_s4_rs1 ? fwd_s4_wdata   :
+                  s2_rs1_data    ;
 
 assign dis_rs2 =
-    s2_rs2 == fwd_s3_rd && |s2_rs2 ? fwd_s3_wdata   :
-    s2_rs2 == fwd_s4_rd && |s2_rs2 ? fwd_s4_wdata   :
-                                     s2_rs2_data    ;
+     fwd_s3_rs2 ? fwd_s3_wdata   :
+     fwd_s4_rs2 ? fwd_s4_wdata   :
+                  s2_rs2_data    ;
 
 //
 // PC offset computation
