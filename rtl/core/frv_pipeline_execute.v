@@ -289,7 +289,7 @@ wire [XL:0] n_s4_opr_b =
 
 // Forwaring / bubbling signals.
 assign fwd_s3_rd    = s3_rd             ; // Writeback stage destination reg.
-assign fwd_s3_wdata = n_s4_opr_a        ; // Write data for writeback stage.
+assign fwd_s3_wdata = alu_result        ; // Write data for writeback stage.
 assign fwd_s3_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Writeback stage has CSR op in it.
 

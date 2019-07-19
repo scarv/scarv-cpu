@@ -60,6 +60,9 @@ output wire [31:0] dmem_wdata        // Write data
 // Common core parameters and constants
 `include "frv_common.vh"
 
+// Use an FPGA BRAM style register file.
+parameter BRAM_REGFILE = 0;
+
 //
 // Event detection
 // -------------------------------------------------------------------------
@@ -123,7 +126,9 @@ wire        s4_p_valid      ; // Is this input valid?
 //  Part of the backend, responsible for clearing pipeline bubbles, RAW
 //  hazards and gathering operands ready for execution.
 //
-frv_pipeline_dispatch i_pipeline_dispatch (
+frv_pipeline_dispatch #(
+.BRAM_REGFILE(BRAM_REGFILE)
+) i_pipeline_dispatch (
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset
 .s2_p_busy       (s2_p_busy       ), // Can this stage accept new inputs?

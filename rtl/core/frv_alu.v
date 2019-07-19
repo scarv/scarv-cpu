@@ -92,7 +92,7 @@ wire out_bw     = alu_op_xor || alu_op_or || alu_op_and;
 wire out_cmp    = alu_op_cmp ;
 
 assign alu_result = 
-    {XLEN{out_adder}} & adder_result[XL:0]    | 
+    out_adder ? adder_result[XL:0] :
     {XLEN{out_shift}} & shift_result[XL:0]    |
     {XLEN{out_bw   }} & bw_result             | 
     {XLEN{out_cmp  }} & {31'b0, alu_lt}       ; 

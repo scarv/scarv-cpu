@@ -156,7 +156,9 @@ frv_pipeline_front i_pipeline_front(
 //  gathering instruction operands, dispatching them to execute and
 //  writing back their results.
 //
-frv_pipeline_back i_pipeline_back(
+frv_pipeline_back #(
+.BRAM_REGFILE(BRAM_REGFILE)
+) i_pipeline_back(
 .g_clk        (g_clk        ), // global clock
 .g_resetn     (g_resetn     ), // synchronous reset
 .s2_p_busy    (s2_p_busy    ), // Can this stage accept new inputs?

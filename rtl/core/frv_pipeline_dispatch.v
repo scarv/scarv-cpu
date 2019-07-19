@@ -58,6 +58,9 @@ output wire        s3_p_valid        // Is this input valid?
 // Common core parameters and constants
 `include "frv_common.vh"
 
+// Use an FPGA BRAM style register file.
+parameter BRAM_REGFILE = 0;
+
 // -------------------------------------------------------------------------
 
 wire [ 4:0] n_s3_rd      = s2_rd    ; // Destination register address
@@ -163,7 +166,9 @@ assign n_s3_opr_c =
 // Submodule instances
 // -------------------------------------------------------------------------
 
-frv_gprs i_gprs (
+frv_gprs #(
+.BRAM_REGFILE(BRAM_REGFILE)
+) i_gprs (
 .g_clk      (g_clk      ), //
 .g_resetn   (g_resetn   ), //
 .rs1_addr   (s2_rs1     ), // Source register 1 address
