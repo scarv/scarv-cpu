@@ -35,6 +35,10 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_rdata ,
 output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 `endif
 
+output wire [XL:0]  trs_pc          , // Trace program counter.
+output wire [31:0]  trs_instr       , // Trace instruction.
+output wire         trs_valid       , // Trace output valid.
+
 input  wire         int_external    , // External interrupt trigger line.
 input  wire         int_software    , // Software interrupt trigger line.
 
@@ -102,6 +106,9 @@ frv_pipeline #(
 .rvfi_mem_rdata(rvfi_mem_rdata),
 .rvfi_mem_wdata(rvfi_mem_wdata),
 `endif
+.trs_pc        (trs_pc        ), // Trace program counter.
+.trs_instr     (trs_instr     ), // Trace instruction.
+.trs_valid     (trs_valid     ), // Trace output valid.
 .imem_cen      (imem_cen      ), // Chip enable
 .imem_wen      (imem_wen      ), // Write enable
 .imem_error    (imem_error    ), // Error

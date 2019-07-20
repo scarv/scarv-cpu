@@ -46,6 +46,10 @@ output wire [11:0] csr_addr        , // Address of the CSR to access.
 output wire [XL:0] csr_wdata       , // Data to be written to a CSR
 input  wire [XL:0] csr_rdata       , // CSR read data
 
+output wire [XL:0] trs_pc          , // Trace program counter.
+output wire [31:0] trs_instr       , // Trace instruction.
+output wire        trs_valid       , // Trace output valid.
+
 output wire        dmem_cen        , // Chip enable
 output wire        dmem_wen        , // Write enable
 input  wire        dmem_error      , // Error
@@ -255,6 +259,9 @@ frv_pipeline_writeback i_pipeline_writeback(
 .trap_pc       (trap_pc        ), // PC value associated with the trap.
 .csr_mepc      (csr_mepc       ), // Current MEPC.
 .csr_mtvec     (csr_mtvec      ), // Current MTVEC.
+.trs_pc        (trs_pc         ), // Trace program counter.
+.trs_instr     (trs_instr      ), // Trace instruction.
+.trs_valid     (trs_valid      ), // Trace output valid.
 .csr_en        (csr_en         ), // CSR Access Enable
 .csr_wr        (csr_wr         ), // CSR Write Enable
 .csr_wr_set    (csr_wr_set     ), // CSR Write - Set

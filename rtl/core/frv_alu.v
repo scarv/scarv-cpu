@@ -52,6 +52,7 @@ wire [XLEN:0] adder_result  = adder_lhs + adder_rhs + adder_ci;
 
 assign alu_add_result       = adder_result[XL:0];
 
+// TODO: Re-use subtraction operation results.
 wire   alu_lt_signed        = $signed(alu_lhs) < $signed(alu_rhs);
 
 wire   alu_lt_unsigned      = $unsigned(alu_lhs) < $unsigned(alu_rhs);

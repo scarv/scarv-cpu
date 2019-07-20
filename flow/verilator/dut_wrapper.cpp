@@ -118,15 +118,14 @@ void dut_wrapper::posedge_gclk () {
     this -> imem_agent -> posedge_clk();
 
     // Do we need to capture a trace item?
-    // TODO - re-implement trace interface.
-    //if(this -> dut -> trs_valid) {
-    //    this -> dut_trace.push (
-    //        {
-    //            this -> dut -> trs_pc,
-    //            this -> dut -> trs_instr
-    //        }
-    //    );
-    //}
+    if(this -> dut -> trs_valid) {
+        this -> dut_trace.push (
+            {
+                this -> dut -> trs_pc,
+                this -> dut -> trs_instr
+            }
+        );
+    }
 }
 
 

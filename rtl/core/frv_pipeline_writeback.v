@@ -42,6 +42,10 @@ output wire [XL:0] trap_pc         , // PC value associated with the trap.
 input  wire [XL:0] csr_mepc        ,
 input  wire [XL:0] csr_mtvec       ,
 
+output wire [XL:0] trs_pc          , // Trace program counter.
+output wire [31:0] trs_instr       , // Trace instruction.
+output wire        trs_valid       , // Trace output valid.
+
 output wire        csr_en          , // CSR Access Enable
 output wire        csr_wr          , // CSR Write Enable
 output wire        csr_wr_set      , // CSR Write - Set
@@ -155,5 +159,13 @@ assign trap_int   = s4_trap ; // A trap occured due to interrupt
 assign trap_cause = 0       ; // Cause of the trap.
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
 assign trap_pc    = s4_pc   ; // PC value associated with the trap.
+
+//
+// Instruction Tracing
+// -------------------------------------------------------------------------
+
+assign trs_pc   = s4_pc;
+assign trs_instr= s4_instr;
+assign trs_valid= s4_p_valid && !s4_p_busy;
 
 endmodule

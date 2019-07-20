@@ -85,6 +85,7 @@ wire       instr_32bit= d_data[1:0] == 2'b11;
 assign     p_size[0]  = instr_16bit;
 assign     p_size[1]  = instr_32bit;
 
+// TODO: Switch to turn on/off.
 assign     p_instr    = instr_16bit ? {16'b0, d_data[15:0]} : d_data ;
 
 //

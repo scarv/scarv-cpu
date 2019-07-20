@@ -35,6 +35,10 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_rdata ,
 output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 `endif
 
+output wire [XL:0]  trs_pc          , // Trace program counter.
+output wire [31:0]  trs_instr       , // Trace instruction.
+output wire         trs_valid       , // Trace output valid.
+
 output wire         imem_cen        , // Chip enable
 output wire         imem_wen        , // Write enable
 input  wire         imem_error      , // Error
@@ -191,6 +195,9 @@ frv_pipeline_back #(
 .csr_addr     (csr_addr     ), // Address of the CSR to access.
 .csr_wdata    (csr_wdata    ), // Data to be written to a CSR
 .csr_rdata    (csr_rdata    ), // CSR read data
+.trs_pc       (trs_pc       ), // Trace program counter.
+.trs_instr    (trs_instr    ), // Trace instruction.
+.trs_valid    (trs_valid    ), // Trace output valid.
 .dmem_cen     (dmem_cen     ), // Chip enable
 .dmem_wen     (dmem_wen     ), // Write enable
 .dmem_error   (dmem_error   ), // Error
