@@ -63,7 +63,6 @@ parameter BRAM_REGFILE = 0;
 
 // -------------------------------------------------------------------------
 
-wire [ 4:0] n_s3_rd      = s2_rd    ; // Destination register address
 wire [31:0] n_s3_pc      = s2_pc    ; // Program counter
 wire [ 4:0] n_s3_uop     = s2_uop   ; // Micro-op code
 wire [ 4:0] n_s3_fu      = s2_fu    ; // Functional Unit
@@ -73,6 +72,16 @@ wire [XL:0] n_s3_opr_a              ; // Operand A
 wire [XL:0] n_s3_opr_b              ; // Operand B
 wire [XL:0] n_s3_opr_c              ; // Operand C
 wire        n_s3_trap               ; // Raise a trap?
+
+wire cfu_conditional = s2_fu[P_FU_CFU] && s2_uop[4:3] == 2'b00;
+
+// Zero destination register for instructions with no writeback so that
+// we don't confuse the forwarding network.
+wire no_rd = s2_fu[P_FU_LSU] && s2_uop[LSU_STORE] ||
+             cfu_conditional                       ;
+
+// Destination register address
+wire [ 4:0] n_s3_rd      = no_rd ? 5'b0 : s2_rd;
 
 //
 // Any extra decode / operand packing/unpacking.
