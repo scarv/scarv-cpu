@@ -425,7 +425,7 @@ assign p_opr_src[DIS_OPRA_CSRI] = // Operand A sources CSR mask immediate
 
 
 assign p_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
-    dec_add        || dec_c_add      || dec_c_addi16sp || dec_c_addi4spn ||
+    dec_add        || dec_c_add      || 
     dec_c_sub      || dec_sub        || dec_and        || dec_c_and      ||
     dec_or         || dec_c_or       || dec_c_xor      || dec_xor        ||
     dec_slt        || dec_sltu       || dec_sra        || dec_srl        ||
@@ -443,7 +443,8 @@ assign p_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_c_slli                       || dec_jalr       || dec_lb         ||
     dec_lbu        || dec_lh         || dec_lhu        || dec_lw         ||
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
-    dec_sb         || dec_sh         || dec_sw          ;
+    dec_sb         || dec_sh         || dec_sw         || dec_c_addi16sp ||
+    dec_c_addi4spn  ;
 
 
 assign p_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
