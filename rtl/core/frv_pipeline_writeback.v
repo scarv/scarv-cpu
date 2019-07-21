@@ -147,7 +147,7 @@ end
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wen  = csr_gpr_wen || alu_gpr_wen;
+assign gpr_wen  = csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen;
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
