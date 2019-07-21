@@ -15,6 +15,8 @@ output wire        lsu_a_error , // Address error.
 output wire        lsu_b_error , // Bus error.
 output wire        lsu_ready   , // Outputs are valid / instruction complete.
 
+input  wire        pipe_prog   , // Pipeline is progressing this cycle.
+
 input  wire [XL:0] lsu_addr    , // Memory address to access.
 input  wire [XL:0] lsu_wdata   , // Data to write to memory.
 input  wire        lsu_load    , // Load instruction.
@@ -38,15 +40,81 @@ output wire [31:0] dmem_wdata    // Write data
 // Common core parameters and constants
 `include "frv_common.vh"
 
-assign lsu_ready = lsu_valid;
-assign lsu_rdata = 0;
-assign lsu_a_error = 0;
-assign lsu_b_error = 0;
+//
+// Instruction done tracking
+// -------------------------------------------------------------------------
 
-assign dmem_cen     = 0;
+wire dmem_txn_done = dmem_cen      && !dmem_stall;
+wire dmem_txn_err  = dmem_txn_done &&  dmem_error;
+
+reg  lsu_finished;
+
+wire n_lsu_finished = 
+    (lsu_finished || (lsu_valid && dmem_txn_done)) &&
+    !pipe_prog;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        lsu_finished <= 1'b0;
+    end else begin
+        lsu_finished <= n_lsu_finished;
+    end
+end
+
+//
+// EXU interface
+// -------------------------------------------------------------------------
+
+assign lsu_ready   = dmem_txn_done || lsu_finished;
+
+assign lsu_rdata[ 7: 0] =
+    {8{lsu_byte && lsu_addr[1:0] == 2'b00}} & dmem_rdata[ 7: 0] |
+    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[ 7: 0] |
+    {8{lsu_word                          }} & dmem_rdata[ 7: 0] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & dmem_rdata[15: 8] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & dmem_rdata[23:16] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & dmem_rdata[31:24] ;
+
+assign lsu_rdata[15: 8] =
+    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[15: 8] |
+    {8{lsu_word                          }} & dmem_rdata[15: 8] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[31:24] ;
+
+assign lsu_rdata[31:16] =
+    {16{lsu_word                         }} & dmem_rdata[31:16] ;
+
+// Address error?
+assign lsu_a_error = lsu_half &&  lsu_addr[  0] ||
+                     lsu_word && |lsu_addr[1:0]  ;
+
+// Bus error?
+assign lsu_b_error = dmem_txn_err;
+
+
+//
+// Memory bus assignments
+// -------------------------------------------------------------------------
+
+assign dmem_cen     = lsu_valid && !lsu_finished && !lsu_a_error;
 assign dmem_wen     = lsu_store ;
-assign dmem_strb    = 0;
 assign dmem_addr    = lsu_addr  ;
 assign dmem_wdata   = lsu_wdata ;
+
+assign dmem_strb[0] = lsu_byte &&  lsu_addr[1:0] == 2'b00 ||
+                      lsu_half && !lsu_addr[  1]          ||
+                      lsu_word                             ;
+
+assign dmem_strb[1] = lsu_byte &&  lsu_addr[1:0] == 2'b01 ||
+                      lsu_half && !lsu_addr[  1]          ||
+                      lsu_word                             ;
+
+assign dmem_strb[2] = lsu_byte &&  lsu_addr[1:0] == 2'b10 ||
+                      lsu_half &&  lsu_addr[  1]          ||
+                      lsu_word                             ;
+
+assign dmem_strb[3] = lsu_byte &&  lsu_addr[1:0] == 2'b11 ||
+                      lsu_half &&  lsu_addr[  1]          ||
+                      lsu_word                             ;
 
 endmodule

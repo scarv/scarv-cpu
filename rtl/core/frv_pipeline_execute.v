@@ -56,6 +56,8 @@ output wire [31:0] dmem_wdata        // Write data
 // Common core parameters and constants
 `include "frv_common.vh"
 
+wire pipe_progress = !s3_p_busy && s3_p_valid;
+
 //
 // Operation Decoding
 // -------------------------------------------------------------------------
@@ -125,7 +127,7 @@ wire        lsu_word   = s3_uop[2:1] == LSU_WORD;
 wire        lsu_signed = s3_uop[LSU_SIGNED]  ;
 
 wire [XL:0] n_s4_opr_a_lsu = lsu_rdata ;
-wire [XL:0] n_s4_opr_b_lsu = 32'b0;
+wire [XL:0] n_s4_opr_b_lsu = lsu_addr  ;
 
 //
 // Functional Unit Interfacing: CFU
@@ -196,7 +198,8 @@ wire [XL:0] n_s4_opr_b_csr = s3_opr_c;
 wire   p_valid   = s3_p_valid;
 
 // Is this stage currently busy?
-assign s3_p_busy = p_busy;
+assign s3_p_busy = p_busy ||
+                   lsu_valid && !lsu_ready;
 
 // Is the next stage currently busy?
 wire   p_busy    ;
@@ -235,6 +238,7 @@ frv_lsu i_lsu (
 .g_resetn       (g_resetn       ), // Global reset.
 .lsu_valid      (lsu_valid      ), // Inputs are valid.
 .lsu_ready      (lsu_ready      ), // Outputs are valid / instruction complete.
+.pipe_prog      (pipe_progress  ), // Pipeline progressing this cycle.
 .lsu_a_error    (lsu_a_error    ), // Address error.
 .lsu_b_error    (lsu_b_error    ), // Bus error.
 .lsu_addr       (lsu_addr       ), // Memory address to access.

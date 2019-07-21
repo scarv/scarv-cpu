@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jul 20 16:13:07 2019
+[*] Sun Jul 21 14:13:34 2019
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.vcd"
-[dumpfile_mtime] "Sat Jul 20 16:10:10 2019"
-[dumpfile_size] 823354
+[dumpfile_mtime] "Sun Jul 21 14:12:31 2019"
+[dumpfile_size] 831504
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
-[timestart] 1981
+[timestart] 2020
 [size] 1920 1025
 [pos] -1 -1
-*-9.268034 3606 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-9.297773 4306 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -379,15 +379,17 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_uop[4:0]
 @800200
 -LSU
 @28
+TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_valid
+@29
+TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_ready
+@28
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_a_error
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_b_error
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_byte
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_half
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_load
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_ready
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_signed
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_store
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_valid
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_word
 @800200
 -DMEM
