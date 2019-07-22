@@ -433,7 +433,7 @@ assign p_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_bgeu       || dec_blt        || dec_bltu       || dec_bne        ||
     dec_c_bnez     || dec_div        || dec_divu       || dec_mul        ||
     dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
-    dec_remu        ;
+    dec_remu       || dec_c_mv        ;
 
 assign p_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
