@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jul 21 14:50:26 2019
+[*] Mon Jul 22 15:10:23 2019
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-ADD-01.vcd"
-[dumpfile_mtime] "Sun Jul 21 14:49:28 2019"
-[dumpfile_size] 1013048
+[dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-JALR-01.vcd"
+[dumpfile_mtime] "Mon Jul 22 15:07:31 2019"
+[dumpfile_size] 1109374
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
-[timestart] 3161
+[timestart] 2699
 [size] 1920 1025
 [pos] -1 -1
-*-7.753424 4027 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-10.292999 3426 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -378,7 +378,7 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_trap
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_uop[4:0]
 @1000200
 -Inputs
-@800200
+@c00200
 -LSU
 @28
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_valid
@@ -408,8 +408,9 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.dmem_strb[3:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.dmem_wdata[31:0]
 @1000200
 -DMEM
+@1401200
 -LSU
-@800200
+@c00200
 -Integer ALU
 @28
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.g_clk
@@ -457,9 +458,9 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_arith
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_lhs[63:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_result[63:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_rhs[4:0]
-@1000200
+@1401200
 -Integer ALU
-@800200
+@c00200
 -Next Outputs
 @22
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_fu[4:0]
@@ -487,7 +488,7 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_size[1:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_trap
 @22
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_uop[4:0]
-@1000200
+@1401200
 -Next Outputs
 @c00200
 -cfu
@@ -541,30 +542,30 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_uop[4:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_clk
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_resetn
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.pipe_progress
-@c00201
+@800200
 -Stage Inputs
-@23
+@22
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_fu[4:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_pc[31:0]
-@2023
-^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
+@2022
+^3 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-JALR-01.elf.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_instr[31:0]
-@23
+@22
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_opr_a[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_opr_b[31:0]
-@29
+@28
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_p_busy
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_p_valid
-@25
+@24
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_rd[4:0]
-@29
+@28
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_size[1:0]
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_trap
-@23
+@22
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_uop[4:0]
-@1401201
+@1000200
 -Stage Inputs
-@c00200
+@800200
 -Control Flow
 @28
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cf_ack
@@ -580,7 +581,9 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_finish_now
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_mret
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_tgt_trap
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_trap
-@1401200
+@29
+TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_link
+@1000200
 -Control Flow
 @c00200
 -CSRs
@@ -649,7 +652,8 @@ TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_mul
 -FU
 @800200
 -GPRs
-@24
+@2024
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_wdata[31:0]

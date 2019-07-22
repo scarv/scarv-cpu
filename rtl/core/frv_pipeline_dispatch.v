@@ -88,7 +88,7 @@ wire [ 4:0] n_s3_rd      = no_rd ? 5'b0 : s2_rd;
 // -------------------------------------------------------------------------
 
 wire [31:0] csr_addr = {20'b0, s2_imm[31:20]};
-wire [31:0] csr_imm  = {{27{s2_rs1[4]}}, s2_rs1};
+wire [31:0] csr_imm  = {27'b0, s2_rs1       };
 
 //
 // Bubbling and stalling

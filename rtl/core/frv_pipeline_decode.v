@@ -205,8 +205,13 @@ wire       csr_op =
     dec_csrrc  || dec_csrrci || dec_csrrs  || dec_csrrsi || dec_csrrw  ||
     dec_csrrwi ;
 
-assign uop_csr[CSR_READ ] = csr_op && dec_rd_32  != 0;
-assign uop_csr[CSR_WRITE] = csr_op && dec_rs1_32 != 0;
+wire csr_no_write = ((dec_csrrs  || dec_csrrc ) && dec_rs1_32 == 0) ||
+                    ((dec_csrrsi || dec_csrrci) && dec_rs1_32 == 0) ;
+
+wire csr_no_read  = (dec_csrrw || dec_csrrwi) && dec_rd_32 == 0;
+
+assign uop_csr[CSR_READ ] = csr_op && !csr_no_read ;
+assign uop_csr[CSR_WRITE] = csr_op && !csr_no_write;
 assign uop_csr[CSR_SET  ] = dec_csrrs || dec_csrrsi ;
 assign uop_csr[CSR_CLEAR] = dec_csrrc || dec_csrrci ;
 assign uop_csr[CSR_SWAP ] = dec_csrrw || dec_csrrwi ;

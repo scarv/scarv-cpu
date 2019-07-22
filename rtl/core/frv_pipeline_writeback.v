@@ -98,14 +98,28 @@ wire [XL:0] lsu_gpr_wdata   = s4_opr_a;
 // Functional Unit: CSR
 // -------------------------------------------------------------------------
 
-assign      csr_en          = fu_csr;
+reg csr_done;
+
+wire n_csr_done = !pipe_progress && (csr_done || csr_en);
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        csr_done <= 1'b0;
+    end else begin
+        csr_done <= n_csr_done;
+    end
+end
+
+assign      csr_en          = fu_csr && !csr_done;
 assign      csr_wr          = fu_csr && s4_uop[CSR_WRITE];
 assign      csr_wr_set      = fu_csr && s4_uop[CSR_SET  ];
 assign      csr_wr_clr      = fu_csr && s4_uop[CSR_CLEAR];
 assign      csr_addr        = s4_opr_b[11:0];
 assign      csr_wdata       = s4_opr_a;
 
-wire        csr_gpr_wen     = fu_csr && s4_uop[CSR_READ];
+wire        csr_read        = fu_csr && s4_uop[CSR_READ];
+
+wire        csr_gpr_wen     = csr_read && !csr_done;
 wire [XL:0] csr_gpr_wdata   = csr_rdata;
 
 //
