@@ -129,7 +129,11 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 wire cfu_cf_taken   = fu_cfu && (s4_uop == CFU_TAKEN  ||
                                  s4_uop == CFU_JALI   ||
                                  s4_uop == CFU_JALR   );
-wire cfu_trap       = fu_cfu && (s4_uop == CFU_EBREAK || s4_uop == CFU_ECALL);
+
+wire cfu_ebreak     = fu_cfu && s4_uop == CFU_EBREAK;
+wire cfu_ecall      = fu_cfu && s4_uop == CFU_ECALL;
+
+wire cfu_trap       = cfu_ebreak || cfu_ecall;
 wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 
 wire cfu_tgt_trap   = cfu_trap || s4_trap;
@@ -187,10 +191,17 @@ assign fwd_s4_csr   = fu_csr;
 // It's a trap!
 // -------------------------------------------------------------------------
 
-assign trap_cpu   = 1'b0    ; // A trap occured due to CPU
+assign trap_cpu   = cfu_trap;
+
 assign trap_int   = s4_trap ; // A trap occured due to interrupt
-assign trap_cause = 0       ; // Cause of the trap.
+
+assign trap_cause = // Cause of the trap.
+    cfu_ebreak  ? TRAP_BREAKPT  :
+    cfu_ecall   ?   TRAP_ECALLM :
+                            0   ;
+
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
+
 assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 
 //
