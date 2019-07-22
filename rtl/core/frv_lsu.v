@@ -100,7 +100,14 @@ assign dmem_cen     = lsu_valid && !lsu_finished && !lsu_a_error;
 assign dmem_wen     = lsu_store ;
 assign dmem_addr    = lsu_addr  & 32'hFFFF_FFFC;
 
-assign dmem_wdata   = lsu_wdata ;
+assign dmem_wdata   = 
+    {32{lsu_byte && lsu_addr[1:0]==2'b00}} & {24'b0, lsu_wdata[ 7:0]       } |
+    {32{lsu_byte && lsu_addr[1:0]==2'b01}} & {16'b0, lsu_wdata[ 7:0],  8'b0} |
+    {32{lsu_byte && lsu_addr[1:0]==2'b10}} & { 8'b0, lsu_wdata[ 7:0], 16'b0} |
+    {32{lsu_byte && lsu_addr[1:0]==2'b11}} & {       lsu_wdata[ 7:0], 24'b0} |
+    {32{lsu_half && lsu_addr[  1]==1'b1 }} & {       lsu_wdata[15:0], 16'b0} |
+    {32{lsu_half && lsu_addr[  1]==1'b0 }} & {16'b0, lsu_wdata[15:0]       } |
+    {32{lsu_word                        }} & {       lsu_wdata             } ;
 
 assign dmem_strb[0] = lsu_byte &&  lsu_addr[1:0] == 2'b00 ||
                       lsu_half && !lsu_addr[  1]          ||
