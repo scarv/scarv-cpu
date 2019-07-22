@@ -162,7 +162,7 @@ wire        cfu_always_take= cfu_jalr || cfu_jali || cfu_jalr;
 
 wire [4:0]  n_s4_uop_cfu   =
     cfu_cond        ? (cfu_cond_taken ? CFU_TAKEN : CFU_NOT_TAKEN)  :
-    cfu_always_take ? CFU_TAKEN                                     :
+    cfu_always_take ? s3_uop                                        :
                       s3_uop                                        ;
 
 wire [XL:0] n_s4_opr_a_cfu = 

@@ -116,6 +116,8 @@ wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 
 wire cfu_tgt_trap   = cfu_trap || s4_trap;
 
+wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
+
 assign cf_req       = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap;
 
 // CFU operation finishing this cycle.
@@ -141,7 +143,7 @@ end else begin
     cfu_done <= n_cfu_done;
 end
 
-wire cfu_gpr_wen = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
+wire cfu_gpr_wen = cfu_link;
 
 wire [XL:0] cfu_gpr_wdata = s4_opr_b;
 
