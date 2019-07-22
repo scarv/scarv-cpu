@@ -98,7 +98,8 @@ assign lsu_b_error = dmem_txn_err;
 
 assign dmem_cen     = lsu_valid && !lsu_finished && !lsu_a_error;
 assign dmem_wen     = lsu_store ;
-assign dmem_addr    = lsu_addr  ;
+assign dmem_addr    = lsu_addr  & 32'hFFFF_FFFC;
+
 assign dmem_wdata   = lsu_wdata ;
 
 assign dmem_strb[0] = lsu_byte &&  lsu_addr[1:0] == 2'b00 ||
