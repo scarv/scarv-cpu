@@ -12,6 +12,8 @@ module frv_pipeline_writeback (
 input              g_clk           , // global clock
 input              g_resetn        , // synchronous reset
 
+input  wire [31:0] s3_pc           , // Next Program counter (for JAL[R])
+
 input  wire [ 4:0] s4_rd           , // Destination register address
 input  wire [XL:0] s4_opr_a        , // Operand A
 input  wire [XL:0] s4_opr_b        , // Operand B
@@ -110,7 +112,9 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 // Functional Unit: CFU
 // -------------------------------------------------------------------------
 
-wire cfu_cf_taken   = fu_cfu &&  s4_uop == CFU_TAKEN;
+wire cfu_cf_taken   = fu_cfu && (s4_uop == CFU_TAKEN  ||
+                                 s4_uop == CFU_JALI   ||
+                                 s4_uop == CFU_JALR   );
 wire cfu_trap       = fu_cfu && (s4_uop == CFU_EBREAK || s4_uop == CFU_ECALL);
 wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 
@@ -145,7 +149,7 @@ end
 
 wire cfu_gpr_wen = cfu_link;
 
-wire [XL:0] cfu_gpr_wdata = s4_opr_b;
+wire [XL:0] cfu_gpr_wdata = s3_pc;
 
 //
 // GPR writeback and forwarding

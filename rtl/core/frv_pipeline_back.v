@@ -234,6 +234,7 @@ frv_pipeline_execute i_pipeline_execute (
 frv_pipeline_writeback i_pipeline_writeback(
 .g_clk         (g_clk          ) , // global clock
 .g_resetn      (g_resetn       ) , // synchronous reset
+.s3_pc         (s3_pc          ) , // Program counter for JAL[R]
 .s4_rd         (s4_rd          ) , // Destination register address
 .s4_opr_a      (s4_opr_a       ) , // Operand A
 .s4_opr_b      (s4_opr_b       ) , // Operand B
