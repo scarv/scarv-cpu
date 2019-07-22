@@ -141,17 +141,22 @@ end else begin
     cfu_done <= n_cfu_done;
 end
 
+wire cfu_gpr_wen = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
+
+wire [XL:0] cfu_gpr_wdata = s4_opr_b;
+
 //
 // GPR writeback and forwarding
 // -------------------------------------------------------------------------
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wen  = csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen;
+assign gpr_wen  = csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen || cfu_gpr_wen;
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
-                  {32{lsu_gpr_wen}} & lsu_gpr_wdata ;
+                  {32{lsu_gpr_wen}} & lsu_gpr_wdata |
+                  {32{cfu_gpr_wen}} & cfu_gpr_wdata ;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;

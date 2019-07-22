@@ -166,7 +166,8 @@ wire [4:0]  n_s4_uop_cfu   =
                       s3_uop                                        ;
 
 wire [XL:0] n_s4_opr_a_cfu = 
-    cfu_jalr    ? alu_add_result : s3_opr_c;
+    cfu_jalr    ? {alu_add_result[XL:1],1'b0} :
+                  {s3_opr_c      [XL:1],1'b0} ;
 
 wire [XL:0] n_s4_opr_b_cfu = 32'b0;
 
