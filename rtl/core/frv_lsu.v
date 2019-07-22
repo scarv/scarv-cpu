@@ -67,7 +67,7 @@ end
 
 assign lsu_ready   = dmem_txn_done || lsu_finished;
 
-assign lsu_rdata[ 7: 0] =
+wire [ 7: 0] rdata_b0 =
     {8{lsu_byte && lsu_addr[1:0] == 2'b00}} & dmem_rdata[ 7: 0] |
     {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[ 7: 0] |
     {8{lsu_word                          }} & dmem_rdata[ 7: 0] |
@@ -76,13 +76,19 @@ assign lsu_rdata[ 7: 0] =
     {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
     {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & dmem_rdata[31:24] ;
 
-assign lsu_rdata[15: 8] =
+wire [ 7: 0] rdata_b1 =
+    {8{lsu_byte && lsu_signed            }} & {8{rdata_b0[7] }} |
     {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[15: 8] |
     {8{lsu_word                          }} & dmem_rdata[15: 8] |
     {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[31:24] ;
 
-assign lsu_rdata[31:16] =
-    {16{lsu_word                         }} & dmem_rdata[31:16] ;
+wire [15: 0] rdata_h1 =
+    {16{lsu_byte && lsu_signed           }} & {16{rdata_b1[7]  }}  |
+    {16{lsu_half && lsu_signed           }} & {16{rdata_b1[7]  }}  |
+    {16{lsu_word                         }} & dmem_rdata[31:16]    ;
+
+//                  31....16,15.....8,7......0
+assign lsu_rdata = {rdata_h1,rdata_b1,rdata_b0};
 
 // Address error?
 assign lsu_a_error = lsu_half &&  lsu_addr[  0] ||
