@@ -87,7 +87,7 @@ wire [  XL:0] bw_result     = {XLEN{alu_op_xor}} & (bw_lhs ^ bw_rhs) |
 // Result multiplexing
 //
 
-wire out_adder  = alu_op_add && !alu_op_cmp;
+wire out_adder  = (alu_op_add || alu_op_sub) && !alu_op_cmp;
 wire out_shift  = alu_op_shf ;
 wire out_bw     = alu_op_xor || alu_op_or || alu_op_and;
 wire out_cmp    = alu_op_cmp ;
