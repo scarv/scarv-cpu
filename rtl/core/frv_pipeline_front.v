@@ -23,7 +23,7 @@ input  wire [     XL:0] imem_rdata  , // Read data
 output wire [     XL:0] imem_wdata  , // Write data
 
 output wire             s2_p_valid  , // Pipeline control signals
-output wire             s2_p_busy   , // Pipeline control signals
+input  wire             s2_p_busy   , // Pipeline control signals
 
 output wire [      4:0] s2_rd       , // Destination register address
 output wire [      4:0] s2_rs1      , // Source register address 1

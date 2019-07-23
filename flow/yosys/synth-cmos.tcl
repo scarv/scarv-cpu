@@ -11,7 +11,7 @@ procs
 tee -o $::env(FRV_WORK)/synth/logic-loops.rpt check -assert
 
 # Generic yosys synthesis command
-synth -top mrv_cpu
+synth -top frv_core
 
 # Print some statistics out
 tee -o $::env(FRV_WORK)/synth/synth-statistics.rpt stat -width

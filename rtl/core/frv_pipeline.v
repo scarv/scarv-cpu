@@ -188,6 +188,7 @@ frv_pipeline_back #(
 .trap_cause   (trap_cause   ), // Cause of a trap.
 .trap_mtval   (trap_mtval   ), // Value associated with the trap.
 .trap_pc      (trap_pc      ), // PC value associated with the trap.
+.exec_mret    (exec_mret    ), // MRET instruction executed.
 .csr_mepc     (csr_mepc     ), // Current MEPC.
 .csr_mtvec    (csr_mtvec    ), // Current MTVEC.
 .csr_en       (csr_en       ), // CSR Access Enable

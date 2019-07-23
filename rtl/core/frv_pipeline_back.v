@@ -34,6 +34,8 @@ output wire [ 5:0] trap_cause      , // A trap occured due to interrupt
 output wire [XL:0] trap_mtval      , // Value associated with the trap.
 output wire [XL:0] trap_pc         , // PC value associated with the trap.
 
+output wire        exec_mret       , // MRET instruction executed.
+
 input  wire [XL:0] csr_mepc        ,
 input  wire [XL:0] csr_mtvec       ,
 
@@ -268,6 +270,7 @@ frv_pipeline_writeback i_pipeline_writeback(
 .trs_pc        (trs_pc         ), // Trace program counter.
 .trs_instr     (trs_instr      ), // Trace instruction.
 .trs_valid     (trs_valid      ), // Trace output valid.
+.exec_mret     (exec_mret      ), // MRET instruction executed.
 .csr_en        (csr_en         ), // CSR Access Enable
 .csr_wr        (csr_wr         ), // CSR Write Enable
 .csr_wr_set    (csr_wr_set     ), // CSR Write - Set

@@ -43,9 +43,9 @@
 
 - PPA Targets:
   - When implemented on Xilinx Artix-7 FPGA
-  - Frequency: 200MHz
-  - LUTs: 2000
-  - FFs: 2000
+  - Frequency: 150MHz
+  - LUTs: ~~2000~~ 2422
+  - FFs: ~~2000~~ 869 + 1024 for GPRs.
 - 5 Stage pipeline
   - Fetch
   - Decode

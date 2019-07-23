@@ -41,6 +41,8 @@ output wire [ 5:0] trap_cause      , // A trap occured due to interrupt
 output wire [XL:0] trap_mtval      , // Value associated with the trap.
 output wire [XL:0] trap_pc         , // PC value associated with the trap.
 
+output wire        exec_mret       , // MRET instruction executed.
+
 input  wire [XL:0] csr_mepc        ,
 input  wire [XL:0] csr_mtvec       ,
 
@@ -142,6 +144,8 @@ wire cfu_ecall      = fu_cfu && s4_uop == CFU_ECALL;
 
 wire cfu_trap       = cfu_ebreak || cfu_ecall;
 wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
+
+assign exec_mret    = cfu_mret && pipe_progress;
 
 wire cfu_tgt_trap   = cfu_trap || s4_trap;
 

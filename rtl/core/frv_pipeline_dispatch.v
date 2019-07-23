@@ -154,7 +154,7 @@ wire [XL:0] dis_rs2                 ; // Dispatch stage value of RS2
 
 wire        fwd_s3_rs1 = s2_rs1 == fwd_s3_rd && |s2_rs1;
 wire        fwd_s4_rs1 = s2_rs1 == fwd_s4_rd && |s2_rs1;
-;
+
 wire        fwd_s3_rs2 = s2_rs2 == fwd_s3_rd && |s2_rs2;
 wire        fwd_s4_rs2 = s2_rs2 == fwd_s4_rd && |s2_rs2;
 

@@ -439,9 +439,9 @@ wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
 
 //
 // TODO: implement these properly.
-wire [63:0] ctr_cycle;
-wire [63:0] ctr_time;
-wire [63:0] ctr_instret;
+wire [63:0] ctr_cycle   =0;
+wire [63:0] ctr_time    =0;
+wire [63:0] ctr_instret =0;
 
 wire   valid_addr     = 
     read_mstatus   ||
