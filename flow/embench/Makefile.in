@@ -2,14 +2,33 @@
 EMBENCH_ROOT=$(FRV_HOME)/external/embench-iot
 EMBENCH_BUILD=$(FRV_WORK)/embench-iot
 EMBENCH_OUT=$(EMBENCH_BUILD)/build
-EMBENCH_EXES_OLD=$(addprefix $(FRV_HOME)/,$(shell find -P work/embench-iot -executable -type f -path "*src*"))
+EMBENCH_EXES_OLD=$(EMBENCH_BUILD)/src/aha-mont64/aha-mont64 \
+                 $(EMBENCH_BUILD)/src/crc32/crc32 \
+                 $(EMBENCH_BUILD)/src/cubic/cubic \
+                 $(EMBENCH_BUILD)/src/edn/edn \
+                 $(EMBENCH_BUILD)/src/huffbench/huffbench \
+                 $(EMBENCH_BUILD)/src/matmult-int/matmult-int \
+                 $(EMBENCH_BUILD)/src/minver/minver \
+                 $(EMBENCH_BUILD)/src/nbody/nbody \
+                 $(EMBENCH_BUILD)/src/nettle-aes/nettle-aes \
+                 $(EMBENCH_BUILD)/src/nettle-sha256/nettle-sha256 \
+                 $(EMBENCH_BUILD)/src/nsichneu/nsichneu \
+                 $(EMBENCH_BUILD)/src/picojpeg/picojpeg \
+                 $(EMBENCH_BUILD)/src/qrduino/qrduino \
+                 $(EMBENCH_BUILD)/src/sglib-combined/sglib-combined \
+                 $(EMBENCH_BUILD)/src/slre/slre \
+                 $(EMBENCH_BUILD)/src/st/st \
+                 $(EMBENCH_BUILD)/src/statemate/statemate \
+                 $(EMBENCH_BUILD)/src/ud/ud \
+                 $(EMBENCH_BUILD)/src/wikisort/wikisort
+
 EMBENCH_EXES=$(shell find -P $(EMBENCH_OUT) -executable -type f)
 EMBENCH_DIS=$(addsuffix .dis,$(EMBENCH_EXES))
 EMBENCH_SREC=$(addsuffix .srec,$(EMBENCH_EXES))
 
 embench-configure:
 	mkdir -p $(EMBENCH_BUILD)
-	cd $(EMBENCH_BUILD) && ../../external/embench-iot/configure \
+	$(EMBENCH_ENV) cd $(EMBENCH_BUILD) && ../../external/embench-iot/configure \
         --host=riscv32-unknown-elf \
         --with-chip=speed-test \
         --with-board=ri5cyverilator
@@ -29,6 +48,9 @@ $(EMBENCH_OUT)/%.dis : $(EMBENCH_OUT)/%
 $(EMBENCH_OUT)/%.srec: $(EMBENCH_OUT)/%
 	riscv32-unknown-elf-objcopy -O srec --srec-forceS3  $< $@
 	@chmod -x $@
+
+embench-clean:
+	rm -rf $(EMBENCH_BUILD)
 
 $(EMBENCH_DIS)  : embench-build
 $(EMBENCH_SREC) : embench-build

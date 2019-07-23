@@ -1,3 +1,6 @@
 [submodule "external/riscv-compliance"]
 	path = external/riscv-compliance
 	url = git@github.com:riscv/riscv-compliance.git
+[submodule "external/embench-iot"]
+	path = external/embench-iot
+	url = git@github.com:embench/embench-iot.git
