@@ -89,7 +89,6 @@ wire [ 4:0] s2_rd      ; // Destination register address
 wire [ 4:0] s2_rs1     ; // Source register address 1
 wire [ 4:0] s2_rs2     ; // Source register address 2
 wire [31:0] s2_imm     ; // Decoded immediate
-wire [31:0] s2_pc      ; // Program counter
 wire [ 4:0] s2_uop     ; // Micro-op code
 wire [ 4:0] s2_fu      ; // Functional Unit
 wire        s2_trap    ; // Raise a trap?
@@ -125,7 +124,8 @@ wire [XL:0] trap_pc    ; // PC value associated with the trap.
 //  Front-end of the pipeline. Responsible for instruction fetch and decode.
 //
 frv_pipeline_front #(
-.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
+.TRACE_INSTR_WORD(TRACE_INSTR_WORD),
+.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
 ) i_pipeline_front(
 .g_clk       (g_clk       ), // global clock
 .g_resetn    (g_resetn    ), // synchronous reset
@@ -146,7 +146,6 @@ frv_pipeline_front #(
 .s2_rs1      (s2_rs1      ), // Source register address 1
 .s2_rs2      (s2_rs2      ), // Source register address 2
 .s2_imm      (s2_imm      ), // Decoded immediate
-.s2_pc       (s2_pc       ), // Program counter
 .s2_uop      (s2_uop      ), // Micro-op code
 .s2_fu       (s2_fu       ), // Functional Unit
 .s2_trap     (s2_trap     ), // Raise a trap?
@@ -164,7 +163,8 @@ frv_pipeline_front #(
 //  writing back their results.
 //
 frv_pipeline_back #(
-.BRAM_REGFILE(BRAM_REGFILE)
+.BRAM_REGFILE(BRAM_REGFILE),
+.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
 ) i_pipeline_back(
 .g_clk        (g_clk        ), // global clock
 .g_resetn     (g_resetn     ), // synchronous reset
@@ -174,7 +174,6 @@ frv_pipeline_back #(
 .s2_rs1       (s2_rs1       ), // Source register address 1
 .s2_rs2       (s2_rs2       ), // Source register address 2
 .s2_imm       (s2_imm       ), // Decoded immediate
-.s2_pc        (s2_pc        ), // Program counter
 .s2_uop       (s2_uop       ), // Micro-op code
 .s2_fu        (s2_fu        ), // Functional Unit
 .s2_trap      (s2_trap      ), // Raise a trap?

@@ -16,7 +16,6 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [ 4:0] s2_rs1          , // Source register address 1
 input  wire [ 4:0] s2_rs2          , // Source register address 2
 input  wire [31:0] s2_imm          , // Decoded immediate
-input  wire [31:0] s2_pc           , // Program counter
 input  wire [ 4:0] s2_uop          , // Micro-op code
 input  wire [ 4:0] s2_fu           , // Functional Unit
 input  wire        s2_trap         , // Raise a trap?
@@ -25,6 +24,10 @@ input  wire [ 1:0] s2_size         , // Size of the instruction.
 input  wire [31:0] s2_instr        , // The instruction word
 
 input  wire        flush           , // Flush this pipeline stage.
+
+input  wire        cf_req          , // Control flow change request
+input  wire [XL:0] cf_target       , // Control flow change destination
+input  wire        cf_ack          , // Control flow change acknolwedge
 
 input  wire [ 4:0] fwd_s4_rd       , // Writeback stage destination reg.
 input  wire [XL:0] fwd_s4_wdata    , // Write data for writeback stage.
@@ -61,9 +64,12 @@ output wire        s3_p_valid        // Is this input valid?
 // Use an FPGA BRAM style register file.
 parameter BRAM_REGFILE = 0;
 
+// Value taken by the PC on a reset.
+parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
+
 // -------------------------------------------------------------------------
 
-wire [31:0] n_s3_pc      = s2_pc    ; // Program counter
+wire [31:0] n_s3_pc      = program_counter; // Program counter
 wire [ 4:0] n_s3_uop     = s2_uop   ; // Micro-op code
 wire [ 4:0] n_s3_fu      = s2_fu    ; // Functional Unit
 wire [ 1:0] n_s3_size    = s2_size  ; // Size of the instruction.
@@ -91,6 +97,35 @@ wire [ 4:0] n_s3_rd      = no_rd ? 5'b0 : s2_rd;
 
 wire [31:0] csr_addr = {20'b0, s2_imm[31:20]};
 wire [31:0] csr_imm  = {27'b0, s2_rs1       };
+
+//
+// Program Counter - Decode stage aligned
+// -------------------------------------------------------------------------
+
+// A control flow change has completed this cycle.
+wire cf_change_now = cf_req && cf_ack;
+
+reg  [XL:0] program_counter;
+wire [XL:0] n_program_counter;
+
+wire size_16 = s2_size[0];
+wire size_32 = s2_size[1];
+
+assign n_program_counter =
+    program_counter +
+    {29'b0, size_32, size_16, 1'b0};
+
+wire progress_pc = s2_p_valid && !s2_p_busy;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        program_counter <= FRV_PC_RESET_VALUE   ;
+    end else if(cf_change_now) begin
+        program_counter <= cf_target;
+    end else if(progress_pc) begin
+        program_counter <= n_program_counter    ;
+    end
+end
 
 //
 // Bubbling and stalling
@@ -139,7 +174,7 @@ assign dis_rs2 =
 
 wire [XL:0] pc_plus_imm             ; // Sum of PC and immediate.
 
-assign      pc_plus_imm = s2_pc + s2_imm;
+assign      pc_plus_imm = program_counter + s2_imm;
 
 //
 // Operand Source decoding

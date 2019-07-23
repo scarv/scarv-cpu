@@ -17,7 +17,6 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [ 4:0] s2_rs1          , // Source register address 1
 input  wire [ 4:0] s2_rs2          , // Source register address 2
 input  wire [31:0] s2_imm          , // Decoded immediate
-input  wire [31:0] s2_pc           , // Program counter
 input  wire [ 4:0] s2_uop          , // Micro-op code
 input  wire [ 4:0] s2_fu           , // Functional Unit
 input  wire        s2_trap         , // Raise a trap?
@@ -66,6 +65,9 @@ output wire [31:0] dmem_wdata        // Write data
 
 // Use an FPGA BRAM style register file.
 parameter BRAM_REGFILE = 0;
+
+// Value taken by the PC on a reset.
+parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
 //
 // Event detection
@@ -131,7 +133,8 @@ wire        s4_p_valid      ; // Is this input valid?
 //  hazards and gathering operands ready for execution.
 //
 frv_pipeline_dispatch #(
-.BRAM_REGFILE(BRAM_REGFILE)
+.BRAM_REGFILE(BRAM_REGFILE),
+.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
 ) i_pipeline_dispatch (
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset
@@ -141,7 +144,6 @@ frv_pipeline_dispatch #(
 .s2_rs1          (s2_rs1          ), // Source register address 1
 .s2_rs2          (s2_rs2          ), // Source register address 2
 .s2_imm          (s2_imm          ), // Decoded immediate
-.s2_pc           (s2_pc           ), // Program counter
 .s2_uop          (s2_uop          ), // Micro-op code
 .s2_fu           (s2_fu           ), // Functional Unit
 .s2_trap         (s2_trap         ), // Raise a trap?
@@ -149,6 +151,9 @@ frv_pipeline_dispatch #(
 .s2_size         (s2_size         ), // Size of the instruction.
 .s2_instr        (s2_instr        ), // The instruction word
 .flush           (flush_dispatch  ), // Flush this pipeline stage.
+.cf_req          (cf_req          ), // Control flow change request
+.cf_target       (cf_target       ), // Control flow change target
+.cf_ack          (cf_ack          ), // Control flow change acknowledge.
 .fwd_s4_rd       (fwd_s4_rd       ), // Writeback stage destination reg.
 .fwd_s4_wdata    (fwd_s4_wdata    ), // Write data for writeback stage.
 .fwd_s4_load     (fwd_s4_load     ), // Writeback stage has load in it.

@@ -29,7 +29,6 @@ output wire [      4:0] s2_rd       , // Destination register address
 output wire [      4:0] s2_rs1      , // Source register address 1
 output wire [      4:0] s2_rs2      , // Source register address 2
 output wire [     31:0] s2_imm      , // Decoded immediate
-output wire [     31:0] s2_pc       , // Program counter
 output wire [      4:0] s2_uop      , // Micro-op code
 output wire [      4:0] s2_fu       , // Functional Unit
 output wire             s2_trap     , // Raise a trap?
@@ -50,7 +49,7 @@ parameter FRONT_PIPE_REG_BUFFERED = 1;
 parameter TRACE_INSTR_WORD = 1'b1;
 
 // Width in bits of the front-end output pipeline register
-localparam FRONT_PIPE_REG_WIDTH = 100;
+localparam FRONT_PIPE_REG_WIDTH = 68;
 
 // Common core parameters and constants
 `include "frv_common.vh"
@@ -134,7 +133,6 @@ assign p_pipe_input = {
     p_rs1        , // Source register address 1
     p_rs2        , // Source register address 2
     p_imm        , // Decoded immediate
-    p_pc         , // Program counter
     p_uop        , // Micro-op code
     p_fu         , // Functional Unit (alu/mem/jump/mul/csr)
     p_trap       , // Raise a trap?
@@ -147,7 +145,6 @@ assign {
     s2_rs1        , // Source register address 1
     s2_rs2        , // Source register address 2
     s2_imm        , // Decoded immediate
-    s2_pc         , // Program counter
     s2_uop        , // Micro-op code
     s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
     s2_trap       , // Raise a trap?
@@ -155,33 +152,6 @@ assign {
     s2_size         // Size of the instruction.
 } = p_pipe_output;
 
-//
-// Program Counter - Decode stage aligned
-// -------------------------------------------------------------------------
-
-reg  [XL:0] program_counter;
-wire [XL:0] n_program_counter;
-
-wire size_16 = p_size[0];
-wire size_32 = p_size[1];
-
-assign n_program_counter =
-    program_counter +
-    {29'b0, size_32, size_16, 1'b0};
-
-assign p_pc = program_counter;
-
-wire progress_pc = fe_ready && !s1_p_busy;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        program_counter <= FRV_PC_RESET_VALUE   ;
-    end else if(cf_change_now) begin
-        program_counter <= cf_target;
-    end else if(progress_pc) begin
-        program_counter <= n_program_counter    ;
-    end
-end
 
 //
 // instance : frv_pipeline_decode
