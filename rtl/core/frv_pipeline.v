@@ -65,6 +65,10 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Use a BRAM/DMEM friendly register file?
 parameter BRAM_REGFILE = 0;
 
+// If set, trace the instruction word through the pipeline. Otherwise,
+// set it to zeros and let it be optimised away.
+parameter TRACE_INSTR_WORD = 1'b1;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -120,7 +124,9 @@ wire [XL:0] trap_pc    ; // PC value associated with the trap.
 //
 //  Front-end of the pipeline. Responsible for instruction fetch and decode.
 //
-frv_pipeline_front i_pipeline_front(
+frv_pipeline_front #(
+.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
+) i_pipeline_front(
 .g_clk       (g_clk       ), // global clock
 .g_resetn    (g_resetn    ), // synchronous reset
 .cf_req      (cf_req      ), // Control flow change request

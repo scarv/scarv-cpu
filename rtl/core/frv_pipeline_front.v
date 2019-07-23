@@ -42,11 +42,15 @@ output wire [     31:0] s2_instr      // The instruction word.
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
-// Width in bits of the front-end output pipeline register
-parameter FRONT_PIPE_REG_WIDTH = 132;
-
 // Use a buffered handshake for the front-end output pipeline register.
 parameter FRONT_PIPE_REG_BUFFERED = 1;
+
+// If set, trace the instruction word through the pipeline. Otherwise,
+// set it to zeros and let it be optimised away.
+parameter TRACE_INSTR_WORD = 1'b1;
+
+// Width in bits of the front-end output pipeline register
+localparam FRONT_PIPE_REG_WIDTH = 100;
 
 // Common core parameters and constants
 `include "frv_common.vh"
@@ -135,8 +139,7 @@ assign p_pipe_input = {
     p_fu         , // Functional Unit (alu/mem/jump/mul/csr)
     p_trap       , // Raise a trap?
     p_opr_src    , // Operand sources for dispatch stage.
-    p_size       , // Size of the instruction.
-    p_instr        // The instruction word
+    p_size         // Size of the instruction.
 };
 
 assign {
@@ -149,8 +152,7 @@ assign {
     s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
     s2_trap       , // Raise a trap?
     s2_opr_src    , // Operand sources for dispatch stage.
-    s2_size       , // Size of the instruction.
-    s2_instr        // The instruction word
+    s2_size         // Size of the instruction.
 } = p_pipe_output;
 
 //
@@ -187,7 +189,9 @@ end
 //  Decode stage of the CPU, responsible for turning RISC-V encoded
 //  instructions into wider pipeline encodings.
 //
-frv_pipeline_decode i_pipeline_decode (
+frv_pipeline_decode #(
+.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
+) i_pipeline_decode (
 .d_valid     (fe_ready    ), // Is the input data valid.
 .d_data      (d_data      ), // Data word to decode.
 .d_error     (d_error     ), // Is d_data associated with a fetch error?
@@ -223,5 +227,31 @@ frv_pipeline_register #(
 .o_valid  (s2_p_valid       ), // Input data from stage N valid?
 .i_busy   (s2_p_busy        )  // Stage N+1 ready to continue?
 );
+
+generate if(TRACE_INSTR_WORD) begin
+
+// Conditionally generated pipeline register to hold traced
+// instruction words.
+frv_pipeline_register #(
+.RLEN(32),
+.BUFFER_HANDSHAKE(FRONT_PIPE_REG_BUFFERED)
+) i_core_front_instr_reg(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (p_instr          ), // Input data from stage N
+.i_valid  (fe_ready         ), // Input data valid?
+.o_busy   (                 ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Unconnected.
+.flush    (fe_flush         ), // Flush the contents of the pipeline
+.o_data   (s2_instr         ), // Output data for stage N+1
+.o_valid  (                 ), // Input data from stage N valid?
+.i_busy   (s2_p_busy        )  // Stage N+1 ready to continue?
+);
+
+end else begin
+
+    assign s2_instr = 32'b0;
+
+end endgenerate
 
 endmodule

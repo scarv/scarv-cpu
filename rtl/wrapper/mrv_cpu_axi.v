@@ -117,6 +117,10 @@ parameter   MMIO_MTIMECMP_ADDR    = MMIO_BASE_ADDR + 8;
 // Value of MTIMECMP register on reset.
 parameter   MMIO_MTIMECMP_RESET   = 64'hFFFFFFFFFFFFFFFF;
 
+// If set, trace the instruction word through the pipeline. Otherwise,
+// set it to zeros and let it be optimised away.
+parameter TRACE_INSTR_WORD = 1'b0;
+
 //
 // Instruction SRAM interface
 wire         isram_cen        ; // Chip enable
@@ -145,7 +149,8 @@ wire [31:0]  dsram_wdata      ; // Write data
 //
 frv_core #(
 .BRAM_REGFILE         (BRAM_REGFILE         ),
-.FRV_PC_RESET_VALUE   (FRV_PC_RESET_VALUE   ) 
+.FRV_PC_RESET_VALUE   (FRV_PC_RESET_VALUE   ),
+.TRACE_INSTR_WORD     (TRACE_INSTR_WORD     )
 ) i_frv_cpu (
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset

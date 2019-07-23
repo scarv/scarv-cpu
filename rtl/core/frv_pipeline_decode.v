@@ -28,6 +28,10 @@ output wire [31:0] p_instr        // The instruction word
 // Common core parameters and constants
 `include "frv_common.vh"
 
+// If set, trace the instruction word through the pipeline. Otherwise,
+// set it to zeros and let it be optimised away.
+parameter TRACE_INSTR_WORD = 1'b1;
+
 //
 // Instruction Decoding
 // -------------------------------------------------------------------------
@@ -85,8 +89,11 @@ wire       instr_32bit= d_data[1:0] == 2'b11;
 assign     p_size[0]  = instr_16bit;
 assign     p_size[1]  = instr_32bit;
 
-// TODO: Switch to turn on/off.
-assign     p_instr    = instr_16bit ? {16'b0, d_data[15:0]} : d_data ;
+generate if (TRACE_INSTR_WORD) begin
+    assign     p_instr    = instr_16bit ? {16'b0, d_data[15:0]} : d_data ;
+end else begin
+    assign     p_instr    = 32'b0;
+end endgenerate
 
 //
 // Micro-OP Decoding / Selection

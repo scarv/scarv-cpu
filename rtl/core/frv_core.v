@@ -68,6 +68,10 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Use a BRAM/DMEM friendly register file?
 parameter BRAM_REGFILE = 0;
 
+// If set, trace the instruction word through the pipeline. Otherwise,
+// set it to zeros and let it be optimised away.
+parameter TRACE_INSTR_WORD = 1'b1;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -80,7 +84,8 @@ parameter BRAM_REGFILE = 0;
 //
 frv_pipeline #(
 .FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE),
-.BRAM_REGFILE(BRAM_REGFILE)
+.BRAM_REGFILE(BRAM_REGFILE),
+.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset
