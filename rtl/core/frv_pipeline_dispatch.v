@@ -71,14 +71,16 @@ wire [31:0] n_s3_instr   = s2_instr ; // The instruction word
 wire [XL:0] n_s3_opr_a              ; // Operand A
 wire [XL:0] n_s3_opr_b              ; // Operand B
 wire [XL:0] n_s3_opr_c              ; // Operand C
-wire        n_s3_trap               ; // Raise a trap?
+wire        n_s3_trap    = s2_trap  ; // Raise a trap?
 
 wire cfu_conditional = s2_fu[P_FU_CFU] && s2_uop[4:3] == 2'b00;
 
 // Zero destination register for instructions with no writeback so that
 // we don't confuse the forwarding network.
-wire no_rd = s2_fu[P_FU_LSU] && s2_uop[LSU_STORE] ||
-             cfu_conditional                       ;
+// If there is a trap, always propagate RD as it contains the cause code.
+wire no_rd = (s2_fu[P_FU_LSU] && s2_uop[LSU_STORE] ||
+              cfu_conditional                      )  &&
+              !s2_trap                                 ;
 
 // Destination register address
 wire [ 4:0] n_s3_rd      = no_rd ? 5'b0 : s2_rd;

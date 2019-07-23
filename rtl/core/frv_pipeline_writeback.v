@@ -182,8 +182,9 @@ wire [XL:0] cfu_gpr_wdata = s3_pc;
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wen  = csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen || cfu_gpr_wen ||
-                  mul_gpr_wen ;
+assign gpr_wen  = !s4_trap &&
+    (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
+     cfu_gpr_wen || mul_gpr_wen );
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
@@ -207,7 +208,7 @@ assign trap_int   = s4_trap ; // A trap occured due to interrupt
 assign trap_cause = // Cause of the trap.
     cfu_ebreak  ? TRAP_BREAKPT  :
     cfu_ecall   ?   TRAP_ECALLM :
-                            0   ;
+                  s4_opr_a[5:0] ;
 
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
 

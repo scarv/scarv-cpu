@@ -9,6 +9,7 @@
 - [Stalling, Forwarding and Bubbling.](#Stalling,-Forwarding-and-Bubbling.)
 - [Control-flow changes](#Control-flow-changes)
 - [Register Fields](#Register-Fields)
+- [Exceptions](#Exceptons)
 
 ---
 
@@ -227,3 +228,51 @@ Signal     | Size  | Description
 `trap`     |  1    | Raise a trap?
 `size`     |  2    | Size of the instruction.
 
+---
+
+## Exceptions
+
+
+Where exceptions are raised, and how they are progressed from stage to
+stage.
+
+**Fetch:**
+Raises:
+- Fetch Bus error: propagated as a single bit into the fetch buffer.
+
+**Decode:**
+Raises:
+- Decode Error: detected by decoder, propagated in pipeline trap bit.
+    Cause code stored in `rd` pipeline field.
+Propagates:
+- Fetch bus error: detected in trap bit of fetch buffer.
+    Cause code stored in `rd` pipeline field.
+
+**Dispatch:**
+Raises:
+- None
+Propagates:
+- Fetch bus error: detected in trap bit of fetch buffer.
+    Cause code stored in `rd` pipeline field.
+- Decode Error: detected by decoder, propagated in pipeline trap bit.
+    Cause code stored in `rd` pipeline field.
+
+**Execute:**
+Raises:
+- Load/store address misaligned. Cause code stored in `rd.
+- Load/store bus error. Cause code stored in `rd.
+Propagates:
+- Fetch bus error: detected in trap bit of fetch buffer.
+    Cause code stored in `opr_b` pipeline field.
+- Decode Error: detected by decoder, propagated in pipeline trap bit.
+    Cause code stored in `opr_b` pipeline field.
+
+**Writeback:**
+Raises:
+- Environment call. Cause communicated to CSRs directly.
+- Breakpoint. Cause communicated to CSRs directly.
+Propagates:
+- Load/store address misaligned.
+- Load/store bus error.
+- Fetch bus error: detected in trap bit of fetch buffer.
+- Decode Error: detected by decoder, propagated in pipeline trap bit.

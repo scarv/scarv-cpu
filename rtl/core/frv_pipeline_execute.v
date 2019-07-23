@@ -302,8 +302,8 @@ frv_alu_muldiv i_alu_muldiv(
 
 localparam PIPE_REG_W = 146;
 
-wire [ 4:0] n_s4_rd    = s3_rd   ; // Destination register address
 wire [31:0] n_s4_pc    = s3_pc   ; // Program counter
+wire [ 4:0] n_s4_rd    = s3_rd   ; // Functional Unit
 wire [ 4:0] n_s4_fu    = s3_fu   ; // Functional Unit
 wire [ 1:0] n_s4_size  = s3_size ; // Size of the instruction.
 wire [31:0] n_s4_instr = s3_instr; // The instruction word
@@ -313,6 +313,14 @@ wire [ 4:0] n_s4_uop   = cfu_valid ? n_s4_uop_cfu : s3_uop  ; // Micro-op code
 wire        n_s4_trap  = s3_trap || 
                          fu_lsu && (lsu_a_error || lsu_b_error);
 
+wire [5:0]  n_trap_cause =
+    s3_trap                             ? {1'b0, s3_rd} :
+    fu_lsu && lsu_a_error && lsu_load   ? TRAP_LDALIGN  :
+    fu_lsu && lsu_a_error && lsu_store  ? TRAP_STALIGN  :
+    fu_lsu && lsu_b_error && lsu_load   ? TRAP_LDACCESS :
+    fu_lsu && lsu_b_error && lsu_store  ? TRAP_STACCESS :
+                                          6'b0          ;
+
 wire [XL:0] n_s4_opr_a = 
     {XLEN{fu_alu}} & n_s4_opr_a_alu |
     {XLEN{fu_mul}} & n_s4_opr_a_mul |
@@ -321,11 +329,13 @@ wire [XL:0] n_s4_opr_a =
     {XLEN{fu_csr}} & n_s4_opr_a_csr ;
 
 wire [XL:0] n_s4_opr_b =
-    {XLEN{fu_alu}} & n_s4_opr_b_alu |
-    {XLEN{fu_mul}} & n_s4_opr_b_mul |
-    {XLEN{fu_lsu}} & n_s4_opr_b_lsu |
-    {XLEN{fu_cfu}} & n_s4_opr_b_cfu |
-    {XLEN{fu_csr}} & n_s4_opr_b_csr ;
+    n_s4_trap ? {26'b0,n_trap_cause} : (
+        {XLEN{fu_alu}} & n_s4_opr_b_alu |
+        {XLEN{fu_mul}} & n_s4_opr_b_mul |
+        {XLEN{fu_lsu}} & n_s4_opr_b_lsu |
+        {XLEN{fu_cfu}} & n_s4_opr_b_cfu |
+        {XLEN{fu_csr}} & n_s4_opr_b_csr 
+    );
 
 
 // Forwaring / bubbling signals.
