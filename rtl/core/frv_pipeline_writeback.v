@@ -88,6 +88,13 @@ wire        alu_gpr_wen     = fu_alu;
 wire [XL:0] alu_gpr_wdata   = s4_opr_a;
 
 //
+// Functional Unit: MUL
+// -------------------------------------------------------------------------
+
+wire        mul_gpr_wen     = fu_mul;
+wire [XL:0] mul_gpr_wdata   = s4_opr_a;
+
+//
 // Functional Unit: LSU
 // -------------------------------------------------------------------------
 
@@ -175,12 +182,14 @@ wire [XL:0] cfu_gpr_wdata = s3_pc;
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wen  = csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen || cfu_gpr_wen;
+assign gpr_wen  = csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen || cfu_gpr_wen ||
+                  mul_gpr_wen ;
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
                   {32{lsu_gpr_wen}} & lsu_gpr_wdata |
-                  {32{cfu_gpr_wen}} & cfu_gpr_wdata ;
+                  {32{cfu_gpr_wen}} & cfu_gpr_wdata |
+                  {32{mul_gpr_wen}} & mul_gpr_wdata ;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;

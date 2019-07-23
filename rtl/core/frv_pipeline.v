@@ -65,9 +65,6 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Use a BRAM/DMEM friendly register file?
 parameter BRAM_REGFILE = 0;
 
-// Use buffered pipeline handshake protocol?
-parameter BUFFER_HANDSHAKE = 0;
-
 // Common core parameters and constants
 `include "frv_common.vh"
 

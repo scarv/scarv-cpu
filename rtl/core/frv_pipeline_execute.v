@@ -108,6 +108,29 @@ wire [XL:0] n_s4_opr_a_alu = alu_result;
 wire [XL:0] n_s4_opr_b_alu = 32'b0;
 
 //
+// Functional Unit Interfacing: Multiplier
+// -------------------------------------------------------------------------
+
+wire        imul_valid      = fu_mul;
+wire        imul_div        = fu_mul && s3_uop == MUL_DIV   ;
+wire        imul_divu       = fu_mul && s3_uop == MUL_DIVU  ;
+wire        imul_mul        = fu_mul && s3_uop == MUL_MUL   ;
+wire        imul_mulh       = fu_mul && s3_uop == MUL_MULH  ;
+wire        imul_mulhsu     = fu_mul && s3_uop == MUL_MULHSU;
+wire        imul_mulhu      = fu_mul && s3_uop == MUL_MULHU ;
+wire        imul_rem        = fu_mul && s3_uop == MUL_REM   ;
+wire        imul_remu       = fu_mul && s3_uop == MUL_REMU  ;
+
+wire [31:0] imul_lhs        = s3_opr_a;
+wire [31:0] imul_rhs        = s3_opr_b;
+
+wire        imul_ready      ;
+wire [31:0] imul_result     ;
+
+wire [XL:0] n_s4_opr_a_mul  = imul_result;
+wire [XL:0] n_s4_opr_b_mul  = 32'b0;
+
+//
 // Functional Unit Interfacing: LSU
 // -------------------------------------------------------------------------
 
@@ -172,16 +195,6 @@ wire [XL:0] n_s4_opr_a_cfu =
 wire [XL:0] n_s4_opr_b_cfu = 32'b0;
 
 //
-// Functional Unit Interfacing: MUL/DIV
-// -------------------------------------------------------------------------
-
-wire        mul_valid  = fu_mul         ; // Inputs are valid.
-wire        mul_ready  = mul_valid      ; // Instruction complete. TODO
-
-wire [XL:0] n_s4_opr_a_mul = 32'b0;
-wire [XL:0] n_s4_opr_b_mul = 32'b0;
-
-//
 // Functional Unit Interfacing: CSR
 // -------------------------------------------------------------------------
 
@@ -199,8 +212,9 @@ wire [XL:0] n_s4_opr_b_csr = s3_opr_c;
 wire   p_valid   = s3_p_valid;
 
 // Is this stage currently busy?
-assign s3_p_busy = p_busy ||
-                   lsu_valid && !lsu_ready;
+assign s3_p_busy = p_busy                   ||
+                   lsu_valid  && !lsu_ready ||
+                   imul_valid && !imul_ready;
 
 // Is the next stage currently busy?
 wire   p_busy    ;
@@ -261,6 +275,27 @@ frv_lsu i_lsu (
 .dmem_wdata     (dmem_wdata     )  // Write data
 );
 
+frv_alu_muldiv i_alu_muldiv(
+.g_clk        (g_clk        ), // Global clock
+.g_resetn     (g_resetn     ), // Global negative level triggered reset
+.exu_stall    (s3_p_busy    ), // stalled due to other stages
+.exu_flush    (flush        ), // should flush everything.
+.pipe_progress(pipe_progress), // Pipe is progressing.
+.imul_valid   (imul_valid   ), // IMUL instruction / op valid
+.imul_mul     (imul_mul     ), // 
+.imul_mulh    (imul_mulh    ), // 
+.imul_mulhu   (imul_mulhu   ), // 
+.imul_mulhsu  (imul_mulhsu  ), // 
+.imul_div     (imul_div     ), // 
+.imul_divu    (imul_divu    ), // 
+.imul_rem     (imul_rem     ), // 
+.imul_remu    (imul_remu    ), // 
+.imul_lhs     (imul_lhs     ), // Left hand operand
+.imul_rhs     (imul_rhs     ), // Left hand operand
+.imul_ready   (imul_ready   ), // ready to progress
+.imul_result  (imul_result  )  // Result of the IMUL operation.
+);
+
 //
 // Pipeline Register
 // -------------------------------------------------------------------------
@@ -275,7 +310,8 @@ wire [31:0] n_s4_instr = s3_instr; // The instruction word
 
 wire [ 4:0] n_s4_uop   = cfu_valid ? n_s4_uop_cfu : s3_uop  ; // Micro-op code
 
-wire        n_s4_trap  = 1'b0    ; // Raise a trap? TODO
+wire        n_s4_trap  = s3_trap || 
+                         fu_lsu && (lsu_a_error || lsu_b_error);
 
 wire [XL:0] n_s4_opr_a = 
     {XLEN{fu_alu}} & n_s4_opr_a_alu |
@@ -294,9 +330,10 @@ wire [XL:0] n_s4_opr_b =
 
 // Forwaring / bubbling signals.
 assign fwd_s3_rd    = s3_rd             ; // Writeback stage destination reg.
-assign fwd_s3_wdata = alu_result        ; // Write data for writeback stage.
+assign fwd_s3_wdata = alu_result | imul_result ;
 assign fwd_s3_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Writeback stage has CSR op in it.
+
 
 wire [PIPE_REG_W-1:0] pipe_reg_out;
 
