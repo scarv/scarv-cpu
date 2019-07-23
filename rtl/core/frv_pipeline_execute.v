@@ -140,7 +140,7 @@ wire        lsu_a_error                 ; // Address error.
 wire        lsu_b_error                 ; // Bus error.
 wire        lsu_ready                   ; // Load/Store instruction complete.
 
-wire [XL:0] lsu_addr   = alu_add_result ; // Memory address to access.
+wire [XL:0] lsu_addr   = s3_opr_a+s3_opr_b; // Memory address to access.
 wire [XL:0] lsu_wdata  = s3_opr_c       ; // Data to write to memory.
 wire        lsu_load   = s3_uop[LSU_LOAD]    ;
 wire        lsu_store  = s3_uop[LSU_STORE]   ;
