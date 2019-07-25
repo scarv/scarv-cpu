@@ -19,6 +19,7 @@ output wire [3:0]   imem_strb       , // Write strobe
 output wire [XL:0]  imem_wdata      , // Write data
 output reg  [XL:0]  imem_addr       , // Read/Write address
 input  wire         imem_gnt        , // request accepted
+output wire         imem_ack        , // Instruction memory ack response.
 input  wire         imem_recv       , // Instruction memory recieve response.
 input  wire         imem_error      , // Error
 input  wire [XL:0]  imem_rdata      , // Read data
@@ -45,7 +46,8 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Stage can progress if buffer has enough data in it for an instruction.
 assign fe_ready = buf_valid;
 
-assign cf_ack   = (!imem_req || imem_req && imem_gnt) && reqs_outstanding == 0;
+// TODO: track when to ignore requests more inteligently.
+assign cf_ack   = (!imem_req || imem_req && imem_gnt);
 
 //
 // Request buffer
@@ -67,7 +69,7 @@ wire buf_ready = fe_ready && !fe_stall; // Eat 2/4 bytes
 reg  [1:0]   reqs_outstanding;
 wire [1:0] n_reqs_outstanding = reqs_outstanding +
                                 (imem_req && imem_gnt) -
-                                imem_recv;
+                                rsp_recv;
 
 wire cf_change          = cf_req && cf_ack;
 
@@ -113,8 +115,12 @@ wire fetch_misaligned = 1'b0; // TODO
 // Memory bus responses
 // --------------------------------------------------------------
 
-assign f_4byte = imem_recv && !fetch_misaligned;
-assign f_2byte = imem_recv &&  fetch_misaligned;
+wire   rsp_recv= imem_recv && imem_ack;
+
+assign f_4byte = rsp_recv && !fetch_misaligned;
+assign f_2byte = rsp_recv &&  fetch_misaligned;
+
+assign imem_ack= f_ready;
 
 //
 // Constant assignments for un-used signals.

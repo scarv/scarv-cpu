@@ -89,10 +89,8 @@ void sram_agent::drive_signals(){
 
 }
 
+void sram_agent::drive_response(){
 
-//! Compute any *next* signal values
-void sram_agent::posedge_clk(){
-    
     //
     // Respond to any outstanding transactions.
     if(req_q.empty() == false && this -> rand_chance(9,10)) {
@@ -113,6 +111,25 @@ void sram_agent::posedge_clk(){
         n_mem_error = 0;
         n_mem_recv  = 0;
         n_mem_rdata = 0;
+
+    }
+
+}
+
+//! Compute any *next* signal values
+void sram_agent::posedge_clk(){
+    
+    if       (!*mem_recv  && !*mem_ack) {
+        drive_response();
+
+    } else if(!*mem_recv  &&  *mem_ack) {
+        drive_response();
+    
+    } else if( *mem_recv  && !*mem_ack) {
+        // Do nothing, waiting to accept response.
+    
+    } else if( *mem_recv  &&  *mem_ack) {
+        drive_response();
 
     }
 

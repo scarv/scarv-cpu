@@ -66,7 +66,8 @@ public:
     uint32_t * mem_addr ; // Read/Write address
 
     // Response channel
-    uint8_t  * mem_recv ; // Instruction memory recieve response.
+    uint8_t  * mem_recv ; // memory recieve response.
+    uint8_t  * mem_ack  ; // memory acknowledge response.
     uint8_t  * mem_error; // Error
     uint32_t * mem_rdata; // Read data
 
@@ -86,6 +87,9 @@ protected:
     uint8_t rand_chance(int a, int b) {
         return ((rand() % b) < a) ? 1 : 0;
     }
+    
+    //! Drives the response channel.
+    void drive_response();
 
     //! handles populating of read data or writing of write data.
     void handle_read_write(

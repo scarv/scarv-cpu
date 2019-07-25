@@ -20,6 +20,7 @@ output wire [XL:0]      imem_wdata  , // Write data
 output wire [XL:0]      imem_addr   , // Read/Write address
 input  wire             imem_gnt    , // request accepted
 input  wire             imem_recv   , // Instruction memory recieve response.
+output wire             imem_ack    , // Instruction memory ack response.
 input  wire             imem_error  , // Error
 input  wire [XL:0]      imem_rdata  , // Read data
 
@@ -101,6 +102,7 @@ frv_pipeline_fetch #(
 .imem_addr      (imem_addr      ), // Read/Write address
 .imem_gnt       (imem_gnt       ), // request accepted
 .imem_recv      (imem_recv      ), // Instruction memory recieve response.
+.imem_ack       (imem_ack       ), // Response acknowledge
 .imem_error     (imem_error     ), // Error
 .imem_rdata     (imem_rdata     ), // Read data
 .fe_flush       (fe_flush       ), // Flush stage

@@ -58,6 +58,7 @@ output wire [XL:0]  dmem_wdata      , // Write data
 output wire [XL:0]  dmem_addr       , // Read/Write address
 input  wire         dmem_gnt        , // request accepted
 input  wire         dmem_recv       , // Instruction memory recieve response.
+output wire         dmem_ack        , // Data memory ack response.
 input  wire         dmem_error      , // Error
 input  wire [XL:0]  dmem_rdata        // Read data
 
@@ -226,6 +227,7 @@ frv_pipeline_execute i_pipeline_execute (
 .dmem_addr      (dmem_addr      ), // Read/Write address
 .dmem_gnt       (dmem_gnt       ), // request accepted
 .dmem_recv      (dmem_recv      ), // Instruction memory recieve response.
+.dmem_ack       (dmem_ack       ), // Response acknowledge
 .dmem_error     (dmem_error     ), // Error
 .dmem_rdata     (dmem_rdata     )  // Read data
 );

@@ -33,6 +33,7 @@ output wire [XL:0] dmem_wdata  , // Write data
 output wire [XL:0] dmem_addr   , // Read/Write address
 input  wire        dmem_gnt    , // request accepted
 input  wire        dmem_recv   , // Instruction memory recieve response.
+output wire        dmem_ack    , // Data memory ack response.
 input  wire        dmem_error  , // Error
 input  wire [XL:0] dmem_rdata    // Read data
 
@@ -44,6 +45,8 @@ input  wire [XL:0] dmem_rdata    // Read data
 //
 // Instruction done tracking
 // -------------------------------------------------------------------------
+
+assign dmem_ack    = 1'b1;
 
 wire dmem_txn_done = 1'b1; // dmem_cen      && !dmem_stall;
 wire dmem_txn_err  = dmem_txn_done &&  dmem_error;
