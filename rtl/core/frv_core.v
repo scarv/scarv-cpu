@@ -42,23 +42,25 @@ output wire         trs_valid       , // Trace output valid.
 input  wire         int_external    , // External interrupt trigger line.
 input  wire         int_software    , // Software interrupt trigger line.
 
-output wire         imem_cen        , // Chip enable
+output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
-input  wire         imem_error      , // Error
-input  wire         imem_stall      , // Memory stall
 output wire [3:0]   imem_strb       , // Write strobe
-output wire [31:0]  imem_addr       , // Read/Write address
-input  wire [31:0]  imem_rdata      , // Read data
-output wire [31:0]  imem_wdata      , // Write data
+output wire [XL:0]  imem_wdata      , // Write data
+output wire [XL:0]  imem_addr       , // Read/Write address
+input  wire         imem_gnt        , // request accepted
+input  wire         imem_recv       , // Instruction memory recieve response.
+input  wire         imem_error      , // Error
+input  wire [XL:0]  imem_rdata      , // Read data
 
-output wire         dmem_cen        , // Chip enable
+output wire         dmem_req        , // Start memory request
 output wire         dmem_wen        , // Write enable
-input  wire         dmem_error      , // Error
-input  wire         dmem_stall      , // Memory stall
 output wire [3:0]   dmem_strb       , // Write strobe
-output wire [31:0]  dmem_addr       , // Read/Write address
-input  wire [31:0]  dmem_rdata      , // Read data
-output wire [31:0]  dmem_wdata        // Write data
+output wire [XL:0]  dmem_wdata      , // Write data
+output wire [XL:0]  dmem_addr       , // Read/Write address
+input  wire         dmem_gnt        , // request accepted
+input  wire         dmem_recv       , // Instruction memory recieve response.
+input  wire         dmem_error      , // Error
+input  wire [XL:0]  dmem_rdata        // Read data
 
 );
 
@@ -114,22 +116,24 @@ frv_pipeline #(
 .trs_pc        (trs_pc        ), // Trace program counter.
 .trs_instr     (trs_instr     ), // Trace instruction.
 .trs_valid     (trs_valid     ), // Trace output valid.
-.imem_cen      (imem_cen      ), // Chip enable
+.imem_req      (imem_req      ), // Start memory request
 .imem_wen      (imem_wen      ), // Write enable
-.imem_error    (imem_error    ), // Error
-.imem_stall    (imem_stall    ), // Memory stall
 .imem_strb     (imem_strb     ), // Write strobe
-.imem_addr     (imem_addr     ), // Read/Write address
-.imem_rdata    (imem_rdata    ), // Read data
 .imem_wdata    (imem_wdata    ), // Write data
-.dmem_cen      (dmem_cen      ), // Chip enable
+.imem_addr     (imem_addr     ), // Read/Write address
+.imem_gnt      (imem_gnt      ), // request accepted
+.imem_recv     (imem_recv     ), // Instruction memory recieve response.
+.imem_error    (imem_error    ), // Error
+.imem_rdata    (imem_rdata    ), // Read data
+.dmem_req      (dmem_req      ), // Start memory request
 .dmem_wen      (dmem_wen      ), // Write enable
-.dmem_error    (dmem_error    ), // Error
-.dmem_stall    (dmem_stall    ), // Memory stall
 .dmem_strb     (dmem_strb     ), // Write strobe
+.dmem_wdata    (dmem_wdata    ), // Write data
 .dmem_addr     (dmem_addr     ), // Read/Write address
-.dmem_rdata    (dmem_rdata    ), // Read data
-.dmem_wdata    (dmem_wdata    )  // Write data
+.dmem_gnt      (dmem_gnt      ), // request accepted
+.dmem_recv     (dmem_recv     ), // Instruction memory recieve response.
+.dmem_error    (dmem_error    ), // Error
+.dmem_rdata    (dmem_rdata    )  // Read data
 );
 
 endmodule

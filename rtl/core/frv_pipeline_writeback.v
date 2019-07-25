@@ -224,6 +224,6 @@ assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 
 assign trs_pc   = s4_pc;
 assign trs_instr= s4_instr;
-assign trs_valid= s4_p_valid && !s4_p_busy || (cfu_trap || cfu_mret);
+assign trs_valid= |s4_size && s4_p_valid && !s4_p_busy || (cfu_trap || cfu_mret);
 
 endmodule

@@ -13,14 +13,15 @@ input  wire         cf_req          , // Control flow change
 input  wire [XL:0]  cf_target       , // Control flow change target
 output wire         cf_ack          , // Acknowledge control flow change
 
-output reg          imem_cen        , // Chip enable
+output reg          imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
-input  wire         imem_error      , // Error
-input  wire         imem_stall      , // Memory stall
 output wire [3:0]   imem_strb       , // Write strobe
-output reg  [XL:0]  imem_addr       , // Read/Write address
-input  wire [XL:0]  imem_rdata      , // Read data
 output wire [XL:0]  imem_wdata      , // Write data
+output reg  [XL:0]  imem_addr       , // Read/Write address
+input  wire         imem_gnt        , // request accepted
+input  wire         imem_recv       , // Instruction memory recieve response.
+input  wire         imem_error      , // Error
+input  wire [XL:0]  imem_rdata      , // Read data
 
 input  wire         fe_flush        , // Flush stage
 input  wire         fe_stall        , // Stall stage
@@ -37,92 +38,90 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Common core parameters and constants
 `include "frv_common.vh"
 
-wire        f_4byte      ; // Input data valid
-wire        f_2byte      ; // Load only the 2 MS bytes
-wire        f_ready      ; // buffer ready for data
+//
+// Pipeline progression
+// --------------------------------------------------------------
 
-wire [XL:0] buf_data     ; // Output data
-wire        buf_out_2    ; // 
-wire        buf_out_4    ; // 
-wire        buf_err      ; // Output error bit
-wire        buf_valid    ; // D output data is valid
-wire        buf_ready    ; // Eat 2/4 bytes
+// Stage can progress if buffer has enough data in it for an instruction.
+assign fe_ready = buf_valid;
 
-assign      d_data       = buf_data;
-assign      d_error      = buf_err;
-
-wire [XL:0] dbg_buf_out = {buf_out_2 ? 16'b0 : buf_data[31:16], buf_data[15:0]};
-
-// Decode stage can eat fetched bytes
-assign      buf_ready = !fe_stall;
-
-// Fetch / decode are ready to progress.
-assign      fe_ready= buf_valid;
-
-// Ignore recieved data
-wire        txn_ign = !f_ready;
-
-// Recieve 4 bytes from memory
-wire        txn_recv= imem_cen && !imem_stall && !txn_ign;
-
-// Store 4 bytes of fetch data to the buffer.
-assign      f_4byte = txn_recv && !misaligned_fetch;
-
-// Store upper 2 bytes of fetch data to the buffer.
-assign      f_2byte = txn_recv &&  misaligned_fetch;
-
-wire progress_fe = !fe_stall && fe_ready;
+assign cf_ack   = (!imem_req || imem_req && imem_gnt) && reqs_outstanding == 0;
 
 //
-// Fetch address computation
-wire [XL:0] n_fetch_addr           = imem_addr + 4;
+// Request buffer
+// --------------------------------------------------------------
 
-reg         misaligned_fetch;
+wire f_ready;
+wire f_4byte;
+wire f_2byte;
 
-wire      n_misaligned_fetch = 
-    (cf_req && cf_ack && cf_target[1] || misaligned_fetch) &&
-    !f_2byte;
+wire buf_out_2 ; // Buffer has 2 byte instruction.
+wire buf_out_4 ; // Buffer has 4 byte instruction.
+wire buf_valid ; // D output data is valid
+wire buf_ready = fe_ready && !fe_stall; // Eat 2/4 bytes
 
-assign      cf_ack = !imem_cen || txn_recv;
+//
+// Memory bus requests
+// --------------------------------------------------------------
 
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        misaligned_fetch <= 1'b0;
-    end else begin
-        misaligned_fetch <= n_misaligned_fetch;
-    end
-end
+reg  [1:0]   reqs_outstanding;
+wire [1:0] n_reqs_outstanding = reqs_outstanding +
+                                (imem_req && imem_gnt) -
+                                imem_recv;
+
+wire cf_change          = cf_req && cf_ack;
+
+wire progress_imem_addr = imem_req && imem_gnt;
+
+wire [XL:0] n_imem_addr = imem_addr + 4;
+
+wire        n_imem_req  = (f_ready || cf_change);
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         imem_addr <= FRV_PC_RESET_VALUE;
-    end else if(cf_req && cf_ack) begin
-        imem_addr <= {cf_target[XL:2],2'b00};
-    end else if(txn_recv) begin
-        imem_addr <= n_fetch_addr;
+    end else if(cf_change) begin
+        imem_addr <= cf_target;
+    end else if(progress_imem_addr) begin
+        imem_addr <= n_imem_addr;
     end
 end
-
-assign imem_wdata = 0;
-assign imem_strb  = 0;
-assign imem_wen   = 0;
-
-reg  p_txn_finish;
-
-always @(posedge g_clk) p_txn_finish<= !g_resetn? 1'b0 : txn_recv;
-
-// Keep fetching so long as there are no valid instructions in the
-// fetch buffer.
-wire n_imem_cen = f_ready ||
-                 !f_ready && progress_fe;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        imem_cen <= 1'b0;
+        imem_req    <= 1'b0;
     end else begin
-        imem_cen <= n_imem_cen;
+        imem_req    <= n_imem_req;
     end
 end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        reqs_outstanding <= 2'b0;
+    end else begin
+        reqs_outstanding <= n_reqs_outstanding;
+    end
+end
+
+//
+// Misalignment tracking
+// --------------------------------------------------------------
+
+wire fetch_misaligned = 1'b0; // TODO
+
+//
+// Memory bus responses
+// --------------------------------------------------------------
+
+assign f_4byte = imem_recv && !fetch_misaligned;
+assign f_2byte = imem_recv &&  fetch_misaligned;
+
+//
+// Constant assignments for un-used signals.
+// --------------------------------------------------------------
+assign imem_wdata = 0;
+assign imem_strb  = 0;
+assign imem_wen   = 0;
 
 // ---------------------- Submodules -------------------------
 
@@ -136,10 +135,10 @@ frv_core_fetch_buffer i_core_fetch_buffer (
 .f_2byte  (f_2byte      ), // Load only the 2 MS bytes
 .f_err    (imem_error   ), // Input error
 .f_in     (imem_rdata   ), // Input data
-.buf_out  (buf_data     ), // Output data
+.buf_out  (d_data       ), // Output data
 .buf_out_2(buf_out_2    ), // Output data
 .buf_out_4(buf_out_4    ), // Output data
-.buf_err  (buf_err      ), // Output error bit
+.buf_err  (d_error      ), // Output error bit
 .buf_valid(buf_valid    ), // D output data is valid
 .buf_ready(buf_ready    )  // Eat 2/4 bytes
 );

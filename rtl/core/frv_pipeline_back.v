@@ -51,14 +51,15 @@ output wire [XL:0] trs_pc          , // Trace program counter.
 output wire [31:0] trs_instr       , // Trace instruction.
 output wire        trs_valid       , // Trace output valid.
 
-output wire        dmem_cen        , // Chip enable
-output wire        dmem_wen        , // Write enable
-input  wire        dmem_error      , // Error
-input  wire        dmem_stall      , // Memory stall
-output wire [3:0]  dmem_strb       , // Write strobe
-output wire [31:0] dmem_addr       , // Read/Write address
-input  wire [31:0] dmem_rdata      , // Read data
-output wire [31:0] dmem_wdata        // Write data
+output wire         dmem_req        , // Start memory request
+output wire         dmem_wen        , // Write enable
+output wire [3:0]   dmem_strb       , // Write strobe
+output wire [XL:0]  dmem_wdata      , // Write data
+output wire [XL:0]  dmem_addr       , // Read/Write address
+input  wire         dmem_gnt        , // request accepted
+input  wire         dmem_recv       , // Instruction memory recieve response.
+input  wire         dmem_error      , // Error
+input  wire [XL:0]  dmem_rdata        // Read data
 
 );
 
@@ -218,14 +219,15 @@ frv_pipeline_execute i_pipeline_execute (
 .s4_instr       (s4_instr       ) , // The instruction word
 .s4_p_busy      (s4_p_busy      ) , // Can this stage accept new inputs?
 .s4_p_valid     (s4_p_valid     ) , // Is this input valid?
-.dmem_cen       (dmem_cen       ) , // Chip enable
-.dmem_wen       (dmem_wen       ) , // Write enable
-.dmem_error     (dmem_error     ) , // Error
-.dmem_stall     (dmem_stall     ) , // Memory stall
-.dmem_strb      (dmem_strb      ) , // Write strobe
-.dmem_addr      (dmem_addr      ) , // Read/Write address
-.dmem_rdata     (dmem_rdata     ) , // Read data
-.dmem_wdata     (dmem_wdata     )   // Write data
+.dmem_req       (dmem_req       ), // Start memory request
+.dmem_wen       (dmem_wen       ), // Write enable
+.dmem_strb      (dmem_strb      ), // Write strobe
+.dmem_wdata     (dmem_wdata     ), // Write data
+.dmem_addr      (dmem_addr      ), // Read/Write address
+.dmem_gnt       (dmem_gnt       ), // request accepted
+.dmem_recv      (dmem_recv      ), // Instruction memory recieve response.
+.dmem_error     (dmem_error     ), // Error
+.dmem_rdata     (dmem_rdata     )  // Read data
 );
 
 

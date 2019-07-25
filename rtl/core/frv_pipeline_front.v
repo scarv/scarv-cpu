@@ -13,14 +13,15 @@ input  wire             cf_req      , // Control flow change request
 input  wire [     XL:0] cf_target   , // Control flow change destination
 output wire             cf_ack      , // Control flow change acknolwedge
 
-output wire             imem_cen    , // Chip enable
+output wire             imem_req    , // Start memory request
 output wire             imem_wen    , // Write enable
+output wire [3:0]       imem_strb   , // Write strobe
+output wire [XL:0]      imem_wdata  , // Write data
+output wire [XL:0]      imem_addr   , // Read/Write address
+input  wire             imem_gnt    , // request accepted
+input  wire             imem_recv   , // Instruction memory recieve response.
 input  wire             imem_error  , // Error
-input  wire             imem_stall  , // Memory stall
-output wire [   XL/8:0] imem_strb   , // Write strobe
-output wire [     XL:0] imem_addr   , // Read/Write address
-input  wire [     XL:0] imem_rdata  , // Read data
-output wire [     XL:0] imem_wdata  , // Write data
+input  wire [XL:0]      imem_rdata  , // Read data
 
 output wire             s2_p_valid  , // Pipeline control signals
 input  wire             s2_p_busy   , // Pipeline control signals
@@ -93,14 +94,15 @@ frv_pipeline_fetch #(
 .cf_req         (cf_req         ), // Control flow change
 .cf_target      (cf_target      ), // Control flow change target
 .cf_ack         (cf_ack         ), // Acknowledge control flow change
-.imem_cen       (imem_cen       ), // Chip enable
+.imem_req       (imem_req       ), // Start memory request
 .imem_wen       (imem_wen       ), // Write enable
-.imem_error     (imem_error     ), // Error
-.imem_stall     (imem_stall     ), // Memory stall
 .imem_strb      (imem_strb      ), // Write strobe
-.imem_addr      (imem_addr      ), // Read/Write address
-.imem_rdata     (imem_rdata     ), // Read data
 .imem_wdata     (imem_wdata     ), // Write data
+.imem_addr      (imem_addr      ), // Read/Write address
+.imem_gnt       (imem_gnt       ), // request accepted
+.imem_recv      (imem_recv      ), // Instruction memory recieve response.
+.imem_error     (imem_error     ), // Error
+.imem_rdata     (imem_rdata     ), // Read data
 .fe_flush       (fe_flush       ), // Flush stage
 .fe_stall       (fe_stall       ), // Stall stage
 .fe_ready       (fe_ready       ), // Stage ready to progress

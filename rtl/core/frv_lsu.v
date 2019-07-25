@@ -26,14 +26,15 @@ input  wire        lsu_half    , // Halfword operation width.
 input  wire        lsu_word    , // Word operation width.
 input  wire        lsu_signed  , // Sign extend loaded data?
 
-output wire        dmem_cen    , // Chip enable
+output wire        dmem_req    , // Start memory request
 output wire        dmem_wen    , // Write enable
-input  wire        dmem_error  , // Error
-input  wire        dmem_stall  , // Memory stall
 output wire [3:0]  dmem_strb   , // Write strobe
-output wire [31:0] dmem_addr   , // Read/Write address
-input  wire [31:0] dmem_rdata  , // Read data
-output wire [31:0] dmem_wdata    // Write data
+output wire [XL:0] dmem_wdata  , // Write data
+output wire [XL:0] dmem_addr   , // Read/Write address
+input  wire        dmem_gnt    , // request accepted
+input  wire        dmem_recv   , // Instruction memory recieve response.
+input  wire        dmem_error  , // Error
+input  wire [XL:0] dmem_rdata    // Read data
 
 );
 
@@ -44,7 +45,7 @@ output wire [31:0] dmem_wdata    // Write data
 // Instruction done tracking
 // -------------------------------------------------------------------------
 
-wire dmem_txn_done = dmem_cen      && !dmem_stall;
+wire dmem_txn_done = 1'b1; // dmem_cen      && !dmem_stall;
 wire dmem_txn_err  = dmem_txn_done &&  dmem_error;
 
 reg  lsu_finished;
@@ -102,7 +103,7 @@ assign lsu_b_error = dmem_txn_err;
 // Memory bus assignments
 // -------------------------------------------------------------------------
 
-assign dmem_cen     = lsu_valid && !lsu_finished && !lsu_a_error;
+assign dmem_req     = lsu_valid && !lsu_finished && !lsu_a_error;
 assign dmem_wen     = lsu_store ;
 assign dmem_addr    = lsu_addr  & 32'hFFFF_FFFC;
 

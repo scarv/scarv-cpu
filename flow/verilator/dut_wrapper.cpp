@@ -19,20 +19,22 @@ dut_wrapper::dut_wrapper (
     this -> mem                    = mem;
 
     this -> imem_agent               = new sram_agent(mem);
-    this -> imem_agent -> mem_cen   = &this -> dut -> imem_cen  ;
+    this -> imem_agent -> mem_req   = &this -> dut -> imem_req  ;
+    this -> imem_agent -> mem_gnt   = &this -> dut -> imem_gnt  ;
+    this -> imem_agent -> mem_recv  = &this -> dut -> imem_recv ;
     this -> imem_agent -> mem_wen   = &this -> dut -> imem_wen  ;
     this -> imem_agent -> mem_error = &this -> dut -> imem_error;
-    this -> imem_agent -> mem_stall = &this -> dut -> imem_stall;
     this -> imem_agent -> mem_strb  = &this -> dut -> imem_strb ;
     this -> imem_agent -> mem_addr  = &this -> dut -> imem_addr ;
     this -> imem_agent -> mem_rdata = &this -> dut -> imem_rdata;
     this -> imem_agent -> mem_wdata = &this -> dut -> imem_wdata;
     
     this -> dmem_agent              = new sram_agent(mem);
-    this -> dmem_agent -> mem_cen   = &this -> dut -> dmem_cen  ;
+    this -> dmem_agent -> mem_req   = &this -> dut -> dmem_req  ;
+    this -> dmem_agent -> mem_gnt   = &this -> dut -> dmem_gnt  ;
+    this -> dmem_agent -> mem_recv  = &this -> dut -> dmem_recv ;
     this -> dmem_agent -> mem_wen   = &this -> dut -> dmem_wen  ;
     this -> dmem_agent -> mem_error = &this -> dut -> dmem_error;
-    this -> dmem_agent -> mem_stall = &this -> dut -> dmem_stall;
     this -> dmem_agent -> mem_strb  = &this -> dut -> dmem_strb ;
     this -> dmem_agent -> mem_addr  = &this -> dut -> dmem_addr ;
     this -> dmem_agent -> mem_rdata = &this -> dut -> dmem_rdata;

@@ -72,7 +72,7 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 wire [31:0] n_s3_pc      = program_counter; // Program counter
 wire [ 4:0] n_s3_uop     = s2_uop   ; // Micro-op code
 wire [ 4:0] n_s3_fu      = s2_fu    ; // Functional Unit
-wire [ 1:0] n_s3_size    = s2_size  ; // Size of the instruction.
+wire [ 1:0] n_s3_size    = dis_bubble ? 2'b00 : s2_size;
 wire [31:0] n_s3_instr   = s2_instr ; // The instruction word
 wire [XL:0] n_s3_opr_a              ; // Operand A
 wire [XL:0] n_s3_opr_b              ; // Operand B
