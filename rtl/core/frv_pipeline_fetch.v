@@ -66,6 +66,13 @@ wire buf_ready = fe_ready && !fe_stall; // Eat 2/4 bytes
 // Memory bus requests
 // --------------------------------------------------------------
 
+reg  [1:0] ignore_rsps       ;
+wire [1:0] n_ignore_rsps     ;
+
+assign     n_ignore_rsps    = ignore_rsps - rsp_recv  ;
+
+wire        drop_response   = |ignore_rsps;
+
 reg  [1:0]   reqs_outstanding;
 wire [1:0] n_reqs_outstanding = reqs_outstanding +
                                 (imem_req && imem_gnt) -
@@ -105,6 +112,16 @@ always @(posedge g_clk) begin
     end
 end
 
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        ignore_rsps <= 2'b0;
+    end else if(cf_change) begin
+        ignore_rsps <= n_reqs_outstanding;
+    end else if(|ignore_rsps) begin
+        ignore_rsps <= n_ignore_rsps;
+    end
+end
+
 //
 // Misalignment tracking
 // --------------------------------------------------------------
@@ -117,8 +134,8 @@ wire fetch_misaligned = 1'b0; // TODO
 
 wire   rsp_recv= imem_recv && imem_ack;
 
-assign f_4byte = rsp_recv && !fetch_misaligned;
-assign f_2byte = rsp_recv &&  fetch_misaligned;
+assign f_4byte = rsp_recv && !fetch_misaligned && !drop_response;
+assign f_2byte = rsp_recv &&  fetch_misaligned && !drop_response;
 
 assign imem_ack= f_ready;
 
