@@ -16,7 +16,7 @@ VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
            $(VL_CSRC_DIR)/srec.cpp
 
 VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 \
-            -I$(CPU_RTL_DIR) -DFRV_VERIF_TRACE \
+            -I$(CPU_RTL_DIR) -DRVFI \
             --exe --trace \
             --top-module frv_core $(VL_BUILD_FLAGS)
 
