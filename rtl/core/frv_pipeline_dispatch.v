@@ -132,7 +132,7 @@ end
 // -------------------------------------------------------------------------
 
 wire   dis_bubble   =
-((               fwd_s4_csr) && (s2_rs1 == fwd_s4_rd || s2_rs2 == fwd_s4_rd))  ||
+((fwd_s4_load || fwd_s4_csr) && (s2_rs1 == fwd_s4_rd || s2_rs2 == fwd_s4_rd))  ||
 ((fwd_s3_load || fwd_s3_csr) && (s2_rs1 == fwd_s3_rd || s2_rs2 == fwd_s3_rd))   ;
 
 wire      p_busy    ;

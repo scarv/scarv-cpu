@@ -46,11 +46,7 @@ output wire        dmem_wen        , // Write enable
 output wire [3:0]  dmem_strb       , // Write strobe
 output wire [XL:0] dmem_wdata      , // Write data
 output wire [XL:0] dmem_addr       , // Read/Write address
-input  wire        dmem_gnt        , // request accepted
-input  wire        dmem_recv       , // Instruction memory recieve response.
-output wire        dmem_ack        , // Data memory ack response.
-input  wire        dmem_error      , // Error
-input  wire [XL:0] dmem_rdata        // Read data
+input  wire        dmem_gnt          // request accepted
 
 );
 
@@ -151,7 +147,7 @@ wire        lsu_half   = s3_uop[2:1] == LSU_HALF;
 wire        lsu_word   = s3_uop[2:1] == LSU_WORD;
 wire        lsu_signed = s3_uop[LSU_SIGNED]  ;
 
-wire [XL:0] n_s4_opr_a_lsu = lsu_rdata ;
+wire [XL:0] n_s4_opr_a_lsu = 32'b0     ;
 wire [XL:0] n_s4_opr_b_lsu = lsu_addr  ;
 
 //
@@ -211,7 +207,7 @@ wire [XL:0] n_s4_opr_b_csr = s3_opr_c;
 // -------------------------------------------------------------------------
 
 // Input into pipeline register, which then drives s4_p_valid;
-wire   p_valid   = s3_p_valid;
+wire   p_valid   = s3_p_valid && !s3_p_busy;
 
 // Is this stage currently busy?
 assign s3_p_busy = p_busy                   ||
@@ -272,11 +268,7 @@ frv_lsu i_lsu (
 .dmem_strb      (dmem_strb      ), // Write strobe
 .dmem_wdata     (dmem_wdata     ), // Write data
 .dmem_addr      (dmem_addr      ), // Read/Write address
-.dmem_gnt       (dmem_gnt       ), // request accepted
-.dmem_recv      (dmem_recv      ), // Instruction memory recieve response.
-.dmem_ack       (dmem_ack       ), // Response acknowledge
-.dmem_error     (dmem_error     ), // Error
-.dmem_rdata     (dmem_rdata     )  // Read data
+.dmem_gnt       (dmem_gnt       )  // request accepted
 );
 
 frv_alu_muldiv i_alu_muldiv(

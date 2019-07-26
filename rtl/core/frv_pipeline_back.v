@@ -225,11 +225,7 @@ frv_pipeline_execute i_pipeline_execute (
 .dmem_strb      (dmem_strb      ), // Write strobe
 .dmem_wdata     (dmem_wdata     ), // Write data
 .dmem_addr      (dmem_addr      ), // Read/Write address
-.dmem_gnt       (dmem_gnt       ), // request accepted
-.dmem_recv      (dmem_recv      ), // Instruction memory recieve response.
-.dmem_ack       (dmem_ack       ), // Response acknowledge
-.dmem_error     (dmem_error     ), // Error
-.dmem_rdata     (dmem_rdata     )  // Read data
+.dmem_gnt       (dmem_gnt       )  // request accepted
 );
 
 
@@ -284,7 +280,11 @@ frv_pipeline_writeback i_pipeline_writeback(
 .csr_rdata     (csr_rdata      ), // CSR read data
 .cf_req        (cf_req         ), // Control flow change request
 .cf_target     (cf_target      ), // Control flow change target
-.cf_ack        (cf_ack         )  // Control flow change acknowledge.
+.cf_ack        (cf_ack         ), // Control flow change acknowledge.
+.dmem_recv     (dmem_recv      ), // Instruction memory recieve response.
+.dmem_ack      (dmem_ack       ), // Response acknowledge
+.dmem_error    (dmem_error     ), // Error
+.dmem_rdata    (dmem_rdata     )  // Read data
 );
 
 endmodule

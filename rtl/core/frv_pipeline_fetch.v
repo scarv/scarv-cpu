@@ -84,7 +84,7 @@ wire progress_imem_addr = imem_req && imem_gnt;
 
 wire [XL:0] n_imem_addr = imem_addr + 4;
 
-wire        n_imem_req  = (f_ready || cf_change);
+wire        n_imem_req  = (f_ready || cf_change) && reqs_outstanding<3;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin

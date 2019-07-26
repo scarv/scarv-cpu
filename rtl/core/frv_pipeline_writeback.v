@@ -60,7 +60,12 @@ input  wire [XL:0] csr_rdata       , // CSR read data
 
 output wire        cf_req          , // Control flow change request
 output wire [XL:0] cf_target       , // Control flow change target
-input  wire        cf_ack            // Control flow change acknowledge.
+input  wire        cf_ack          , // Control flow change acknowledge.
+
+input  wire        dmem_recv       , // Instruction memory recieve response.
+output wire        dmem_ack        , // Data memory ack response.
+input  wire        dmem_error      , // Error
+input  wire [XL:0] dmem_rdata        // Read data
 
 );
 
@@ -70,7 +75,8 @@ input  wire        cf_ack            // Control flow change acknowledge.
 
 wire  pipe_progress = s4_p_valid && !s4_p_busy;
 
-assign s4_p_busy = fu_cfu ? cfu_busy    : 1'b0;
+assign s4_p_busy = fu_cfu && cfu_busy ||
+                   fu_lsu && lsu_busy ;
 
 //
 // Operation Decoding
@@ -95,13 +101,6 @@ wire [XL:0] alu_gpr_wdata   = s4_opr_a;
 
 wire        mul_gpr_wen     = fu_mul;
 wire [XL:0] mul_gpr_wdata   = s4_opr_a;
-
-//
-// Functional Unit: LSU
-// -------------------------------------------------------------------------
-
-wire        lsu_gpr_wen     = fu_lsu && s4_uop[LSU_LOAD];
-wire [XL:0] lsu_gpr_wdata   = s4_opr_a;
 
 //
 // Functional Unit: CSR
@@ -180,6 +179,72 @@ wire cfu_gpr_wen = cfu_link;
 
 wire [XL:0] cfu_gpr_wdata = s3_pc;
 
+
+//
+// Functional Unit: LSU
+// -------------------------------------------------------------------------
+
+wire        lsu_txn_recv    = fu_lsu    && s4_uop[LSU_LOAD] &&
+                              dmem_recv && dmem_ack         &&
+                              lsu_rsp_expected              ;
+
+wire        n_lsu_rsp_seen  = 
+    !pipe_progress && (lsu_rsp_seen || (dmem_recv && dmem_ack));
+
+reg         lsu_rsp_seen;
+
+wire        lsu_rsp_expected= fu_lsu    && !lsu_rsp_seen    ;
+
+assign      dmem_ack    = lsu_rsp_expected;
+
+wire        lsu_gpr_wen     = lsu_txn_recv && !dmem_error;
+wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
+
+wire        lsu_load    = s4_uop[LSU_LOAD]    ;
+wire        lsu_store   = s4_uop[LSU_STORE]   ;
+wire        lsu_byte    = s4_uop[2:1] == LSU_BYTE;
+wire        lsu_half    = s4_uop[2:1] == LSU_HALF;
+wire        lsu_word    = s4_uop[2:1] == LSU_WORD;
+wire        lsu_signed  = s4_uop[LSU_SIGNED]  ;
+wire [XL:0] lsu_addr    = s4_opr_b;
+
+wire        lsu_busy    =
+    fu_lsu && !(lsu_rsp_seen || (dmem_recv && dmem_ack));
+
+wire [ 7: 0] rdata_b0 =
+    {8{lsu_byte && lsu_addr[1:0] == 2'b00}} & dmem_rdata[ 7: 0] |
+    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[ 7: 0] |
+    {8{lsu_word                          }} & dmem_rdata[ 7: 0] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & dmem_rdata[15: 8] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & dmem_rdata[23:16] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & dmem_rdata[31:24] ;
+
+wire [ 7: 0] rdata_b1 =
+    {8{lsu_byte && lsu_signed            }} & {8{rdata_b0[7] }} |
+    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[15: 8] |
+    {8{lsu_word                          }} & dmem_rdata[15: 8] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[31:24] ;
+
+wire [15: 0] rdata_h1 =
+    {16{lsu_byte && lsu_signed           }} & {16{rdata_b1[7]}} |
+    {16{lsu_half && lsu_signed           }} & {16{rdata_b1[7]}} |
+    {16{lsu_word                         }} & dmem_rdata[31:16] ;
+
+//                  31....16,15.....8,7......0
+wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
+
+// LSU Bus error?
+wire        lsu_b_error = dmem_error;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        lsu_rsp_seen <= 1'b0;
+    end else begin
+        lsu_rsp_seen <= n_lsu_rsp_seen;
+    end
+end
+
 //
 // GPR writeback and forwarding
 // -------------------------------------------------------------------------
@@ -198,7 +263,7 @@ assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;
-assign fwd_s4_load  = 1'b0;
+assign fwd_s4_load  = lsu_load;
 assign fwd_s4_csr   = fu_csr;
 
 //

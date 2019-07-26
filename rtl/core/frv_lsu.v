@@ -31,11 +31,7 @@ output wire        dmem_wen    , // Write enable
 output wire [3:0]  dmem_strb   , // Write strobe
 output wire [XL:0] dmem_wdata  , // Write data
 output wire [XL:0] dmem_addr   , // Read/Write address
-input  wire        dmem_gnt    , // request accepted
-input  wire        dmem_recv   , // Instruction memory recieve response.
-output wire        dmem_ack    , // Data memory ack response.
-input  wire        dmem_error  , // Error
-input  wire [XL:0] dmem_rdata    // Read data
+input  wire        dmem_gnt      // request accepted
 
 );
 
@@ -46,16 +42,16 @@ input  wire [XL:0] dmem_rdata    // Read data
 // Instruction done tracking
 // -------------------------------------------------------------------------
 
-assign dmem_ack    = 1'b1;
+wire dmem_txn_done = dmem_req      && dmem_gnt  ;
 
-wire dmem_txn_done = 1'b1; // dmem_cen      && !dmem_stall;
-wire dmem_txn_err  = dmem_txn_done &&  dmem_error;
 
 reg  lsu_finished;
 
 wire n_lsu_finished = 
-    (lsu_finished || (lsu_valid && dmem_txn_done)) &&
+    (lsu_finished || ((lsu_valid && dmem_txn_done) || lsu_a_error)) &&
     !pipe_prog;
+
+assign lsu_ready    = dmem_txn_done || lsu_finished;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -65,42 +61,10 @@ always @(posedge g_clk) begin
     end
 end
 
-//
-// EXU interface
-// -------------------------------------------------------------------------
-
-assign lsu_ready   = dmem_txn_done || lsu_finished;
-
-wire [ 7: 0] rdata_b0 =
-    {8{lsu_byte && lsu_addr[1:0] == 2'b00}} & dmem_rdata[ 7: 0] |
-    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[ 7: 0] |
-    {8{lsu_word                          }} & dmem_rdata[ 7: 0] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & dmem_rdata[15: 8] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & dmem_rdata[23:16] |
-    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & dmem_rdata[31:24] ;
-
-wire [ 7: 0] rdata_b1 =
-    {8{lsu_byte && lsu_signed            }} & {8{rdata_b0[7] }} |
-    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[15: 8] |
-    {8{lsu_word                          }} & dmem_rdata[15: 8] |
-    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[31:24] ;
-
-wire [15: 0] rdata_h1 =
-    {16{lsu_byte && lsu_signed           }} & {16{rdata_b1[7]  }}  |
-    {16{lsu_half && lsu_signed           }} & {16{rdata_b1[7]  }}  |
-    {16{lsu_word                         }} & dmem_rdata[31:16]    ;
-
-//                  31....16,15.....8,7......0
-assign lsu_rdata = {rdata_h1,rdata_b1,rdata_b0};
 
 // Address error?
 assign lsu_a_error = lsu_half &&  lsu_addr[  0] ||
                      lsu_word && |lsu_addr[1:0]  ;
-
-// Bus error?
-assign lsu_b_error = dmem_txn_err;
-
 
 //
 // Memory bus assignments
