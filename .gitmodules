@@ -4,3 +4,6 @@
 [submodule "external/embench-iot"]
 	path = external/embench-iot
 	url = git@github.com:embench/embench-iot.git
+[submodule "external/riscv-formal"]
+	path = external/riscv-formal
+	url = git@github.com:symbioticeda/riscv-formal.git
