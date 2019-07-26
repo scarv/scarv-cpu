@@ -146,11 +146,12 @@ wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 
 assign exec_mret    = cfu_mret && pipe_progress;
 
-wire cfu_tgt_trap   = cfu_trap || s4_trap;
+wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap;
 
 wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
 
-assign cf_req       = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap;
+assign cf_req       = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap ||
+                      lsu_trap      ;
 
 // CFU operation finishing this cycle.
 wire cfu_finish_now = cf_req && cf_ack;
@@ -235,7 +236,9 @@ wire [15: 0] rdata_h1 =
 wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
 
 // LSU Bus error?
-wire        lsu_b_error = dmem_error;
+wire        lsu_b_error = lsu_rsp_expected && dmem_error;
+
+wire        lsu_trap    = lsu_b_error;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -270,14 +273,16 @@ assign fwd_s4_csr   = fu_csr;
 // It's a trap!
 // -------------------------------------------------------------------------
 
-assign trap_cpu   = cfu_trap;
+assign trap_cpu   = cfu_trap || lsu_trap;
 
 assign trap_int   = s4_trap ; // A trap occured due to interrupt
 
 assign trap_cause = // Cause of the trap.
-    cfu_ebreak  ? TRAP_BREAKPT  :
-    cfu_ecall   ?   TRAP_ECALLM :
-                  s4_opr_a[5:0] ;
+    lsu_b_error && lsu_load     ? TRAP_LDACCESS :
+    lsu_b_error && lsu_store    ? TRAP_STACCESS :
+    cfu_ebreak                  ? TRAP_BREAKPT  :
+    cfu_ecall                   ?   TRAP_ECALLM :
+                                  s4_opr_a[5:0] ;
 
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
 

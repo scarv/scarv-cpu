@@ -133,9 +133,7 @@ wire [XL:0] n_s4_opr_b_mul  = 32'b0;
 // -------------------------------------------------------------------------
 
 wire        lsu_valid  = fu_lsu         ; // Inputs are valid.
-wire [XL:0] lsu_rdata                   ; // Data read from memory.
 wire        lsu_a_error                 ; // Address error.
-wire        lsu_b_error                 ; // Bus error.
 wire        lsu_ready                   ; // Load/Store instruction complete.
 
 wire [XL:0] lsu_addr   = s3_opr_a+s3_opr_b; // Memory address to access.
@@ -253,10 +251,8 @@ frv_lsu i_lsu (
 .lsu_ready      (lsu_ready      ), // Outputs are valid / instruction complete.
 .pipe_prog      (pipe_progress  ), // Pipeline progressing this cycle.
 .lsu_a_error    (lsu_a_error    ), // Address error.
-.lsu_b_error    (lsu_b_error    ), // Bus error.
 .lsu_addr       (lsu_addr       ), // Memory address to access.
 .lsu_wdata      (lsu_wdata      ), // Data to write to memory.
-.lsu_rdata      (lsu_rdata      ), // Data read from memory.
 .lsu_load       (lsu_load       ), // Load instruction.
 .lsu_store      (lsu_store      ), // Store instruction.
 .lsu_byte       (lsu_byte       ), // Byte operation width.
@@ -307,14 +303,12 @@ wire [31:0] n_s4_instr = s3_instr; // The instruction word
 wire [ 4:0] n_s4_uop   = cfu_valid ? n_s4_uop_cfu : s3_uop  ; // Micro-op code
 
 wire        n_s4_trap  = s3_trap || 
-                         fu_lsu && (lsu_a_error || lsu_b_error);
+                         fu_lsu && (lsu_a_error);
 
 wire [5:0]  n_trap_cause =
     s3_trap                             ? {1'b0, s3_rd} :
     fu_lsu && lsu_a_error && lsu_load   ? TRAP_LDALIGN  :
     fu_lsu && lsu_a_error && lsu_store  ? TRAP_STALIGN  :
-    fu_lsu && lsu_b_error && lsu_load   ? TRAP_LDACCESS :
-    fu_lsu && lsu_b_error && lsu_store  ? TRAP_STACCESS :
                                           6'b0          ;
 
 wire [XL:0] n_s4_opr_a = 

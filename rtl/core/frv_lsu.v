@@ -10,9 +10,7 @@ input  wire        g_clk       , // Global clock
 input  wire        g_resetn    , // Global reset.
 
 input  wire        lsu_valid   , // Inputs are valid.
-output wire [XL:0] lsu_rdata   , // Data read from memory.
 output wire        lsu_a_error , // Address error.
-output wire        lsu_b_error , // Bus error.
 output wire        lsu_ready   , // Outputs are valid / instruction complete.
 
 input  wire        pipe_prog   , // Pipeline is progressing this cycle.
