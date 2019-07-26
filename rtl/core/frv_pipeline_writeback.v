@@ -12,6 +12,32 @@ module frv_pipeline_writeback (
 input              g_clk           , // global clock
 input              g_resetn        , // synchronous reset
 
+`ifdef RVFI
+output [NRET        - 1 : 0] rvfi_valid     ,
+output [NRET *   64 - 1 : 0] rvfi_order     ,
+output [NRET * ILEN - 1 : 0] rvfi_insn      ,
+output [NRET        - 1 : 0] rvfi_trap      ,
+output [NRET        - 1 : 0] rvfi_halt      ,
+output [NRET        - 1 : 0] rvfi_intr      ,
+output [NRET * 2    - 1 : 0] rvfi_mode      ,
+
+output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
+output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
+output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
+output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
+output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
+output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
+
+output [NRET * XLEN - 1 : 0] rvfi_pc_rdata  ,
+output [NRET * XLEN - 1 : 0] rvfi_pc_wdata  ,
+
+output [NRET * XLEN  - 1: 0] rvfi_mem_addr  ,
+output [NRET * XLEN/8- 1: 0] rvfi_mem_rmask ,
+output [NRET * XLEN/8- 1: 0] rvfi_mem_wmask ,
+output [NRET * XLEN  - 1: 0] rvfi_mem_rdata ,
+output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
+`endif
+
 input  wire [31:0] s3_pc           , // Next Program counter (for JAL[R])
 
 input  wire [ 4:0] s4_rd           , // Destination register address
@@ -295,5 +321,41 @@ assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 assign trs_pc   = s4_pc;
 assign trs_instr= s4_instr;
 assign trs_valid= |s4_size && s4_p_valid && !s4_p_busy || (cfu_trap || cfu_mret);
+
+
+//
+// RISC-V Formal
+// -------------------------------------------------------------------------
+
+`ifdef RVFI
+
+assign rvfi_valid = trs_valid;
+assign rvfi_insn  = trs_instr;
+assign rvfi_trap  = trap_cpu ;
+
+assign rvfi_rs1_addr = 0; // TODO
+assign rvfi_rs2_addr = 0;
+assign rvfi_rs1_rdata= 0;
+assign rvfi_rs2_rdata= 0;
+
+assign rvfi_rd_addr  = s4_rd    ;
+assign rvfi_rd_wdata = gpr_wdata;
+
+assign rvfi_pc_rdata = trs_pc   ; 
+assign rvfi_pc_wdata = 0        ;   // TODO
+
+assign rvfi_mem_addr = s4_opr_b ;
+assign rvfi_mem_rmask= 0        ;
+assign rvfi_mem_wmask= 0        ;
+assign rvfi_mem_rdata= lsu_rdata;
+assign rvfi_mem_wdata= s4_opr_a ;
+
+// Constant assignments to features of RVFI not supported/relevent.
+assign rvfi_order = 0;
+assign rvfi_halt  = 0;
+assign rvfi_intr  = 0;
+assign rvfi_mode  = 0;
+
+`endif
 
 endmodule

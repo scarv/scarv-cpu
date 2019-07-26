@@ -17,77 +17,81 @@ wire [31:0]  trs_instr       ; // Instruction traced out.
 
 wire         g_resetn = !reset;
 
+parameter XL = 31;
+
 (*keep*) `rvformal_rand_reg         int_external; // External interrupt
 (*keep*) `rvformal_rand_reg         int_software; // Software interrupt
 
-(*keep*) wire                       imem_cen  ; // Chip enable
+(*keep*) wire                       imem_req  ; // Start memory request
 (*keep*) wire                       imem_wen  ; // Write enable
+(*keep*) wire [3:0]                 imem_strb ; // Write strobe
+(*keep*) wire [XL:0]                imem_wdata; // Write data
+(*keep*) wire [XL:0]                imem_addr ; // Read/Write address
+(*keep*) `rvformal_rand_reg         imem_gnt  ; // request accepted
+(*keep*) `rvformal_rand_reg         imem_recv ; // memory recieve response.
+(*keep*) wire                       imem_ack  ; // memory ack response.
 (*keep*) `rvformal_rand_reg         imem_error; // Error
-(*keep*) `rvformal_rand_reg         imem_stall; // Memory stall
-(*keep*) wire               [3:0]   imem_strb ; // Write strobe
-(*keep*) wire               [31:0]  imem_addr ; // Read/Write address
-(*keep*) `rvformal_rand_reg [31:0]  imem_rdata; // Read data
-(*keep*) wire               [31:0]  imem_wdata; // Write data
+(*keep*) `rvformal_rand_reg [XL:0]  imem_rdata; // Read data
 
-(*keep*) wire                       dmem_cen  ; // Chip enable
+(*keep*) wire                       dmem_req  ; // Start memory request
 (*keep*) wire                       dmem_wen  ; // Write enable
+(*keep*) wire [3:0]                 dmem_strb ; // Write strobe
+(*keep*) wire [31:0]                dmem_wdata; // Write data
+(*keep*) wire [31:0]                dmem_addr ; // Read/Write address
+(*keep*) `rvformal_rand_reg         dmem_gnt  ; // request accepted
+(*keep*) `rvformal_rand_reg         dmem_recv ; // memory recieve response.
+(*keep*) wire                       dmem_ack  ; // memory ack response.
 (*keep*) `rvformal_rand_reg         dmem_error; // Error
-(*keep*) `rvformal_rand_reg         dmem_stall; // Memory stall
-(*keep*) wire               [3:0]   dmem_strb ; // Write strobe
-(*keep*) wire               [31:0]  dmem_addr ; // Read/Write address
-(*keep*) `rvformal_rand_reg [31:0]  dmem_rdata; // Read data
-(*keep*) wire               [31:0]  dmem_wdata; // Write data
+(*keep*) `rvformal_rand_reg [XL:0]  dmem_rdata; // Read data
 
-always @(posedge clock) begin
-    // riscv-formal has no notion of a memory bus error.
-    if(imem_cen) assume(imem_error == 1'b0);
-    if(dmem_cen) assume(dmem_error == 1'b0);
-end
-
-mrv_cpu i_mrv_cpu(
-.g_clk           (clock           ), // global clock
-.g_resetn        (g_resetn        ), // synchronous reset
-.trs_valid       (trs_valid       ), // Trace output valid.
-.trs_pc          (trs_pc          ), // Trace program counter object.
-.trs_instr       (trs_instr       ), // Instruction traced out.
-.rvfi_valid      (rvfi_valid      ),
-.rvfi_order      (rvfi_order      ),
-.rvfi_insn       (rvfi_insn       ),
-.rvfi_trap       (rvfi_trap       ),
-.rvfi_halt       (rvfi_halt       ),
-.rvfi_intr       (rvfi_intr       ),
-.rvfi_mode       (rvfi_mode       ),
-.rvfi_rs1_addr   (rvfi_rs1_addr   ),
-.rvfi_rs2_addr   (rvfi_rs2_addr   ),
-.rvfi_rs1_rdata  (rvfi_rs1_rdata  ),
-.rvfi_rs2_rdata  (rvfi_rs2_rdata  ),
-.rvfi_rd_addr    (rvfi_rd_addr    ),
-.rvfi_rd_wdata   (rvfi_rd_wdata   ),
-.rvfi_pc_rdata   (rvfi_pc_rdata   ),
-.rvfi_pc_wdata   (rvfi_pc_wdata   ),
-.rvfi_mem_addr   (rvfi_mem_addr   ),
-.rvfi_mem_rmask  (rvfi_mem_rmask  ),
-.rvfi_mem_wmask  (rvfi_mem_wmask  ),
-.rvfi_mem_rdata  (rvfi_mem_rdata  ),
-.rvfi_mem_wdata  (rvfi_mem_wdata  ),
-.int_external    (int_external    ),
-.int_software    (int_software    ),
-.imem_cen        (imem_cen        ), // Chip enable
-.imem_wen        (imem_wen        ), // Write enable
-.imem_error      (imem_error      ), // Error
-.imem_stall      (imem_stall      ), // Memory stall
-.imem_strb       (imem_strb       ), // Write strobe
-.imem_addr       (imem_addr       ), // Read/Write address
-.imem_rdata      (imem_rdata      ), // Read data
-.imem_wdata      (imem_wdata      ), // Write data
-.dmem_cen        (dmem_cen        ), // Chip enable
-.dmem_wen        (dmem_wen        ), // Write enable
-.dmem_error      (dmem_error      ), // Error
-.dmem_stall      (dmem_stall      ), // Memory stall
-.dmem_strb       (dmem_strb       ), // Write strobe
-.dmem_addr       (dmem_addr       ), // Read/Write address
-.dmem_rdata      (dmem_rdata      ), // Read data
-.dmem_wdata      (dmem_wdata      )  // Write data
+frv_core i_dut(
+.g_clk          (clock          ), // global clock
+.g_resetn       (g_resetn       ), // synchronous reset
+.rvfi_valid     (rvfi_valid     ),
+.rvfi_order     (rvfi_order     ),
+.rvfi_insn      (rvfi_insn      ),
+.rvfi_trap      (rvfi_trap      ),
+.rvfi_halt      (rvfi_halt      ),
+.rvfi_intr      (rvfi_intr      ),
+.rvfi_mode      (rvfi_mode      ),
+.rvfi_rs1_addr  (rvfi_rs1_addr  ),
+.rvfi_rs2_addr  (rvfi_rs2_addr  ),
+.rvfi_rs1_rdata (rvfi_rs1_rdata ),
+.rvfi_rs2_rdata (rvfi_rs2_rdata ),
+.rvfi_rd_addr   (rvfi_rd_addr   ),
+.rvfi_rd_wdata  (rvfi_rd_wdata  ),
+.rvfi_pc_rdata  (rvfi_pc_rdata  ),
+.rvfi_pc_wdata  (rvfi_pc_wdata  ),
+.rvfi_mem_addr  (rvfi_mem_addr  ),
+.rvfi_mem_rmask (rvfi_mem_rmask ),
+.rvfi_mem_wmask (rvfi_mem_wmask ),
+.rvfi_mem_rdata (rvfi_mem_rdata ),
+.rvfi_mem_wdata (rvfi_mem_wdata ),
+.trs_pc         (trs_pc         ), // Trace program counter.
+.trs_instr      (trs_instr      ), // Trace instruction.
+.trs_valid      (trs_valid      ), // Trace output valid.
+.int_external   (int_external   ), // External interrupt trigger line.
+.int_software   (int_software   ), // Software interrupt trigger line.
+.imem_req       (imem_req       ), // Start memory request
+.imem_wen       (imem_wen       ), // Write enable
+.imem_strb      (imem_strb      ), // Write strobe
+.imem_wdata     (imem_wdata     ), // Write data
+.imem_addr      (imem_addr      ), // Read/Write address
+.imem_gnt       (imem_gnt       ), // request accepted
+.imem_recv      (imem_recv      ), // Instruction memory recieve response.
+.imem_ack       (imem_ack       ), // Instruction memory ack response.
+.imem_error     (imem_error     ), // Error
+.imem_rdata     (imem_rdata     ), // Read data
+.dmem_req       (dmem_req       ), // Start memory request
+.dmem_wen       (dmem_wen       ), // Write enable
+.dmem_strb      (dmem_strb      ), // Write strobe
+.dmem_wdata     (dmem_wdata     ), // Write data
+.dmem_addr      (dmem_addr      ), // Read/Write address
+.dmem_gnt       (dmem_gnt       ), // request accepted
+.dmem_recv      (dmem_recv      ), // Data memory recieve response.
+.dmem_ack       (dmem_ack       ), // Data memory ack response.
+.dmem_error     (dmem_error     ), // Error
+.dmem_rdata     (dmem_rdata     )  // Read data
 );
 
 endmodule

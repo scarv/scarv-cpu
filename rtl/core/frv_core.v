@@ -9,7 +9,7 @@ module frv_core(
 input               g_clk           , // global clock
 input               g_resetn        , // synchronous reset
 
-`ifdef FORMAL
+`ifdef RVFI
 output [NRET        - 1 : 0] rvfi_valid     ,
 output [NRET *   64 - 1 : 0] rvfi_order     ,
 output [NRET * ILEN - 1 : 0] rvfi_insn      ,
@@ -93,7 +93,7 @@ frv_pipeline #(
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset
-`ifdef FORMAL
+`ifdef RVFI
 .rvfi_valid    (rvfi_valid    ),
 .rvfi_order    (rvfi_order    ),
 .rvfi_insn     (rvfi_insn     ),

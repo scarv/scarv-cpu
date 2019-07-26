@@ -9,7 +9,7 @@ module frv_pipeline (
 input               g_clk           , // global clock
 input               g_resetn        , // synchronous reset
 
-`ifdef FORMAL
+`ifdef RVFI
 output [NRET        - 1 : 0] rvfi_valid     ,
 output [NRET *   64 - 1 : 0] rvfi_order     ,
 output [NRET * ILEN - 1 : 0] rvfi_insn      ,
@@ -174,6 +174,28 @@ frv_pipeline_back #(
 ) i_pipeline_back(
 .g_clk        (g_clk        ), // global clock
 .g_resetn     (g_resetn     ), // synchronous reset
+`ifdef RVFI
+.rvfi_valid    (rvfi_valid    ),
+.rvfi_order    (rvfi_order    ),
+.rvfi_insn     (rvfi_insn     ),
+.rvfi_trap     (rvfi_trap     ),
+.rvfi_halt     (rvfi_halt     ),
+.rvfi_intr     (rvfi_intr     ),
+.rvfi_mode     (rvfi_mode     ),
+.rvfi_rs1_addr (rvfi_rs1_addr ),
+.rvfi_rs2_addr (rvfi_rs2_addr ),
+.rvfi_rs1_rdata(rvfi_rs1_rdata),
+.rvfi_rs2_rdata(rvfi_rs2_rdata),
+.rvfi_rd_addr  (rvfi_rd_addr  ),
+.rvfi_rd_wdata (rvfi_rd_wdata ),
+.rvfi_pc_rdata (rvfi_pc_rdata ),
+.rvfi_pc_wdata (rvfi_pc_wdata ),
+.rvfi_mem_addr (rvfi_mem_addr ),
+.rvfi_mem_rmask(rvfi_mem_rmask),
+.rvfi_mem_wmask(rvfi_mem_wmask),
+.rvfi_mem_rdata(rvfi_mem_rdata),
+.rvfi_mem_wdata(rvfi_mem_wdata),
+`endif
 .s2_p_busy    (s2_p_busy    ), // Can this stage accept new inputs?
 .s2_p_valid   (s2_p_valid   ), // Is this input valid?
 .s2_rd        (s2_rd        ), // Destination register address

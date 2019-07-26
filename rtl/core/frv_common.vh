@@ -115,7 +115,7 @@ localparam TRAP_INT_MEI = 6'd11;
 
 //
 // RISC-V Formal flow macros and parameters.
-`ifdef FORMAL
+`ifdef RVFI
 
 //
 // Maximum number of instructions retired per cycle.
