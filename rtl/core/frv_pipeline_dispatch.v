@@ -43,6 +43,15 @@ input  wire        gpr_wen         , // GPR write enable.
 input  wire [ 4:0] gpr_rd          , // GPR destination register.
 input  wire [XL:0] gpr_wdata       , // GPR write data.
 
+`ifdef RVFI
+
+output reg  [XL:0] rvfi_s3_rs1_rdata, // Source register data 1
+output reg  [XL:0] rvfi_s3_rs2_rdata, // Source register data 2
+output reg  [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
+output reg  [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
+
+`endif
+
 output wire [ 4:0] s3_rd           , // Destination register address
 output wire [XL:0] s3_opr_a        , // Operand A
 output wire [XL:0] s3_opr_b        , // Operand B
@@ -277,6 +286,29 @@ frv_pipeline_register #(
 .o_valid  (s3_p_valid       ), // Input data from stage N valid?
 .i_busy   (s3_p_busy        )  // Stage N+1 ready to continue?
 );
+
+
+//
+// RISC-V Formal
+// -------------------------------------------------------------------------
+
+`ifdef RVFI
+
+always @(posedge g_clk) begin
+    if(!g_resetn || pipe_reg_flush) begin
+        rvfi_s3_rs1_rdata <= 0; // Source register data 1
+        rvfi_s3_rs2_rdata <= 0; // Source register data 2
+        rvfi_s3_rs1_addr  <= 0; // Source register address 1
+        rvfi_s3_rs2_addr  <= 0; // Source register address 2
+    end else if(p_valid && !p_busy) begin
+        rvfi_s3_rs1_rdata <= dis_rs1;
+        rvfi_s3_rs2_rdata <= dis_rs2;
+        rvfi_s3_rs1_addr  <= s2_rs1 ;
+        rvfi_s3_rs2_addr  <= s2_rs2 ;
+    end
+end
+
+`endif
 
 endmodule
 

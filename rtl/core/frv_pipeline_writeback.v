@@ -36,6 +36,11 @@ output [NRET * XLEN/8- 1: 0] rvfi_mem_rmask ,
 output [NRET * XLEN/8- 1: 0] rvfi_mem_wmask ,
 output [NRET * XLEN  - 1: 0] rvfi_mem_rdata ,
 output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
+
+input  wire [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
+input  wire [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
+input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
+input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 `endif
 
 input  wire [31:0] s3_pc           , // Next Program counter (for JAL[R])
@@ -88,6 +93,8 @@ output wire        cf_req          , // Control flow change request
 output wire [XL:0] cf_target       , // Control flow change target
 input  wire        cf_ack          , // Control flow change acknowledge.
 
+output wire        hold_lsu_req    , // Don't make LSU requests yet.
+
 input  wire        dmem_recv       , // Instruction memory recieve response.
 output wire        dmem_ack        , // Data memory ack response.
 input  wire        dmem_error      , // Error
@@ -102,7 +109,12 @@ input  wire [XL:0] dmem_rdata        // Read data
 wire  pipe_progress = s4_p_valid && !s4_p_busy;
 
 assign s4_p_busy = fu_cfu && cfu_busy ||
+                   (cf_req && !cf_ack) ||
                    fu_lsu && lsu_busy ;
+
+// Don't make LSU memory requests until writeback stage is sure it won't
+// raise an exception.
+assign hold_lsu_req = cf_req || lsu_busy;
 
 //
 // Operation Decoding
@@ -320,7 +332,8 @@ assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 
 assign trs_pc   = s4_pc;
 assign trs_instr= s4_instr;
-assign trs_valid= |s4_size && s4_p_valid && !s4_p_busy || (cfu_trap || cfu_mret);
+assign trs_valid= 
+    (|s4_size && s4_p_valid && !s4_p_busy) || (cf_req && cf_ack);
 
 
 //
@@ -329,20 +342,34 @@ assign trs_valid= |s4_size && s4_p_valid && !s4_p_busy || (cfu_trap || cfu_mret)
 
 `ifdef RVFI
 
+reg  [63:0] rvfi_order_counter;
+wire [63:0] n_rvfi_order_counter = rvfi_order_counter + 1;
+
+assign rvfi_order = rvfi_order_counter;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        rvfi_order_counter <= 0;
+    end else if(rvfi_valid) begin
+        rvfi_order_counter <= n_rvfi_order_counter;
+    end
+end
+
+
 assign rvfi_valid = trs_valid;
 assign rvfi_insn  = trs_instr;
 assign rvfi_trap  = trap_cpu ;
 
-assign rvfi_rs1_addr = 0; // TODO
-assign rvfi_rs2_addr = 0;
-assign rvfi_rs1_rdata= 0;
-assign rvfi_rs2_rdata= 0;
+assign rvfi_rs1_addr = rvfi_s4_rs1_addr ;
+assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
+assign rvfi_rs1_rdata= rvfi_s4_rs1_rdata;
+assign rvfi_rs2_rdata= rvfi_s4_rs2_rdata;
 
 assign rvfi_rd_addr  = s4_rd    ;
-assign rvfi_rd_wdata = gpr_wdata;
+assign rvfi_rd_wdata = |s4_rd ? gpr_wdata : 0;
 
 assign rvfi_pc_rdata = trs_pc   ; 
-assign rvfi_pc_wdata = 0        ;   // TODO
+assign rvfi_pc_wdata = cf_req ? cf_target : s4_pc+{29'b0,s4_size,1'b0} ;
 
 assign rvfi_mem_addr = s4_opr_b ;
 assign rvfi_mem_rmask= 0        ;
@@ -351,7 +378,6 @@ assign rvfi_mem_rdata= lsu_rdata;
 assign rvfi_mem_wdata= s4_opr_a ;
 
 // Constant assignments to features of RVFI not supported/relevent.
-assign rvfi_order = 0;
 assign rvfi_halt  = 0;
 assign rvfi_intr  = 0;
 assign rvfi_mode  = 0;

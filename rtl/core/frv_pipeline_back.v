@@ -140,6 +140,8 @@ wire [31:0] s3_instr        ; // The instruction word
 wire        s3_p_busy       ; // Can this stage accept new inputs?
 wire        s3_p_valid      ; // Is this input valid?
 
+wire        hold_lsu_req    ; // Hold LSU requests until WB stage done.
+
 wire [ 4:0] s4_rd           ; // Destination register address
 wire [XL:0] s4_opr_a        ; // Operand A
 wire [XL:0] s4_opr_b        ; // Operand B
@@ -151,6 +153,27 @@ wire [ 1:0] s4_size         ; // Size of the instruction.
 wire [31:0] s4_instr        ; // The instruction word
 wire        s4_p_busy       ; // Can this stage accept new inputs?
 wire        s4_p_valid      ; // Is this input valid?
+
+//
+// RISC-V Formal
+// -------------------------------------------------------------------------
+
+`ifdef RVFI
+
+// Outputs of dispatch stage, into execute.
+wire [XL:0] rvfi_s3_rs1_rdata   ; // Source register data 1
+wire [XL:0] rvfi_s3_rs2_rdata   ; // Source register data 2
+wire [ 4:0] rvfi_s3_rs1_addr    ; // Source register address 1
+wire [ 4:0] rvfi_s3_rs2_addr    ; // Source register address 2
+
+// Outputs of execute stage, into writeback.
+wire [XL:0] rvfi_s4_rs1_rdata   ; // Source register data 1
+wire [XL:0] rvfi_s4_rs2_rdata   ; // Source register data 2
+wire [ 4:0] rvfi_s4_rs1_addr    ; // Source register address 1
+wire [ 4:0] rvfi_s4_rs2_addr    ; // Source register address 2
+
+
+`endif
 
 //
 // Sub-module instances.
@@ -195,6 +218,12 @@ frv_pipeline_dispatch #(
 .gpr_wen         (gpr_wen         ), // GPR write enable.
 .gpr_rd          (gpr_rd          ), // GPR destination register.
 .gpr_wdata       (gpr_wdata       ), // GPR write data.
+`ifdef RVFI
+.rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
+.rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
+.rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
+`endif
 .s3_rd           (s3_rd           ), // Destination register address
 .s3_opr_a        (s3_opr_a        ), // Operand A
 .s3_opr_b        (s3_opr_b        ), // Operand B
@@ -235,6 +264,16 @@ frv_pipeline_execute i_pipeline_execute (
 .fwd_s3_wdata   (fwd_s3_wdata   ) , // Write data for writeback stage.
 .fwd_s3_load    (fwd_s3_load    ) , // Writeback stage has load in it.
 .fwd_s3_csr     (fwd_s3_csr     ) , // Writeback stage has CSR op in it.
+`ifdef RVFI
+.rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
+.rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
+.rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
+.rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
+.rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
+.rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+`endif
 .s4_rd          (s4_rd          ) , // Destination register address
 .s4_opr_a       (s4_opr_a       ) , // Operand A
 .s4_opr_b       (s4_opr_b       ) , // Operand B
@@ -246,6 +285,7 @@ frv_pipeline_execute i_pipeline_execute (
 .s4_instr       (s4_instr       ) , // The instruction word
 .s4_p_busy      (s4_p_busy      ) , // Can this stage accept new inputs?
 .s4_p_valid     (s4_p_valid     ) , // Is this input valid?
+.hold_lsu_req   (hold_lsu_req   ), // Don't make LSU requests yet.
 .dmem_req       (dmem_req       ), // Start memory request
 .dmem_wen       (dmem_wen       ), // Write enable
 .dmem_strb      (dmem_strb      ), // Write strobe
@@ -288,6 +328,10 @@ frv_pipeline_writeback i_pipeline_writeback(
 .rvfi_mem_wmask(rvfi_mem_wmask),
 .rvfi_mem_rdata(rvfi_mem_rdata),
 .rvfi_mem_wdata(rvfi_mem_wdata),
+.rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
+.rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
+.rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
 `endif
 .s3_pc         (s3_pc          ) , // Program counter for JAL[R]
 .s4_rd         (s4_rd          ) , // Destination register address
@@ -329,6 +373,7 @@ frv_pipeline_writeback i_pipeline_writeback(
 .cf_req        (cf_req         ), // Control flow change request
 .cf_target     (cf_target      ), // Control flow change target
 .cf_ack        (cf_ack         ), // Control flow change acknowledge.
+.hold_lsu_req  (hold_lsu_req   ), // Don't make LSU requests yet.
 .dmem_recv     (dmem_recv      ), // Instruction memory recieve response.
 .dmem_ack      (dmem_ack       ), // Response acknowledge
 .dmem_error    (dmem_error     ), // Error

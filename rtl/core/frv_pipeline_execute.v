@@ -29,6 +29,17 @@ output wire [XL:0] fwd_s3_wdata    , // Write data for writeback stage.
 output wire        fwd_s3_load     , // Writeback stage has load in it.
 output wire        fwd_s3_csr      , // Writeback stage has CSR op in it.
 
+`ifdef RVFI
+input  wire [XL:0] rvfi_s3_rs1_rdata, // Source register data 1
+input  wire [XL:0] rvfi_s3_rs2_rdata, // Source register data 2
+input  wire [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
+input  wire [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
+output reg  [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
+output reg  [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
+output reg  [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
+output reg  [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
+`endif
+
 output wire [ 4:0] s4_rd           , // Destination register address
 output wire [XL:0] s4_opr_a        , // Operand A
 output wire [XL:0] s4_opr_b        , // Operand B
@@ -40,6 +51,8 @@ output wire [ 1:0] s4_size         , // Size of the instruction.
 output wire [31:0] s4_instr        , // The instruction word
 input  wire        s4_p_busy       , // Can this stage accept new inputs?
 output wire        s4_p_valid      , // Is this input valid?
+
+input  wire        hold_lsu_req    , // Don't make LSU requests yet.
 
 output wire        dmem_req        , // Start memory request
 output wire        dmem_wen        , // Write enable
@@ -259,6 +272,7 @@ frv_lsu i_lsu (
 .lsu_half       (lsu_half       ), // Halfword operation width.
 .lsu_word       (lsu_word       ), // Word operation width.
 .lsu_signed     (lsu_signed     ), // Sign extend loaded data?
+.hold_lsu_req   (hold_lsu_req   ), // Don't make LSU requests yet.
 .dmem_req       (dmem_req       ), // Start memory request
 .dmem_wen       (dmem_wen       ), // Write enable
 .dmem_strb      (dmem_strb      ), // Write strobe
@@ -377,6 +391,29 @@ frv_pipeline_register #(
 .o_valid  (s4_p_valid       ), // Input data from stage N valid?
 .i_busy   (s4_p_busy        )  // Stage N+1 ready to continue?
 );
+
+
+//
+// RISC-V Formal
+// -------------------------------------------------------------------------
+
+`ifdef RVFI
+
+always @(posedge g_clk) begin
+    if(!g_resetn || flush) begin
+        rvfi_s4_rs1_rdata <= 0; // Source register data 1
+        rvfi_s4_rs2_rdata <= 0; // Source register data 2
+        rvfi_s4_rs1_addr  <= 0; // Source register address 1
+        rvfi_s4_rs2_addr  <= 0; // Source register address 2
+    end else if(p_valid && !p_busy) begin
+        rvfi_s4_rs1_rdata <= rvfi_s3_rs1_rdata;
+        rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
+        rvfi_s4_rs1_addr  <= rvfi_s3_rs1_addr ;
+        rvfi_s4_rs2_addr  <= rvfi_s3_rs2_addr ;
+    end
+end
+
+`endif
 
 endmodule
 

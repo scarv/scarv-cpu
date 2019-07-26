@@ -24,6 +24,8 @@ input  wire        lsu_half    , // Halfword operation width.
 input  wire        lsu_word    , // Word operation width.
 input  wire        lsu_signed  , // Sign extend loaded data?
 
+input  wire        hold_lsu_req, // Don't make LSU requests yet.
+
 output wire        dmem_req    , // Start memory request
 output wire        dmem_wen    , // Write enable
 output wire [3:0]  dmem_strb   , // Write strobe
@@ -68,7 +70,8 @@ assign lsu_a_error = lsu_half &&  lsu_addr[  0] ||
 // Memory bus assignments
 // -------------------------------------------------------------------------
 
-assign dmem_req     = lsu_valid && !lsu_finished && !lsu_a_error;
+assign dmem_req     = lsu_valid && !lsu_finished && !lsu_a_error &&
+                      !hold_lsu_req;
 assign dmem_wen     = lsu_store ;
 assign dmem_addr    = lsu_addr  & 32'hFFFF_FFFC;
 
