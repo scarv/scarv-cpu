@@ -298,8 +298,8 @@ assign p_rs2 = instr_16bit ? dec_rs2_16 : dec_rs2_32;
 
 // Destination register address carries trap cause if need be.
 assign p_rd    = p_trap           ? trap_cause[4:0]   :
-                 {5{instr_16bit}} & dec_rd_16 | 
-                 {5{instr_32bit}} & dec_rd_32 ;
+                 {5{instr_16bit && |p_fu}} & dec_rd_16 | 
+                 {5{instr_32bit && |p_fu}} & dec_rd_32 ;
 
 //
 // Immediate Decoding

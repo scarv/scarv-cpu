@@ -13,7 +13,8 @@ input  wire [ 4:0] s3_rd           , // Destination register address
 input  wire [XL:0] s3_opr_a        , // Operand A
 input  wire [XL:0] s3_opr_b        , // Operand B
 input  wire [XL:0] s3_opr_c        , // Operand C
-input  wire [31:0] s3_pc           , // Program counter
+input  wire [31:0] s2_pc           , // Dispatch aligned Program counter
+input  wire [31:0] s3_pc           , // Execute aligned Program counter
 input  wire [ 4:0] s3_uop          , // Micro-op code
 input  wire [ 4:0] s3_fu           , // Functional Unit
 input  wire        s3_trap         , // Raise a trap?
@@ -38,6 +39,7 @@ output reg  [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 output reg  [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
 output reg  [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
+output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
 
 output wire [ 4:0] s4_rd           , // Destination register address
@@ -201,7 +203,7 @@ wire [XL:0] n_s4_opr_a_cfu =
     cfu_jalr    ? {alu_add_result[XL:1],1'b0} :
                   {s3_opr_c      [XL:1],1'b0} ;
 
-wire [XL:0] n_s4_opr_b_cfu = 32'b0;
+wire [XL:0] n_s4_opr_b_cfu = s2_pc;
 
 //
 // Functional Unit Interfacing: CSR
@@ -410,6 +412,26 @@ always @(posedge g_clk) begin
         rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
         rvfi_s4_rs1_addr  <= rvfi_s3_rs1_addr ;
         rvfi_s4_rs2_addr  <= rvfi_s3_rs2_addr ;
+    end
+end
+
+reg [XL:0] mem_wdata_store;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        rvfi_s4_mem_wdata <= 0;
+    end else if(p_valid && !p_busy && dmem_req && dmem_gnt) begin
+        rvfi_s4_mem_wdata <= dmem_wdata;
+    end else if(p_valid && !p_busy) begin
+        rvfi_s4_mem_wdata <= mem_wdata_store;
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        mem_wdata_store <= 0;
+    end else if(dmem_req && dmem_gnt) begin
+        mem_wdata_store <= dmem_wdata;
     end
 end
 

@@ -56,7 +56,8 @@ output wire [ 4:0] s3_rd           , // Destination register address
 output wire [XL:0] s3_opr_a        , // Operand A
 output wire [XL:0] s3_opr_b        , // Operand B
 output wire [XL:0] s3_opr_c        , // Operand C
-output wire [31:0] s3_pc           , // Program counter
+output wire [31:0] s2_pc           , // Dispatch aligned Program counter
+output wire [31:0] s3_pc           , // Execute aligned Program counter
 output wire [ 4:0] s3_uop          , // Micro-op code
 output wire [ 4:0] s3_fu           , // Functional Unit
 output wire        s3_trap         , // Raise a trap?
@@ -116,6 +117,8 @@ wire cf_change_now = cf_req && cf_ack;
 
 reg  [XL:0] program_counter;
 wire [XL:0] n_program_counter;
+
+assign s2_pc = program_counter;
 
 wire size_16 = s2_size[0];
 wire size_32 = s2_size[1];
@@ -300,7 +303,7 @@ always @(posedge g_clk) begin
         rvfi_s3_rs2_rdata <= 0; // Source register data 2
         rvfi_s3_rs1_addr  <= 0; // Source register address 1
         rvfi_s3_rs2_addr  <= 0; // Source register address 2
-    end else if(p_valid && !p_busy) begin
+    end else if(progress_pc) begin
         rvfi_s3_rs1_rdata <= dis_rs1;
         rvfi_s3_rs2_rdata <= dis_rs2;
         rvfi_s3_rs1_addr  <= s2_rs1 ;

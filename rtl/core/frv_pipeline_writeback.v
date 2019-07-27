@@ -41,9 +41,8 @@ input  wire [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 input  wire [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
 input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
+input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
-
-input  wire [31:0] s3_pc           , // Next Program counter (for JAL[R])
 
 input  wire [ 4:0] s4_rd           , // Destination register address
 input  wire [XL:0] s4_opr_a        , // Operand A
@@ -216,7 +215,7 @@ end
 
 wire cfu_gpr_wen = cfu_link;
 
-wire [XL:0] cfu_gpr_wdata = s3_pc;
+wire [XL:0] cfu_gpr_wdata = s4_opr_b;
 
 
 //
@@ -356,6 +355,7 @@ always @(posedge g_clk) begin
 end
 
 
+reg [XL:0] saved_gpr_waddr;
 reg [XL:0] saved_gpr_wdata;
 reg        use_saved_gpr_wdata;
 
@@ -373,8 +373,10 @@ end
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         saved_gpr_wdata <= 0;
+        saved_gpr_waddr <= 0;
     end else if(gpr_wen) begin
         saved_gpr_wdata <= gpr_wdata;
+        saved_gpr_waddr <= gpr_rd   ;
     end
 end
 
@@ -410,7 +412,8 @@ assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
 assign rvfi_rs1_rdata= rvfi_s4_rs1_rdata;
 assign rvfi_rs2_rdata= rvfi_s4_rs2_rdata;
 
-assign rvfi_rd_addr  = s4_rd    ;
+assign rvfi_rd_addr  = use_saved_gpr_wdata ? saved_gpr_waddr :
+                       gpr_wen             ? gpr_rd          : 0;
 assign rvfi_rd_wdata = |s4_rd && !trap_cpu ?
                        (use_saved_gpr_wdata ? saved_gpr_wdata : gpr_wdata) : 0;
 
@@ -418,10 +421,10 @@ assign rvfi_pc_rdata = trs_pc   ;
 assign rvfi_pc_wdata = cf_req ? cf_target : s4_pc+{29'b0,s4_size,1'b0} ;
 
 assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
-assign rvfi_mem_rmask= lsu_store ? 4'b0000  : lsu_strb;
-assign rvfi_mem_wmask= lsu_store ? lsu_strb : 4'b0000 ;
+assign rvfi_mem_rmask= fu_lsu && lsu_load  ? lsu_strb : 4'b0000 ;
+assign rvfi_mem_wmask= fu_lsu && lsu_store ? lsu_strb : 4'b0000 ;
 assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata : dmem_rdata;
-assign rvfi_mem_wdata= s4_opr_a ;
+assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 // Constant assignments to features of RVFI not supported/relevent.
 assign rvfi_halt  = 0;

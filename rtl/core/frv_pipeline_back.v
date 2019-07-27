@@ -131,7 +131,8 @@ wire [ 4:0] s3_rd           ; // Destination register address
 wire [XL:0] s3_opr_a        ; // Operand A
 wire [XL:0] s3_opr_b        ; // Operand B
 wire [XL:0] s3_opr_c        ; // Operand C
-wire [31:0] s3_pc           ; // Program counter
+wire [31:0] s2_pc           ; // Dispatch aligned Program counter
+wire [31:0] s3_pc           ; // Execute aligned Program counter
 wire [ 4:0] s3_uop          ; // Micro-op code
 wire [ 4:0] s3_fu           ; // Functional Unit
 wire        s3_trap         ; // Raise a trap?
@@ -171,7 +172,7 @@ wire [XL:0] rvfi_s4_rs1_rdata   ; // Source register data 1
 wire [XL:0] rvfi_s4_rs2_rdata   ; // Source register data 2
 wire [ 4:0] rvfi_s4_rs1_addr    ; // Source register address 1
 wire [ 4:0] rvfi_s4_rs2_addr    ; // Source register address 2
-
+wire [XL:0] rvfi_s4_mem_wdata   ; // Memory write data.
 
 `endif
 
@@ -228,7 +229,8 @@ frv_pipeline_dispatch #(
 .s3_opr_a        (s3_opr_a        ), // Operand A
 .s3_opr_b        (s3_opr_b        ), // Operand B
 .s3_opr_c        (s3_opr_c        ), // Operand C
-.s3_pc           (s3_pc           ), // Program counter
+.s2_pc           (s2_pc           ), // Dispatch aligned Program counter
+.s3_pc           (s3_pc           ), // Execute aligned Program counter
 .s3_uop          (s3_uop          ), // Micro-op code
 .s3_fu           (s3_fu           ), // Functional Unit
 .s3_trap         (s3_trap         ), // Raise a trap?
@@ -251,7 +253,8 @@ frv_pipeline_execute i_pipeline_execute (
 .s3_opr_a       (s3_opr_a       ) , // Operand A
 .s3_opr_b       (s3_opr_b       ) , // Operand B
 .s3_opr_c       (s3_opr_c       ) , // Operand C
-.s3_pc          (s3_pc          ) , // Program counter
+.s2_pc          (s2_pc          ) , // Dispatch aligned Program counter
+.s3_pc          (s3_pc          ) , // Execute aligned Program counter
 .s3_uop         (s3_uop         ) , // Micro-op code
 .s3_fu          (s3_fu          ) , // Functional Unit
 .s3_trap        (s3_trap        ) , // Raise a trap?
@@ -273,6 +276,7 @@ frv_pipeline_execute i_pipeline_execute (
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+.rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif
 .s4_rd          (s4_rd          ) , // Destination register address
 .s4_opr_a       (s4_opr_a       ) , // Operand A
@@ -332,8 +336,8 @@ frv_pipeline_writeback i_pipeline_writeback(
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+.rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif
-.s3_pc         (s3_pc          ) , // Program counter for JAL[R]
 .s4_rd         (s4_rd          ) , // Destination register address
 .s4_opr_a      (s4_opr_a       ) , // Operand A
 .s4_opr_b      (s4_opr_b       ) , // Operand B
