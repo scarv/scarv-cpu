@@ -247,13 +247,13 @@ wire        lsu_word    = s4_uop[2:1] == LSU_WORD;
 wire        lsu_signed  = s4_uop[LSU_SIGNED]  ;
 wire [XL:0] lsu_addr    = s4_opr_b;
 
+wire [ 3:0] lsu_strb    = s4_opr_a[3:0];
+
 wire        lsu_busy    =
     fu_lsu && !(lsu_rsp_seen || (dmem_recv && dmem_ack));
 
 wire [ 7: 0] rdata_b0 =
-    {8{lsu_byte && lsu_addr[1:0] == 2'b00}} & dmem_rdata[ 7: 0] |
-    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[ 7: 0] |
-    {8{lsu_word                          }} & dmem_rdata[ 7: 0] |
+    {8{lsu_strb[0]                       }} & dmem_rdata[ 7: 0] |
     {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & dmem_rdata[15: 8] |
     {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & dmem_rdata[23:16] |
     {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
@@ -274,7 +274,7 @@ wire [15: 0] rdata_h1 =
 wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
 
 // LSU Bus error?
-wire        lsu_b_error = lsu_rsp_expected && dmem_error;
+wire        lsu_b_error = lsu_rsp_expected && dmem_error && dmem_recv;
 
 wire        lsu_trap    = lsu_b_error;
 
@@ -311,9 +311,9 @@ assign fwd_s4_csr   = fu_csr;
 // It's a trap!
 // -------------------------------------------------------------------------
 
-assign trap_cpu   = cfu_trap || lsu_trap;
+assign trap_cpu   = cfu_trap || lsu_trap || s4_trap;
 
-assign trap_int   = s4_trap ; // A trap occured due to interrupt
+assign trap_int   = 1'b0 ; // A trap occured due to interrupt
 
 assign trap_cause = // Cause of the trap.
     lsu_b_error && lsu_load     ? TRAP_LDACCESS :
@@ -356,6 +356,51 @@ always @(posedge g_clk) begin
 end
 
 
+reg [XL:0] saved_gpr_wdata;
+reg        use_saved_gpr_wdata;
+
+wire       n_use_saved_gpr_wdata =
+    !pipe_progress && (use_saved_gpr_wdata || gpr_wen);
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        use_saved_gpr_wdata <= 1'b0;
+    end else begin
+        use_saved_gpr_wdata <= n_use_saved_gpr_wdata;
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        saved_gpr_wdata <= 0;
+    end else if(gpr_wen) begin
+        saved_gpr_wdata <= gpr_wdata;
+    end
+end
+
+reg [XL:0] saved_mem_rdata;
+reg        use_saved_mem_rdata;
+
+wire       n_use_saved_mem_rdata =
+    !pipe_progress && (use_saved_mem_rdata || (dmem_recv && dmem_ack));
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        use_saved_mem_rdata <= 1'b0;
+    end else begin
+        use_saved_mem_rdata <= n_use_saved_mem_rdata;
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        saved_mem_rdata <= 0;
+    end else if(dmem_recv && dmem_ack) begin
+        saved_mem_rdata <= dmem_rdata;
+    end
+end
+
+
 assign rvfi_valid = trs_valid;
 assign rvfi_insn  = trs_instr;
 assign rvfi_trap  = trap_cpu ;
@@ -366,15 +411,16 @@ assign rvfi_rs1_rdata= rvfi_s4_rs1_rdata;
 assign rvfi_rs2_rdata= rvfi_s4_rs2_rdata;
 
 assign rvfi_rd_addr  = s4_rd    ;
-assign rvfi_rd_wdata = |s4_rd ? gpr_wdata : 0;
+assign rvfi_rd_wdata = |s4_rd && !trap_cpu ?
+                       (use_saved_gpr_wdata ? saved_gpr_wdata : gpr_wdata) : 0;
 
 assign rvfi_pc_rdata = trs_pc   ; 
 assign rvfi_pc_wdata = cf_req ? cf_target : s4_pc+{29'b0,s4_size,1'b0} ;
 
-assign rvfi_mem_addr = s4_opr_b ;
-assign rvfi_mem_rmask= 0        ;
-assign rvfi_mem_wmask= 0        ;
-assign rvfi_mem_rdata= lsu_rdata;
+assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
+assign rvfi_mem_rmask= lsu_store ? 4'b0000  : lsu_strb;
+assign rvfi_mem_wmask= lsu_store ? lsu_strb : 4'b0000 ;
+assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata : dmem_rdata;
 assign rvfi_mem_wdata= s4_opr_a ;
 
 // Constant assignments to features of RVFI not supported/relevent.

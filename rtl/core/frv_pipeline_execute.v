@@ -158,7 +158,7 @@ wire        lsu_half   = s3_uop[2:1] == LSU_HALF;
 wire        lsu_word   = s3_uop[2:1] == LSU_WORD;
 wire        lsu_signed = s3_uop[LSU_SIGNED]  ;
 
-wire [XL:0] n_s4_opr_a_lsu = 32'b0     ;
+wire [XL:0] n_s4_opr_a_lsu = {28'b0,dmem_strb};
 wire [XL:0] n_s4_opr_b_lsu = lsu_addr  ;
 
 //
@@ -166,7 +166,7 @@ wire [XL:0] n_s4_opr_b_lsu = lsu_addr  ;
 // -------------------------------------------------------------------------
 
 wire        cfu_valid   = fu_cfu        ; // Inputs are valid.
-wire        cfu_ready   = cfu_valid     ; // Instruction complete. TODO
+wire        cfu_ready   = cfu_valid     ; // Instruction complete.
 
 wire        cfu_cond    = cfu_valid && s3_uop[4:3] == 2'b00;
 wire        cfu_uncond  = cfu_valid && s3_uop[4:3] == 2'b10;
@@ -208,7 +208,7 @@ wire [XL:0] n_s4_opr_b_cfu = 32'b0;
 // -------------------------------------------------------------------------
 
 wire        csr_valid  = fu_csr         ; // Inputs are valid.
-wire        csr_ready  = csr_valid      ; // Instruction complete. TODO
+wire        csr_ready  = csr_valid      ; // Instruction complete.
 
 wire [XL:0] n_s4_opr_a_csr = s3_opr_a;
 wire [XL:0] n_s4_opr_b_csr = s3_opr_c;
