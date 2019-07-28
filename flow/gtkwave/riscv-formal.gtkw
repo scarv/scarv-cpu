@@ -1,21 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jul 27 14:41:25 2019
+[*] Sun Jul 28 17:43:20 2019
 [*]
 [dumpfile] "(null)"
 [savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/riscv-formal.gtkw"
-[timestart] 56
+[timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-4.360063 153 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.804848 122 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
 [treeopen] rvfi_testbench.wrapper.i_dut.
 [treeopen] rvfi_testbench.wrapper.i_dut.i_pipeline.
-[treeopen] rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.
 [sst_width] 346
-[signals_width] 470
+[signals_width] 367
 [sst_expanded] 1
 [sst_vpaned_height] 279
 @28
@@ -38,9 +37,13 @@ rvfi_testbench.rvfi_mode[1:0]
 rvfi_testbench.rvfi_order[63:0]
 rvfi_testbench.rvfi_pc_rdata[31:0]
 rvfi_testbench.rvfi_pc_wdata[31:0]
+@24
 rvfi_testbench.rvfi_rs1_addr[4:0]
+@22
 rvfi_testbench.rvfi_rs1_rdata[31:0]
+@24
 rvfi_testbench.rvfi_rs2_addr[4:0]
+@22
 rvfi_testbench.rvfi_rs2_rdata[31:0]
 @28
 rvfi_testbench.rvfi_trap
@@ -55,88 +58,30 @@ rvfi_testbench.checker_inst.insn_spec.spec_pc_wdata[31:0]
 rvfi_testbench.checker_inst.insn_spec.spec_rd_addr[4:0]
 rvfi_testbench.checker_inst.insn_spec.spec_rd_wdata[31:0]
 @28
-rvfi_testbench.checker_inst.insn_spec.spec_trap
 rvfi_testbench.checker_inst.insn_spec.spec_valid
+@24
+rvfi_testbench.checker_inst.insn_spec.spec_rs2_addr[4:0]
+@25
+rvfi_testbench.checker_inst.insn_spec.spec_rs1_addr[4:0]
 @200
 -
 @22
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.s3_pc[31:0]
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_pc[31:0]
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.rvfi_rs2_rdata[31:0]
+@24
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.rvfi_s4_rs2_addr[4:0]
+@22
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
+@28
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_valid
+@24
+rvfi_testbench.wrapper.i_dut.i_pipeline.s1_rs2_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_pipeline.rvfi_s2_rs2_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_pipeline.rvfi_s3_rs2_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_pipeline.rvfi_s4_rs2_addr[4:0]
 @200
 -
-@c00024
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
-@28
-(0)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
-(1)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
-(2)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
-(3)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
-(4)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
-@1401204
--group_end
-@22
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_wdata[31:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_wen
-@800201
--CFU
-@29
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_busy
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_cf_taken
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_done
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_ebreak
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_ecall
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_finish_now
-@23
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_gpr_wdata[31:0]
-@29
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_gpr_wen
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_link
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_mret
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_tgt_trap
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_trap
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_cfu
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.n_cfu_done
-@1000201
--CFU
-@800200
--WB LSU
-@22
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_addr[31:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_busy
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_byte
-@22
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_gpr_wdata[31:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_gpr_wen
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_half
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_load
-@22
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_rdata[31:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_signed
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_store
-@c00028
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_strb[3:0]
-@28
-(0)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_strb[3:0]
-(1)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_strb[3:0]
-(2)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_strb[3:0]
-(3)rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_strb[3:0]
-@1401200
--group_end
-@28
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_trap
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_txn_recv
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_word
-@22
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.rdata_b0[7:0]
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.rdata_b1[7:0]
-rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_back.i_pipeline_writeback.rdata_h1[15:0]
-@1000200
--WB LSU
-@800200
+@c00200
 -DMEM
 @28
 rvfi_testbench.wrapper.i_dut.i_pipeline.dmem_req
@@ -155,7 +100,7 @@ rvfi_testbench.wrapper.i_dut.i_pipeline.dmem_ack
 rvfi_testbench.wrapper.i_dut.i_pipeline.dmem_error
 @22
 rvfi_testbench.wrapper.i_dut.i_pipeline.dmem_rdata[31:0]
-@1000200
+@1401200
 -DMEM
 [pattern_trace] 1
 [pattern_trace] 0

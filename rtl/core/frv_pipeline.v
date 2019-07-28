@@ -293,10 +293,12 @@ frv_pipeline_decode #(
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change
+`ifdef RVFI
 .rvfi_s2_rs1_addr   (rvfi_s2_rs1_addr   ),
 .rvfi_s2_rs2_addr   (rvfi_s2_rs2_addr   ),
 .rvfi_s2_rs1_data   (rvfi_s2_rs1_rdata  ),
 .rvfi_s2_rs2_data   (rvfi_s2_rs2_rdata  ),
+`endif
 .s2_valid           (s2_valid           ), // Is the output data valid?
 .s2_busy            (s2_busy            ), // Is next stage ready?
 .s2_rd              (s2_rd              ), // Destination register address

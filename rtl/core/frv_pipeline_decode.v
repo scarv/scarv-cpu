@@ -27,10 +27,12 @@ input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
 input  wire        cf_ack        , // Control flow change acknowledge.
 
-output wire [ 4:0] rvfi_s2_rs1_addr,
-output wire [ 4:0] rvfi_s2_rs2_addr,
-output wire [XL:0] rvfi_s2_rs1_data,
-output wire [XL:0] rvfi_s2_rs2_data,
+`ifdef RVFI
+output reg  [ 4:0] rvfi_s2_rs1_addr,
+output reg  [ 4:0] rvfi_s2_rs2_addr,
+output reg  [XL:0] rvfi_s2_rs1_data,
+output reg  [XL:0] rvfi_s2_rs2_data,
+`endif
 
 output wire        s2_valid      , // Is the output data valid?
 input  wire        s2_busy       , // Is the next stage ready for new inputs?
@@ -58,6 +60,8 @@ parameter TRACE_INSTR_WORD = 1'b1;
 
 // From (buffered) pipeline register of next stage.
 wire   p_s2_busy;
+
+wire pipe_progress = s1_valid && !s1_busy;
 
 assign s1_busy      = p_s2_busy || s1_bubble;
 wire   n_s2_valid   = s1_valid  || s1_bubble;
@@ -598,27 +602,27 @@ assign n_s2_opr_c =
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 220;
+localparam RL = 146;
 
 `ifdef RVFI
-wire [   4:0] rvfi_n_s2_rs1_addr = s1_rs1_addr;
-wire [   4:0] rvfi_n_s2_rs2_addr = s1_rs1_addr;
-wire [  XL:0] rvfi_n_s2_rs1_data = s1_rs1_rdata;
-wire [  XL:0] rvfi_n_s2_rs2_data = s1_rs2_rdata;
-`else
-wire [   4:0] rvfi_n_s2_rs1_addr = 0;
-wire [   4:0] rvfi_n_s2_rs2_addr = 0;
-wire [  XL:0] rvfi_n_s2_rs1_data = 0;
-wire [  XL:0] rvfi_n_s2_rs2_data = 0;
+always @(posedge g_clk) begin
+    if(!g_resetn || s1_flush) begin
+        rvfi_s2_rs1_addr <= 0;
+        rvfi_s2_rs2_addr <= 0;
+        rvfi_s2_rs1_data <= 0;
+        rvfi_s2_rs2_data <= 0;
+    end else if (pipe_progress) begin
+        rvfi_s2_rs1_addr <= s1_rs1_addr;
+        rvfi_s2_rs1_data <= s1_rs1_rdata;
+        rvfi_s2_rs2_addr <= s1_rs2_addr;
+        rvfi_s2_rs2_data <= s1_rs2_rdata;
+    end
+end
 `endif
 
 wire [RL-1:0] p_mr;
 
 wire [RL-1:0] p_in = {
- rvfi_n_s2_rs1_addr,
- rvfi_n_s2_rs2_addr,
- rvfi_n_s2_rs1_data,
- rvfi_n_s2_rs2_data,
  s1_bubble ?  5'b0 : n_s2_rd   , // Destination register address
  n_s2_opr_a                , // Operand A
  n_s2_opr_b                , // Operand B
@@ -633,10 +637,6 @@ wire [RL-1:0] p_in = {
 wire [RL-1:0] p_out;
 
 assign {
- rvfi_s2_rs1_addr,
- rvfi_s2_rs2_addr,
- rvfi_s2_rs1_data,
- rvfi_s2_rs2_data,
  s2_rd         , // Destination register address
  s2_opr_a      , // Operand A
  s2_opr_b      , // Operand B

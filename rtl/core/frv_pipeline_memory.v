@@ -108,19 +108,32 @@ wire        lsu_half   = s3_uop[2:1] == LSU_HALF;
 wire        lsu_word   = s3_uop[2:1] == LSU_WORD;
 wire        lsu_signed = s3_uop[LSU_SIGNED]  ;
 
+wire [5:0]  lsu_cause = 
+           (   lsu_load&&lsu_a_error)? TRAP_LDALIGN  :
+           (lsu_store  &&lsu_a_error)? TRAP_STALIGN  :
+                                        0            ;
+
 wire [XL:0] n_s4_opr_a_lsu = {28'b0,dmem_strb};
 wire [XL:0] n_s4_opr_b_lsu = lsu_addr;
+
+//
+// Trapping
+// -------------------------------------------------------------------------
+
+wire n_s4_trap   = s3_trap || (fu_lsu && lsu_a_error) ; // Raise a trap?
+
+wire[4:0] n_s4_rd     =     s3_trap  ? s3_rd         :
+                   fu_lsu&&lsu_a_error ? lsu_cause[4:0]:
+                                       s3_rd         ;
 
 //
 // Next pipestage value progression.
 // -------------------------------------------------------------------------
 
-wire [ 4:0] n_s4_rd     = s3_rd   ; // Destination register address
 wire [XL:0] n_s4_opr_a  = lsu_valid ? n_s4_opr_a_lsu : s3_opr_a; // Operand A
 wire [XL:0] n_s4_opr_b  = lsu_valid ? n_s4_opr_b_lsu : s3_opr_b; // Operand B
 wire [ 4:0] n_s4_uop    = s3_uop  ; // Micro-op code
 wire [ 4:0] n_s4_fu     = s3_fu   ; // Functional Unit
-wire        n_s4_trap   = s3_trap ; // Raise a trap?
 wire [ 1:0] n_s4_size   = s3_size ; // Size of the instruction.
 wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 
@@ -213,5 +226,39 @@ frv_pipeline_register #(
 .o_valid  (s4_valid         ), // Input data from stage N valid?
 .i_busy   (s4_busy          )  // Stage N+1 ready to continue?
 );
+
+always @(posedge g_clk) begin
+    if(!g_resetn || flush) begin
+        rvfi_s4_rs1_rdata <= 0; // Source register data 1
+        rvfi_s4_rs2_rdata <= 0; // Source register data 2
+        rvfi_s4_rs1_addr  <= 0; // Source register address 1
+        rvfi_s4_rs2_addr  <= 0; // Source register address 2
+    end else if(pipe_progress) begin
+        rvfi_s4_rs1_rdata <= rvfi_s3_rs1_rdata;
+        rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
+        rvfi_s4_rs1_addr  <= rvfi_s3_rs1_addr ;
+        rvfi_s4_rs2_addr  <= rvfi_s3_rs2_addr ;
+    end
+end
+
+reg [31:0] mem_wdata_store;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        rvfi_s4_mem_wdata <= 0;
+    end else if(p_valid && !p_busy && dmem_req && dmem_gnt) begin
+        rvfi_s4_mem_wdata <= dmem_wdata;
+    end else if(p_valid && !p_busy) begin
+        rvfi_s4_mem_wdata <= mem_wdata_store;
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        mem_wdata_store <= 0;
+    end else if(dmem_req && dmem_gnt) begin
+        mem_wdata_store <= dmem_wdata;
+    end
+end
 
 endmodule

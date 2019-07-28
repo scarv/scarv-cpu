@@ -361,7 +361,7 @@ always @(posedge g_clk) begin
         rvfi_s3_rs2_rdata <= 0; // Source register data 2
         rvfi_s3_rs1_addr  <= 0; // Source register address 1
         rvfi_s3_rs2_addr  <= 0; // Source register address 2
-    end else if(p_valid && !p_busy) begin
+    end else if(pipe_progress) begin
         rvfi_s3_rs1_rdata <= rvfi_s2_rs1_rdata;
         rvfi_s3_rs2_rdata <= rvfi_s2_rs2_rdata;
         rvfi_s3_rs1_addr  <= rvfi_s2_rs1_addr ;
