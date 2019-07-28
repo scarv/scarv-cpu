@@ -13,10 +13,11 @@ input               g_resetn        , // synchronous reset
 input  wire         int_external    , // External interrupt trigger line.
 input  wire         int_software    , // Software interrupt trigger line.
 
-`ifdef MRV_VERIF_TRACE
 output wire         trs_valid       , // Trace output valid.
-output wire [XL:0]  trs_pc          , // Trace program counter object.
+output wire [31:0]  trs_pc          , // Trace program counter object.
 output wire [31:0]  trs_instr       , // Instruction traced out.
+
+`ifdef MRV_VERIF_TRACE
 
 output [NRET        - 1 : 0] rvfi_valid     ,
 output [NRET *   64 - 1 : 0] rvfi_order     ,
@@ -58,6 +59,7 @@ output [ 3:0] imem_wstrb     ,
 
 input         imem_bvalid    ,
 output        imem_bready    ,
+input  [ 1:0] imem_bresp     ,
 
 output        imem_arvalid   ,
 input         imem_arready   ,
@@ -67,6 +69,7 @@ output [ 2:0] imem_arprot    ,
 input         imem_rvalid    ,
 output        imem_rready    ,
 input  [31:0] imem_rdata     ,
+input  [ 1:0] imem_rresp     ,
 
 input         dmem_aclk      ,
 input         dmem_aresetn   ,
@@ -83,6 +86,7 @@ output [ 3:0] dmem_wstrb     ,
 
 input         dmem_bvalid    ,
 output        dmem_bready    ,
+input  [ 1:0] dmem_bresp     ,
 
 output        dmem_arvalid   ,
 input         dmem_arready   ,
@@ -91,6 +95,7 @@ output [ 2:0] dmem_arprot    ,
 
 input         dmem_rvalid    ,
 output        dmem_rready    ,
+input  [ 1:0] dmem_rresp     ,
 input  [31:0] dmem_rdata      
 
 );
@@ -122,26 +127,30 @@ parameter   MMIO_MTIMECMP_RESET   = 64'hFFFFFFFFFFFFFFFF;
 parameter TRACE_INSTR_WORD = 1'b0;
 
 //
-// Instruction SRAM interface
-wire         isram_cen        ; // Chip enable
-wire         isram_wen        ; // Write enable
-wire         isram_error      ; // Error
-wire         isram_stall      ; // Memory stall
-wire [3:0]   isram_strb       ; // Write strobe
-wire [31:0]  isram_addr       ; // Read/Write address
-wire [31:0]  isram_rdata      ; // Read data
-wire [31:0]  isram_wdata      ; // Write data
+// Instruction Memory interface
+wire         i_req        ; // Start memory request
+wire         i_wen        ; // Write enable
+wire [3:0]   i_strb       ; // Write strobe
+wire [31:0]  i_wdata      ; // Write data
+wire [31:0]  i_addr       ; // Read/Write address
+wire         i_gnt        ; // request accepted
+wire         i_recv       ; // Instruction memory recieve response.
+wire         i_ack        ; // Instruction memory ack response.
+wire         i_error      ; // Error
+wire [31:0]  i_rdata      ; // Read data
 
 //
-// Data SRAM interface
-wire         dsram_cen        ; // Chip enable
-wire         dsram_wen        ; // Write enable
-wire         dsram_error      ; // Error
-wire         dsram_stall      ; // Memory stall
-wire [3:0]   dsram_strb       ; // Write strobe
-wire [31:0]  dsram_addr       ; // Read/Write address
-wire [31:0]  dsram_rdata      ; // Read data
-wire [31:0]  dsram_wdata      ; // Write data
+// Data Memory interface
+wire         d_req        ; // Start memory request
+wire         d_wen        ; // Write enable
+wire [3:0]   d_strb       ; // Write strobe
+wire [31:0]  d_wdata      ; // Write data
+wire [31:0]  d_addr       ; // Read/Write address
+wire         d_gnt        ; // request accepted
+wire         d_recv       ; // Data memory recieve response.
+wire         d_ack        ; // Data memory ack response.
+wire         d_error      ; // Error
+wire [31:0]  d_rdata      ; // Read data
 
 
 //
@@ -156,10 +165,10 @@ frv_core #(
 .g_resetn        (g_resetn        ), // synchronous reset
 .int_external    (int_external    ), // External interrupt trigger line.
 .int_software    (int_software    ), // Software interrupt trigger line.
-`ifdef MRV_VERIF_TRACE
 .trs_valid       (trs_valid       ), // Trace output valid.
 .trs_pc          (trs_pc          ), // Trace program counter object.
 .trs_instr       (trs_instr       ), // Instruction traced out.
+`ifdef RVFI
 .rvfi_valid      (rvfi_valid      ),
 .rvfi_order      (rvfi_order      ),
 .rvfi_insn       (rvfi_insn       ),
@@ -181,28 +190,35 @@ frv_core #(
 .rvfi_mem_rdata  (rvfi_mem_rdata  ),
 .rvfi_mem_wdata  (rvfi_mem_wdata  ),
 `endif
-.imem_cen        (isram_cen        ), // Chip enable
-.imem_wen        (isram_wen        ), // Write enable
-.imem_error      (isram_error      ), // Error
-.imem_stall      (isram_stall      ), // Memory stall
-.imem_strb       (isram_strb       ), // Write strobe
-.imem_addr       (isram_addr       ), // Read/Write address
-.imem_rdata      (isram_rdata      ), // Read data
-.imem_wdata      (isram_wdata      ), // Write data
-.dmem_cen        (dsram_cen        ), // Chip enable
-.dmem_wen        (dsram_wen        ), // Write enable
-.dmem_error      (dsram_error      ), // Error
-.dmem_stall      (dsram_stall      ), // Memory stall
-.dmem_strb       (dsram_strb       ), // Write strobe
-.dmem_addr       (dsram_addr       ), // Read/Write address
-.dmem_rdata      (dsram_rdata      ), // Read data
-.dmem_wdata      (dsram_wdata      )  // Write data
+.imem_req      (i_req      ), // Start memory request
+.imem_wen      (i_wen      ), // Write enable
+.imem_strb     (i_strb     ), // Write strobe
+.imem_wdata    (i_wdata    ), // Write data
+.imem_addr     (i_addr     ), // Read/Write address
+.imem_gnt      (i_gnt      ), // request accepted
+.imem_recv     (i_recv     ), // Instruction memory recieve response.
+.imem_ack      (i_ack      ), // Response acknowledge
+.imem_error    (i_error    ), // Error
+.imem_rdata    (i_rdata    ), // Read data
+.dmem_req      (d_req      ), // Start memory request
+.dmem_wen      (d_wen      ), // Write enable
+.dmem_strb     (d_strb     ), // Write strobe
+.dmem_wdata    (d_wdata    ), // Write data
+.dmem_addr     (d_addr     ), // Read/Write address
+.dmem_gnt      (d_gnt      ), // request accepted
+.dmem_recv     (d_recv     ), // Instruction memory recieve response.
+.dmem_ack      (d_ack      ), // Response acknowledge
+.dmem_error    (d_error    ), // Error
+.dmem_rdata    (d_rdata    )  // Read data
 );
 
 
-sram_axi_adapter i_instr_sram_axi_adapter (
-.g_clk           (g_clk           ),
-.g_resetn        (g_resetn        ),
+frv_axi_adapter #(
+.INSTR_INTERFACE(1'b0),
+.RSP_PRIORITY_WR(1'b1)
+) i_instr_sram_axi_adapter (
+.g_clk           (g_clk        ),
+.g_resetn        (g_resetn     ),
 .mem_axi_awvalid (imem_awvalid ),
 .mem_axi_awready (imem_awready ),
 .mem_axi_awaddr  (imem_awaddr  ),
@@ -213,6 +229,7 @@ sram_axi_adapter i_instr_sram_axi_adapter (
 .mem_axi_wstrb   (imem_wstrb   ),
 .mem_axi_bvalid  (imem_bvalid  ),
 .mem_axi_bready  (imem_bready  ),
+.mem_axi_bresp   (imem_bresp   ),
 .mem_axi_arvalid (imem_arvalid ),
 .mem_axi_arready (imem_arready ),
 .mem_axi_araddr  (imem_araddr  ),
@@ -220,19 +237,25 @@ sram_axi_adapter i_instr_sram_axi_adapter (
 .mem_axi_rvalid  (imem_rvalid  ),
 .mem_axi_rready  (imem_rready  ),
 .mem_axi_rdata   (imem_rdata   ),
-.mem_instr       (1'b1         ), // Is this an instruction fetch?
-.mem_cen         (isram_cen    ),
-.mem_stall       (isram_stall  ),
-.mem_error       (isram_error  ),
-.mem_addr        (isram_addr   ),
-.mem_wdata       (isram_wdata  ),
-.mem_wstrb       (isram_strb   ),
-.mem_rdata       (isram_rdata  )
+.mem_axi_rresp   (imem_rresp   ),
+.mem_req         (i_req        ), // Start memory request
+.mem_wen         (i_wen        ), // Write enable
+.mem_strb        (i_strb       ), // Write strobe
+.mem_wdata       (i_wdata      ), // Write data
+.mem_addr        (i_addr       ), // Read/Write address
+.mem_gnt         (i_gnt        ), // request accepted
+.mem_recv        (i_recv       ), // Instruction memory recieve response.
+.mem_ack         (i_ack        ), // Response acknowledge
+.mem_error       (i_error      ), // Error
+.mem_rdata       (i_rdata      )  // Read data
 );
 
-sram_axi_adapter i_data_sram_axi_adapter (
-.g_clk           (g_clk           ),
-.g_resetn        (g_resetn        ),
+frv_axi_adapter #(
+.INSTR_INTERFACE(1'b0),
+.RSP_PRIORITY_WR(1'b1)
+) i_data_sram_axi_adapter (
+.g_clk           (g_clk        ),
+.g_resetn        (g_resetn     ),
 .mem_axi_awvalid (dmem_awvalid ),
 .mem_axi_awready (dmem_awready ),
 .mem_axi_awaddr  (dmem_awaddr  ),
@@ -243,6 +266,7 @@ sram_axi_adapter i_data_sram_axi_adapter (
 .mem_axi_wstrb   (dmem_wstrb   ),
 .mem_axi_bvalid  (dmem_bvalid  ),
 .mem_axi_bready  (dmem_bready  ),
+.mem_axi_bresp   (dmem_bresp   ),
 .mem_axi_arvalid (dmem_arvalid ),
 .mem_axi_arready (dmem_arready ),
 .mem_axi_araddr  (dmem_araddr  ),
@@ -250,14 +274,17 @@ sram_axi_adapter i_data_sram_axi_adapter (
 .mem_axi_rvalid  (dmem_rvalid  ),
 .mem_axi_rready  (dmem_rready  ),
 .mem_axi_rdata   (dmem_rdata   ),
-.mem_instr       (1'b0         ), // Is this an instruction fetch?
-.mem_cen         (dsram_cen    ),
-.mem_stall       (dsram_stall  ),
-.mem_error       (dsram_error  ),
-.mem_addr        (dsram_addr   ),
-.mem_wdata       (dsram_wdata  ),
-.mem_wstrb       (dsram_strb   ),
-.mem_rdata       (dsram_rdata  )
+.mem_axi_rresp   (dmem_rresp   ),
+.mem_req         (d_req        ), // Start memory request
+.mem_wen         (d_wen        ), // Write enable
+.mem_strb        (d_strb       ), // Write strobe
+.mem_wdata       (d_wdata      ), // Write data
+.mem_addr        (d_addr       ), // Read/Write address
+.mem_gnt         (d_gnt        ), // request accepted
+.mem_recv        (d_recv       ), // Instruction memory recieve response.
+.mem_ack         (d_ack        ), // Response acknowledge
+.mem_error       (d_error      ), // Error
+.mem_rdata       (d_rdata      )  // Read data
 );
 
 endmodule
