@@ -95,8 +95,8 @@ wire fu_csr = s3_fu[P_FU_CSR];
 // -------------------------------------------------------------------------
 
 wire        lsu_valid  = fu_lsu         ; // Inputs are valid.
-wire        lsu_a_error= 1'b0           ; // Address error. TODO
-wire        lsu_ready  = lsu_valid      ; // Load/Store instruction complete.
+wire        lsu_a_error                 ; // Address error. TODO
+wire        lsu_ready                   ; // Load/Store instruction complete.
 
 wire        lsu_load   = s3_uop[LSU_LOAD ];
 wire        lsu_store  = s3_uop[LSU_STORE];

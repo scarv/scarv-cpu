@@ -335,7 +335,7 @@ assign {
 frv_pipeline_register #(
 .RLEN(PIPE_REG_W),
 .BUFFER_HANDSHAKE(1'b0)
-) i_dispatch_pipe_reg(
+) i_execute_pipe_reg(
 .g_clk    (g_clk            ), // global clock
 .g_resetn (g_resetn         ), // synchronous reset
 .i_data   (pipe_reg_in      ), // Input data from stage N
