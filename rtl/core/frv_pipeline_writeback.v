@@ -355,7 +355,7 @@ always @(posedge g_clk) begin
 end
 
 
-reg [XL:0] saved_gpr_waddr;
+reg [ 4:0] saved_gpr_waddr;
 reg [XL:0] saved_gpr_wdata;
 reg        use_saved_gpr_wdata;
 
