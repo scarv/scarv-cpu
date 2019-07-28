@@ -23,10 +23,9 @@
   - Fetch: Responsible for fetching data from memory and presenting it
     to the decode stage.
   - Decode: Transforms RISC-V encoded instructions into pipeline
-    encodings.
-  - Dispatch : Gathers all operands needed to execute an instruction.
-  - Execute: Performs compute on the instruction as needed and accesses
-    data memory.
+    encodings. Gathers all operands needed to execute an instruction.
+  - Execute: Performs compute on the instruction as needed.
+  - Memory: Accesses data memory.
   - Writeback: Commits results to architectural state, sends control
     flow changes to the fetch stage, interracts with CSR registers.
 
@@ -39,8 +38,8 @@ Source Stage    | Combinatorial Prefix  | Registered Prefix
 ----------------|-----------------------|--------------------------
 Fetch           | `c0_`                 | `r0_`
 Decode          | `c1_`                 | `r1_`
-Dispatch        | `c2_`                 | `r2_`
-Execute         | `c3_`                 | `r3_`
+Execute         | `c2_`                 | `r2_`
+Memory          | `c3_`                 | `r3_`
 Writeback       | `c4_`                 | `r4_`
 
 A signal which crosses from one pipeline stage into another is
@@ -58,9 +57,9 @@ into Decode.
 
 There will be 4 pipeline registers:
 - `p0` - Fetch -> Decode
-- `p1` - Decode -> Dispatch
-- `p2` - Dispatch -> Execute
-- `p3` - Execute -> Writeback 
+- `p1` - Decode -> Execute 
+- `p2` - Execute -> Memory
+- `p3` - Memory -> Writeback 
 
 The pipeline will be organised into a module hierarchy:
 
@@ -69,58 +68,50 @@ The pipeline will be organised into a module hierarchy:
     |                        |                        |  
     |   frv_pipeline         | Memory I/F             |
     |                        |                        |  
-    | +----------------------#---------------------+  |
-    | | frv_pipeline_front   |                     |  |
-    | |                      |                     |  |
-    | | +--------------------|-------------------+ |  |
-    | | |              frv_fetch                 | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |>             frv_pipereg_fd      p0    | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |              frv_decode                | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | +-----|---------|--------|-------------------+  |  
-    |       |         |        |                      |
-    | +-----|---------|--------|-------------------+  |  
-    | |     |         |        | frv_pipeline_back |  |
-    | |     |         |        |                   |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |>             frv_pipereg_dd      p1    | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |              frv_dispatch              | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |>             frv_pipereg_de      p2    | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |              frv_execute               |-|--|---# Data Memory I/F
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |>             frv_pipereg_ew      p3    | |  |
-    | | +---^------------------------------------+ |  |
-    | |     |         |Valid   | Data              |  |
-    | |     |Ready    |        |                   |  |
-    | | +-------------*--------*-----------------+ |  |
-    | | |              frv_writeback             | |  |
-    | | +----------------------------------------+ |  |
-    | +--------------------------------------------+  |
+    |   +--------------------|-------------------+    |
+    |   |              frv_fetch           s0    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |>             frv_pipereg         p0    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |              frv_decode          s1    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |>             frv_pipereg         p1    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |              frv_execute         s2    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |>             frv_pipereg         p2    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |              frv_memory          s3    |----|---# Data Memory I/F
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |>             frv_pipereg         p3    |    |
+    |   +---^------------------------------------+    |
+    |       |         |Valid   | Data                 |
+    |       |Ready    |        |                      |
+    |   +-------------*--------*-----------------+    |
+    |   |              frv_writeback       s4    |    |
+    |   +----------------------------------------+    |
+    |                                                 |
     +-------------------------------------------------+
 ```
 ## Stalling, Forwarding and Bubbling.
@@ -178,26 +169,9 @@ Signal     | Size  | Description
 `ferr`     |  1    | A fetch error occured so raise an exception
 
 
-### Decode Dispatch Pipeline Register
+### Decode Execute Pipeline Register
 
-- Signals from decode stage into register are prefixed with `c1_`.
-- Signals from register into dispatch are prefixed with `r2_`.
-
-Signal     | Size  | Description
------------|-------|-------------------------------------------------------
-`rd`       |  5    | Destination register address
-`rs1`      |  5    | Source register address 1
-`rs2`      |  5    | Source register address 2
-`imm`      |  32   | Decoded immediate
-`uop`      |  5    | Micro-op code
-`fu`       |  5    | Functional Unit (alu/mem/jump/mul/csr)
-`trap`     |  1    | Raise a trap?
-`size`     |  2    | Size of the instruction.
-
-
-### Dispatch Execute Pipeline Register
-
-- Signals from dispatch stage into register are prefixed with `c2_`.
+- Signals from decode stage into register are prefixed with `c2_`.
 - Signals from register into execute are prefixed with `r3_`.
 
 Signal     | Size  | Description
@@ -212,10 +186,24 @@ Signal     | Size  | Description
 `trap`     |  1    | Raise a trap?
 `size`     |  2    | Size of the instruction.
 
-
-### Execute Writeback Pipeline register.
+### Execute Memory Pipeline register.
 
 - Signals from Execute stage into register are prefixed with `c3_`.
+- Signals from register into Memory are prefixed with `r4_`.
+
+Signal     | Size  | Description
+-----------|-------|-------------------------------------------------------
+`rd`       |  5    | Destination register address
+`opr_a`    |  32   | Operand A
+`opr_b`    |  32   | Operand B
+`uop`      |  5    | Micro-op code
+`fu`       |  5    | Functional Unit (alu/mem/jump/mul/csr)
+`trap`     |  1    | Raise a trap?
+`size`     |  2    | Size of the instruction.
+
+### Memory Writeback Pipeline register.
+
+- Signals from Memory stage into register are prefixed with `c3_`.
 - Signals from register into Writeback are prefixed with `r4_`.
 
 Signal     | Size  | Description
@@ -248,19 +236,17 @@ Propagates:
 - Fetch bus error: detected in trap bit of fetch buffer.
     Cause code stored in `rd` pipeline field.
 
-**Dispatch:**
+**Execute:**
+
 Raises:
-- None
+- Load/store address misaligned. Cause code stored in `rd`.
 Propagates:
 - Fetch bus error: detected in trap bit of fetch buffer.
-    Cause code stored in `rd` pipeline field.
+    Cause code stored in `opr_b` pipeline field.
 - Decode Error: detected by decoder, propagated in pipeline trap bit.
-    Cause code stored in `rd` pipeline field.
+    Cause code stored in `opr_b` pipeline field.
 
-**Execute:**
-Raises:
-- Load/store address misaligned. Cause code stored in `rd.
-- Load/store bus error. Cause code stored in `rd.
+**Memory:**
 Propagates:
 - Fetch bus error: detected in trap bit of fetch buffer.
     Cause code stored in `opr_b` pipeline field.

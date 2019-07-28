@@ -1,31 +1,28 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Fri Jul 26 09:37:35 2019
+[*] Sun Jul 28 16:34:07 2019
 [*]
-[dumpfile] "/home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.vcd"
-[dumpfile_mtime] "Fri Jul 26 09:35:13 2019"
-[dumpfile_size] 813080
-[savefile] "/home/ben/projects/riscv-faster/flow/gtkwave/verilator.gtkw"
-[timestart] 2909
+[dumpfile] "/home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-BEQ-01.vcd"
+[dumpfile_mtime] "Sun Jul 28 16:33:20 2019"
+[dumpfile_size] 1287749
+[savefile] "/home/ben/projects/riscv/cores/fast/flow/gtkwave/verilator.gtkw"
+[timestart] 4119
 [size] 1920 1025
 [pos] -1 -1
-*-5.919996 3046 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.722558 4353 1906 4346 5106 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_back.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_front.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.
-[sst_width] 223
+[treeopen] TOP.frv_core.i_pipeline.i_pipeline_s2_execute.
+[treeopen] TOP.frv_core.i_pipeline.i_pipeline_s3_memory.
+[sst_width] 270
 [signals_width] 400
 [sst_expanded] 1
 [sst_vpaned_height] 351
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
-@c00200
+@800200
 -Instruction Memory
 @22
 TOP.frv_core.imem_addr[31:0]
@@ -37,22 +34,92 @@ TOP.frv_core.imem_strb[3:0]
 TOP.frv_core.imem_wdata[31:0]
 @28
 TOP.frv_core.imem_wen
-@1401200
+@1000200
 -Instruction Memory
-@c00200
+@800200
 -Data Memory
-@22
-TOP.frv_core.dmem_addr[31:0]
 @28
-TOP.frv_core.dmem_error
+TOP.frv_core.i_pipeline.dmem_req
+TOP.frv_core.i_pipeline.dmem_gnt
 @22
-TOP.frv_core.dmem_rdata[31:0]
-TOP.frv_core.dmem_strb[3:0]
-TOP.frv_core.dmem_wdata[31:0]
+TOP.frv_core.i_pipeline.dmem_addr[31:0]
+TOP.frv_core.i_pipeline.dmem_strb[3:0]
+TOP.frv_core.i_pipeline.dmem_wdata[31:0]
 @28
-TOP.frv_core.dmem_wen
+TOP.frv_core.i_pipeline.dmem_wen
+@200
+-
+@28
+TOP.frv_core.i_pipeline.dmem_recv
+TOP.frv_core.i_pipeline.dmem_ack
+@22
+TOP.frv_core.i_pipeline.dmem_rdata[31:0]
+@28
+TOP.frv_core.i_pipeline.dmem_error
+@1000200
+-Data Memory
+@800200
+-Trace
+@2022
+^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-BEQ-01.elf.gtkwl
+TOP.frv_core.trs_instr[31:0]
+@22
+TOP.frv_core.trs_instr[31:0]
+TOP.frv_core.trs_pc[31:0]
+@28
+TOP.frv_core.trs_valid
+TOP.frv_core.i_pipeline.cf_req
+TOP.frv_core.i_pipeline.cf_ack
+@22
+TOP.frv_core.i_pipeline.cf_target[31:0]
+@1000200
+-Trace
+@800200
+-GPR
+@2024
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.gpr_rd[4:0]
+@c00022
+TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+@28
+(0)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(1)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(2)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(3)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(4)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(5)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(6)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(7)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(8)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(9)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(10)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(11)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(12)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(13)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(14)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(15)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(16)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(17)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(18)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(19)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(20)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(21)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(22)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(23)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(24)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(25)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(26)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(27)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(28)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(29)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(30)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
+(31)TOP.frv_core.i_pipeline.gpr_wdata[31:0]
 @1401200
--Data Memory
+-group_end
+@28
+TOP.frv_core.i_pipeline.gpr_wen
+@1000200
+-GPR
 @c00200
 -Interrupts
 @28
@@ -60,627 +127,265 @@ TOP.frv_core.int_external
 TOP.frv_core.int_software
 @1401200
 -Interrupts
-@800200
--Pipeline
-@28
-TOP.frv_core.i_pipeline.g_clk
-TOP.frv_core.i_pipeline.g_resetn
-@200
--
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.trs_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.trs_instr[31:0]
-TOP.frv_core.i_pipeline.trs_pc[31:0]
-@28
-TOP.frv_core.i_pipeline.trs_valid
-@800200
--Control FLow
-@28
-TOP.frv_core.i_pipeline.cf_req
-TOP.frv_core.i_pipeline.cf_ack
-@22
-TOP.frv_core.i_pipeline.cf_target[31:0]
-@1000200
--Control FLow
 @c00200
--Instruction Memory
-@22
-TOP.frv_core.i_pipeline.imem_addr[31:0]
+-Pipe Valid/Busy
 @28
-TOP.frv_core.i_pipeline.imem_error
-@22
-TOP.frv_core.i_pipeline.imem_rdata[31:0]
+TOP.frv_core.i_pipeline.s0_busy
+TOP.frv_core.i_pipeline.s1_busy
+TOP.frv_core.i_pipeline.s2_busy
+TOP.frv_core.i_pipeline.s3_busy
+TOP.frv_core.i_pipeline.s4_busy
+TOP.frv_core.i_pipeline.s1_valid
+TOP.frv_core.i_pipeline.s2_valid
+TOP.frv_core.i_pipeline.s3_valid
+TOP.frv_core.i_pipeline.s4_valid
 @1401200
--Instruction Memory
+-Pipe Valid/Busy
 @c00200
--Front end
-@800200
--Instruction Memory
+-Forwarding
 @28
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.imem_req
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.imem_gnt
+TOP.frv_core.i_pipeline.s1_bubble
+TOP.frv_core.i_pipeline.hzd_rs1_s2
+TOP.frv_core.i_pipeline.hzd_rs1_s3
+TOP.frv_core.i_pipeline.hzd_rs1_s4
+TOP.frv_core.i_pipeline.hzd_rs2_s2
+TOP.frv_core.i_pipeline.hzd_rs2_s3
+TOP.frv_core.i_pipeline.hzd_rs2_s4
 @22
-TOP.frv_core.i_pipeline.i_pipeline_front.imem_addr[31:0]
-@200
--
-@28
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.imem_recv
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.imem_ack
+TOP.frv_core.i_pipeline.fwd_rs1_rdata[31:0]
+TOP.frv_core.i_pipeline.fwd_rs2_rdata[31:0]
+@2024
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.fwd_s2_rd[4:0]
 @22
-TOP.frv_core.i_pipeline.i_pipeline_front.imem_rdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_front.imem_error
-@1000200
--Instruction Memory
+TOP.frv_core.i_pipeline.fwd_s2_wdata[31:0]
+@2024
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.fwd_s3_rd[4:0]
 @22
-TOP.frv_core.i_pipeline.i_pipeline_front.d_data[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.buf_out_2
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.buf_out_4
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.buf_ready
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.buf_valid
-@24
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.i_core_fetch_buffer.bdepth[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.reqs_outstanding[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_front.i_pipeline_fetch.ignore_rsps[1:0]
-@800200
--Decoder Outputs
+TOP.frv_core.i_pipeline.fwd_s3_wdata[31:0]
+@2024
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.fwd_s4_rd[4:0]
 @22
-TOP.frv_core.i_pipeline.i_pipeline_front.p_fu[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_front.p_imm[31:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_front.p_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_front.p_instr[31:0]
-@24
-TOP.frv_core.i_pipeline.i_pipeline_front.p_rd[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_front.p_rs1[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_front.p_rs2[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_front.p_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_front.p_trap
-TOP.frv_core.i_pipeline.i_pipeline_front.p_opr_src[7:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_front.p_uop[4:0]
-@1000200
--Decoder Outputs
+TOP.frv_core.i_pipeline.fwd_s4_wdata[31:0]
 @1401200
--Front end
-@c00201
--Front-end Outputs
+-Forwarding
+@c00200
+-Pipe - S0 - Fetch
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.buf_out_2
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.buf_out_4
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.buf_ready
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.buf_valid
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.cf_ack
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.cf_change
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.cf_req
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.cf_target[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.drop_response
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.f_2byte
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.f_4byte
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.f_ready
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.fetch_misaligned
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.g_clk
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.g_resetn
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.ignore_rsps[1:0]
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_ack
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_error
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_gnt
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_rdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_recv
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_req
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_strb[3:0]
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_wdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_wen
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.n_ignore_rsps[1:0]
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.n_imem_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.n_imem_req
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.n_reqs_outstanding[1:0]
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.progress_imem_addr
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.reqs_outstanding[1:0]
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.rsp_recv
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s0_flush
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_busy
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_data[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_error
+TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_valid
+@1401200
+-Pipe - S0 - Fetch
+@800200
+-Pipe - S1 Decode
+@22
+TOP.frv_core.i_pipeline.s1_data[31:0]
+@2022
+^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-BEQ-01.elf.gtkwl
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_bubble
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_busy
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_data[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_error
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_flush
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_addr[4:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_rdata[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_addr[4:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_rdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_valid
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.program_counter[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_program_counter[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_a[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_b[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_c[31:0]
+@1000200
+-Pipe - S1 Decode
+@800200
+-Pipe - S2 Execute
+@28
+TOP.frv_core.i_pipeline.s2_busy
+TOP.frv_core.i_pipeline.s2_valid
 @22
 TOP.frv_core.i_pipeline.s2_fu[4:0]
-TOP.frv_core.i_pipeline.s2_imm[31:0]
-@28
-TOP.frv_core.i_pipeline.s2_p_busy
-TOP.frv_core.i_pipeline.s2_p_valid
-@24
+@2022
+^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-BEQ-01.elf.gtkwl
+TOP.frv_core.i_pipeline.s2_instr[31:0]
+@22
+TOP.frv_core.i_pipeline.s2_opr_a[31:0]
+TOP.frv_core.i_pipeline.s2_opr_b[31:0]
+TOP.frv_core.i_pipeline.s2_opr_c[31:0]
+@2024
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s2_rd[4:0]
-TOP.frv_core.i_pipeline.s2_rs1[4:0]
-TOP.frv_core.i_pipeline.s2_rs2[4:0]
 @28
 TOP.frv_core.i_pipeline.s2_size[1:0]
 TOP.frv_core.i_pipeline.s2_trap
-TOP.frv_core.i_pipeline.i_pipeline_front.s2_opr_src[7:0]
 @22
 TOP.frv_core.i_pipeline.s2_uop[4:0]
-@2022
->-4
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.s2_instr[31:0]
-@22
->0
-TOP.frv_core.i_pipeline.s2_instr[31:0]
-@1401201
--Front-end Outputs
-@200
--
-@800200
--Backend
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.g_clk
-TOP.frv_core.i_pipeline.i_pipeline_back.g_resetn
-@800200
--Control Flow
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.cf_ack
-TOP.frv_core.i_pipeline.i_pipeline_back.cf_req
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.cf_target[31:0]
 @1000200
--Control Flow
+-Pipe - S2 Execute
 @c00200
--Data Memory
+-Pipe - S3 Memory
+@28
+TOP.frv_core.i_pipeline.s3_busy
 @22
-TOP.frv_core.i_pipeline.i_pipeline_back.dmem_addr[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.dmem_error
+TOP.frv_core.i_pipeline.s3_fu[4:0]
+@2022
+^1 /home/ben/projects/riscv/cores/fast/work/riscv-compliance/rv32i/I-BEQ-01.elf.gtkwl
+TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
-TOP.frv_core.i_pipeline.i_pipeline_back.dmem_rdata[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.dmem_strb[3:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.dmem_wdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.dmem_wen
-@1401200
--Data Memory
-@c00200
--Stage Flushing
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.flush_dispatch
-TOP.frv_core.i_pipeline.i_pipeline_back.flush_execute
-@1401200
--Stage Flushing
-@c00200
--Dispatch
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.dis_bubble
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_p_busy
-@800200
--GPRs and Forwarding
+TOP.frv_core.i_pipeline.s3_opr_a[31:0]
+TOP.frv_core.i_pipeline.s3_opr_b[31:0]
 @2024
-^2 /home/ben/projects/riscv-faster/flow/gtkwave/filter-gprs.txt
-TOP.frv_core.i_pipeline.i_pipeline_back.gpr_rd[4:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.gpr_wdata[31:0]
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.s3_rd[4:0]
 @28
-TOP.frv_core.i_pipeline.i_pipeline_back.gpr_wen
+TOP.frv_core.i_pipeline.s3_size[1:0]
+TOP.frv_core.i_pipeline.s3_trap
+@22
+TOP.frv_core.i_pipeline.s3_uop[4:0]
+@28
+TOP.frv_core.i_pipeline.s3_valid
+@c00200
+-LSU
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_req
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_gnt
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_addr[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_strb[3:0]
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wen
 @200
 -
 @28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s3_csr
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s3_load
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_txn_done
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_clk
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_resetn
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.hold_lsu_req
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_a_error
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_addr[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_byte
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_finished
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_half
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_load
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_ready
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_signed
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_store
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_valid
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_wdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_word
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.n_lsu_finished
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
+@1401200
+-LSU
+-Pipe - S3 Memory
+@800200
+-Pipe - S4 - Writeback
+@28
+TOP.frv_core.i_pipeline.s4_busy
+TOP.frv_core.i_pipeline.s4_flush
+@22
+TOP.frv_core.i_pipeline.s4_fu[4:0]
+TOP.frv_core.i_pipeline.s4_instr[31:0]
+TOP.frv_core.i_pipeline.s4_opr_a[31:0]
+TOP.frv_core.i_pipeline.s4_opr_b[31:0]
 @2024
-^2 /home/ben/projects/riscv-faster/flow/gtkwave/filter-gprs.txt
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s3_rd[4:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s3_wdata[31:0]
-@200
--
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.s4_rd[4:0]
 @28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_csr
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_load
-@c02024
-^2 /home/ben/projects/riscv-faster/flow/gtkwave/filter-gprs.txt
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rd[4:0]
+TOP.frv_core.i_pipeline.s4_size[1:0]
+TOP.frv_core.i_pipeline.s4_trap
+@22
+TOP.frv_core.i_pipeline.s4_uop[4:0]
 @28
-(0)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rd[4:0]
-(1)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rd[4:0]
-(2)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rd[4:0]
-(3)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rd[4:0]
-(4)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rd[4:0]
-@1401200
--group_end
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_wdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s3_rs1
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s3_rs2
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rs1
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.fwd_s4_rs2
-@1000200
--GPRs and Forwarding
-@c00200
--Dispatch Inputs
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_fu[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_imm[31:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_opr_src[7:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_p_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_p_valid
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_rd[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_rs1[4:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_rs1_data[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_rs2[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_rs2_data[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s2_uop[4:0]
-@1401200
--Dispatch Inputs
-@800200
--Next dispatch out
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_pc[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_instr[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_opr_a[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_opr_b[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_opr_c[31:0]
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_rd[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_fu[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.n_s3_uop[4:0]
-@1000200
--Next dispatch out
-@c00200
--Dispatch Out
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_instr[31:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_pc[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_fu[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_opr_a[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_opr_b[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_opr_c[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_p_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_p_valid
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_rd[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_dispatch.s3_uop[4:0]
-@1401200
--Dispatch Out
--Dispatch
-@800200
--Execute
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.p_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.p_valid
-@800200
--Inputs
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_fu[4:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_pc[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_opr_a[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_opr_b[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_opr_c[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_p_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_p_valid
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_rd[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s3_uop[4:0]
-@1000200
--Inputs
-@800200
--LSU
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_valid
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_ready
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_a_error
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_b_error
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_byte
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_half
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_load
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_signed
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_store
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.lsu_word
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_txn_done
-@800200
--DMEM
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_req
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_gnt
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_wen
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_addr[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_wdata[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_lsu.dmem_strb[3:0]
-@200
--
-@1000200
--DMEM
--LSU
-@c00200
--Integer ALU
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.g_clk
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.g_resetn
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_valid
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_ready
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.adder_ci[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.adder_lhs[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.adder_result[32:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.adder_rhs[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_add_result[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_eq
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_flush
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_lhs[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_lt
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_lt_signed
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_lt_unsigned
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_add
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_and
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_cmp
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_or
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_shf
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_shf_arith
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_shf_left
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_sub
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_unsigned
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_op_xor
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_result[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.alu_rhs[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.bw_lhs[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.bw_result[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.bw_rhs[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.out_adder
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.out_bw
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.out_cmp
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.out_shift
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_arith
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_lhs[63:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_result[63:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.i_alu.shift_rhs[4:0]
-@1401200
--Integer ALU
-@c00200
--Next Outputs
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_fu[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a[31:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a_alu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a_cfu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a_csr[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a_lsu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a_mul[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b_alu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b_cfu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b_csr[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b_lsu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b_mul[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_pc[31:0]
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_rd[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_uop[4:0]
-@1401200
--Next Outputs
-@c00200
--cfu
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_always_take
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_cond
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_cond_taken
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_jali
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_jalr
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_jmp
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_ready
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_uncond
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.cfu_valid
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.fu_cfu
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_a_cfu[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_opr_b_cfu[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.n_s4_uop_cfu[4:0]
-@1401200
--cfu
-@c00200
--Execute Outputs
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_fu[4:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_opr_a[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_opr_b[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_p_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_p_valid
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_pc[31:0]
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_rd[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_execute.s4_uop[4:0]
-@1401200
--Execute Outputs
-@1000200
--Execute
-@800200
--Writeback
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_clk
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.g_resetn
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.pipe_progress
-@800200
--Stage Inputs
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_fu[4:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_pc[31:0]
-@2022
-^1 /home/ben/projects/riscv-faster/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_instr[31:0]
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_opr_a[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_opr_b[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_p_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_p_valid
-@24
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_rd[4:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_size[1:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_trap
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.s4_uop[4:0]
-@1000200
--Stage Inputs
-@c00200
--Control Flow
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cf_ack
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cf_req
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cf_target[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_busy
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_cf_taken
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.n_cfu_done
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_done
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_finish_now
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_mret
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_tgt_trap
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_trap
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.cfu_link
-@1401200
--Control Flow
-@800200
--LSU
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_lsu
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_store
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_load
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_word
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_half
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_byte
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_addr[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_b_error
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_busy
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_gpr_wdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_gpr_wen
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_rdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_signed
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_rsp_expected
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.lsu_rsp_seen
-@800200
--DMEM
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.dmem_ack
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.dmem_recv
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.dmem_error
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.dmem_rdata[31:0]
-@1000200
--DMEM
--LSU
-@c00200
--CSRs
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mepc[31:0]
-@c00022
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-@28
-(0)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(1)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(2)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(3)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(4)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(5)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(6)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(7)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(8)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(9)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(10)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(11)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(12)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(13)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(14)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(15)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(16)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(17)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(18)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(19)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(20)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(21)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(22)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(23)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(24)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(25)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(26)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(27)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(28)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(29)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(30)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-(31)TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_mtvec[31:0]
-@1401200
--group_end
-@200
--
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_en
-@22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_addr[11:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_rdata[31:0]
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_wdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_wr
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_wr_clr
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.csr_wr_set
-@1401200
--CSRs
-@c00200
--FU
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_alu
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_cfu
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_csr
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_lsu
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.fu_mul
-@1401200
--FU
-@800200
--GPRs
+TOP.frv_core.i_pipeline.s4_valid
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.fwd_s4_csr
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.fwd_s4_load
 @2024
-^2 /home/ben/projects/riscv-faster/flow/gtkwave/filter-gprs.txt
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_rd[4:0]
+^2 /home/ben/projects/riscv/cores/fast/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.fwd_s4_rd[4:0]
 @22
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_wdata[31:0]
-@28
-TOP.frv_core.i_pipeline.i_pipeline_back.i_pipeline_writeback.gpr_wen
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.fwd_s4_wdata[31:0]
 @1000200
--GPRs
--Writeback
--Backend
--Pipeline
+-Pipe - S4 - Writeback
+@800200
+-CSR Bus
+@22
+TOP.frv_core.i_pipeline.csr_addr[11:0]
+@28
+TOP.frv_core.i_pipeline.csr_en
+@22
+TOP.frv_core.i_pipeline.csr_mepc[31:0]
+TOP.frv_core.i_pipeline.csr_mtvec[31:0]
+TOP.frv_core.i_pipeline.csr_rdata[31:0]
+TOP.frv_core.i_pipeline.csr_wdata[31:0]
+@28
+TOP.frv_core.i_pipeline.csr_wr
+TOP.frv_core.i_pipeline.csr_wr_clr
+TOP.frv_core.i_pipeline.csr_wr_set
+@1000200
+-CSR Bus
 [pattern_trace] 1
 [pattern_trace] 0

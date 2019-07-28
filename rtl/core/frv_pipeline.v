@@ -78,28 +78,14 @@ parameter TRACE_INSTR_WORD = 1'b1;
 
 // -------------------------------------------------------------------------
 
+//
+// Control flow change bus.
 wire        cf_req     ; // Control flow change request
 wire [XL:0] cf_target  ; // Control flow change destination
 wire        cf_ack     ; // Control flow change acknolwedge
 
 //
-// Front-end register pipeline control.
-wire        s2_p_valid ; // Pipeline control signals
-wire        s2_p_busy  ; // Pipeline control signals
-
-//
-// Outputs from front-end pipeline register.
-wire [ 4:0] s2_rd      ; // Destination register address
-wire [ 4:0] s2_rs1     ; // Source register address 1
-wire [ 4:0] s2_rs2     ; // Source register address 2
-wire [31:0] s2_imm     ; // Decoded immediate
-wire [ 4:0] s2_uop     ; // Micro-op code
-wire [ 4:0] s2_fu      ; // Functional Unit
-wire        s2_trap    ; // Raise a trap?
-wire [ 7:0] s2_opr_src ; // Operand sources for dispatch stage.
-wire [ 1:0] s2_size    ; // Size of the instruction.
-wire [31:0] s2_instr   ; // The instruction word
-
+// CSR access bus.
 wire        csr_en     ; // CSR Access Enable
 wire        csr_wr     ; // CSR Write Enable
 wire        csr_wr_set ; // CSR Write - Set
@@ -113,132 +99,401 @@ wire [XL:0] csr_mtvec  ; // Current MTVEC.
 
 wire        exec_mret  ; // MRET instruction executed.
 
+//
+// Trap raising bus.
 wire        trap_cpu   ; // A trap occured due to CPU
 wire        trap_int   ; // A trap occured due to interrupt
 wire [ 5:0] trap_cause ; // Cause code for the trap.
 wire [XL:0] trap_mtval ; // Value associated with the trap.
 wire [XL:0] trap_pc    ; // PC value associated with the trap.
 
+
+wire        s0_flush   = cf_req && cf_ack; // Flush stage
+wire        s1_flush   = cf_req && cf_ack; // Flush pipe stage register.
+wire        s2_flush   = cf_req && cf_ack; // Flush this pipeline stage.
+wire        s4_flush   = cf_req && cf_ack; // Flush this pipeline stage.
+
+wire        s0_busy       ; // Stall stage
+
+wire        s1_valid      ; // Stage ready to progress
+wire        s1_busy       ; // Stage ready to progress
+wire [XL:0] s1_data       ; // Data to be decoded.
+wire        s1_error      ;
+
+wire [ 4:0] s1_rs1_addr   ;
+wire [ 4:0] s1_rs2_addr   ;
+wire [XL:0] s1_rs1_rdata  ;
+wire [XL:0] s1_rs2_rdata  ;
+
+wire        s2_valid      ; // Is the output data valid?
+wire        s2_busy       ; // Is the next stage ready for new inputs?
+wire [ 4:0] s2_rd         ; // Destination register address
+wire [XL:0] s2_opr_a      ; // Operand A
+wire [XL:0] s2_opr_b      ; // Operand B
+wire [XL:0] s2_opr_c      ; // Operand C
+wire [ 4:0] s2_uop        ; // Micro-op code
+wire [ 4:0] s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
+wire        s2_trap       ; // Raise a trap?
+wire [ 1:0] s2_size       ; // Size of the instruction.
+wire [31:0] s2_instr      ; // The instruction word
+
+wire [ 4:0] fwd_s2_rd     ; // Writeback stage destination reg.
+wire [XL:0] fwd_s2_wdata  ; // Write data for writeback stage.
+wire        fwd_s2_load   ; // Writeback stage has load in it.
+wire        fwd_s2_csr    ; // Writeback stage has CSR op in it.
+
+wire [ 4:0] s3_rd         ; // Destination register address
+wire [XL:0] s3_opr_a      ; // Operand A
+wire [XL:0] s3_opr_b      ; // Operand B
+wire [ 4:0] s3_uop        ; // Micro-op code
+wire [ 4:0] s3_fu         ; // Functional Unit
+wire        s3_trap       ; // Raise a trap?
+wire [ 1:0] s3_size       ; // Size of the instruction.
+wire [31:0] s3_instr      ; // The instruction word
+wire        s3_busy       ; // Can this stage accept new inputs?
+wire        s3_valid      ; // Is this input valid?
+
+wire [ 4:0] fwd_s3_rd     ; // Writeback stage destination reg.
+wire [XL:0] fwd_s3_wdata  ; // Write data for writeback stage.
+wire        fwd_s3_load   ; // Writeback stage has load in it.
+wire        fwd_s3_csr    ; // Writeback stage has CSR op in it.
+
+wire [ 4:0] s4_rd         ; // Destination register address
+wire [XL:0] s4_opr_a      ; // Operand A
+wire [XL:0] s4_opr_b      ; // Operand B
+wire [ 4:0] s4_uop        ; // Micro-op code
+wire [ 4:0] s4_fu         ; // Functional Unit
+wire        s4_trap       ; // Raise a trap?
+wire [ 1:0] s4_size       ; // Size of the instruction.
+wire [31:0] s4_instr      ; // The instruction word
+wire        s4_busy       ; // Can this stage accept new inputs?
+wire        s4_valid      ; // Is this input valid?
+
+wire [ 4:0] fwd_s4_rd     ; // Writeback stage destination reg.
+wire [XL:0] fwd_s4_wdata  ; // Write data for writeback stage.
+wire        fwd_s4_load   ; // Writeback stage has load in it.
+wire        fwd_s4_csr    ; // Writeback stage has CSR op in it.
+
+wire        gpr_wen       ; // GPR write enable.
+wire [ 4:0] gpr_rd        ; // GPR destination register.
+wire [XL:0] gpr_wdata     ; // GPR write data.
+
+wire        hold_lsu_req  ; // Don't make LSU requests yet.
+
+`ifdef RVFI
+wire [XL:0] rvfi_s2_rs1_rdata; // Source register data 1
+wire [XL:0] rvfi_s2_rs2_rdata; // Source register data 2
+wire [ 4:0] rvfi_s2_rs1_addr ; // Source register address 1
+wire [ 4:0] rvfi_s2_rs2_addr ; // Source register address 2
+wire [XL:0] rvfi_s3_rs1_rdata; // Source register data 1
+wire [XL:0] rvfi_s3_rs2_rdata; // Source register data 2
+wire [ 4:0] rvfi_s3_rs1_addr ; // Source register address 1
+wire [ 4:0] rvfi_s3_rs2_addr ; // Source register address 2
+wire [XL:0] rvfi_s4_rs1_rdata; // Source register data 1
+wire [XL:0] rvfi_s4_rs2_rdata; // Source register data 2
+wire [ 4:0] rvfi_s4_rs1_addr ; // Source register address 1
+wire [ 4:0] rvfi_s4_rs2_addr ; // Source register address 2
+wire [XL:0] rvfi_s4_mem_wdata; // Memory write data.
+`endif
+
+
+//
+// Bubbling and forwarding control.
+// -------------------------------------------------------------------------
+
+wire nz_s1_rs1     = |s1_rs1_addr;
+wire nz_s1_rs2     = |s1_rs2_addr;
+
+wire hzd_rs1_s4 = s1_rs1_addr == fwd_s4_rd && nz_s1_rs1;
+wire hzd_rs1_s3 = s1_rs1_addr == fwd_s3_rd && nz_s1_rs1;
+wire hzd_rs1_s2 = s1_rs1_addr == fwd_s2_rd && nz_s1_rs1;
+
+wire hzd_rs2_s4 = s1_rs2_addr == fwd_s4_rd && nz_s1_rs2;
+wire hzd_rs2_s3 = s1_rs2_addr == fwd_s3_rd && nz_s1_rs2;
+wire hzd_rs2_s2 = s1_rs2_addr == fwd_s2_rd && nz_s1_rs2;
+
+//
+// Bubbling occurs when:
+// - There is a data hazard due to a CSR read or a data load.
+wire   s1_bubble   =
+    ((fwd_s4_load || fwd_s4_csr) && (hzd_rs1_s4 || hzd_rs2_s4))  ||
+    ((fwd_s3_load || fwd_s3_csr) && (hzd_rs1_s3 || hzd_rs2_s3))  ||
+    ((fwd_s2_load || fwd_s2_csr) && (hzd_rs1_s2 || hzd_rs2_s2))   ;
+
+
+wire [XL:0] fwd_rs1_rdata =
+     hzd_rs1_s2 ? fwd_s2_wdata   :
+     hzd_rs1_s3 ? fwd_s3_wdata   :
+     hzd_rs1_s4 ? fwd_s4_wdata   :
+                  s1_rs1_rdata   ;
+
+wire [XL:0] fwd_rs2_rdata =
+     hzd_rs2_s2 ? fwd_s2_wdata   :
+     hzd_rs2_s3 ? fwd_s3_wdata   :
+     hzd_rs2_s4 ? fwd_s4_wdata   :
+                  s1_rs2_rdata   ;
+
+//
+// Submodule Instances.
 // -------------------------------------------------------------------------
 
 
 //
-// instance : frv_pipeline_front
+// instance: frv_pipeline_fetch
 //
-//  Front-end of the pipeline. Responsible for instruction fetch and decode.
+//  Fetch pipeline stage.
 //
-frv_pipeline_front #(
-.TRACE_INSTR_WORD(TRACE_INSTR_WORD),
+frv_pipeline_fetch #(
 .FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
-) i_pipeline_front(
-.g_clk       (g_clk       ), // global clock
-.g_resetn    (g_resetn    ), // synchronous reset
-.cf_req      (cf_req      ), // Control flow change request
-.cf_target   (cf_target   ), // Control flow change destination
-.cf_ack      (cf_ack      ), // Control flow change acknolwedge
-.imem_req    (imem_req    ), // Start memory request
-.imem_wen    (imem_wen    ), // Write enable
-.imem_strb   (imem_strb   ), // Write strobe
-.imem_wdata  (imem_wdata  ), // Write data
-.imem_addr   (imem_addr   ), // Read/Write address
-.imem_gnt    (imem_gnt    ), // request accepted
-.imem_recv   (imem_recv   ), // Instruction memory recieve response.
-.imem_ack    (imem_ack    ), // Response acknowledge
-.imem_error  (imem_error  ), // Error
-.imem_rdata  (imem_rdata  ), // Read data
-.s2_p_valid  (s2_p_valid  ), // Pipeline control signals
-.s2_p_busy   (s2_p_busy   ), // Pipeline control signals
-.s2_rd       (s2_rd       ), // Destination register address
-.s2_rs1      (s2_rs1      ), // Source register address 1
-.s2_rs2      (s2_rs2      ), // Source register address 2
-.s2_imm      (s2_imm      ), // Decoded immediate
-.s2_uop      (s2_uop      ), // Micro-op code
-.s2_fu       (s2_fu       ), // Functional Unit
-.s2_trap     (s2_trap     ), // Raise a trap?
-.s2_opr_src  (s2_opr_src  ), // Operand sources for dispatch stage.
-.s2_size     (s2_size     ), // Size of the instruction.
-.s2_instr    (s2_instr    )  // The instruction word.
+) i_pipeline_s0_fetch (
+.g_clk              (g_clk              ), // global clock
+.g_resetn           (g_resetn           ), // synchronous reset
+.cf_req             (cf_req             ), // Control flow change
+.cf_target          (cf_target          ), // Control flow change target
+.cf_ack             (cf_ack             ), // Acknowledge control flow change
+.imem_req           (imem_req           ), // Start memory request
+.imem_wen           (imem_wen           ), // Write enable
+.imem_strb          (imem_strb          ), // Write strobe
+.imem_wdata         (imem_wdata         ), // Write data
+.imem_addr          (imem_addr          ), // Read/Write address
+.imem_gnt           (imem_gnt           ), // request accepted
+.imem_ack           (imem_ack           ), // memory ack response.
+.imem_recv          (imem_recv          ), // memory recieve response.
+.imem_error         (imem_error         ), // Error
+.imem_rdata         (imem_rdata         ), // Read data
+.s0_flush           (s0_flush           ), // Flush stage
+.s1_busy            (s1_busy            ), // Stall stage
+.s1_valid           (s1_valid           ), // Stage ready to progress
+.s1_data            (s1_data            ), // Data to be decoded.
+.s1_error           (s1_error           )
+);
+
+//
+// instance : frv_pipeline_decode
+//
+//  Decode stage of the CPU, responsible for turning RISC-V encoded
+//  instructions into wider pipeline encodings.
+//
+frv_pipeline_decode #(
+.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE),
+.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
+) i_pipeline_s1_decode (
+.g_clk              (g_clk              ), // global clock
+.g_resetn           (g_resetn           ), // synchronous reset
+.s1_valid           (s1_valid           ), // Is the input data valid?
+.s1_busy            (s1_busy            ), // Is this stage ready for new inputs?
+.s1_data            (s1_data            ), // Data word to decode.
+.s1_error           (s1_error           ), // Is there a fetch bus error?
+.s1_flush           (s1_flush           ), // Flush pipe stage register.
+.s1_bubble          (s1_bubble          ), // Insert a pipeline bubble.
+.s1_rs1_addr        (s1_rs1_addr        ),
+.s1_rs2_addr        (s1_rs2_addr        ),
+.s1_rs1_rdata       (fwd_rs1_rdata      ),
+.s1_rs2_rdata       (fwd_rs2_rdata      ),
+.cf_req             (cf_req             ), // Control flow change
+.cf_target          (cf_target          ), // Control flow change target
+.cf_ack             (cf_ack             ), // Acknowledge control flow change
+.rvfi_s2_rs1_addr   (rvfi_s2_rs1_addr   ),
+.rvfi_s2_rs2_addr   (rvfi_s2_rs2_addr   ),
+.rvfi_s2_rs1_data   (rvfi_s2_rs1_rdata  ),
+.rvfi_s2_rs2_data   (rvfi_s2_rs2_rdata  ),
+.s2_valid           (s2_valid           ), // Is the output data valid?
+.s2_busy            (s2_busy            ), // Is next stage ready?
+.s2_rd              (s2_rd              ), // Destination register address
+.s2_opr_a           (s2_opr_a           ), // Operand A
+.s2_opr_b           (s2_opr_b           ), // Operand B
+.s2_opr_c           (s2_opr_c           ), // Operand C
+.s2_uop             (s2_uop             ), // Micro-op code
+.s2_fu              (s2_fu              ), // Functional Unit
+.s2_trap            (s2_trap            ), // Raise a trap?
+.s2_size            (s2_size            ), // Size of the instruction.
+.s2_instr           (s2_instr           )  // The instruction word
+);
+
+//
+// instance: frv_pipeline_execute
+//
+//  Execute stage of the pipeline, responsible for ALU / LSU / Branch compare.
+//
+frv_pipeline_execute i_pipeline_s2_execute (
+.g_clk            (g_clk            ), // global clock
+.g_resetn         (g_resetn         ), // synchronous reset
+.s2_rd            (s2_rd            ), // Destination register address
+.s2_opr_a         (s2_opr_a         ), // Operand A
+.s2_opr_b         (s2_opr_b         ), // Operand B
+.s2_opr_c         (s2_opr_c         ), // Operand C
+.s2_uop           (s2_uop           ), // Micro-op code
+.s2_fu            (s2_fu            ), // Functional Unit
+.s2_trap          (s2_trap          ), // Raise a trap?
+.s2_size          (s2_size          ), // Size of the instruction.
+.s2_instr         (s2_instr         ), // The instruction word
+.s2_busy          (s2_busy          ), // Can this stage accept new inputs?
+.s2_valid         (s2_valid         ), // Is this input valid?
+.flush            (s2_flush         ), // Flush this pipeline stage.
+.fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
+.fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.
+.fwd_s2_load      (fwd_s2_load      ), // Writeback stage has load in it.
+.fwd_s2_csr       (fwd_s2_csr       ), // Writeback stage has CSR op in it.
+`ifdef RVFI
+.rvfi_s2_rs1_rdata(rvfi_s2_rs1_rdata), // Source register data 1
+.rvfi_s2_rs2_rdata(rvfi_s2_rs2_rdata), // Source register data 2
+.rvfi_s2_rs1_addr (rvfi_s2_rs1_addr ), // Source register address 1
+.rvfi_s2_rs2_addr (rvfi_s2_rs2_addr ), // Source register address 2
+.rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
+.rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
+.rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
+`endif // RVFI
+.s3_rd            (s3_rd            ), // Destination register address
+.s3_opr_a         (s3_opr_a         ), // Operand A
+.s3_opr_b         (s3_opr_b         ), // Operand B
+.s3_uop           (s3_uop           ), // Micro-op code
+.s3_fu            (s3_fu            ), // Functional Unit
+.s3_trap          (s3_trap          ), // Raise a trap?
+.s3_size          (s3_size          ), // Size of the instruction.
+.s3_instr         (s3_instr         ), // The instruction word
+.s3_busy          (s3_busy          ), // Can this stage accept new inputs?
+.s3_valid         (s3_valid         )  // Is this input valid?
 );
 
 
 //
-// instance: frv_pipeline_back
+// instance: frv_pipeline_memory
 //
-//  The backend of the instruction execution pipeline. Responsible for
-//  gathering instruction operands, dispatching them to execute and
-//  writing back their results.
+//  Memory stage of the pipeline, responsible making memory requests.
 //
-frv_pipeline_back #(
-.BRAM_REGFILE(BRAM_REGFILE),
-.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
-) i_pipeline_back(
-.g_clk        (g_clk        ), // global clock
-.g_resetn     (g_resetn     ), // synchronous reset
+frv_pipeline_memory i_pipeline_s3_memory(
+.g_clk            (g_clk            ), // global clock
+.g_resetn         (g_resetn         ), // synchronous reset
+.flush            (s4_flush         ), // Flush this pipeline stage.
+.s3_rd            (s3_rd            ), // Destination register address
+.s3_opr_a         (s3_opr_a         ), // Operand A
+.s3_opr_b         (s3_opr_b         ), // Operand B
+.s3_uop           (s3_uop           ), // Micro-op code
+.s3_fu            (s3_fu            ), // Functional Unit
+.s3_trap          (s3_trap          ), // Raise a trap?
+.s3_size          (s3_size          ), // Size of the instruction.
+.s3_instr         (s3_instr         ), // The instruction word
+.s3_busy          (s3_busy          ), // Can this stage accept new inputs?
+.s3_valid         (s3_valid         ), // Is this input valid?
+.fwd_s3_rd        (fwd_s3_rd        ), // Writeback stage destination reg.
+.fwd_s3_wdata     (fwd_s3_wdata     ), // Write data for writeback stage.
+.fwd_s3_load      (fwd_s3_load      ), // Writeback stage has load in it.
+.fwd_s3_csr       (fwd_s3_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
-.rvfi_valid    (rvfi_valid    ),
-.rvfi_order    (rvfi_order    ),
-.rvfi_insn     (rvfi_insn     ),
-.rvfi_trap     (rvfi_trap     ),
-.rvfi_halt     (rvfi_halt     ),
-.rvfi_intr     (rvfi_intr     ),
-.rvfi_mode     (rvfi_mode     ),
-.rvfi_rs1_addr (rvfi_rs1_addr ),
-.rvfi_rs2_addr (rvfi_rs2_addr ),
-.rvfi_rs1_rdata(rvfi_rs1_rdata),
-.rvfi_rs2_rdata(rvfi_rs2_rdata),
-.rvfi_rd_addr  (rvfi_rd_addr  ),
-.rvfi_rd_wdata (rvfi_rd_wdata ),
-.rvfi_pc_rdata (rvfi_pc_rdata ),
-.rvfi_pc_wdata (rvfi_pc_wdata ),
-.rvfi_mem_addr (rvfi_mem_addr ),
-.rvfi_mem_rmask(rvfi_mem_rmask),
-.rvfi_mem_wmask(rvfi_mem_wmask),
-.rvfi_mem_rdata(rvfi_mem_rdata),
-.rvfi_mem_wdata(rvfi_mem_wdata),
-`endif
-.s2_p_busy    (s2_p_busy    ), // Can this stage accept new inputs?
-.s2_p_valid   (s2_p_valid   ), // Is this input valid?
-.s2_rd        (s2_rd        ), // Destination register address
-.s2_rs1       (s2_rs1       ), // Source register address 1
-.s2_rs2       (s2_rs2       ), // Source register address 2
-.s2_imm       (s2_imm       ), // Decoded immediate
-.s2_uop       (s2_uop       ), // Micro-op code
-.s2_fu        (s2_fu        ), // Functional Unit
-.s2_trap      (s2_trap      ), // Raise a trap?
-.s2_opr_src   (s2_opr_src   ), // Operand sources for dispatch stage.
-.s2_size      (s2_size      ), // Size of the instruction.
-.s2_instr     (s2_instr     ), // The instruction word
-.cf_req       (cf_req       ), // Control flow change request
-.cf_target    (cf_target    ), // Control flow change target
-.cf_ack       (cf_ack       ), // Control flow change acknowledge.
-.trap_cpu     (trap_cpu     ), // A trap occured due to CPU
-.trap_int     (trap_int     ), // A trap occured due to interrupt
-.trap_cause   (trap_cause   ), // Cause of a trap.
-.trap_mtval   (trap_mtval   ), // Value associated with the trap.
-.trap_pc      (trap_pc      ), // PC value associated with the trap.
-.exec_mret    (exec_mret    ), // MRET instruction executed.
-.csr_mepc     (csr_mepc     ), // Current MEPC.
-.csr_mtvec    (csr_mtvec    ), // Current MTVEC.
-.csr_en       (csr_en       ), // CSR Access Enable
-.csr_wr       (csr_wr       ), // CSR Write Enable
-.csr_wr_set   (csr_wr_set   ), // CSR Write - Set
-.csr_wr_clr   (csr_wr_clr   ), // CSR Write - Clear
-.csr_addr     (csr_addr     ), // Address of the CSR to access.
-.csr_wdata    (csr_wdata    ), // Data to be written to a CSR
-.csr_rdata    (csr_rdata    ), // CSR read data
-.trs_pc       (trs_pc       ), // Trace program counter.
-.trs_instr    (trs_instr    ), // Trace instruction.
-.trs_valid    (trs_valid    ), // Trace output valid.
-.dmem_req     (dmem_req     ), // Start memory request
-.dmem_wen     (dmem_wen     ), // Write enable
-.dmem_strb    (dmem_strb    ), // Write strobe
-.dmem_wdata   (dmem_wdata   ), // Write data
-.dmem_addr    (dmem_addr    ), // Read/Write address
-.dmem_gnt     (dmem_gnt     ), // request accepted
-.dmem_recv    (dmem_recv    ), // Instruction memory recieve response.
-.dmem_ack     (dmem_ack     ), // Response acknowledge
-.dmem_error   (dmem_error   ), // Error
-.dmem_rdata   (dmem_rdata   )  // Read data
+.rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
+.rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
+.rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
+.rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
+.rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
+.rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+.rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
+`endif // RVFI
+.hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
+.dmem_req         (dmem_req         ), // Start memory request
+.dmem_wen         (dmem_wen         ), // Write enable
+.dmem_strb        (dmem_strb        ), // Write strobe
+.dmem_wdata       (dmem_wdata       ), // Write data
+.dmem_addr        (dmem_addr        ), // Read/Write address
+.dmem_gnt         (dmem_gnt         ), // request accepted
+.s4_rd            (s4_rd            ), // Destination register address
+.s4_opr_a         (s4_opr_a         ), // Operand A
+.s4_opr_b         (s4_opr_b         ), // Operand B
+.s4_uop           (s4_uop           ), // Micro-op code
+.s4_fu            (s4_fu            ), // Functional Unit
+.s4_trap          (s4_trap          ), // Raise a trap?
+.s4_size          (s4_size          ), // Size of the instruction.
+.s4_instr         (s4_instr         ), // The instruction word
+.s4_busy          (s4_busy          ), // Can this stage accept new inputs?
+.s4_valid         (s4_valid         )  // Is this input valid?
+);
+
+
+//
+// instance: frv_pipeline_writeback
+//
+//  Responsible for finalising all instruction writeback behaviour.
+//  - Jumps/control flow changes
+//  - CSR accesses
+//  - GPR writeback.
+//
+frv_pipeline_writeback #(
+.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
+) i_pipeline_s4_writeback(
+.g_clk            (g_clk            ), // global clock
+.g_resetn         (g_resetn         ), // synchronous reset
+`ifdef RVFI
+.rvfi_valid       (rvfi_valid       ),
+.rvfi_order       (rvfi_order       ),
+.rvfi_insn        (rvfi_insn        ),
+.rvfi_trap        (rvfi_trap        ),
+.rvfi_halt        (rvfi_halt        ),
+.rvfi_intr        (rvfi_intr        ),
+.rvfi_mode        (rvfi_mode        ),
+.rvfi_rs1_addr    (rvfi_rs1_addr    ),
+.rvfi_rs2_addr    (rvfi_rs2_addr    ),
+.rvfi_rs1_rdata   (rvfi_rs1_rdata   ),
+.rvfi_rs2_rdata   (rvfi_rs2_rdata   ),
+.rvfi_rd_addr     (rvfi_rd_addr     ),
+.rvfi_rd_wdata    (rvfi_rd_wdata    ),
+.rvfi_pc_rdata    (rvfi_pc_rdata    ),
+.rvfi_pc_wdata    (rvfi_pc_wdata    ),
+.rvfi_mem_addr    (rvfi_mem_addr    ),
+.rvfi_mem_rmask   (rvfi_mem_rmask   ),
+.rvfi_mem_wmask   (rvfi_mem_wmask   ),
+.rvfi_mem_rdata   (rvfi_mem_rdata   ),
+.rvfi_mem_wdata   (rvfi_mem_wdata   ),
+.rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
+.rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
+.rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+.rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
+`endif // RVFI
+.s4_rd            (s4_rd            ), // Destination register address
+.s4_opr_a         (s4_opr_a         ), // Operand A
+.s4_opr_b         (s4_opr_b         ), // Operand B
+.s4_uop           (s4_uop           ), // Micro-op code
+.s4_fu            (s4_fu            ), // Functional Unit
+.s4_trap          (s4_trap          ), // Raise a trap?
+.s4_size          (s4_size          ), // Size of the instruction.
+.s4_instr         (s4_instr         ), // The instruction word
+.s4_busy          (s4_busy          ), // Can this stage accept new inputs?
+.s4_valid         (s4_valid         ), // Are the stage inputs valid?
+.fwd_s4_rd        (fwd_s4_rd        ), // Writeback stage destination reg.
+.fwd_s4_wdata     (fwd_s4_wdata     ), // Write data for writeback stage.
+.fwd_s4_load      (fwd_s4_load      ), // Writeback stage has load in it.
+.fwd_s4_csr       (fwd_s4_csr       ), // Writeback stage has CSR op in it.
+.gpr_wen          (gpr_wen          ), // GPR write enable.
+.gpr_rd           (gpr_rd           ), // GPR destination register.
+.gpr_wdata        (gpr_wdata        ), // GPR write data.
+.trap_cpu         (trap_cpu         ), // A trap occured due to CPU
+.trap_int         (trap_int         ), // A trap occured due to interrupt
+.trap_cause       (trap_cause       ), // A trap occured due to interrupt
+.trap_mtval       (trap_mtval       ), // Value associated with the trap.
+.trap_pc          (trap_pc          ), // PC value associated with the trap.
+.exec_mret        (exec_mret        ), // MRET instruction executed.
+.csr_mepc         (csr_mepc         ),
+.csr_mtvec        (csr_mtvec        ),
+.trs_pc           (trs_pc           ), // Trace program counter.
+.trs_instr        (trs_instr        ), // Trace instruction.
+.trs_valid        (trs_valid        ), // Trace output valid.
+.csr_en           (csr_en           ), // CSR Access Enable
+.csr_wr           (csr_wr           ), // CSR Write Enable
+.csr_wr_set       (csr_wr_set       ), // CSR Write - Set
+.csr_wr_clr       (csr_wr_clr       ), // CSR Write - Clear
+.csr_addr         (csr_addr         ), // Address of the CSR to access.
+.csr_wdata        (csr_wdata        ), // Data to be written to a CSR
+.csr_rdata        (csr_rdata        ), // CSR read data
+.cf_req           (cf_req           ), // Control flow change request
+.cf_target        (cf_target        ), // Control flow change target
+.cf_ack           (cf_ack           ), // Control flow change acknowledge.
+.hold_lsu_req     (hold_lsu_req     ), // Don't make LSU requests yet.
+.dmem_recv        (dmem_recv        ), // Instruction memory recieve response.
+.dmem_ack         (dmem_ack         ), // Data memory ack response.
+.dmem_error       (dmem_error       ), // Error
+.dmem_rdata       (dmem_rdata       )  // Read data
 );
 
 //
@@ -264,6 +519,26 @@ frv_csrs i_csrs (
 .trap_cause       (trap_cause       ), // Cause of a trap.
 .trap_mtval       (trap_mtval       ), // Value associated with the trap.
 .trap_pc          (trap_pc          )  // PC value associated with the trap.
+);
+
+
+//
+// instance: frv_gprs
+//
+//  The general purpose register file.
+//
+frv_gprs #(
+.BRAM_REGFILE(BRAM_REGFILE)
+) i_gprs (
+.g_clk      (g_clk          ), //
+.g_resetn   (g_resetn       ), //
+.rs1_addr   (s1_rs1_addr    ), // Source register 1 address
+.rs1_data   (s1_rs1_rdata   ), // Source register 1 read data
+.rs2_addr   (s1_rs2_addr    ), // Source register 2 address
+.rs2_data   (s1_rs2_rdata   ), // Source register 2 read data
+.rd_wen     (gpr_wen        ), // Destination register write enable
+.rd_addr    (gpr_rd         ), // Destination register address
+.rd_data    (gpr_wdata      )  // Destination register write data
 );
 
 endmodule

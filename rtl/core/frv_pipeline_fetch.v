@@ -24,12 +24,12 @@ input  wire         imem_recv       , // Instruction memory recieve response.
 input  wire         imem_error      , // Error
 input  wire [XL:0]  imem_rdata      , // Read data
 
-input  wire         fe_flush        , // Flush stage
-input  wire         fe_stall        , // Stall stage
-output wire         fe_ready        , // Stage ready to progress
+input  wire         s0_flush        , // Flush stage
+input  wire         s1_busy        , // Stall stage
 
-output wire [XL:0]  d_data          , // Data to be decoded.
-output wire         d_error 
+output wire         s1_valid        , // Stage ready to progress
+output wire [XL:0]  s1_data         , // Data to be decoded.
+output wire         s1_error 
 
 );
 
@@ -44,7 +44,7 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // --------------------------------------------------------------
 
 // Stage can progress if buffer has enough data in it for an instruction.
-assign fe_ready = buf_valid;
+assign s1_valid = buf_valid;
 
 // TODO: track when to ignore requests more inteligently.
 assign cf_ack   = (!imem_req || imem_req && imem_gnt);
@@ -60,7 +60,7 @@ wire f_2byte;
 wire buf_out_2 ; // Buffer has 2 byte instruction.
 wire buf_out_4 ; // Buffer has 4 byte instruction.
 wire buf_valid ; // D output data is valid
-wire buf_ready = fe_ready && !fe_stall; // Eat 2/4 bytes
+wire buf_ready = s1_valid && !s1_busy; // Eat 2/4 bytes
 
 //
 // Memory bus requests
@@ -152,16 +152,16 @@ assign imem_wen   = 0;
 frv_core_fetch_buffer i_core_fetch_buffer (
 .g_clk    (g_clk        ), // Global clock
 .g_resetn (g_resetn     ), // Global negative level triggered reset
-.flush    (fe_flush     ),
+.flush    (s0_flush     ),
 .f_ready  (f_ready      ),
 .f_4byte  (f_4byte      ), // Input data valid
 .f_2byte  (f_2byte      ), // Load only the 2 MS bytes
 .f_err    (imem_error   ), // Input error
 .f_in     (imem_rdata   ), // Input data
-.buf_out  (d_data       ), // Output data
+.buf_out  (s1_data      ), // Output data
 .buf_out_2(buf_out_2    ), // Output data
 .buf_out_4(buf_out_4    ), // Output data
-.buf_err  (d_error      ), // Output error bit
+.buf_err  (s1_error     ), // Output error bit
 .buf_valid(buf_valid    ), // D output data is valid
 .buf_ready(buf_ready    )  // Eat 2/4 bytes
 );

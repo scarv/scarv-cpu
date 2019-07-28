@@ -47,14 +47,13 @@ input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 input  wire [ 4:0] s4_rd           , // Destination register address
 input  wire [XL:0] s4_opr_a        , // Operand A
 input  wire [XL:0] s4_opr_b        , // Operand B
-input  wire [31:0] s4_pc           , // Program counter
 input  wire [ 4:0] s4_uop          , // Micro-op code
 input  wire [ 4:0] s4_fu           , // Functional Unit
 input  wire        s4_trap         , // Raise a trap?
 input  wire [ 1:0] s4_size         , // Size of the instruction.
 input  wire [31:0] s4_instr        , // The instruction word
-output wire        s4_p_busy       , // Can this stage accept new inputs?
-input  wire        s4_p_valid      , // Are the stage inputs valid?
+output wire        s4_busy         , // Can this stage accept new inputs?
+input  wire        s4_valid        , // Are the stage inputs valid?
 
 output wire [ 4:0] fwd_s4_rd       , // Writeback stage destination reg.
 output wire [XL:0] fwd_s4_wdata    , // Write data for writeback stage.
@@ -105,15 +104,35 @@ input  wire [XL:0] dmem_rdata        // Read data
 // Common core parameters and constants
 `include "frv_common.vh"
 
-wire  pipe_progress = s4_p_valid && !s4_p_busy;
+// Value taken by the PC on a reset.
+parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
-assign s4_p_busy = fu_cfu && cfu_busy ||
-                   (cf_req && !cf_ack) ||
-                   fu_lsu && lsu_busy ;
+wire  pipe_progress = s4_valid && !s4_busy;
+
+assign s4_busy = fu_cfu && cfu_busy ||
+                (cf_req && !cf_ack) ||
+                 fu_lsu && lsu_busy ;
 
 // Don't make LSU memory requests until writeback stage is sure it won't
 // raise an exception.
 assign hold_lsu_req = cf_req || lsu_busy;
+
+//
+// PC computation
+// -------------------------------------------------------------------------
+
+reg  [XL:0] s4_pc;
+wire [XL:0] n_s4_pc = s4_pc + {29'b0, s4_size,1'b0};
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        s4_pc <= FRV_PC_RESET_VALUE;
+    end else if(cf_req && cf_ack) begin
+        s4_pc <= cf_target;
+    end else if(s4_valid && !s4_busy) begin
+        s4_pc <= n_s4_pc;
+    end
+end
 
 //
 // Operation Decoding
@@ -215,7 +234,7 @@ end
 
 wire cfu_gpr_wen = cfu_link;
 
-wire [XL:0] cfu_gpr_wdata = s4_opr_b;
+wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 
 
 //
@@ -303,7 +322,7 @@ assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;
-assign fwd_s4_load  = lsu_load;
+assign fwd_s4_load  = fu_lsu && lsu_load;
 assign fwd_s4_csr   = fu_csr;
 
 //
@@ -332,7 +351,7 @@ assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 assign trs_pc   = s4_pc;
 assign trs_instr= s4_instr;
 assign trs_valid= 
-    (|s4_size && s4_p_valid && !s4_p_busy) || (cf_req && cf_ack);
+    (|s4_size && s4_valid && !s4_busy) || (cf_req && cf_ack);
 
 
 //
