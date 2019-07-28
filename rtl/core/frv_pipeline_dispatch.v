@@ -143,9 +143,16 @@ end
 // Bubbling and stalling
 // -------------------------------------------------------------------------
 
+//
+// Bubbling occurs when:
+// - There is a data hazard due to a CSR read or a data load.
+// - When the front-end cannot provide us with a new instruction, but
+//   all of the backend is ready to proceed. This allows memory responses
+//   to be acknowledged even when we are instruction starved.
 wire   dis_bubble   =
-((fwd_s4_load || fwd_s4_csr) && (s2_rs1 == fwd_s4_rd || s2_rs2 == fwd_s4_rd))  ||
-((fwd_s3_load || fwd_s3_csr) && (s2_rs1 == fwd_s3_rd || s2_rs2 == fwd_s3_rd))   ;
+!s2_p_valid && !p_busy  ||
+((fwd_s4_load||fwd_s4_csr) && (s2_rs1==fwd_s4_rd || s2_rs2==fwd_s4_rd))  ||
+((fwd_s3_load||fwd_s3_csr) && (s2_rs1==fwd_s3_rd || s2_rs2==fwd_s3_rd))   ;
 
 wire      p_busy    ;
 
