@@ -227,6 +227,8 @@ frv_pipeline_register #(
 .i_busy   (s4_busy          )  // Stage N+1 ready to continue?
 );
 
+`ifdef RVFI
+
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         rvfi_s4_rs1_rdata <= 0; // Source register data 1
@@ -260,5 +262,7 @@ always @(posedge g_clk) begin
         mem_wdata_store <= dmem_wdata;
     end
 end
+
+`endif // RVFI
 
 endmodule
