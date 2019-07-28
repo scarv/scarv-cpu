@@ -90,7 +90,7 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         imem_addr <= FRV_PC_RESET_VALUE;
     end else if(cf_change) begin
-        imem_addr <= cf_target;
+        imem_addr <= {cf_target[31:2],2'b00};
     end else if(progress_imem_addr) begin
         imem_addr <= n_imem_addr;
     end
@@ -126,7 +126,18 @@ end
 // Misalignment tracking
 // --------------------------------------------------------------
 
-wire fetch_misaligned = 1'b0; // TODO
+reg  fetch_misaligned;
+wire n_fetch_misaligned =
+    ((cf_change && cf_target[1]) || fetch_misaligned) &&
+    !f_2byte;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        fetch_misaligned <= 1'b0;
+    end else begin
+        fetch_misaligned <= n_fetch_misaligned;
+    end
+end
 
 //
 // Memory bus responses
