@@ -216,6 +216,7 @@ wire hzd_rs2_s2 = s1_rs2_addr == fwd_s2_rd && nz_s1_rs2;
 // Bubbling occurs when:
 // - There is a data hazard due to a CSR read or a data load.
 wire   s1_bubble   =
+    !s1_valid && !s2_busy                                        ||
     ((fwd_s4_load || fwd_s4_csr) && (hzd_rs1_s4 || hzd_rs2_s4))  ||
     ((fwd_s3_load || fwd_s3_csr) && (hzd_rs1_s3 || hzd_rs2_s3))  ||
     ((fwd_s2_load || fwd_s2_csr) && (hzd_rs1_s2 || hzd_rs2_s2))   ;
