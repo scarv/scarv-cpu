@@ -66,6 +66,10 @@ input  wire [XL:0]  dmem_rdata        // Read data
 
 );
 
+// Base address of the memory mapped IO region.
+parameter   MMIO_BASE_ADDR   = 32'h0000_1000;
+parameter   MMIO_BASE_MASK   = 32'hFFFF_F000;
+
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
@@ -81,6 +85,27 @@ parameter TRACE_INSTR_WORD = 1'b1;
 
 // -------------------------------------------------------------------------
 
+wire        instr_ret        ; // Instruction retired.
+wire        timer_interrupt  ; // Raise a timer interrupt
+
+wire [63:0] ctr_time         ; // The time counter value.
+wire [63:0] ctr_cycle        ; // The cycle counter value.
+wire [63:0] ctr_instret      ; // The instret counter value.
+
+wire        inhibit_cy       ; // Stop cycle counter incrementing.
+wire        inhibit_tm       ; // Stop time counter incrementing.
+wire        inhibit_ir       ; // Stop instret incrementing.
+
+wire        mmio_en          ; // MMIO enable
+wire        mmio_wen         ; // MMIO write enable
+wire [31:0] mmio_addr        ; // MMIO address
+wire [31:0] mmio_wdata       ; // MMIO write data
+wire [31:0] mmio_rdata       ; // MMIO read data
+wire        mmio_error       ; // MMIO error
+wire        mmio_valid       ; // MMIO read data valid.
+
+// -------------------------------------------------------------------------
+
 //
 // instance: frv_pipeline
 //
@@ -89,7 +114,9 @@ parameter TRACE_INSTR_WORD = 1'b1;
 frv_pipeline #(
 .FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE),
 .BRAM_REGFILE(BRAM_REGFILE),
-.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
+.TRACE_INSTR_WORD(TRACE_INSTR_WORD),
+.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
+.MMIO_BASE_MASK(MMIO_BASE_MASK)
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset
@@ -118,6 +145,21 @@ frv_pipeline #(
 .trs_pc        (trs_pc        ), // Trace program counter.
 .trs_instr     (trs_instr     ), // Trace instruction.
 .trs_valid     (trs_valid     ), // Trace output valid.
+.instr_ret      (instr_ret      ), // Instruction retired.
+.timer_interrupt(timer_interrupt), // Raise a timer interrupt
+.ctr_time       (ctr_time       ), // The time counter value.
+.ctr_cycle      (ctr_cycle      ), // The cycle counter value.
+.ctr_instret    (ctr_instret    ), // The instret counter value.
+.inhibit_cy     (inhibit_cy     ), // Stop cycle counter incrementing.
+.inhibit_tm     (inhibit_tm     ), // Stop time counter incrementing.
+.inhibit_ir     (inhibit_ir     ), // Stop instret incrementing.
+.mmio_en        (mmio_en        ), // MMIO enable
+.mmio_wen       (mmio_wen       ), // MMIO write enable
+.mmio_addr      (mmio_addr      ), // MMIO address
+.mmio_wdata     (mmio_wdata     ), // MMIO write data
+.mmio_rdata     (mmio_rdata     ), // MMIO read data
+.mmio_error     (mmio_error     ), // MMIO error
+.mmio_valid     (mmio_valid     ), // MMIO read data valid.
 .imem_req      (imem_req      ), // Start memory request
 .imem_wen      (imem_wen      ), // Write enable
 .imem_strb     (imem_strb     ), // Write strobe
@@ -138,6 +180,34 @@ frv_pipeline #(
 .dmem_ack      (dmem_ack      ), // Response acknowledge
 .dmem_error    (dmem_error    ), // Error
 .dmem_rdata    (dmem_rdata    )  // Read data
+);
+
+//
+// instance: frv_counters
+//
+//  Responsible for all performance counters and timers.
+//
+frv_counters #(
+.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
+.MMIO_BASE_MASK(MMIO_BASE_MASK)
+) i_counters(
+.g_clk          (g_clk          ), // global clock
+.g_resetn       (g_resetn       ), // synchronous reset
+.instr_ret      (instr_ret      ), // Instruction retired.
+.timer_interrupt(timer_interrupt), // Raise a timer interrupt
+.ctr_time       (ctr_time       ), // The time counter value.
+.ctr_cycle      (ctr_cycle      ), // The cycle counter value.
+.ctr_instret    (ctr_instret    ), // The instret counter value.
+.inhibit_cy     (inhibit_cy     ), // Stop cycle counter incrementing.
+.inhibit_tm     (inhibit_tm     ), // Stop time counter incrementing.
+.inhibit_ir     (inhibit_ir     ), // Stop instret incrementing.
+.mmio_en        (mmio_en        ), // MMIO enable
+.mmio_wen       (mmio_wen       ), // MMIO write enable
+.mmio_addr      (mmio_addr      ), // MMIO address
+.mmio_wdata     (mmio_wdata     ), // MMIO write data
+.mmio_rdata     (mmio_rdata     ), // MMIO read data
+.mmio_error     (mmio_error     ), // MMIO error
+.mmio_valid     (mmio_valid     )  // MMIO read data valid.
 );
 
 endmodule

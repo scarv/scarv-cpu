@@ -62,6 +62,10 @@ output wire        s4_valid          // Is this input valid?
 );
 
 
+// Base address of the memory mapped IO region.
+parameter   MMIO_BASE_ADDR        = 32'h0000_1000;
+parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -155,7 +159,10 @@ assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
 //
 //  Load store unit. Responsible for all data accesses.
 //
-frv_lsu i_lsu(
+frv_lsu #(
+.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
+.MMIO_BASE_MASK(MMIO_BASE_MASK)
+) i_lsu(
 .g_clk       (g_clk       ), // Global clock
 .g_resetn    (g_resetn    ), // Global reset.
 .lsu_valid   (lsu_valid   ), // Inputs are valid.

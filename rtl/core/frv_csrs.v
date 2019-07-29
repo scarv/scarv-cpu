@@ -22,6 +22,14 @@ output wire [XL:0] csr_mtvec        , // Current MTVEC.
 
 input  wire        exec_mret        , // MRET instruction executed.
 
+input  wire [63:0] ctr_time         , // The time counter value.
+input  wire [63:0] ctr_cycle        , // The cycle counter value.
+input  wire [63:0] ctr_instret      , // The instret counter value.
+
+output wire        inhibit_cy       , // Stop cycle counter incrementing.
+output wire        inhibit_tm       , // Stop time counter incrementing.
+output wire        inhibit_ir       , // Stop instret incrementing.
+
 input  wire        trap_cpu         , // A trap occured due to CPU
 input  wire        trap_int         , // A trap occured due to interrupt
 input  wire [ 5:0] trap_cause       , // A trap occured due to interrupt
@@ -381,9 +389,9 @@ reg mcountin_tm;
 reg mcountin_cy;
 
 // TODO: Turn into ports.
-wire inhibit_ir = mcountin_ir;
-wire inhibit_tm = mcountin_tm;
-wire inhibit_cy = mcountin_cy;
+assign inhibit_ir = mcountin_ir;
+assign inhibit_tm = mcountin_tm;
+assign inhibit_cy = mcountin_cy;
 
 wire wen_mcountin = csr_wr && csr_addr == CSR_ADDR_MCOUNTIN;
 
@@ -436,12 +444,6 @@ wire   read_minstret  = csr_en && csr_addr == CSR_ADDR_MINSTRET ;
 wire   read_mcycleh   = csr_en && csr_addr == CSR_ADDR_MCYCLEH  ;
 wire   read_minstreth = csr_en && csr_addr == CSR_ADDR_MINSTRETH;
 wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
-
-//
-// TODO: implement these properly.
-wire [63:0] ctr_cycle   =0;
-wire [63:0] ctr_time    =0;
-wire [63:0] ctr_instret =0;
 
 wire   valid_addr     = 
     read_mstatus   ||

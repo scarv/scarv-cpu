@@ -39,6 +39,25 @@ output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
 
+output wire         instr_ret       , // Instruction retired.
+input  wire         timer_interrupt , // Raise a timer interrupt
+
+input  wire [63:0]  ctr_time        , // The time counter value.
+input  wire [63:0]  ctr_cycle       , // The cycle counter value.
+input  wire [63:0]  ctr_instret     , // The instret counter value.
+
+output wire         inhibit_cy      , // Stop cycle counter incrementing.
+output wire         inhibit_tm      , // Stop time counter incrementing.
+output wire         inhibit_ir      , // Stop instret incrementing.
+
+output wire         mmio_en         , // MMIO enable
+output wire         mmio_wen        , // MMIO write enable
+output wire [31:0]  mmio_addr       , // MMIO address
+output wire [31:0]  mmio_wdata      , // MMIO write data
+input  wire [31:0]  mmio_rdata      , // MMIO read data
+input  wire         mmio_error      , // MMIO error
+input  wire         mmio_valid      , // MMIO read data valid.
+
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
 output wire [3:0]   imem_strb       , // Write strobe
@@ -69,6 +88,10 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // Use a BRAM/DMEM friendly register file?
 parameter BRAM_REGFILE = 0;
 
+// Base address of the memory mapped IO region.
+parameter   MMIO_BASE_ADDR        = 32'h0000_1000;
+parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
+
 // If set, trace the instruction word through the pipeline. Otherwise,
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
@@ -77,6 +100,10 @@ parameter TRACE_INSTR_WORD = 1'b1;
 `include "frv_common.vh"
 
 // -------------------------------------------------------------------------
+
+//
+// Alias'd / miscellaneous signals.
+assign      instr_ret = trs_valid;
 
 //
 // Control flow change bus.
@@ -365,7 +392,10 @@ frv_pipeline_execute i_pipeline_s2_execute (
 //
 //  Memory stage of the pipeline, responsible making memory requests.
 //
-frv_pipeline_memory i_pipeline_s3_memory(
+frv_pipeline_memory #(
+.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
+.MMIO_BASE_MASK(MMIO_BASE_MASK)
+) i_pipeline_s3_memory(
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
 .flush            (s4_flush         ), // Flush this pipeline stage.
@@ -517,6 +547,12 @@ frv_csrs i_csrs (
 .csr_mepc         (csr_mepc         ), // Current MEPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
 .exec_mret        (exec_mret        ), // MRET instruction executed.
+.ctr_time         (ctr_time         ), // The time counter value.
+.ctr_cycle        (ctr_cycle        ), // The cycle counter value.
+.ctr_instret      (ctr_instret      ), // The instret counter value.
+.inhibit_cy       (inhibit_cy       ), // Stop cycle counter incrementing.
+.inhibit_tm       (inhibit_tm       ), // Stop time counter incrementing.
+.inhibit_ir       (inhibit_ir       ), // Stop instret incrementing.
 .trap_cpu         (trap_cpu         ), // A trap occured due to CPU
 .trap_int         (trap_int         ), // A trap occured due to interrupt
 .trap_cause       (trap_cause       ), // Cause of a trap.
