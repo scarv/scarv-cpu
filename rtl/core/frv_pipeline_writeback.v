@@ -64,6 +64,10 @@ output wire        gpr_wen         , // GPR write enable.
 output wire [ 4:0] gpr_rd          , // GPR destination register.
 output wire [XL:0] gpr_wdata       , // GPR write data.
 
+input  wire        int_trap_req    , // Request WB stage trap an interrupt
+input  wire [ 5:0] int_trap_cause  , // Cause of interrupt
+output wire        int_trap_ack    , // WB stage acknowledges the taken trap.
+
 output wire        trap_cpu        , // A trap occured due to CPU
 output wire        trap_int        , // A trap occured due to interrupt
 output wire [ 5:0] trap_cause      , // A trap occured due to interrupt
@@ -205,12 +209,12 @@ wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 
 assign exec_mret    = cfu_mret && pipe_progress;
 
-wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap;
+wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap || trap_int;
 
 wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
 
 assign cf_req       = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap ||
-                      lsu_trap      ;
+                      lsu_trap     || trap_int  ;
 
 // CFU operation finishing this cycle.
 wire cfu_finish_now = cf_req && cf_ack;
@@ -343,15 +347,18 @@ assign fwd_s4_csr   = fu_csr;
 // It's a trap!
 // -------------------------------------------------------------------------
 
+// Trap occured due to CPU exception or instruction.
 assign trap_cpu   = cfu_trap || lsu_trap || s4_trap;
 
-assign trap_int   = 1'b0 ; // A trap occured due to interrupt
+ // A trap occured due to interrupt. trap_cpu takes priority.
+assign trap_int   = int_trap_req && !trap_cpu;
 
 assign trap_cause = // Cause of the trap.
     lsu_b_error && lsu_load     ? TRAP_LDACCESS :
     lsu_b_error && lsu_store    ? TRAP_STACCESS :
     cfu_ebreak                  ? TRAP_BREAKPT  :
     cfu_ecall                   ?   TRAP_ECALLM :
+    trap_int                    ? int_trap_cause:
                                   s4_opr_a[5:0] ;
 
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
@@ -439,6 +446,7 @@ end
 assign rvfi_valid = trs_valid;
 assign rvfi_insn  = trs_instr;
 assign rvfi_trap  = trap_cpu ;
+assign rvfi_intr  = trap_int;
 
 assign rvfi_rs1_addr = rvfi_s4_rs1_addr ;
 assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
@@ -461,7 +469,6 @@ assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 // Constant assignments to features of RVFI not supported/relevent.
 assign rvfi_halt  = 0;
-assign rvfi_intr  = 0;
 assign rvfi_mode  = 0;
 
 `endif

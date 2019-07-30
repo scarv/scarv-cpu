@@ -40,11 +40,23 @@ output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
 
 output wire         instr_ret       , // Instruction retired.
-input  wire         timer_interrupt , // Raise a timer interrupt
+
+output wire         mstatus_mie     , // Global interrupt enable.
+output wire         mie_meie        , // External interrupt enable.
+output wire         mie_mtie        , // Timer interrupt enable.
+output wire         mie_msie        , // Software interrupt enable.
+
+input  wire         mip_meip        , // External interrupt pending
+input  wire         mip_mtip        , // Timer interrupt pending
+input  wire         mip_msip        , // Software interrupt pending
 
 input  wire [63:0]  ctr_time        , // The time counter value.
 input  wire [63:0]  ctr_cycle       , // The cycle counter value.
 input  wire [63:0]  ctr_instret     , // The instret counter value.
+
+input  wire         int_trap_req    , // Request WB stage trap an interrupt
+input  wire [ 5:0]  int_trap_cause  , // Cause of interrupt
+output wire         int_trap_ack    , // WB stage acknowledges the taken trap.
 
 output wire         inhibit_cy      , // Stop cycle counter incrementing.
 output wire         inhibit_tm      , // Stop time counter incrementing.
@@ -504,6 +516,9 @@ frv_pipeline_writeback #(
 .gpr_wen          (gpr_wen          ), // GPR write enable.
 .gpr_rd           (gpr_rd           ), // GPR destination register.
 .gpr_wdata        (gpr_wdata        ), // GPR write data.
+.int_trap_req     (int_trap_req     ), // Request WB stage trap an interrupt
+.int_trap_cause   (int_trap_cause   ), // Cause of interrupt
+.int_trap_ack     (int_trap_ack     ), // WB stage acknowledge the taken trap.
 .trap_cpu         (trap_cpu         ), // A trap occured due to CPU
 .trap_int         (trap_int         ), // A trap occured due to interrupt
 .trap_cause       (trap_cause       ), // A trap occured due to interrupt
@@ -552,6 +567,13 @@ frv_csrs i_csrs (
 .csr_mepc         (csr_mepc         ), // Current MEPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
 .exec_mret        (exec_mret        ), // MRET instruction executed.
+.mstatus_mie      (mstatus_mie      ), // Global interrupt enable.
+.mie_meie         (mie_meie         ), // External interrupt enable.
+.mie_mtie         (mie_mtie         ), // Timer interrupt enable.
+.mie_msie         (mie_msie         ), // Software interrupt enable.
+.mip_meip         (mip_meip         ), // External interrupt pending
+.mip_mtip         (mip_mtip         ), // Timer interrupt pending
+.mip_msip         (mip_msip         ), // Software interrupt pending
 .ctr_time         (ctr_time         ), // The time counter value.
 .ctr_cycle        (ctr_cycle        ), // The cycle counter value.
 .ctr_instret      (ctr_instret      ), // The instret counter value.

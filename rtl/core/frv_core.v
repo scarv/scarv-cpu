@@ -86,11 +86,25 @@ parameter TRACE_INSTR_WORD = 1'b1;
 // -------------------------------------------------------------------------
 
 wire        instr_ret        ; // Instruction retired.
-wire        timer_interrupt  ; // Raise a timer interrupt
 
 wire [63:0] ctr_time         ; // The time counter value.
 wire [63:0] ctr_cycle        ; // The cycle counter value.
 wire [63:0] ctr_instret      ; // The instret counter value.
+
+wire        mstatus_mie      ; // Global interrupt enable.
+wire        mie_meie         ; // External interrupt enable.
+wire        mie_mtie         ; // Timer interrupt enable.
+wire        mie_msie         ; // Software interrupt enable.
+
+wire        ti_pending       ; // Raise a timer interrupt. From frv_counters.
+
+wire        mip_meip         ; // External interrupt pending
+wire        mip_mtip         ; // Timer interrupt pending
+wire        mip_msip         ; // Software interrupt pending
+
+wire        int_trap_req     ; // Request WB stage trap an interrupt
+wire [ 5:0] int_trap_cause   ; // Cause of interrupt
+wire        int_trap_ack     ; // WB stage acknowledges the taken trap.
 
 wire        inhibit_cy       ; // Stop cycle counter incrementing.
 wire        inhibit_tm       ; // Stop time counter incrementing.
@@ -145,7 +159,16 @@ frv_pipeline #(
 .trs_instr     (trs_instr     ), // Trace instruction.
 .trs_valid     (trs_valid     ), // Trace output valid.
 .instr_ret      (instr_ret      ), // Instruction retired.
-.timer_interrupt(timer_interrupt), // Raise a timer interrupt
+.mstatus_mie    (mstatus_mie    ), // Global interrupt enable.
+.mie_meie       (mie_meie       ), // External interrupt enable.
+.mie_mtie       (mie_mtie       ), // Timer interrupt enable.
+.mie_msie       (mie_msie       ), // Software interrupt enable.
+.mip_meip       (mip_meip       ), // External interrupt pending
+.mip_mtip       (mip_mtip       ), // Timer interrupt pending
+.mip_msip       (mip_msip       ), // Software interrupt pending
+.int_trap_req   (int_trap_req   ), // Request WB stage trap an interrupt
+.int_trap_cause (int_trap_cause ), // Cause of interrupt
+.int_trap_ack   (int_trap_ack   ), // WB stage acknowledge the taken trap.
 .ctr_time       (ctr_time       ), // The time counter value.
 .ctr_cycle      (ctr_cycle      ), // The cycle counter value.
 .ctr_instret    (ctr_instret    ), // The instret counter value.
@@ -180,6 +203,31 @@ frv_pipeline #(
 .dmem_rdata    (dmem_rdata    )  // Read data
 );
 
+
+//
+// instance: frv_interrupts
+//
+//  Handles internal and external interrupts.
+//
+frv_interrupt i_interrupts (
+.g_clk         (g_clk         ), //
+.g_resetn      (g_resetn      ), //
+.mstatus_mie   (mstatus_mie   ), // Global interrupt enable.
+.mie_meie      (mie_meie      ), // External interrupt enable.
+.mie_mtie      (mie_mtie      ), // Timer interrupt enable.
+.mie_msie      (mie_msie      ), // Software interrupt enable.
+.ex_pending    (int_external  ), // External interrupt pending?
+.ti_pending    (ti_pending    ), // From mrv_counters is mtime pending?
+.sw_pending    (int_software  ), // Software interrupt pending?
+.mip_meip      (mip_meip      ), // External interrupt pending
+.mip_mtip      (mip_mtip      ), // Timer interrupt pending
+.mip_msip      (mip_msip      ), // Software interrupt pending
+.int_trap_req  (int_trap_req  ), // Request WB stage trap an interrupt
+.int_trap_cause(int_trap_cause), // Cause of interrupt
+.int_trap_ack  (int_trap_ack  )  // WB stage acknowledges the taken trap.
+);
+
+
 //
 // instance: frv_counters
 //
@@ -192,7 +240,7 @@ frv_counters #(
 .g_clk          (g_clk          ), // global clock
 .g_resetn       (g_resetn       ), // synchronous reset
 .instr_ret      (instr_ret      ), // Instruction retired.
-.timer_interrupt(timer_interrupt), // Raise a timer interrupt
+.timer_interrupt(ti_pending     ), // Raise a timer interrupt
 .ctr_time       (ctr_time       ), // The time counter value.
 .ctr_cycle      (ctr_cycle      ), // The cycle counter value.
 .ctr_instret    (ctr_instret    ), // The instret counter value.

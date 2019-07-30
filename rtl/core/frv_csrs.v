@@ -22,6 +22,15 @@ output wire [XL:0] csr_mtvec        , // Current MTVEC.
 
 input  wire        exec_mret        , // MRET instruction executed.
 
+output wire        mstatus_mie      , // Global interrupt enable.
+output reg         mie_meie         , // External interrupt enable.
+output reg         mie_mtie         , // Timer interrupt enable.
+output reg         mie_msie         , // Software interrupt enable.
+
+input  wire        mip_meip         , // External interrupt pending
+input  wire        mip_mtip         , // Timer interrupt pending
+input  wire        mip_msip         , // Software interrupt pending
+
 input  wire [63:0] ctr_time         , // The time counter value.
 input  wire [63:0] ctr_cycle        , // The cycle counter value.
 input  wire [63:0] ctr_instret      , // The instret counter value.
@@ -115,8 +124,28 @@ wire [31:0] reg_mideleg         = 32'b0;
 // CSR: MIP / MIE
 // -------------------------------------------------------------------------
 
-wire [31:0] reg_mip = 32'b0;
-wire [31:0] reg_mie = 32'b0;
+wire [31:0] reg_mip = {20'b0,mip_meip,3'b0,mip_mtip,3'b0,mip_msip,3'b0};
+
+wire wen_mie = csr_en && csr_wr  && csr_addr == CSR_ADDR_MIE;
+
+wire [31:0] reg_mie = {20'b0,mie_meie,3'b0,mie_mtie,3'b0,mie_msie,3'b0};
+
+wire [31:0] n_reg_mie = 
+    csr_wr_set ? reg_mie |  csr_wdata :
+    csr_wr_clr ? reg_mie & ~csr_wdata :
+                            csr_wdata ;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        mie_meie <= 1'b0;
+        mie_mtie <= 1'b0;
+        mie_msie <= 1'b0;
+    end else if(wen_mie) begin
+        mie_meie <= n_reg_mie[11];
+        mie_mtie <= n_reg_mie[ 7];
+        mie_msie <= n_reg_mie[ 3];
+    end
+end
 
 
 //
