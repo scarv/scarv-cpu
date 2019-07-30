@@ -393,7 +393,7 @@ always @(posedge g_clk) begin
     end else if(trap_int_pending) begin
         trap_int_pending <= !(cf_req && cf_ack);
     end else begin
-        trap_int_pending <= int_trap_req;
+        trap_int_pending <= int_trap_req && !pipe_progress;
     end
 end
 

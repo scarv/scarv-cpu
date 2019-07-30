@@ -149,6 +149,7 @@ wire [XL:0] trap_pc    ; // PC value associated with the trap.
 wire        s0_flush   = cf_req && cf_ack; // Flush stage
 wire        s1_flush   = cf_req && cf_ack; // Flush pipe stage register.
 wire        s2_flush   = cf_req && cf_ack; // Flush this pipeline stage.
+wire        s3_flush   = cf_req && cf_ack; // Flush this pipeline stage.
 wire        s4_flush   = cf_req && cf_ack; // Flush this pipeline stage.
 
 wire        s0_busy       ; // Stall stage
@@ -409,7 +410,7 @@ frv_pipeline_memory #(
 ) i_pipeline_s3_memory(
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
-.flush            (s4_flush         ), // Flush this pipeline stage.
+.flush            (s3_flush         ), // Flush this pipeline stage.
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
 .s3_opr_b         (s3_opr_b         ), // Operand B
