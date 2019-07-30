@@ -197,25 +197,37 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 // Functional Unit: CFU
 // -------------------------------------------------------------------------
 
+// A "normal" control flow change due to an (in)direct jump or conditional
+// branch instruction.
 wire cfu_cf_taken   = fu_cfu && (s4_uop == CFU_TAKEN  ||
                                  s4_uop == CFU_JALI   ||
                                  s4_uop == CFU_JALR   );
 
+// "Special" control flow change instructions which jump to the current MTVEC
 wire cfu_ebreak     = fu_cfu && s4_uop == CFU_EBREAK;
 wire cfu_ecall      = fu_cfu && s4_uop == CFU_ECALL;
 
+// A trap caused by the CFU
 wire cfu_trap       = cfu_ebreak || cfu_ecall;
+
 wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 
+// Pulsed signal indicating to the CSRs we just returned from an M mode
+// trap handler.
 assign exec_mret    = cfu_mret && pipe_progress;
 
+// Control flow change target should go to the trap handler.
 wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap || trap_int;
 
+// We need to write the next natural PC to a register.
 wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
 
+// Control flow change occuring due to anything except an interrupt.
+// Separate out interrupts for easier RVFI tracking of events.
 wire   cf_req_noint = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap ||
                       lsu_trap     ;
 
+// Any sort of control flow change is occuring.
 assign cf_req       = cf_req_noint || trap_int  ;
 
 // CFU operation finishing this cycle.
@@ -225,6 +237,7 @@ wire [31:0] cf_target_noint =
     {XLEN{cfu_cf_taken}}  & s4_opr_a  |
     {XLEN{cfu_mret    }}  & csr_mepc  ;
 
+// Given a control flow change, this is where we are going.
 assign cf_target    = 
           cfu_tgt_trap    ? csr_mtvec : cf_target_noint;
 
@@ -243,8 +256,10 @@ end else begin
     cfu_done <= n_cfu_done;
 end
 
+// CFU only writes to GPRs due to a jump and link instruction.
 wire cfu_gpr_wen = cfu_link;
 
+// Always writes the "next" PC value, i.e. instruction following the jump.
 wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 
 
@@ -252,20 +267,31 @@ wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 // Functional Unit: LSU
 // -------------------------------------------------------------------------
 
+//
 // Are we expecting an MMIO access?
 wire        lsu_mmio        = fu_lsu    && s4_opr_a[4];
 
+//
+// Are we recieving a data memory response which we expected?
 wire        lsu_txn_recv    = lsu_load               &&
                               dmem_recv && dmem_ack  &&
                               lsu_rsp_expected       ;
 
+//
+// Track whether we've already seen the expected memory response for the
+// current writeback stage instruction.
 wire        n_lsu_rsp_seen  = 
     !pipe_progress && (lsu_rsp_seen || lsu_mmio || (dmem_recv && dmem_ack));
 
 reg         lsu_rsp_seen;
 
+//
+// Do we *expect* to see a data memory response, given the current
+// instruction?
 wire        lsu_rsp_expected= fu_lsu && !lsu_rsp_seen && !lsu_mmio;
 
+//
+// Only accept data memory responses if we expect them.
 assign      dmem_ack    = lsu_rsp_expected;
 
 wire        lsu_gpr_wen     = (lsu_txn_recv && !dmem_error ||
@@ -282,8 +308,12 @@ wire        lsu_word    = s4_uop[2:1] == LSU_WORD;
 wire        lsu_signed  = s4_uop[LSU_SIGNED]  ;
 wire [XL:0] lsu_addr    = s4_opr_b;
 
+//
+// Strobe bits communicated from memory stage
 wire [ 3:0] lsu_strb    = s4_opr_a[3:0];
 
+//
+// Are we still waiting for the memory response?
 wire        lsu_busy    =
     fu_lsu && !(
         lsu_rsp_seen || (dmem_recv && dmem_ack) || lsu_mmio
@@ -291,6 +321,8 @@ wire        lsu_busy    =
 
 wire [31:0] mem_rdata = lsu_mmio ? mmio_rdata : dmem_rdata;
 
+//
+// Re-arrange the byte data on a memory read response as needed.
 wire [ 7: 0] rdata_b0 =
     {8{lsu_strb[0]                       }} & mem_rdata[ 7: 0] |
     {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & mem_rdata[15: 8] |
@@ -312,7 +344,8 @@ wire [15: 0] rdata_h1 =
 //                         31....16,15.....8,7......0
 wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
 
-// LSU Bus error?
+//
+// LSU Bus error? Due to MMIO or DMEM bus?
 wire        lsu_b_error = lsu_rsp_expected && dmem_error && dmem_recv ||
                           lsu_mmio         && mmio_error              ;
 
@@ -351,6 +384,7 @@ assign fwd_s4_csr   = fu_csr;
 // It's a trap!
 // -------------------------------------------------------------------------
 
+// Is there a pending interrupt control flow change to be made?
 reg    trap_int_pending;
 
 always @(posedge g_clk) begin
@@ -378,6 +412,7 @@ assign trap_cause = // Cause of the trap.
     trap_int                    ? int_trap_cause:
                                   s4_opr_a[5:0] ;
 
+// TODO: Make this useful.
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
 
 assign trap_pc    = s4_pc   ; // PC value associated with the trap.
@@ -388,12 +423,24 @@ assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 
 assign trs_pc   = s4_pc;
 assign trs_instr= s4_instr;
+
+// Trace packet valid iff:
+// - The instruction has non-zero size AND
+//   - The pipeline is progressing OR
+//   - A control flow change finished this cycle.
 assign trs_valid= 
     |s4_size && ((s4_valid && !s4_busy) || (cf_req && cf_ack && !cfu_done));
 
 
 //
 // RISC-V Formal
+//
+//  This section contains tracking and interface code used only to make sure
+//  that the RVFI interface gives consistent results.
+//  Typically, this just means catching and storing data which the
+//  core doesn't need to keep, but that needs to be output with each
+//  RVFI packet.
+//
 // -------------------------------------------------------------------------
 
 `ifdef RVFI
@@ -412,6 +459,9 @@ always @(posedge g_clk) begin
 end
 
 
+//
+// If GPR writeback finishes before the pipeline moves on, save what we
+// wrote so we report it correctly.
 reg [ 4:0] saved_gpr_waddr;
 reg [XL:0] saved_gpr_wdata;
 reg        use_saved_gpr_wdata;
@@ -437,6 +487,9 @@ always @(posedge g_clk) begin
     end
 end
 
+//
+// If memory read transactions complete before the pipeline moves on,
+// save what we read so we report it correctly.
 reg [XL:0] saved_mem_rdata;
 reg        use_saved_mem_rdata;
 
@@ -458,6 +511,9 @@ always @(posedge g_clk) begin
         saved_mem_rdata <= dmem_rdata;
     end
 end
+
+//
+// Track if this is the first instruction after an interrupt.
 
 reg  intr_tracker;
 wire n_intr_tracker = trap_int || intr_tracker;

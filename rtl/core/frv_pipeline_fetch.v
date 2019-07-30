@@ -50,12 +50,12 @@ assign s1_valid = buf_valid;
 assign cf_ack   = (!imem_req || imem_req && imem_gnt);
 
 //
-// Request buffer
+// Request buffer interface signals.
 // --------------------------------------------------------------
 
-wire f_ready;
-wire f_4byte;
-wire f_2byte;
+wire f_ready;   // Buffer ready to recieve input data.
+wire f_4byte;   // Buffer should store 4 bytes of input.
+wire f_2byte;   // Buffer should store 2 bytes of input.
 
 wire buf_out_2 ; // Buffer has 2 byte instruction.
 wire buf_out_4 ; // Buffer has 4 byte instruction.
@@ -66,13 +66,19 @@ wire buf_ready = s1_valid && !s1_busy; // Eat 2/4 bytes
 // Memory bus requests
 // --------------------------------------------------------------
 
+// Counter to store the number of future memory responses to be ignored.
 reg  [2:0] ignore_rsps       ;
 wire [2:0] n_ignore_rsps     ;
 
 assign     n_ignore_rsps    = ignore_rsps - {2'b00, rsp_recv};
 
+// If we get a memory response while ignoring them, drop the response so
+// it doesn't enter the fetch buffer.
 wire        drop_response   = |ignore_rsps;
 
+// The number of outstanding memory requests for which we haven't yet
+// recieved a response. This counter is updated whether or not the
+// response is dropped or not.
 reg  [2:0]   reqs_outstanding;
 wire [2:0] n_reqs_outstanding = reqs_outstanding +
                                 {2'b0,(imem_req && imem_gnt)} -
@@ -80,12 +86,18 @@ wire [2:0] n_reqs_outstanding = reqs_outstanding +
 
 wire cf_change          = cf_req && cf_ack;
 
+// Update the memory fetch address each time we get a response.
 wire progress_imem_addr = imem_req && imem_gnt;
 
 wire [XL:0] n_imem_addr = imem_addr + 4;
 
+// Don't start a memory fetch request if there are already a bunch of
+// outstanding, unrecieved responses.
 wire        n_imem_req  = (f_ready || cf_change) && reqs_outstanding<3;
 
+//
+// Update the fetch address in terms of control flow changes and natural
+// progression to the next word.
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         imem_addr <= FRV_PC_RESET_VALUE;
@@ -126,6 +138,10 @@ end
 // Misalignment tracking
 // --------------------------------------------------------------
 
+//
+// The fetch address only becomes misaligned iff we jump onto a
+// halfword aligned instruction. The misalignment flag signals we
+// should only store the "upper" halfword of the response.
 reg  fetch_misaligned;
 wire n_fetch_misaligned =
     ((cf_change && cf_target[1]) || fetch_misaligned) &&
@@ -145,7 +161,10 @@ end
 
 wire   rsp_recv= imem_recv && imem_ack;
 
+// Store the entire 4-byte response data
 assign f_4byte = rsp_recv && !fetch_misaligned && !drop_response;
+
+// Store the upper halfword of the response data.
 assign f_2byte = rsp_recv &&  fetch_misaligned && !drop_response;
 
 assign imem_ack= f_ready;
