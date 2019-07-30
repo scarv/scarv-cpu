@@ -67,7 +67,7 @@ always @(posedge g_clk) begin
     end
 end
 
-assign      mmio_en    = lsu_mmio && !mmio_done;
+assign      mmio_en    = lsu_mmio && !mmio_done && !hold_lsu_req;
 assign      mmio_addr  = lsu_addr   ;
 assign      mmio_wen   = lsu_store  ;
 assign      mmio_wdata = lsu_wdata  ;

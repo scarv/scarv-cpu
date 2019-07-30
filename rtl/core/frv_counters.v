@@ -116,7 +116,7 @@ wire [31:0] n_mmio_rdata =
     {32{addr_mtimecmp_lo}} & mapped_mtimecmp[31: 0] |
     {32{addr_mtimecmp_hi}} & mapped_mtimecmp[63:32] ;
         
-wire        n_mmio_error = !(
+wire        n_mmio_error = mmio_en && !(
     addr_mtime_lo       ||
     addr_mtime_hi       ||
     addr_mtimecmp_lo    ||
@@ -125,6 +125,8 @@ wire        n_mmio_error = !(
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
+        mmio_error <=  1'b0;
+        mmio_rdata <= 32'b0;
     end else if(mmio_en) begin
         mmio_error <= n_mmio_error;
         mmio_rdata <= n_mmio_rdata;

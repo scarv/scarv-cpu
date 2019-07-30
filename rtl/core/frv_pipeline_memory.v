@@ -267,7 +267,7 @@ reg [31:0] mem_wdata_store;
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         rvfi_s4_mem_wdata <= 0;
-    end else if(p_valid && !p_busy && dmem_req && dmem_gnt) begin
+    end else if(p_valid && !p_busy && (mmio_en || dmem_req && dmem_gnt)) begin
         rvfi_s4_mem_wdata <= dmem_wdata;
     end else if(p_valid && !p_busy) begin
         rvfi_s4_mem_wdata <= mem_wdata_store;
@@ -277,7 +277,7 @@ end
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         mem_wdata_store <= 0;
-    end else if(dmem_req && dmem_gnt) begin
+    end else if(mmio_en || dmem_req && dmem_gnt) begin
         mem_wdata_store <= dmem_wdata;
     end
 end

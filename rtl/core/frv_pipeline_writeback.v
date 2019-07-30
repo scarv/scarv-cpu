@@ -122,7 +122,7 @@ assign s4_busy = fu_cfu && cfu_busy ||
 
 // Don't make LSU memory requests until writeback stage is sure it won't
 // raise an exception.
-assign hold_lsu_req = cf_req || lsu_busy;
+assign hold_lsu_req = cf_req || lsu_busy || trap_int;
 
 //
 // PC computation
@@ -136,7 +136,7 @@ always @(posedge g_clk) begin
         s4_pc <= FRV_PC_RESET_VALUE;
     end else if(cf_req && cf_ack) begin
         s4_pc <= cf_target;
-    end else if(s4_valid && !s4_busy) begin
+    end else if(pipe_progress) begin
         s4_pc <= n_s4_pc;
     end
 end
@@ -351,11 +351,24 @@ assign fwd_s4_csr   = fu_csr;
 // It's a trap!
 // -------------------------------------------------------------------------
 
+reg    trap_int_pending;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        trap_int_pending <= 1'b0;
+    end else if(trap_int_pending) begin
+        trap_int_pending <= !(cf_req && cf_ack);
+    end else begin
+        trap_int_pending <= int_trap_req;
+    end
+end
+
 // Trap occured due to CPU exception or instruction.
 assign trap_cpu   = cfu_trap || lsu_trap || s4_trap;
 
  // A trap occured due to interrupt. trap_cpu takes priority.
-assign trap_int   = int_trap_req && !trap_cpu;
+assign trap_int   = (int_trap_req || trap_int_pending) &&
+                    !trap_cpu && !lsu_rsp_expected;
 
 assign trap_cause = // Cause of the trap.
     lsu_b_error && lsu_load     ? TRAP_LDACCESS :
@@ -454,9 +467,15 @@ always @(posedge g_clk) begin
         intr_tracker <= 1'b0;
     end else if(intr_tracker) begin
         intr_tracker <= !pipe_progress;
-    end else begin
+    end else if(pipe_progress) begin
         intr_tracker <= n_intr_tracker;
     end
+end
+
+//
+// Assume we never get an MMIO error, because RVFI can't handle them well.
+always @(posedge g_clk) begin
+    assume(!mmio_error);
 end
 
 assign rvfi_valid = trs_valid;
@@ -481,7 +500,9 @@ assign rvfi_pc_wdata = cf_req_noint ? cf_target_noint            :
 assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
 assign rvfi_mem_rmask= fu_lsu && lsu_load  ? lsu_strb : 4'b0000 ;
 assign rvfi_mem_wmask= fu_lsu && lsu_store ? lsu_strb : 4'b0000 ;
-assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata : dmem_rdata;
+assign rvfi_mem_rdata= lsu_mmio            ? mmio_rdata      :
+                       use_saved_mem_rdata ? saved_mem_rdata :
+                                             dmem_rdata;
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 // Constant assignments to features of RVFI not supported/relevent.
