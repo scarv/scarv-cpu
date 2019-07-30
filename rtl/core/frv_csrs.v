@@ -174,7 +174,7 @@ reg         reg_mstatus_wpri4      ;
 wire        reg_mstatus_sie     = 0; // Supervisor mode not implemented
 wire        reg_mstatus_uie     = 0; // User mode not implemented
 
-wire        mstatus_mie = reg_mstatus_mie;
+assign        mstatus_mie = reg_mstatus_mie;
 
 wire [31:0] reg_mstatus         = {
     reg_mstatus_sd    ,
