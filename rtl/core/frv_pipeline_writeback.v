@@ -213,16 +213,20 @@ wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap || trap_int;
 
 wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
 
-assign cf_req       = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap ||
-                      lsu_trap     || trap_int  ;
+wire   cf_req_noint = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap ||
+                      lsu_trap     ;
+
+assign cf_req       = cf_req_noint || trap_int  ;
 
 // CFU operation finishing this cycle.
 wire cfu_finish_now = cf_req && cf_ack;
 
-assign cf_target    = 
+wire [31:0] cf_target_noint = 
     {XLEN{cfu_cf_taken}}  & s4_opr_a  |
-    {XLEN{cfu_tgt_trap}}  & csr_mtvec |
     {XLEN{cfu_mret    }}  & csr_mepc  ;
+
+assign cf_target    = 
+          cfu_tgt_trap    ? csr_mtvec : cf_target_noint;
 
 // CFU operation finished, but pipeline still stalled.
 reg     cfu_done;
@@ -442,11 +446,23 @@ always @(posedge g_clk) begin
     end
 end
 
+reg  intr_tracker;
+wire n_intr_tracker = trap_int || intr_tracker;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        intr_tracker <= 1'b0;
+    end else if(intr_tracker) begin
+        intr_tracker <= !pipe_progress;
+    end else begin
+        intr_tracker <= n_intr_tracker;
+    end
+end
 
 assign rvfi_valid = trs_valid;
 assign rvfi_insn  = trs_instr;
 assign rvfi_trap  = trap_cpu ;
-assign rvfi_intr  = trap_int;
+assign rvfi_intr  = intr_tracker;
 
 assign rvfi_rs1_addr = rvfi_s4_rs1_addr ;
 assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
@@ -459,7 +475,8 @@ assign rvfi_rd_wdata = |s4_rd && !trap_cpu ?
                        (use_saved_gpr_wdata ? saved_gpr_wdata : gpr_wdata) : 0;
 
 assign rvfi_pc_rdata = trs_pc   ; 
-assign rvfi_pc_wdata = cf_req ? cf_target : s4_pc+{29'b0,s4_size,1'b0} ;
+assign rvfi_pc_wdata = cf_req_noint ? cf_target_noint            :
+                                      s4_pc+{29'b0,s4_size,1'b0} ;
 
 assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
 assign rvfi_mem_rmask= fu_lsu && lsu_load  ? lsu_strb : 4'b0000 ;
