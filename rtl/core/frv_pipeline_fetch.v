@@ -66,17 +66,17 @@ wire buf_ready = s1_valid && !s1_busy; // Eat 2/4 bytes
 // Memory bus requests
 // --------------------------------------------------------------
 
-reg  [1:0] ignore_rsps       ;
-wire [1:0] n_ignore_rsps     ;
+reg  [2:0] ignore_rsps       ;
+wire [2:0] n_ignore_rsps     ;
 
-assign     n_ignore_rsps    = ignore_rsps - rsp_recv  ;
+assign     n_ignore_rsps    = ignore_rsps - {2'b00, rsp_recv};
 
 wire        drop_response   = |ignore_rsps;
 
-reg  [1:0]   reqs_outstanding;
-wire [1:0] n_reqs_outstanding = reqs_outstanding +
-                                (imem_req && imem_gnt) -
-                                rsp_recv;
+reg  [2:0]   reqs_outstanding;
+wire [2:0] n_reqs_outstanding = reqs_outstanding +
+                                {2'b0,(imem_req && imem_gnt)} -
+                                {2'b0,rsp_recv};
 
 wire cf_change          = cf_req && cf_ack;
 
@@ -106,7 +106,7 @@ end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        reqs_outstanding <= 2'b0;
+        reqs_outstanding <= 3'b0;
     end else begin
         reqs_outstanding <= n_reqs_outstanding;
     end
@@ -114,7 +114,7 @@ end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        ignore_rsps <= 2'b0;
+        ignore_rsps <= 3'b0;
     end else if(cf_change) begin
         ignore_rsps <= n_reqs_outstanding;
     end else if(|ignore_rsps) begin
