@@ -397,6 +397,9 @@ always @(posedge g_clk) begin
     end
 end
 
+// TODO
+assign int_trap_ack = 1'b0;
+
 // Trap occured due to CPU exception or instruction.
 assign trap_cpu   = cfu_trap || lsu_trap || s4_trap;
 
