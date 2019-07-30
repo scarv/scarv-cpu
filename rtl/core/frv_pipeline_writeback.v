@@ -93,6 +93,9 @@ input  wire        cf_ack          , // Control flow change acknowledge.
 
 output wire        hold_lsu_req    , // Don't make LSU requests yet.
 
+input  wire [31:0] mmio_rdata      , // MMIO read data
+input  wire        mmio_error      , // MMIO error
+
 input  wire        dmem_recv       , // Instruction memory recieve response.
 output wire        dmem_ack        , // Data memory ack response.
 input  wire        dmem_error      , // Error
@@ -241,24 +244,30 @@ wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 // Functional Unit: LSU
 // -------------------------------------------------------------------------
 
-wire        lsu_txn_recv    = fu_lsu    && s4_uop[LSU_LOAD] &&
-                              dmem_recv && dmem_ack         &&
-                              lsu_rsp_expected              ;
+// Are we expecting an MMIO access?
+wire        lsu_mmio        = fu_lsu    && s4_opr_a[4];
+
+wire        lsu_txn_recv    = lsu_load               &&
+                              dmem_recv && dmem_ack  &&
+                              lsu_rsp_expected       ;
 
 wire        n_lsu_rsp_seen  = 
-    !pipe_progress && (lsu_rsp_seen || (dmem_recv && dmem_ack));
+    !pipe_progress && (lsu_rsp_seen || lsu_mmio || (dmem_recv && dmem_ack));
 
 reg         lsu_rsp_seen;
 
-wire        lsu_rsp_expected= fu_lsu    && !lsu_rsp_seen    ;
+wire        lsu_rsp_expected= fu_lsu && !lsu_rsp_seen && !lsu_mmio;
 
 assign      dmem_ack    = lsu_rsp_expected;
 
-wire        lsu_gpr_wen     = lsu_txn_recv && !dmem_error;
+wire        lsu_gpr_wen     = (lsu_txn_recv && !dmem_error ||
+                               lsu_mmio     && !mmio_error  ) &&
+                              !lsu_rsp_seen &&  lsu_load       ;
+
 wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
 
-wire        lsu_load    = s4_uop[LSU_LOAD]    ;
-wire        lsu_store   = s4_uop[LSU_STORE]   ;
+wire        lsu_load    = fu_lsu && s4_uop[LSU_LOAD];
+wire        lsu_store   = fu_lsu && s4_uop[LSU_STORE]   ;
 wire        lsu_byte    = s4_uop[2:1] == LSU_BYTE;
 wire        lsu_half    = s4_uop[2:1] == LSU_HALF;
 wire        lsu_word    = s4_uop[2:1] == LSU_WORD;
@@ -268,31 +277,36 @@ wire [XL:0] lsu_addr    = s4_opr_b;
 wire [ 3:0] lsu_strb    = s4_opr_a[3:0];
 
 wire        lsu_busy    =
-    fu_lsu && !(lsu_rsp_seen || (dmem_recv && dmem_ack));
+    fu_lsu && !(
+        lsu_rsp_seen || (dmem_recv && dmem_ack) || lsu_mmio
+    );
+
+wire [31:0] mem_rdata = lsu_mmio ? mmio_rdata : dmem_rdata;
 
 wire [ 7: 0] rdata_b0 =
-    {8{lsu_strb[0]                       }} & dmem_rdata[ 7: 0] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & dmem_rdata[15: 8] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & dmem_rdata[23:16] |
-    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & dmem_rdata[31:24] ;
+    {8{lsu_strb[0]                       }} & mem_rdata[ 7: 0] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & mem_rdata[15: 8] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & mem_rdata[23:16] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & mem_rdata[23:16] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & mem_rdata[31:24] ;
 
 wire [ 7: 0] rdata_b1 =
     {8{lsu_byte && lsu_signed            }} & {8{rdata_b0[7] }} |
-    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[15: 8] |
-    {8{lsu_word                          }} & dmem_rdata[15: 8] |
-    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[31:24] ;
+    {8{lsu_half && lsu_addr[  1] == 1'b0 }} &  mem_rdata[15: 8] |
+    {8{lsu_word                          }} &  mem_rdata[15: 8] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} &  mem_rdata[31:24] ;
 
 wire [15: 0] rdata_h1 =
     {16{lsu_byte && lsu_signed           }} & {16{rdata_b1[7]}} |
     {16{lsu_half && lsu_signed           }} & {16{rdata_b1[7]}} |
-    {16{lsu_word                         }} & dmem_rdata[31:16] ;
+    {16{lsu_word                         }} &  mem_rdata[31:16] ;
 
-//                  31....16,15.....8,7......0
+//                         31....16,15.....8,7......0
 wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
 
 // LSU Bus error?
-wire        lsu_b_error = lsu_rsp_expected && dmem_error && dmem_recv;
+wire        lsu_b_error = lsu_rsp_expected && dmem_error && dmem_recv ||
+                          lsu_mmio         && mmio_error              ;
 
 wire        lsu_trap    = lsu_b_error;
 

@@ -102,7 +102,6 @@ wire [31:0] mmio_addr        ; // MMIO address
 wire [31:0] mmio_wdata       ; // MMIO write data
 wire [31:0] mmio_rdata       ; // MMIO read data
 wire        mmio_error       ; // MMIO error
-wire        mmio_valid       ; // MMIO read data valid.
 
 // -------------------------------------------------------------------------
 
@@ -159,7 +158,6 @@ frv_pipeline #(
 .mmio_wdata     (mmio_wdata     ), // MMIO write data
 .mmio_rdata     (mmio_rdata     ), // MMIO read data
 .mmio_error     (mmio_error     ), // MMIO error
-.mmio_valid     (mmio_valid     ), // MMIO read data valid.
 .imem_req      (imem_req      ), // Start memory request
 .imem_wen      (imem_wen      ), // Write enable
 .imem_strb     (imem_strb     ), // Write strobe
@@ -206,8 +204,7 @@ frv_counters #(
 .mmio_addr      (mmio_addr      ), // MMIO address
 .mmio_wdata     (mmio_wdata     ), // MMIO write data
 .mmio_rdata     (mmio_rdata     ), // MMIO read data
-.mmio_error     (mmio_error     ), // MMIO error
-.mmio_valid     (mmio_valid     )  // MMIO read data valid.
+.mmio_error     (mmio_error     )  // MMIO error
 );
 
 endmodule

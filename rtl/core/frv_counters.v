@@ -24,9 +24,8 @@ input  wire        mmio_en          , // MMIO enable
 input  wire        mmio_wen         , // MMIO write enable
 input  wire [31:0] mmio_addr        , // MMIO address
 input  wire [31:0] mmio_wdata       , // MMIO write data
-output wire [31:0] mmio_rdata       , // MMIO read data
-output wire        mmio_error       , // MMIO error
-output wire        mmio_valid         // MMIO read data valid.
+output reg  [31:0] mmio_rdata       , // MMIO read data
+output reg         mmio_error         // MMIO error
 
 );
 
@@ -111,20 +110,27 @@ end
 
 // ---------------------- MMIO Bus Reads --------------------------------
 
-assign mmio_valid = mmio_en;
-
-assign mmio_error = !(
+wire [31:0] n_mmio_rdata =
+    {32{addr_mtime_lo   }} & mapped_mtime   [31: 0] |
+    {32{addr_mtime_hi   }} & mapped_mtime   [63:32] |
+    {32{addr_mtimecmp_lo}} & mapped_mtimecmp[31: 0] |
+    {32{addr_mtimecmp_hi}} & mapped_mtimecmp[63:32] ;
+        
+wire        n_mmio_error = !(
     addr_mtime_lo       ||
     addr_mtime_hi       ||
     addr_mtimecmp_lo    ||
     addr_mtimecmp_hi    
 );
 
-assign mmio_rdata =
-    {32{addr_mtime_lo   }} & mapped_mtime   [31: 0] |
-    {32{addr_mtime_hi   }} & mapped_mtime   [63:32] |
-    {32{addr_mtimecmp_lo}} & mapped_mtimecmp[31: 0] |
-    {32{addr_mtimecmp_hi}} & mapped_mtimecmp[63:32] ;
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+    end else if(mmio_en) begin
+        mmio_error <= n_mmio_error;
+        mmio_rdata <= n_mmio_rdata;
+    end
+end
+
 
 // ---------------------- CSR registers ---------------------------------
 

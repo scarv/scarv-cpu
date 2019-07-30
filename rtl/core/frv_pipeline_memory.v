@@ -41,6 +41,11 @@ output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 
 input  wire        hold_lsu_req    , // Hold LSU requests for now.
 
+output wire        mmio_en         , // MMIO enable
+output wire        mmio_wen        , // MMIO write enable
+output wire [31:0] mmio_addr       , // MMIO address
+output wire [31:0] mmio_wdata      , // MMIO write data
+
 output wire        dmem_req        , // Start memory request
 output wire        dmem_wen        , // Write enable
 output wire [3:0]  dmem_strb       , // Write strobe
@@ -102,6 +107,8 @@ wire        lsu_valid  = fu_lsu         ; // Inputs are valid.
 wire        lsu_a_error                 ; // Address error. TODO
 wire        lsu_ready                   ; // Load/Store instruction complete.
 
+wire        lsu_mmio                    ; // Is this an MMIO access?
+
 wire        lsu_load   = s3_uop[LSU_LOAD ];
 wire        lsu_store  = s3_uop[LSU_STORE];
 
@@ -117,7 +124,7 @@ wire [5:0]  lsu_cause =
            (lsu_store  &&lsu_a_error)? TRAP_STALIGN  :
                                         0            ;
 
-wire [XL:0] n_s4_opr_a_lsu = {28'b0,dmem_strb};
+wire [XL:0] n_s4_opr_a_lsu = {27'b0,lsu_mmio,dmem_strb};
 wire [XL:0] n_s4_opr_b_lsu = lsu_addr;
 
 //
@@ -168,6 +175,7 @@ frv_lsu #(
 .lsu_valid   (lsu_valid   ), // Inputs are valid.
 .lsu_a_error (lsu_a_error ), // Address error.
 .lsu_ready   (lsu_ready   ), // Outputs are valid / instruction complete.
+.lsu_mmio    (lsu_mmio    ), // Is this an MMIO access?
 .pipe_prog   (pipe_progress),// Pipeline is progressing this cycle.
 .lsu_addr    (lsu_addr    ), // Memory address to access.
 .lsu_wdata   (lsu_wdata   ), // Data to write to memory.
@@ -178,6 +186,10 @@ frv_lsu #(
 .lsu_word    (lsu_word    ), // Word operation width.
 .lsu_signed  (lsu_signed  ), // Sign extend loaded data?
 .hold_lsu_req(hold_lsu_req), // Don't make LSU requests yet.
+.mmio_en     (mmio_en     ), // MMIO enable
+.mmio_wen    (mmio_wen    ), // MMIO write enable
+.mmio_addr   (mmio_addr   ), // MMIO address
+.mmio_wdata  (mmio_wdata  ), // MMIO write data
 .dmem_req    (dmem_req    ), // Start memory request
 .dmem_wen    (dmem_wen    ), // Write enable
 .dmem_strb   (dmem_strb   ), // Write strobe

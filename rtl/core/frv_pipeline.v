@@ -56,7 +56,6 @@ output wire [31:0]  mmio_addr       , // MMIO address
 output wire [31:0]  mmio_wdata      , // MMIO write data
 input  wire [31:0]  mmio_rdata      , // MMIO read data
 input  wire         mmio_error      , // MMIO error
-input  wire         mmio_valid      , // MMIO read data valid.
 
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
@@ -425,6 +424,10 @@ frv_pipeline_memory #(
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
+.mmio_en          (mmio_en          ), // MMIO enable
+.mmio_wen         (mmio_wen         ), // MMIO write enable
+.mmio_addr        (mmio_addr        ), // MMIO address
+.mmio_wdata       (mmio_wdata       ), // MMIO write data
 .dmem_req         (dmem_req         ), // Start memory request
 .dmem_wen         (dmem_wen         ), // Write enable
 .dmem_strb        (dmem_strb        ), // Write strobe
@@ -523,6 +526,8 @@ frv_pipeline_writeback #(
 .cf_target        (cf_target        ), // Control flow change target
 .cf_ack           (cf_ack           ), // Control flow change acknowledge.
 .hold_lsu_req     (hold_lsu_req     ), // Don't make LSU requests yet.
+.mmio_rdata       (mmio_rdata       ), // MMIO read data
+.mmio_error       (mmio_error       ), // MMIO error
 .dmem_recv        (dmem_recv        ), // Instruction memory recieve response.
 .dmem_ack         (dmem_ack         ), // Data memory ack response.
 .dmem_error       (dmem_error       ), // Error

@@ -12,6 +12,7 @@ input  wire        g_resetn    , // Global reset.
 input  wire        lsu_valid   , // Inputs are valid.
 output wire        lsu_a_error , // Address error.
 output wire        lsu_ready   , // Outputs are valid / instruction complete.
+output wire        lsu_mmio    , // Is this an MMIO access?
 
 input  wire        pipe_prog   , // Pipeline is progressing this cycle.
 
@@ -25,6 +26,11 @@ input  wire        lsu_word    , // Word operation width.
 input  wire        lsu_signed  , // Sign extend loaded data?
 
 input  wire        hold_lsu_req, // Don't make LSU requests yet.
+
+output wire        mmio_en     , // MMIO enable
+output wire        mmio_wen    , // MMIO write enable
+output wire [31:0] mmio_addr   , // MMIO address
+output wire [31:0] mmio_wdata  , // MMIO write data
 
 output wire        dmem_req    , // Start memory request
 output wire        dmem_wen    , // Write enable
@@ -43,10 +49,35 @@ parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
 `include "frv_common.vh"
 
 //
+// MMIO Handling
+// -------------------------------------------------------------------------
+
+assign      lsu_mmio   = lsu_valid && 
+                         (lsu_addr & MMIO_BASE_MASK) == MMIO_BASE_ADDR;
+
+reg         mmio_done;
+
+wire        n_mmio_done= (mmio_done || mmio_en) && !pipe_prog;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        mmio_done <= 1'b0;
+    end else begin
+        mmio_done <= n_mmio_done;
+    end
+end
+
+assign      mmio_en    = lsu_mmio && !mmio_done;
+assign      mmio_addr  = lsu_addr   ;
+assign      mmio_wen   = lsu_store  ;
+assign      mmio_wdata = lsu_wdata  ;
+
+//
 // Instruction done tracking
 // -------------------------------------------------------------------------
 
-wire dmem_txn_done = dmem_req      && dmem_gnt  ;
+wire dmem_txn_done = !lsu_mmio && dmem_req && dmem_gnt  ||
+                      lsu_mmio && mmio_en               ;
 
 
 reg  lsu_finished;
@@ -75,7 +106,7 @@ assign lsu_a_error = lsu_half &&  lsu_addr[  0] ||
 // -------------------------------------------------------------------------
 
 assign dmem_req     = lsu_valid && !lsu_finished && !lsu_a_error &&
-                      !hold_lsu_req;
+                      !hold_lsu_req && !lsu_mmio;
 assign dmem_wen     = lsu_store ;
 assign dmem_addr    = lsu_addr  & 32'hFFFF_FFFC;
 
