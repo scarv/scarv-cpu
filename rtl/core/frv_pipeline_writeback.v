@@ -389,7 +389,7 @@ assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 assign trs_pc   = s4_pc;
 assign trs_instr= s4_instr;
 assign trs_valid= 
-    (|s4_size && s4_valid && !s4_busy) || (cf_req && cf_ack);
+    |s4_size && ((s4_valid && !s4_busy) || (cf_req && cf_ack && !cfu_done));
 
 
 //
