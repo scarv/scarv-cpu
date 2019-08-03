@@ -1,10 +1,11 @@
 
 #include <iostream>
+
 #include "sram_agent.hpp"
     
     
 sram_agent::sram_agent (
-    memory_device * mem
+    memory_bus * mem
 ) {
     this -> mem = mem;
 }
@@ -31,54 +32,6 @@ void sram_agent::clear_reset(){
 }
 
 
-//! handles populating of read data or writing of write data.
-void sram_agent::handle_read_write(
-    sram_agent_req * req    //!< The request to handle.
-){
-        
-    uint64_t addr = req -> addr;
-        
-    if(req -> write) {
-
-        uint32_t wdata= req -> data;
-
-        req -> success = true;
-        
-        if(req -> wstrb & 0b0001) {
-            req -> success &= mem -> write_byte(addr+0,(wdata>> 0)&0xFF);
-        }
-        
-        if(req -> wstrb & 0b0010) {
-            req -> success &= mem -> write_byte(addr+1,(wdata>> 8)&0xFF);
-        }
-        
-        if(req -> wstrb & 0b0100) {
-            req -> success &= mem -> write_byte(addr+2,(wdata>>16)&0xFF);
-        }
-        
-        if(req -> wstrb & 0b1000) {
-            req -> success &= mem -> write_byte(addr+3,(wdata>>24)&0xFF);
-        }
-
-        if(req -> success == false) {
-            std::cerr << "Failed write to " << std::hex << addr
-                      << std::endl;
-        }
-
-    } else {
-        req -> success = this -> mem -> read_word(
-            req -> addr, &req -> data
-        );
-
-        if(!req -> success) {
-            n_mem_error = 1;
-            std::cerr << "Failed read from " << std::hex << addr
-                      << std::endl;
-        }
-    }
-
-}
-
 //! Drive any signal updates
 void sram_agent::drive_signals(){
 
@@ -95,15 +48,19 @@ void sram_agent::drive_response(){
     // Respond to any outstanding transactions.
     if(req_q.empty() == false && this -> rand_chance(9,10)) {
 
-        sram_agent_req * req = req_q.front();
+        memory_req_txn * req = req_q.front();
 
-        handle_read_write(req);
+        memory_rsp_txn * rsp = this -> mem -> request(req);
         
-        n_mem_error = !(req -> success);
+        n_mem_error = rsp -> error();
         n_mem_recv  = 1;
-        n_mem_rdata = req -> data;
+
+        if(req -> is_read()) {
+            n_mem_rdata = rsp -> data_word();
+        }
 
         req_q.pop();
+        delete rsp;
         delete req;
 
     } else {
@@ -140,12 +97,25 @@ void sram_agent::posedge_clk(){
 
     if(new_txn) {
         // There is an active request.
-        req_q.push(new sram_agent_req (
+
+        size_t txn_length  = 4;
+
+        memory_req_txn * req = new memory_req_txn(
             *mem_addr,
-            *mem_wen ,
-            *mem_strb,
-            *mem_wdata
-        ));
+            txn_length,
+            *mem_wen
+        );
+
+        if(*mem_wen) {
+
+            for(int i = 0; i < 4 ; i ++) {
+                req -> data()[i] = (*mem_wdata>> (8*i)) & 0xFF;
+                req -> strb()[i] = (bool)((*mem_strb >> i    ) & 0x1);
+            }
+
+        }
+
+        req_q.push(req);
     }
     
     // Randomise the stall signal value.

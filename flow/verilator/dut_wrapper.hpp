@@ -36,7 +36,7 @@ public:
     @param in dump_waves - If true, write wave file.
     */
     dut_wrapper (
-        memory_device * mem         ,
+        memory_bus    * mem         ,
         bool            dump_waves  ,
         std::string     wavefile
     );
@@ -65,7 +65,7 @@ public:
 protected:
     
     //! Set of available memories. Fed to memory agents.
-    memory_device* mem;
+    memory_bus   * mem;
 
     //! Instruction memory SRAM agent
     sram_agent * imem_agent;

@@ -9,8 +9,8 @@
 
 #include "srec.hpp"
 #include "memory_device.hpp"
-#include "sram_agent.hpp"
 #include "dut_wrapper.hpp"
+#include "testbench.hpp"
 
 uint32_t    TB_PASS_ADDRESS     = 0;
 uint32_t    TB_FAIL_ADDRESS     = -1;
@@ -150,7 +150,7 @@ void process_arguments(int argc, char ** argv) {
 
 
 void load_srec_file (
-    memory_device * mem
+    memory_bus * mem
 ) {
     std::cout <<">> Loading srec: " << srec_path << std::endl;
 
@@ -165,7 +165,7 @@ void load_srec_file (
 
 //! Write out the memory signature for verification
 void dump_signature_file (
-    memory_device *mem
+    memory_bus *mem
 ) {
 
     FILE * fh = fopen(sig_dump_path.c_str(),"w");
@@ -198,7 +198,7 @@ int a2h(char c)
 
 //! Verify the in-memory signature against the supplied file
 bool verif_signature_file (
-    memory_device *mem
+    memory_bus *mem
 ) {
     std::cout << ">> Checking signature..." << std::endl;
 
@@ -251,76 +251,43 @@ bool verif_signature_file (
 */
 int main(int argc, char** argv) {
 
+    printf("> ");
+    for(int i = 0; i < argc; i ++) {
+        printf("%s ",argv[i]);
+    }
+    printf("\n");
+
     process_arguments(argc, argv);
 
-    memory_device imem (0x80000000, 8192*2);
+    testbench tb (vcd_wavefile_path, dump_waves);
 
     if(load_srec) {
-        load_srec_file(&imem);
+        load_srec_file(tb.bus);
     }
 
-    dut_wrapper           dut (
-        &imem,
-        dump_waves,
-        vcd_wavefile_path
-    );
+    tb.pass_address = TB_PASS_ADDRESS;
+    tb.fail_address = TB_FAIL_ADDRESS;
+    tb.max_sim_time = max_sim_time;
 
-    // Start in reset
-    dut.dut_set_reset();
-    
-    // Run the DUT for a few cycles while held in reset.
-    for(int i = 0; i < 5; i ++) {
-        dut.dut_step_clk();
-    }
-    
-    // Start running the DUT proper.
-    dut.dut_clear_reset();
-
-    bool finish_sim = false;
-    bool test_passed= true;
-    dut_trace_pkt_t trs_item;
-
-    while(dut.get_sim_time() < max_sim_time && !finish_sim) {
-        
-        dut.dut_step_clk();
-
-        if(dut.dut_trace.empty() == false) {
-            trs_item = dut.dut_trace.front();
-            
-            if(trs_item.program_counter == TB_PASS_ADDRESS) {
-                test_passed = true;
-                finish_sim  = true;
-            } else if (trs_item.program_counter == TB_FAIL_ADDRESS) {
-                test_passed = false;
-                finish_sim  = true;
-            }
-
-            dut.dut_trace.pop();
-        }
-
-    }
-
-    if(dut.dump_waves) {
-        dut.trace_fh -> close();
-    }
+    tb.run_simulation();
 
     if(dump_signature) {
-        dump_signature_file(&imem);
+        dump_signature_file(tb.bus);
     }
 
     bool verif_result = true;
 
     if(verif_signature) {
-        verif_result = verif_signature_file(&imem);
-        test_passed &= verif_result;
+        verif_result = verif_signature_file(tb.bus);
+        tb.sim_passed &= verif_result;
     }
 
-    if(dut.get_sim_time() >= max_sim_time) {
+    if(tb.get_sim_time() >= max_sim_time) {
         
         std::cout << ">> TIMEOUT" << std::endl;
         return 1;
 
-    } else if(test_passed) {
+    } else if(tb.sim_passed) {
         
         std::cout << ">> SIM PASS" << std::endl;
         return 0;

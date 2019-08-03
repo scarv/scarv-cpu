@@ -11,11 +11,14 @@ VL_ARGS     = +IMEM=$(FRV_WORK)/riscv-compliance/rv32imc/C-ADD.elf.srec
 VL_CSRC_DIR=$(FRV_HOME)/flow/verilator
 VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
            $(VL_CSRC_DIR)/dut_wrapper.cpp \
+           $(VL_CSRC_DIR)/testbench.cpp \
            $(VL_CSRC_DIR)/sram_agent.cpp \
+           $(VL_CSRC_DIR)/memory_bus.cpp \
            $(VL_CSRC_DIR)/memory_device.cpp \
+           $(VL_CSRC_DIR)/memory_device_ram.cpp \
            $(VL_CSRC_DIR)/srec.cpp
 
-VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 \
+VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
             -I$(CPU_RTL_DIR) -DRVFI \
             --exe --trace \
             --top-module frv_core $(VL_BUILD_FLAGS)

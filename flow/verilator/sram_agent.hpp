@@ -1,37 +1,11 @@
 
-#include "memory_device.hpp"
 #include <queue>
+
+#include "memory_txns.hpp"
+#include "memory_bus.hpp"
 
 #ifndef SRAM_AGENT_HPP
 #define SRAM_AGENT_HPP
-
-/*!
-@brief Contains all required information on a single SRAM interface request.
-*/
-class sram_agent_req {
-
-public:
-
-    //! Create a new request object.
-    sram_agent_req (
-        uint32_t addr   , //!< Address of the request.
-        bool     write  , //!< Is this a write request?
-        uint8_t  wstrb  , //!< Write strobe enable.
-        uint32_t data     //!< Read/Write data
-    ) {
-        this -> addr  = addr ;
-        this -> write = write;
-        this -> wstrb = wstrb;
-        this -> data  = data ;
-    }
-
-    uint32_t addr   ; //!< Address of the request.
-    bool     write  ; //!< Is this a write request?
-    uint8_t  wstrb  ; //!< Write strobe enable.
-    uint32_t  data  ; //!< Read/Write data
-    bool     success; //!< Did the access succeed?
-
-};
 
 /*!
 @brief Acts as an SRAM slave agent.
@@ -41,7 +15,7 @@ class sram_agent {
 public:
 
     sram_agent (
-        memory_device * mem
+        memory_bus * mem
     );
 
 
@@ -73,11 +47,11 @@ public:
 
 protected:
     
-    //! memory device this agent can access.
-    memory_device* mem;
+    //! memory bus this agent can access.
+    memory_bus * mem;
     
     //! Queue of requests to handle.
-    std::queue<sram_agent_req*> req_q;
+    std::queue<memory_req_txn *> req_q;
     
     uint8_t  n_mem_error;  // Next Error
     uint8_t  n_mem_recv ;  // Next Memory stall
@@ -90,11 +64,6 @@ protected:
     
     //! Drives the response channel.
     void drive_response();
-
-    //! handles populating of read data or writing of write data.
-    void handle_read_write(
-        sram_agent_req * req    //!< The request to handle.
-    );
 };
 
 #endif

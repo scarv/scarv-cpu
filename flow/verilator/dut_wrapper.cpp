@@ -6,7 +6,7 @@
 /*!
 */
 dut_wrapper::dut_wrapper (
-    memory_device * mem         ,
+    memory_bus    * mem         ,
     bool            dump_waves  ,
     std::string     wavefile
 ){
