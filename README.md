@@ -1,8 +1,8 @@
 
-# Fast RISC-V
+# Vanilla RISC-V
 
-*A toy 5 stage RISC-V CPU, implementing the `rv32imc` ISA. It is optimised
-to run at a high frequency and instruction throughput.*
+*A toy 5 stage RISC-V CPU, implementing the `rv32imc` ISA.
+It's not clever or special, it just does the job.*
 
 ---
 
