@@ -1,12 +1,15 @@
+ENTRY(_start);
 
 SECTIONS {
 
     . = 0x80000000;
 
-    .text : { *(.text.*) }
-    .data : { *(.data.*) }
+    .text : {
+        *(.text._start);
+        *(.text._passfail);
+        *(.text*);
+    }
+    .data : { *(.data) }
     .bss  : { *(.bss) }
-
-    /DISCARD/ : { *(.comment) }
 
 }

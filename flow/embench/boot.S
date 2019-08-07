@@ -1,10 +1,36 @@
 
 
-.section .text
+.extern main
 
+.section .text._start
 .global _start
 _start:                         // Entry point for the basic bootloader.
     j _boot
+
+
+.section .text._passfail
+
+.global test_fail
+.func
+test_fail:                      // Test ends here if it fails
+    nop
+    nop
+    nop
+    nop
+    j test_fail
+.endfunc
+
+.global test_pass
+.func
+test_pass:                      // Test ends here if it passes
+    nop
+    nop
+    nop
+    nop
+    j test_pass
+.endfunc
+
+.section .text 
 
 .align 4
 _boot:
@@ -64,23 +90,3 @@ _trap_handler:                  // Main trap handler function.
     nop
     nop
 
-
-.global test_fail
-.func
-test_fail:                      // Test ends here if it fails
-    nop
-    nop
-    nop
-    nop
-    j test_fail
-.endfunc
-
-.global test_pass
-.func
-test_pass:                      // Test ends here if it passes
-    nop
-    nop
-    nop
-    nop
-    j test_pass
-.endfunc

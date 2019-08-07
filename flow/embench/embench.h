@@ -1,6 +1,9 @@
 
 #include <stdint.h>
 
+// In embench-iot/support
+#include "support.h"
+
 #ifndef UNIT_TEST_H
 #define UNIT_TEST_H
 

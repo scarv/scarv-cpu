@@ -1,62 +1,63 @@
 
-EMBENCH_ROOT=$(FRV_HOME)/external/embench-iot
-EMBENCH_BUILD=$(FRV_WORK)/embench-iot
-EMBENCH_OUT=$(EMBENCH_BUILD)/build
-EMBENCH_EXES_OLD=$(EMBENCH_BUILD)/src/aha-mont64/aha-mont64 \
-                 $(EMBENCH_BUILD)/src/crc32/crc32 \
-                 $(EMBENCH_BUILD)/src/cubic/cubic \
-                 $(EMBENCH_BUILD)/src/edn/edn \
-                 $(EMBENCH_BUILD)/src/huffbench/huffbench \
-                 $(EMBENCH_BUILD)/src/matmult-int/matmult-int \
-                 $(EMBENCH_BUILD)/src/minver/minver \
-                 $(EMBENCH_BUILD)/src/nbody/nbody \
-                 $(EMBENCH_BUILD)/src/nettle-aes/nettle-aes \
-                 $(EMBENCH_BUILD)/src/nettle-sha256/nettle-sha256 \
-                 $(EMBENCH_BUILD)/src/nsichneu/nsichneu \
-                 $(EMBENCH_BUILD)/src/picojpeg/picojpeg \
-                 $(EMBENCH_BUILD)/src/qrduino/qrduino \
-                 $(EMBENCH_BUILD)/src/sglib-combined/sglib-combined \
-                 $(EMBENCH_BUILD)/src/slre/slre \
-                 $(EMBENCH_BUILD)/src/st/st \
-                 $(EMBENCH_BUILD)/src/statemate/statemate \
-                 $(EMBENCH_BUILD)/src/ud/ud \
-                 $(EMBENCH_BUILD)/src/wikisort/wikisort
+EMBENCH_REPO        = $(FRV_HOME)/external/embench-iot
+EMBENCH_BUILD       = $(FRV_WORK)/embench-iot
+EMBENCH_MAKEFILE    = $(EMBENCH_BUILD)/Makefile
 
-EMBENCH_EXES=$(shell find -P $(EMBENCH_OUT) -executable -type f)
-EMBENCH_DIS=$(addsuffix .dis,$(EMBENCH_EXES))
-EMBENCH_SREC=$(addsuffix .srec,$(EMBENCH_EXES))
+EMBENCH_TIMEOUT     = 100000000
+EMBENCH_PASS        = 0x80000016
+EMBENCH_FAIL        = 0x8000000c
 
-embench-configure:
+EMBENCH_SRCS        = $(FRV_HOME)/flow/embench/boot.S \
+                      $(FRV_HOME)/flow/embench/main.c \
+                      $(FRV_HOME)/flow/embench/util.S \
+                      $(EMBENCH_BUILD)/support/beebsc.o \
+                      $(EMBENCH_BUILD)/support/libdummym_la-dummy-libm.o \
+                      $(EMBENCH_BUILD)/support/libdummyc_la-dummy-libc.o
+
+EMBENCH_CFLAGS      = -O2 -mabi=ilp32 -march=rv32imc -nostartfiles \
+                      -I$(EMBENCH_REPO)/support \
+                      -T$(FRV_HOME)/flow/embench/link.ld
+
+EMBENCH_BENCHMARKS  = aha-mont64 crc32          cubic    edn      \
+                      huffbench  matmult-int    minver   nbody    \
+                      nettle-aes nettle-sha256  nsichneu picojpeg \
+                      qrduino    sglib-combined slre     st       \
+                      statemate  ud             wikisort
+
+EMBENCH_ELFS        = $(addsuffix /benchmark.elf,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
+EMBENCH_DISASM      = $(addsuffix /benchmark.dis,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
+EMBENCH_SREC        = $(addsuffix /benchmark.srec,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
+EMBENCH_SIM_LOGS    = $(addsuffix /benchmark.log,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
+EMBENCH_SIM_VCD     = $(addsuffix /benchmark.vcd,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
+
+$(EMBENCH_BUILD)/src/%/benchmark.elf : $(EMBENCH_SRCS) $(EMBENCH_BUILD)/src/%/*.o
+	$(CC) $(EMBENCH_CFLAGS) -o $@ $^
+
+$(EMBENCH_BUILD)/src/%/benchmark.dis : $(EMBENCH_BUILD)/src/%/benchmark.elf
+	$(OBJDUMP) -D $^ > $@
+
+$(EMBENCH_BUILD)/src/%/benchmark.srec: $(EMBENCH_BUILD)/src/%/benchmark.elf
+	$(OBJCOPY) -O srec --srec-forceS3 --srec-len=4 $< $@
+
+embench-benchmarks: $(EMBENCH_ELFS) $(EMBENCH_DISASM) $(EMBENCH_SREC)
+	
+embench-run-%: $(EMBENCH_BUILD)/src/%/benchmark.srec $(VL_OUT)
+	$(VL_OUT) +IMEM=$< \
+              +IMEM_MAX_STALL=0 +DMEM_MAX_STALL=0 \
+	          +TIMEOUT=$(EMBENCH_TIMEOUT) \
+	          +PASS_ADDR=$(EMBENCH_PASS) +FAIL_ADDR=$(EMBENCH_FAIL)
+
+embench-configure: $(EMBENCH_MAKEFILE)
+$(EMBENCH_MAKEFILE) :
 	mkdir -p $(EMBENCH_BUILD)
-	$(EMBENCH_ENV) cd $(EMBENCH_BUILD) && ../../external/embench-iot/configure \
+	cd $(EMBENCH_BUILD) && $(EMBENCH_REPO)/configure \
         --host=riscv32-unknown-elf \
         --with-chip=speed-test \
         --with-board=ri5cyverilator
 
-$(EMBENCH_BUILD)/%.dis : $(EMBENCH_BUILD)/%
-	riscv32-unknown-elf-objdump -D $< > $@
-
-embench-build:
-	cd $(EMBENCH_BUILD) && make
-	rm -rf $(EMBENCH_OUT)/*
-	mkdir -p $(EMBENCH_OUT)
-	cp $(EMBENCH_EXES_OLD) $(EMBENCH_OUT)/.
-
-$(EMBENCH_OUT)/%.dis : $(EMBENCH_OUT)/%
-	riscv32-unknown-elf-objdump -D $< > $@
-
-$(EMBENCH_OUT)/%.srec: $(EMBENCH_OUT)/%
-	riscv32-unknown-elf-objcopy -O srec --srec-forceS3  $< $@
-	@chmod -x $@
+embench-build: $(EMBENCH_MAKEFILE)
+	$(MAKE) -C $(EMBENCH_BUILD)
 
 embench-clean:
 	rm -rf $(EMBENCH_BUILD)
 
-$(EMBENCH_DIS)  : embench-build
-$(EMBENCH_SREC) : embench-build
-
-embench-disasm: $(EMBENCH_DIS)
-
-embench-srec: $(EMBENCH_SREC)
-
-embench: embench-disasm embench-srec
