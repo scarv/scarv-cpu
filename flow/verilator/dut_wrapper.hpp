@@ -62,6 +62,15 @@ public:
     //! Trace of post-writeback PC and instructions.
     std::queue<dut_trace_pkt_t> dut_trace;
 
+    void set_imem_max_stall (uint32_t stall) {
+        imem_agent -> max_req_stall = stall;
+        imem_agent -> max_rsp_stall = stall;
+    }
+    void set_dmem_max_stall (uint32_t stall) {
+        dmem_agent -> max_req_stall = stall;
+        dmem_agent -> max_rsp_stall = stall;
+    }
+
 protected:
     
     //! Set of available memories. Fed to memory agents.

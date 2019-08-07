@@ -45,7 +45,19 @@ public:
     uint8_t  * mem_error; // Error
     uint32_t * mem_rdata; // Read data
 
+    //! Maximum length of a stalled request.
+    uint32_t   max_req_stall = 5;
+
+    //! Maximum length of a stalled response.
+    uint32_t   max_rsp_stall = 5;
+
 protected:
+
+    //! Current request stall length.
+    uint32_t   req_stall_len = 0;
+
+    //! Current response stall length.
+    uint32_t   rsp_stall_len = 0;
     
     //! memory bus this agent can access.
     memory_bus * mem;

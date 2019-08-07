@@ -46,7 +46,8 @@ void sram_agent::drive_response(){
 
     //
     // Respond to any outstanding transactions.
-    if(req_q.empty() == false && this -> rand_chance(9,10)) {
+    if(req_q.empty() == false && 
+       (this -> rand_chance(7,10) || (rsp_stall_len >= max_rsp_stall))) {
 
         memory_req_txn * req = req_q.front();
 
@@ -54,6 +55,8 @@ void sram_agent::drive_response(){
         
         n_mem_error = rsp -> error();
         n_mem_recv  = 1;
+
+        rsp_stall_len = 0;
 
         if(req -> is_read()) {
             n_mem_rdata = rsp -> data_word();
@@ -64,6 +67,8 @@ void sram_agent::drive_response(){
         delete req;
 
     } else {
+
+        rsp_stall_len += req_q.size() > 0 ? 1 : 0;
         
         n_mem_error = 0;
         n_mem_recv  = 0;
@@ -95,8 +100,14 @@ void sram_agent::posedge_clk(){
     
     bool new_txn = *mem_req && *mem_gnt;
 
+    if(*mem_req && !*mem_gnt) {
+        req_stall_len += 1;
+    }
+
     if(new_txn) {
         // There is an active request.
+
+        req_stall_len      = 0;
 
         size_t txn_length  = 4;
 
@@ -119,6 +130,7 @@ void sram_agent::posedge_clk(){
     }
     
     // Randomise the stall signal value.
-    n_mem_gnt = this -> rand_chance(6,10);
+    n_mem_gnt = this -> rand_chance(7,10) ||
+                (req_stall_len >= max_req_stall);
 
 }

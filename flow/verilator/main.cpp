@@ -34,6 +34,11 @@ uint64_t    max_sim_time        = 10000;
 bool        load_srec           = false;
 std::string srec_path           = "";
 
+// Maximum amounts of time for which memory reqests/responses
+// will be stalled for.
+uint32_t    max_stall_imem      = 5;
+uint32_t    max_stall_dmem      = 5;
+
 /*
 @brief Responsible for parsing all of the command line arguments.
 */
@@ -64,6 +69,14 @@ void process_arguments(int argc, char ** argv) {
             if(!quiet) {
             std::cout << ">> Timeout after " << time <<" cycles."<<std::endl;
             }
+        }
+        else if(s.find("+IMEM_MAX_STALL=") != std::string::npos) {
+            std::string str = s.substr(16);
+            max_stall_imem = std::stoul(str);
+        }
+        else if(s.find("+DMEM_MAX_STALL=") != std::string::npos) {
+            std::string str = s.substr(16);
+            max_stall_dmem = std::stoul(str);
         }
         else if(s.find("+PASS_ADDR=") != std::string::npos) {
             std::string addr = s.substr(11);
@@ -268,6 +281,9 @@ int main(int argc, char** argv) {
     tb.pass_address = TB_PASS_ADDRESS;
     tb.fail_address = TB_FAIL_ADDRESS;
     tb.max_sim_time = max_sim_time;
+
+    tb.dut -> set_imem_max_stall(max_stall_imem);
+    tb.dut -> set_dmem_max_stall(max_stall_dmem);
 
     tb.run_simulation();
 
