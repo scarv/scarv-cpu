@@ -66,7 +66,7 @@ _boot:
     li x30, 0
     li x31, 0
 
-    la sp , _start + 0x3FFC
+    la sp , _start + 0x7FFC
 
     la   t0 , _trap_handler     // Setup the trap handler.
     csrw mtvec, t0

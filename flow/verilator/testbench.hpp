@@ -82,7 +82,7 @@ protected:
     size_t      default_ram_base_addr = 0x80000000;
 
     //! Default size of the default memory.
-    size_t      default_ram_size = 1<<16;
+    size_t      default_ram_size = 0x8000;
 
 };
 

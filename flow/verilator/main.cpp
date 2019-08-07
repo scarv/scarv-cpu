@@ -288,7 +288,7 @@ int main(int argc, char** argv) {
     tb.run_simulation();
 
     std::cout << ">> Finished after " 
-              << std::dec<<tb.dut -> get_sim_time()
+              << std::dec<<tb.get_sim_time()/10
               << " simulated clock cycles" << std::endl;
 
     if(dump_signature) {
