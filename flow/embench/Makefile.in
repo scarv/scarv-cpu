@@ -11,8 +11,6 @@ EMBENCH_SRCS        = $(FRV_HOME)/flow/embench/boot.S \
                       $(FRV_HOME)/flow/embench/main.c \
                       $(FRV_HOME)/flow/embench/util.S \
                       $(EMBENCH_BUILD)/support/beebsc.o \
-                      $(EMBENCH_BUILD)/support/libdummym_la-dummy-libm.o \
-                      $(EMBENCH_BUILD)/support/libdummyc_la-dummy-libc.o
 
 EMBENCH_CFLAGS      = -O2 -mabi=ilp32 -march=rv32imc -nostartfiles \
                       -I$(EMBENCH_REPO)/support \
@@ -31,7 +29,7 @@ EMBENCH_SIM_LOGS    = $(addsuffix /benchmark.log,$(addprefix $(EMBENCH_BUILD)/sr
 EMBENCH_SIM_VCD     = $(addsuffix /benchmark.vcd,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
 
 $(EMBENCH_BUILD)/src/%/benchmark.elf : $(EMBENCH_SRCS) $(EMBENCH_BUILD)/src/%/*.o
-	$(CC) $(EMBENCH_CFLAGS) -o $@ $^
+	$(CC) $(EMBENCH_CFLAGS) -o $@ $^ -lm
 
 $(EMBENCH_BUILD)/src/%/benchmark.dis : $(EMBENCH_BUILD)/src/%/benchmark.elf
 	$(OBJDUMP) -D $^ > $@
@@ -46,6 +44,8 @@ embench-run-%: $(EMBENCH_BUILD)/src/%/benchmark.srec $(VL_OUT)
               +IMEM_MAX_STALL=0 +DMEM_MAX_STALL=0 \
 	          +TIMEOUT=$(EMBENCH_TIMEOUT) \
 	          +PASS_ADDR=$(EMBENCH_PASS) +FAIL_ADDR=$(EMBENCH_FAIL)
+
+embench-run-all: $(addprefix embench-run-,$(EMBENCH_BENCHMARKS))
 
 embench-configure: $(EMBENCH_MAKEFILE)
 $(EMBENCH_MAKEFILE) :

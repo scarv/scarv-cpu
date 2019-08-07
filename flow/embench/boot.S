@@ -66,7 +66,7 @@ _boot:
     li x30, 0
     li x31, 0
 
-    la sp , _start + 0x7FFC
+    la sp , 0x8001FFF0
 
     la   t0 , _trap_handler     // Setup the trap handler.
     csrw mtvec, t0
@@ -83,6 +83,7 @@ _boot:
     j       test_fail           // Nonzero -> fail.
 
 
+.align 2
 _trap_handler:                  // Main trap handler function.
     j test_fail
     nop
