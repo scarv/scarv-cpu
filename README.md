@@ -1,8 +1,13 @@
 
-# Vanilla RISC-V
+# [SCARV](https://github.com/scarv): SoC
 
-*A toy 5 stage RISC-V CPU, implementing the `rv32imc` ISA.
-It's not clever or special, it just does the job.*
+*Acting as a component part of the
+[SCARV](https://www.scarv.org)
+project,
+SCARV-CPU is 5-stage micro-controller CPU core,
+augmented with the
+[XCrypto](https://github.com/scarv/xcrypto)
+instruction set extensions.*
 
 ---
 
@@ -13,25 +18,20 @@ It's not clever or special, it just does the job.*
   - [RISC-V Compliance](#RISC-V-Compliance-Flow)
   - [Unit Tests](#Unit-Tests-Flow)
   - [RISC-V Formal](#RISC-V-Formal-Verfication-Flow)
-  - [General Formal](#General-Formal-Verification-Flow)
 - [Notes & Queries](#Notes-and-Queries)
 
 ## Overview
 
-This is a toy 5-stage single issue in order CPU core, implementing the
+This is a 5-stage single issue in order CPU core, implementing the
 RISC-V 32-bit integer base architecture, along with the **C**ompressed
 and **M**ultiply extensions.
 It's a micro-controller, with no cache, branch prediction or
 virtual memory.
 
-A list of the design requirements for the core can be found in
-[docs/requirements.md](docs/requirements.md). These are what I set out
-to meet when first building the core. They have changed a bit over time,
-but are all now met.
-
 ## Documentation
 
-- TBD
+See the `docs/` folder for information on the design requirements and
+the pipeline structure.
 
 ## Getting Started
 
@@ -46,12 +46,11 @@ These commands will checkout the repository and it's submodules, and
 setup the project environment:
 
 ```sh
-git clone git@github.com:ben-marshall/mediocre-riscv.git
+git clone git@github.com:scarv-cpu/scarv-cpu.git
 cd mediocre-riscv/
 git submodule update --init --remote
-source bin/source.me.sh
+source bin/conf.sh
 ```
-
 
 ## Flows
 
@@ -135,75 +134,10 @@ make riscv-formal-run NJOBS=2 CHECKS=insn_add_ch0\ insn_sw_ch0
 
 Results are put in `work/riscv-formal/<check name>`
 
-### General Formal Verification Flow
+---
 
-There is a general formal flow (also using yosys) which checks things
-like interface protocols.
+## Acknowledgements
 
-#### SRAM Interface Checker
-
-Used to check signal stability and sensical behaviour of the `mrv_cpu`
-top level module.
-The checkers are found in `verif/formal/`.
-
-**Building:**
-```sh
-make formal-sram-build
-```
-
-**Running:**
-```sh
-make formal-sram-trace  # Create a VCD trace which adheres to all assertions
-make formal-sram-cover  # Check all assertions are reachable.
-make formal-sram-bmc    # Run the BMC checker.
-```
-
-In the case of a failure, the failing trace is written too
-`work/formal/sram_check/`.
-
-## Notes and Queries
-
-Why did you make this?
-- I wanted some experience with RISC-V and longer pipelines than what I'd
-  worked with before.  Also, I like making CPUs. I wanted to build a RISC-V
-  core I could use as the basis of future projects. 
-- I don't usually publish what I build either, but figured there are
-  enough hobby RISC-V cores out there already such that one more wouldn't
-  hurt.
-
-Why 5 pipeline stages?
-- No special reason. It could be 6 stages if you split the decode and
-  operand gather stages, or 4 stages if you merged mem and exeute.
-
-How confident are you that this implementation is correct?
-- That depends on which aspect of the core you talk about.
-- I'm very confident that each instruction is implemented correctly,
-  thanks to the `riscv-formal` integration. I'm also happy that the
-  trace interface I built to service `riscv-formal` is also simple
-  enough to be correct.
-- I'm very confident that the `mrv_cpu` module SRAM interfaces are
-  correct thanks to the formal checking flow I built for them.
-- I am less confident about interrupts, CSRs and the AXI bus interface
-  wrapper. The CSR interface for `riscv-formal` is not implemented,
-  and it doesn't check everything about interrupts either.
-- There is no coverage model for the core! That means that although I
-  have tried to write some tests, I have no idea how much of the feature
-  space they actually cover.
-
-Why didn't you do the additional verification work on the bits you mention?
-- Verification is *alot* of work. I love the challenge of verification, but
-  the aim of this project was to learn about *building* a RISC-V CPU. Not to
-  verify one. Hardware verification is a sysiphean task, and eventually
-  pushes back *hard* against attempts to make a project fun.
-- That said, I have learned a lot about how I *would* go about verifying
-  a RISC-V core in the future. Spoiler: there are *alot* of cross cutting
-  concerns thanks to the PRA and the modularity of RISC-V itself.
-
-Can I use this in my project?
-- Feel free. It's all MIT licensed.
-
-Should I use this in my project?
-- I'd be very happy if you did! Just remember, this is a *toy* project. It is
-  *not* a properly verified core, and no doubt has bugs in it. You have been
-  warned.
-
+This work has been supported in part by EPSRC via grant 
+[EP/R012288/1](https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/R012288/1),
+under the [RISE](http://www.ukrise.org) programme.
