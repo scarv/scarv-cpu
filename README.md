@@ -1,5 +1,5 @@
 
-# [SCARV](https://github.com/scarv): SoC
+# [SCARV](https://github.com/scarv): CPU
 
 *Acting as a component part of the
 [SCARV](https://www.scarv.org)
