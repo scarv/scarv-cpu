@@ -20,8 +20,10 @@ output [NRET * 2    - 1 : 0] rvfi_mode      ,
 
 output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
+output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
+output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
 
@@ -161,8 +163,10 @@ wire        s1_error      ;
 
 wire [ 4:0] s1_rs1_addr   ;
 wire [ 4:0] s1_rs2_addr   ;
+wire [ 4:0] s1_rs3_addr   ;
 wire [XL:0] s1_rs1_rdata  ;
 wire [XL:0] s1_rs2_rdata  ;
+wire [XL:0] s1_rs3_rdata  ;
 
 wire        s2_valid      ; // Is the output data valid?
 wire        s2_busy       ; // Is the next stage ready for new inputs?
@@ -222,16 +226,22 @@ wire        hold_lsu_req  ; // Don't make LSU requests yet.
 `ifdef RVFI
 wire [XL:0] rvfi_s2_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s2_rs2_rdata; // Source register data 2
+wire [XL:0] rvfi_s2_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s2_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s2_rs2_addr ; // Source register address 2
+wire [ 4:0] rvfi_s2_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s3_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s3_rs2_rdata; // Source register data 2
+wire [XL:0] rvfi_s3_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s3_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s3_rs2_addr ; // Source register address 2
+wire [ 4:0] rvfi_s3_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s4_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s4_rs2_rdata; // Source register data 2
+wire [XL:0] rvfi_s4_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s4_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s4_rs2_addr ; // Source register address 2
+wire [ 4:0] rvfi_s4_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s4_mem_wdata; // Memory write data.
 `endif
 
@@ -242,6 +252,7 @@ wire [XL:0] rvfi_s4_mem_wdata; // Memory write data.
 
 wire nz_s1_rs1     = |s1_rs1_addr;
 wire nz_s1_rs2     = |s1_rs2_addr;
+wire nz_s1_rs3     = |s1_rs3_addr;
 
 wire hzd_rs1_s4 = s1_rs1_addr == fwd_s4_rd && nz_s1_rs1;
 wire hzd_rs1_s3 = s1_rs1_addr == fwd_s3_rd && nz_s1_rs1;
@@ -251,14 +262,18 @@ wire hzd_rs2_s4 = s1_rs2_addr == fwd_s4_rd && nz_s1_rs2;
 wire hzd_rs2_s3 = s1_rs2_addr == fwd_s3_rd && nz_s1_rs2;
 wire hzd_rs2_s2 = s1_rs2_addr == fwd_s2_rd && nz_s1_rs2;
 
+wire hzd_rs3_s4 = s1_rs3_addr == fwd_s4_rd && nz_s1_rs3;
+wire hzd_rs3_s3 = s1_rs3_addr == fwd_s3_rd && nz_s1_rs3;
+wire hzd_rs3_s2 = s1_rs3_addr == fwd_s2_rd && nz_s1_rs3;
+
 //
 // Bubbling occurs when:
 // - There is a data hazard due to a CSR read or a data load.
 wire   s1_bubble   =
-    !s1_valid && !s2_busy                                        ||
-    ((fwd_s4_load || fwd_s4_csr) && (hzd_rs1_s4 || hzd_rs2_s4))  ||
-    ((fwd_s3_load || fwd_s3_csr) && (hzd_rs1_s3 || hzd_rs2_s3))  ||
-    ((fwd_s2_load || fwd_s2_csr) && (hzd_rs1_s2 || hzd_rs2_s2))   ;
+    !s1_valid && !s2_busy                                                   ||
+    ((fwd_s4_load||fwd_s4_csr) && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4)) ||
+    ((fwd_s3_load||fwd_s3_csr) && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3)) ||
+    ((fwd_s2_load||fwd_s2_csr) && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2))  ;
 
 
 wire [XL:0] fwd_rs1_rdata =
@@ -272,6 +287,12 @@ wire [XL:0] fwd_rs2_rdata =
      hzd_rs2_s3 ? fwd_s3_wdata   :
      hzd_rs2_s4 ? fwd_s4_wdata   :
                   s1_rs2_rdata   ;
+
+wire [XL:0] fwd_rs3_rdata =
+     hzd_rs3_s2 ? fwd_s2_wdata   :
+     hzd_rs3_s3 ? fwd_s3_wdata   :
+     hzd_rs3_s4 ? fwd_s4_wdata   :
+                  s1_rs3_rdata   ;
 
 //
 // Submodule Instances.
@@ -328,16 +349,20 @@ frv_pipeline_decode #(
 .s1_bubble          (s1_bubble          ), // Insert a pipeline bubble.
 .s1_rs1_addr        (s1_rs1_addr        ),
 .s1_rs2_addr        (s1_rs2_addr        ),
+.s1_rs3_addr        (s1_rs3_addr        ),
 .s1_rs1_rdata       (fwd_rs1_rdata      ),
 .s1_rs2_rdata       (fwd_rs2_rdata      ),
+.s1_rs3_rdata       (fwd_rs3_rdata      ),
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change
 `ifdef RVFI
 .rvfi_s2_rs1_addr   (rvfi_s2_rs1_addr   ),
 .rvfi_s2_rs2_addr   (rvfi_s2_rs2_addr   ),
+.rvfi_s2_rs3_addr   (rvfi_s2_rs3_addr   ),
 .rvfi_s2_rs1_data   (rvfi_s2_rs1_rdata  ),
 .rvfi_s2_rs2_data   (rvfi_s2_rs2_rdata  ),
+.rvfi_s2_rs3_data   (rvfi_s2_rs3_rdata  ),
 `endif
 .s2_valid           (s2_valid           ), // Is the output data valid?
 .s2_busy            (s2_busy            ), // Is next stage ready?
@@ -379,12 +404,16 @@ frv_pipeline_execute i_pipeline_s2_execute (
 `ifdef RVFI
 .rvfi_s2_rs1_rdata(rvfi_s2_rs1_rdata), // Source register data 1
 .rvfi_s2_rs2_rdata(rvfi_s2_rs2_rdata), // Source register data 2
+.rvfi_s2_rs3_rdata(rvfi_s2_rs3_rdata), // Source register data 2
 .rvfi_s2_rs1_addr (rvfi_s2_rs1_addr ), // Source register address 1
 .rvfi_s2_rs2_addr (rvfi_s2_rs2_addr ), // Source register address 2
+.rvfi_s2_rs3_addr (rvfi_s2_rs3_addr ), // Source register address 2
 .rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
 .rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs3_rdata(rvfi_s3_rs3_rdata), // Source register data 2
 .rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
+.rvfi_s3_rs3_addr (rvfi_s3_rs3_addr ), // Source register address 2
 `endif // RVFI
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
@@ -428,12 +457,16 @@ frv_pipeline_memory #(
 `ifdef RVFI
 .rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
 .rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs3_rdata(rvfi_s3_rs3_rdata), // Source register data 3
 .rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
+.rvfi_s3_rs3_addr (rvfi_s3_rs3_addr ), // Source register address 3
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs3_rdata(rvfi_s4_rs3_rdata), // Source register data 3
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+.rvfi_s4_rs3_addr (rvfi_s4_rs3_addr ), // Source register address 3
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
@@ -483,8 +516,10 @@ frv_pipeline_writeback #(
 .rvfi_mode        (rvfi_mode        ),
 .rvfi_rs1_addr    (rvfi_rs1_addr    ),
 .rvfi_rs2_addr    (rvfi_rs2_addr    ),
+.rvfi_rs3_addr    (rvfi_rs3_addr    ),
 .rvfi_rs1_rdata   (rvfi_rs1_rdata   ),
 .rvfi_rs2_rdata   (rvfi_rs2_rdata   ),
+.rvfi_rs3_rdata   (rvfi_rs3_rdata   ),
 .rvfi_rd_addr     (rvfi_rd_addr     ),
 .rvfi_rd_wdata    (rvfi_rd_wdata    ),
 .rvfi_pc_rdata    (rvfi_pc_rdata    ),
@@ -496,8 +531,10 @@ frv_pipeline_writeback #(
 .rvfi_mem_wdata   (rvfi_mem_wdata   ),
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs3_rdata(rvfi_s4_rs3_rdata), // Source register data 3
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
+.rvfi_s4_rs3_addr (rvfi_s4_rs3_addr ), // Source register address 2
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .s4_rd            (s4_rd            ), // Destination register address
@@ -603,6 +640,8 @@ frv_gprs #(
 .rs1_data   (s1_rs1_rdata   ), // Source register 1 read data
 .rs2_addr   (s1_rs2_addr    ), // Source register 2 address
 .rs2_data   (s1_rs2_rdata   ), // Source register 2 read data
+.rs3_addr   (s1_rs3_addr    ), // Source register 3 address
+.rs3_data   (s1_rs3_rdata   ), // Source register 3 read data
 .rd_wen     (gpr_wen        ), // Destination register write enable
 .rd_addr    (gpr_rd         ), // Destination register address
 .rd_data    (gpr_wdata      )  // Destination register write data

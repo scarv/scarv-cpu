@@ -31,12 +31,16 @@ output wire        fwd_s2_csr      , // Writeback stage has CSR op in it.
 `ifdef RVFI
 input  wire [XL:0] rvfi_s2_rs1_rdata, // Source register data 1
 input  wire [XL:0] rvfi_s2_rs2_rdata, // Source register data 2
+input  wire [XL:0] rvfi_s2_rs3_rdata, // Source register data 3
 input  wire [ 4:0] rvfi_s2_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s2_rs2_addr , // Source register address 2
+input  wire [ 4:0] rvfi_s2_rs3_addr , // Source register address 3
 output reg  [XL:0] rvfi_s3_rs1_rdata, // Source register data 1
 output reg  [XL:0] rvfi_s3_rs2_rdata, // Source register data 2
+output reg  [XL:0] rvfi_s3_rs3_rdata, // Source register data 3
 output reg  [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
+output reg  [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
 `endif
 
 output wire [ 4:0] s3_rd           , // Destination register address
@@ -359,13 +363,17 @@ always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         rvfi_s3_rs1_rdata <= 0; // Source register data 1
         rvfi_s3_rs2_rdata <= 0; // Source register data 2
+        rvfi_s3_rs3_rdata <= 0; // Source register data 3
         rvfi_s3_rs1_addr  <= 0; // Source register address 1
         rvfi_s3_rs2_addr  <= 0; // Source register address 2
+        rvfi_s3_rs3_addr  <= 0; // Source register address 3
     end else if(pipe_progress) begin
         rvfi_s3_rs1_rdata <= rvfi_s2_rs1_rdata;
         rvfi_s3_rs2_rdata <= rvfi_s2_rs2_rdata;
+        rvfi_s3_rs3_rdata <= rvfi_s2_rs3_rdata;
         rvfi_s3_rs1_addr  <= rvfi_s2_rs1_addr ;
         rvfi_s3_rs2_addr  <= rvfi_s2_rs2_addr ;
+        rvfi_s3_rs3_addr  <= rvfi_s2_rs3_addr ;
     end
 end
 

@@ -15,6 +15,9 @@ output wire [31:0]  rs1_data, // Source register 1 read data
 input  wire [ 4:0]  rs2_addr, // Source register 2 address
 output wire [31:0]  rs2_data, // Source register 2 read data
 
+input  wire [ 4:0]  rs3_addr, // Source register 3 address
+output wire [31:0]  rs3_data, // Source register 3 read data
+
 input  wire         rd_wen  , // Destination register write enable
 input  wire [ 4:0]  rd_addr , // Destination register address
 input  wire [31:0]  rd_data   // Destination register write data
@@ -31,12 +34,15 @@ generate begin if(BRAM_REGFILE) begin
 
     reg [31:0] gpr1 [31:0];
     reg [31:0] gpr2 [31:0];
+    reg [31:0] gpr3 [31:0];
 
     wire [31:0] z_rs1 = {32{rs1_addr != 0}};
     wire [31:0] z_rs2 = {32{rs2_addr != 0}};
+    wire [31:0] z_rs3 = {32{rs2_addr != 0}};
 
     assign rs1_data = z_rs1 & gpr1[rs1_addr];
     assign rs2_data = z_rs2 & gpr2[rs2_addr];
+    assign rs3_data = z_rs3 & gpr3[rs3_addr];
 
     always @(posedge g_clk) begin
         if(rd_wen) begin
@@ -50,6 +56,12 @@ generate begin if(BRAM_REGFILE) begin
         end
     end
 
+    always @(posedge g_clk) begin
+        if(rd_wen) begin
+            gpr3[rd_addr] <= rd_data;
+        end
+    end
+
 end else begin // BRAM_REGFILE = 0
 
     //
@@ -59,6 +71,7 @@ end else begin // BRAM_REGFILE = 0
 
     assign rs1_data = gprs[rs1_addr];
     assign rs2_data = gprs[rs2_addr];
+    assign rs3_data = gprs[rs3_addr];
 
     genvar i;
 

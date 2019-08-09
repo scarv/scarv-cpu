@@ -20,8 +20,10 @@ input  wire        s1_flush      , // Flush pipe stage register.
 input  wire        s1_bubble     , // Insert a bubble into the pipeline.
 output wire [ 4:0] s1_rs1_addr   ,
 output wire [ 4:0] s1_rs2_addr   ,
+output wire [ 4:0] s1_rs3_addr   ,
 input  wire [XL:0] s1_rs1_rdata  ,
 input  wire [XL:0] s1_rs2_rdata  ,
+input  wire [XL:0] s1_rs3_rdata  ,
 
 input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
@@ -30,8 +32,10 @@ input  wire        cf_ack        , // Control flow change acknowledge.
 `ifdef RVFI
 output reg  [ 4:0] rvfi_s2_rs1_addr,
 output reg  [ 4:0] rvfi_s2_rs2_addr,
+output reg  [ 4:0] rvfi_s2_rs3_addr,
 output reg  [XL:0] rvfi_s2_rs1_data,
 output reg  [XL:0] rvfi_s2_rs2_data,
+output reg  [XL:0] rvfi_s2_rs3_data,
 `endif
 
 output wire        s2_valid      , // Is the output data valid?
@@ -130,6 +134,7 @@ assign n_s2_fu[P_FU_CSR] =
 
 wire [4:0] dec_rs1_32 = s1_data[19:15];
 wire [4:0] dec_rs2_32 = s1_data[24:20];
+wire [4:0] dec_rs3_32 = s1_data[31:27];
 wire [4:0] dec_rd_32  = s1_data[11: 7];
 
 wire       instr_16bit= s1_data[1:0] != 2'b11;
@@ -344,6 +349,7 @@ wire [4:0] dec_rd_16 =
 
 assign s1_rs1_addr = instr_16bit ? dec_rs1_16 : dec_rs1_32;
 assign s1_rs2_addr = instr_16bit ? dec_rs2_16 : dec_rs2_32;
+assign s1_rs3_addr =                            dec_rs3_32;
 
 wire lsu_no_rd = uop_lsu[LSU_STORE] && n_s2_fu[P_FU_LSU];
 wire cfu_no_rd = (uop_cfu!=CFU_JALI && uop_cfu!=CFU_JALR) &&
@@ -611,11 +617,15 @@ always @(posedge g_clk) begin
         rvfi_s2_rs2_addr <= 0;
         rvfi_s2_rs1_data <= 0;
         rvfi_s2_rs2_data <= 0;
+        rvfi_s2_rs3_data <= 0;
+        rvfi_s2_rs3_data <= 0;
     end else if (pipe_progress) begin
         rvfi_s2_rs1_addr <= s1_rs1_addr;
         rvfi_s2_rs1_data <= s1_rs1_rdata;
         rvfi_s2_rs2_addr <= s1_rs2_addr;
         rvfi_s2_rs2_data <= s1_rs2_rdata;
+        rvfi_s2_rs3_addr <= s1_rs3_addr;
+        rvfi_s2_rs3_data <= s1_rs3_rdata;
     end
 end
 `endif

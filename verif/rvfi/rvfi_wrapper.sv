@@ -44,6 +44,10 @@ parameter XL = 31;
 (*keep*) `rvformal_rand_reg         dmem_error; // Error
 (*keep*) `rvformal_rand_reg [XL:0]  dmem_rdata; // Read data
 
+// Unused by RVFI, but used by XCrypto formal checkers.
+wire [NRET *    5 - 1 : 0] rvfi_rs3_addr  ;
+wire [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ;
+
 //
 // Memory request/response counters
 // --------------------------------------------------------------------
@@ -195,8 +199,10 @@ frv_core #(
 .rvfi_mode      (rvfi_mode      ),
 .rvfi_rs1_addr  (rvfi_rs1_addr  ),
 .rvfi_rs2_addr  (rvfi_rs2_addr  ),
+.rvfi_rs3_addr  (rvfi_rs3_addr  ),
 .rvfi_rs1_rdata (rvfi_rs1_rdata ),
 .rvfi_rs2_rdata (rvfi_rs2_rdata ),
+.rvfi_rs3_rdata (rvfi_rs3_rdata ),
 .rvfi_rd_addr   (rvfi_rd_addr   ),
 .rvfi_rd_wdata  (rvfi_rd_wdata  ),
 .rvfi_pc_rdata  (rvfi_pc_rdata  ),

@@ -23,8 +23,10 @@ output [NRET * 2    - 1 : 0] rvfi_mode      ,
 
 output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
+output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
+output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
 
@@ -39,8 +41,10 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 
 input  wire [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 input  wire [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
+input  wire [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
 input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
+input  wire [ 4:0] rvfi_s4_rs3_addr , // Source register address 3
 input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
 
@@ -544,8 +548,10 @@ assign rvfi_intr  = intr_tracker;
 
 assign rvfi_rs1_addr = rvfi_s4_rs1_addr ;
 assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
+assign rvfi_rs3_addr = rvfi_s4_rs3_addr ;
 assign rvfi_rs1_rdata= rvfi_s4_rs1_rdata;
 assign rvfi_rs2_rdata= rvfi_s4_rs2_rdata;
+assign rvfi_rs3_rdata= rvfi_s4_rs3_rdata;
 
 assign rvfi_rd_addr  = use_saved_gpr_wdata ? saved_gpr_waddr :
                        gpr_wen             ? gpr_rd          : 0;
