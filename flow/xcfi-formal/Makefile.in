@@ -1,0 +1,35 @@
+
+XCFI_SRC_DIR    = $(FRV_HOME)/verif/rvfi
+XCFI_WORK       = $(FRV_WORK)/xcfi
+
+XCFI_COMMON     = $(XCFI_SRC_DIR)/fi_fairness.sv \
+                  $(XCFI_SRC_DIR)/xcfi_insn_checker.sv \
+                  $(XCFI_SRC_DIR)/xcfi_macros.sv \
+                  $(XCFI_SRC_DIR)/xcfi_testbench.v \
+                  $(XCFI_SRC_DIR)/xcfi_wrapper.sv
+
+XCFI_MODELS     = $(notdir $(basename $(shell find $(XCFI_SRC_DIR)/models -name '*.v')))
+
+XCFI_SBY_TGTS   = $(addsuffix .sby,$(addprefix $(XCFI_WORK)/,$(XCFI_MODELS)))
+XCFI_SBY_LOGS   = $(addsuffix /logfile.txt,$(addprefix $(XCFI_WORK)/,$(XCFI_MODELS)))
+
+XCFI_SBY_SRC    = $(FRV_HOME)/flow/xcfi-formal/config.sby.template
+
+$(XCFI_WORK)/%.sby : $(XCFI_SRC_DIR)/models/%.v $(XCFI_COMMON)
+	@mkdir -p $(dir $@)
+	@cp $(XCFI_SBY_SRC) $@
+	@echo "read_verilog -sv $^" >> $@
+	@echo "read_verilog -DRVFI -sv $(CPU_RTL_SRCS)" >> $@
+	@echo "prep -flatten -nordff -top xcfi_testbench" >> $@
+	@echo "chformal -early" >> $@
+
+$(XCFI_WORK)/%/logfile.txt : $(XCFI_WORK)/%.sby
+	sby -f $<
+
+xcfi-prepare: $(XCFI_SBY_TGTS)
+
+xcfi-clean:
+	rm -rf $(XCFI_WORK)/*
+
+xcfi-run: $(XCFI_SBY_LOGS)
+	

@@ -1,0 +1,17 @@
+[options]
+mode bmc
+expect pass,fail
+append 0
+tbtop wrapper.uut
+depth 21
+skip 20
+
+[engines]
+smtbmc boolector
+
+[files]
+./verif/rvfi/xcfi_macros.sv
+./rtl/core/frv_pipeline_decode.vh
+
+[script]
+

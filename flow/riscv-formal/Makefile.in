@@ -2,7 +2,7 @@
 RVFML   = $(FRV_HOME)/external/riscv-formal/cores/mrv
 FMLWORK = $(FRV_WORK)/riscv-formal
 
-CFG     = $(FRV_HOME)/verif/rvfi/checks.cfg
+CFG     = $(FRV_HOME)/flow/riscv-formal/rvfi-checks.cfg
 WRAPPER = $(FRV_HOME)/verif/rvfi/rvfi_wrapper.sv
 
 NJOBS   = 1

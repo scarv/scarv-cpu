@@ -1,14 +1,19 @@
 
+`include "xcfi_macros.sv"
+
 //
-// module: rvfi_wrapper
+// module: xcfi_wrapper
 //
 //  A wrapper around the core which allows it to interface with the
-//  riscv-formal framework.
+//  xcrypto-formal framework.
 //
-module rvfi_wrapper (
-	input         clock,
-	input         reset,
-	`RVFI_OUTPUTS
+module xcfi_wrapper (
+
+    `XCFI_TRACE_OUTPUTS    ,
+	
+    input clock            ,
+	input reset            
+
 );
 
 wire         trs_valid       ; // Trace output valid.
@@ -17,34 +22,35 @@ wire [31:0]  trs_instr       ; // Instruction traced out.
 
 wire         g_resetn = !reset;
 
+parameter ILEN = 32      ;
 parameter NRET = 1       ;
 parameter XLEN = 32      ;
 parameter XL   = XLEN - 1;
 
-(*keep*) `rvformal_rand_reg         int_external; // External interrupt
-(*keep*) `rvformal_rand_reg         int_software; // Software interrupt
+(*keep*) reg         int_external = $anyseq; // External interrupt
+(*keep*) reg         int_software = $anyseq; // Software interrupt
 
-(*keep*) wire                       imem_req  ; // Start memory request
-(*keep*) wire                       imem_wen  ; // Write enable
-(*keep*) wire [3:0]                 imem_strb ; // Write strobe
-(*keep*) wire [XL:0]                imem_wdata; // Write data
-(*keep*) wire [XL:0]                imem_addr ; // Read/Write address
-(*keep*) `rvformal_rand_reg         imem_gnt  ; // request accepted
-(*keep*) `rvformal_rand_reg         imem_recv ; // memory recieve response.
-(*keep*) wire                       imem_ack  ; // memory ack response.
-(*keep*) `rvformal_rand_reg         imem_error; // Error
-(*keep*) `rvformal_rand_reg [XL:0]  imem_rdata; // Read data
+(*keep*) wire        imem_req  ; // Start memory request
+(*keep*) wire        imem_wen  ; // Write enable
+(*keep*) wire [3:0]  imem_strb ; // Write strobe
+(*keep*) wire [XL:0] imem_wdata; // Write data
+(*keep*) wire [XL:0] imem_addr ; // Read/Write address
+(*keep*) reg         imem_gnt   = $anyseq; // request accepted
+(*keep*) reg         imem_recv  = $anyseq; // memory recieve response.
+(*keep*) wire        imem_ack  ; // memory ack response.
+(*keep*) reg         imem_error = $anyseq; // Error
+(*keep*) reg [XL:0]  imem_rdata = $anyseq; // Read data
 
-(*keep*) wire                       dmem_req  ; // Start memory request
-(*keep*) wire                       dmem_wen  ; // Write enable
-(*keep*) wire [3:0]                 dmem_strb ; // Write strobe
-(*keep*) wire [31:0]                dmem_wdata; // Write data
-(*keep*) wire [31:0]                dmem_addr ; // Read/Write address
-(*keep*) `rvformal_rand_reg         dmem_gnt  ; // request accepted
-(*keep*) `rvformal_rand_reg         dmem_recv ; // memory recieve response.
-(*keep*) wire                       dmem_ack  ; // memory ack response.
-(*keep*) `rvformal_rand_reg         dmem_error; // Error
-(*keep*) `rvformal_rand_reg [XL:0]  dmem_rdata; // Read data
+(*keep*) wire        dmem_req  ; // Start memory request
+(*keep*) wire        dmem_wen  ; // Write enable
+(*keep*) wire [3:0]  dmem_strb ; // Write strobe
+(*keep*) wire [31:0] dmem_wdata; // Write data
+(*keep*) wire [31:0] dmem_addr ; // Read/Write address
+(*keep*) reg         dmem_gnt   = $anyseq; // request accepted
+(*keep*) reg         dmem_recv  = $anyseq; // memory recieve response.
+(*keep*) wire        dmem_ack  ; // memory ack response.
+(*keep*) reg         dmem_error = $anyseq; // Error
+(*keep*) reg [XL:0]  dmem_rdata = $anyseq; // Read data
 
 // Unused by RVFI, but used by XCrypto formal checkers.
 wire [NRET *    5 - 1 : 0] rvfi_rs3_addr  ;

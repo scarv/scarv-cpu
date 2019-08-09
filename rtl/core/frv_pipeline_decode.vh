@@ -82,6 +82,91 @@ wire dec_c_ebreak   = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:
 wire dec_c_jalr     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:12] == 1'd1 && d_data[6:2] == 5'd0 && d_data[11:7] != 0;
 wire dec_c_add      = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:12] == 1'd1 && d_data[6:2] != 5'd0;
 wire dec_c_swsp     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd6;
+
+wire dec_xc_ldr_b       = (d_data & 32'hfe00707f) == 32'h7003;
+wire dec_xc_ldr_h       = (d_data & 32'hfe00707f) == 32'h2007003;
+wire dec_xc_ldr_w       = (d_data & 32'hfe00707f) == 32'h4007003;
+wire dec_xc_ldr_d       = (d_data & 32'hfe00707f) == 32'h6007003;
+wire dec_xc_ldr_bu      = (d_data & 32'hfe00707f) == 32'h8007003;
+wire dec_xc_ldr_hu      = (d_data & 32'hfe00707f) == 32'ha007003;
+wire dec_xc_ldr_wu      = (d_data & 32'hfe00707f) == 32'hc007003;
+wire dec_xc_str_b       = (d_data & 32'h6007fff) == 32'h4023;
+wire dec_xc_str_h       = (d_data & 32'h6007fff) == 32'h40a3;
+wire dec_xc_str_w       = (d_data & 32'h6007fff) == 32'h4123;
+wire dec_xc_str_d       = (d_data & 32'h6007fff) == 32'h41a3;
+wire dec_xc_mmul_3      = (d_data & 32'h60070ff) == 32'h4004023;
+wire dec_xc_macc_1      = (d_data & 32'h60070ff) == 32'h40040a3;
+wire dec_xc_madd_3      = (d_data & 32'h60070ff) == 32'h6004023;
+wire dec_xc_msub_3      = (d_data & 32'h60070ff) == 32'h60050a3;
+wire dec_xc_mror        = (d_data & 32'h60070ff) == 32'h5023;
+wire dec_xc_rngtest     = (d_data & 32'hfffff07f) == 32'h300073;
+wire dec_xc_rngsamp     = (d_data & 32'hfffff07f) == 32'h500073;
+wire dec_xc_rngseed     = (d_data & 32'hfff07fff) == 32'h700073;
+wire dec_xc_lut         = (d_data & 32'hfe00707f) == 32'h62006033;
+wire dec_xc_bop         = (d_data & 32'h7e00707f) == 32'h64006033;
+wire dec_xc_padd        = (d_data & 32'h3e00707f) == 32'h2000073;
+wire dec_xc_psub        = (d_data & 32'h3e00707f) == 32'h4000073;
+wire dec_xc_pror        = (d_data & 32'h3e00707f) == 32'h6000073;
+wire dec_xc_psll        = (d_data & 32'h3e00707f) == 32'h8000073;
+wire dec_xc_psrl        = (d_data & 32'h3e00707f) == 32'ha000073;
+wire dec_xc_pror_i      = (d_data & 32'h3c00707f) == 32'h30007003;
+wire dec_xc_psll_i      = (d_data & 32'h3c00707f) == 32'h2c007003;
+wire dec_xc_psrl_i      = (d_data & 32'h3c00707f) == 32'h28007003;
+wire dec_xc_pmul_l      = (d_data & 32'h3e00707f) == 32'hc000073;
+wire dec_xc_pmul_h      = (d_data & 32'h3e00707f) == 32'he000073;
+wire dec_xc_pclmul_l    = (d_data & 32'h3e00707f) == 32'h10000033;
+wire dec_xc_pclmul_h    = (d_data & 32'h3e00707f) == 32'h12000033;
+wire dec_xc_scatter_b   = (d_data & 32'h6007fff) == 32'h4223;
+wire dec_xc_scatter_h   = (d_data & 32'h6007fff) == 32'h42a3;
+wire dec_xc_gather_b    = (d_data & 32'hfe00707f) == 32'h3c001013;
+wire dec_xc_gather_h    = (d_data & 32'hfe00707f) == 32'h3e001013;
+wire dec_xc_aessub_enc  = (d_data & 32'hfe00707f) == 32'h1a007003;
+wire dec_xc_aessub_encrot = (d_data & 32'hfe00707f) == 32'h1c007003;
+wire dec_xc_aessub_dec  = (d_data & 32'hfe00707f) == 32'h1e007003;
+wire dec_xc_aessub_decrot = (d_data & 32'hfe00707f) == 32'h20007003;
+wire dec_xc_aesmix_enc  = (d_data & 32'hfe00707f) == 32'h22007003;
+wire dec_xc_aesmix_dec  = (d_data & 32'hfe00707f) == 32'h24007003;
+wire dec_xc_sha3_xy     = (d_data & 32'h3e00707f) == 32'h10007003;
+wire dec_xc_sha3_x1     = (d_data & 32'h3e00707f) == 32'h12007003;
+wire dec_xc_sha3_x2     = (d_data & 32'h3e00707f) == 32'h14007003;
+wire dec_xc_sha3_x4     = (d_data & 32'h3e00707f) == 32'h16007003;
+wire dec_xc_sha3_yx     = (d_data & 32'h3e00707f) == 32'h18007003;
+wire dec_xc_sha256_s0   = (d_data & 32'hfff0707f) == 32'he007003;
+wire dec_xc_sha256_s1   = (d_data & 32'hfff0707f) == 32'he107003;
+wire dec_xc_sha256_s2   = (d_data & 32'hfff0707f) == 32'he207003;
+wire dec_xc_sha256_s3   = (d_data & 32'hfff0707f) == 32'he307003;
+wire dec_xc_sha512_s0   = (d_data & 32'hfff0707f) == 32'he407003;
+wire dec_xc_sha512_s1   = (d_data & 32'hfff0707f) == 32'he507003;
+wire dec_xc_sha512_s2   = (d_data & 32'hfff0707f) == 32'he607003;
+wire dec_xc_sha512_s3   = (d_data & 32'hfff0707f) == 32'he707003;
+wire dec_b_cmov        = (d_data & 32'h600707f) == 32'h6005033;
+wire dec_b_rol         = (d_data & 32'hfe00707f) == 32'h60001033;
+wire dec_b_ror         = (d_data & 32'hfe00707f) == 32'h60005033;
+wire dec_b_rori        = (d_data & 32'hfc00707f) == 32'h60005013;
+wire dec_b_rolw        = (d_data & 32'hfe00707f) == 32'h6000103b;
+wire dec_b_rorw        = (d_data & 32'hfe00707f) == 32'h6000503b;
+wire dec_b_roriw       = (d_data & 32'hfe00707f) == 32'h6000501b;
+wire dec_b_fsl         = (d_data & 32'h600707f) == 32'h4001033;
+wire dec_b_fsr         = (d_data & 32'h600707f) == 32'h4005033;
+wire dec_b_fsri        = (d_data & 32'h400707f) == 32'h4005013;
+wire dec_b_fslw        = (d_data & 32'h600707f) == 32'h400103b;
+wire dec_b_fsrw        = (d_data & 32'h600707f) == 32'h400503b;
+wire dec_b_fsriw       = (d_data & 32'h600707f) == 32'h400501b;
+wire dec_b_clmul       = (d_data & 32'hfe00707f) == 32'ha001033;
+wire dec_b_clmulr      = (d_data & 32'hfe00707f) == 32'ha002033;
+wire dec_b_clmulh      = (d_data & 32'hfe00707f) == 32'ha003033;
+wire dec_b_clmulw      = (d_data & 32'hfe00707f) == 32'ha00103b;
+wire dec_b_clmulrw     = (d_data & 32'hfe00707f) == 32'ha00203b;
+wire dec_b_clmulhw     = (d_data & 32'hfe00707f) == 32'ha00303b;
+wire dec_b_bdep        = (d_data & 32'hfe00707f) == 32'h8002033;
+wire dec_b_bdepw       = (d_data & 32'hfe00707f) == 32'h800203b;
+wire dec_b_bext        = (d_data & 32'hfe00707f) == 32'h8006033;
+wire dec_b_bextw       = (d_data & 32'hfe00707f) == 32'h800603b;
+wire dec_b_grev        = (d_data & 32'hfe00707f) == 32'h40001033;
+wire dec_b_grevi       = (d_data & 32'hfc00707f) == 32'h40001013;
+wire dec_b_grevw       = (d_data & 32'hfe00707f) == 32'h4000103b;
+wire dec_b_greviw      = (d_data & 32'hfe00707f) == 32'h4000101b;
+
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge
 ||dec_bltu      ||dec_bgeu      ||dec_lb        ||dec_lh        ||dec_lw
@@ -99,4 +184,25 @@ wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_c_srli    ||dec_c_srai    ||dec_c_andi    ||dec_c_sub     ||dec_c_xor
 ||dec_c_or      ||dec_c_and     ||dec_c_j       ||dec_c_beqz    ||dec_c_bnez
 ||dec_c_slli    ||dec_c_lwsp    ||dec_c_jr      ||dec_c_mv
-||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp    );
+||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp 
+||dec_b_bdep  || dec_b_bdepw  || dec_b_bext  || dec_b_bextw  || dec_b_clmul  ||
+dec_b_clmulh   || dec_b_clmulhw   || dec_b_clmulr   || dec_b_clmulrw   ||
+dec_b_clmulw  || dec_b_cmov   || dec_b_grev  || dec_b_grevi   || dec_b_greviw
+|| dec_b_grevw   || dec_b_fsl   || dec_b_fslw  || dec_b_fsr   || dec_b_fsri
+|| dec_b_fsriw   || dec_b_fsrw  || dec_b_rol   || dec_b_rolw  || dec_b_ror  ||
+dec_b_rori  || dec_b_roriw   || dec_b_rorw   || dec_xc_aesmix_dec   ||
+dec_xc_aesmix_enc  || dec_xc_aessub_dec   || dec_xc_aessub_decrot   ||
+dec_xc_aessub_enc   || dec_xc_aessub_encrot   || dec_xc_bop   ||
+dec_xc_gather_b   || dec_xc_gather_h   || dec_xc_ldr_b   || dec_xc_ldr_bu   ||
+dec_xc_ldr_d   || dec_xc_ldr_h   || dec_xc_ldr_hu   || dec_xc_ldr_w   ||
+dec_xc_ldr_wu   || dec_xc_lut   || dec_xc_macc_1   || dec_xc_madd_3   ||
+dec_xc_mmul_3   || dec_xc_mror   || dec_xc_msub_3   || dec_xc_padd   ||
+dec_xc_pclmul_h  || dec_xc_pclmul_l   || dec_xc_pmul_h   || dec_xc_pmul_l   ||
+dec_xc_pror   || dec_xc_pror_i   || dec_xc_psll  || dec_xc_psll_i   ||
+dec_xc_psrl   || dec_xc_psrl_i   || dec_xc_psub   || dec_xc_rngsamp   ||
+dec_xc_rngseed   || dec_xc_rngtest   || dec_xc_scatter_b   || dec_xc_scatter_h
+|| dec_xc_sha256_s0   || dec_xc_sha256_s1   || dec_xc_sha256_s2   ||
+dec_xc_sha256_s3   || dec_xc_sha3_x1   || dec_xc_sha3_x2   || dec_xc_sha3_x4
+|| dec_xc_sha3_xy  || dec_xc_sha3_yx   || dec_xc_sha512_s0   ||
+dec_xc_sha512_s1   || dec_xc_sha512_s2   || dec_xc_sha512_s3   || dec_xc_str_b
+|| dec_xc_str_d  || dec_xc_str_h   || dec_xc_str_w   );
