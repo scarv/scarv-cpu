@@ -51,8 +51,8 @@ input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 input  wire [ 4:0] s4_rd           , // Destination register address
 input  wire [XL:0] s4_opr_a        , // Operand A
 input  wire [XL:0] s4_opr_b        , // Operand B
-input  wire [ 4:0] s4_uop          , // Micro-op code
-input  wire [ 4:0] s4_fu           , // Functional Unit
+input  wire [OP:0] s4_uop          , // Micro-op code
+input  wire [FU:0] s4_fu           , // Functional Unit
 input  wire        s4_trap         , // Raise a trap?
 input  wire [ 1:0] s4_size         , // Size of the instruction.
 input  wire [31:0] s4_instr        , // The instruction word

@@ -151,6 +151,9 @@ Instruction  | Action                   | uOP code
 `grevi      `| rd <= f(rs1,rs2)         | {10, 001} 
 `xc.lut     `| rd <= f(rs1,rs2,rs3)     | {11, 000} 
 `xc.bop     `| rd <= f(rs1,rs2,rs3)     | {11, 001} 
+`fsl        `| rd <= rs1 || rs2 << rs3  | {00, 000}
+`fsr        `| rd <= rs1 || rs2 << rs3  | {00, 001}
+`fsri       `| rd <= rs1 || rs2 << imm  | {00, 001}
 
 
 **Algorithm Specific Instructions:**
@@ -203,6 +206,7 @@ Instruction  | Action                   | uOP code
 Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 -------------|--------------|---------------|-----------------
 `add        `|  rs1         |  rs2          |  0
+`xc.padd    `|  rs1         |  rs2          |  0
 `addi       `|  rs1         |  imm          |  0
 `c_add      `|  rs1         |  rs2          |  0
 `c_addi     `|  rs1         |  imm          |  0
@@ -212,6 +216,7 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `auipc      `|  PC+imm      |  0            |  0
 `c_sub      `|  rs1         |  rs2          |  0
 `sub        `|  rs1         |  rs2          |  0
+`xc.psub    `|  rs1         |  rs2          |  0
 `and        `|  rs1         |  rs2          |  0
 `andi       `|  rs1         |  imm          |  0
 `c_and      `|  rs1         |  rs2          |  0
@@ -235,10 +240,18 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `c_srai     `|  rs1         |  imm          |  0
 `c_srli     `|  rs1         |  imm          |  0
 `srl        `|  rs1         |  rs2          |  0
+`xc.psrl    `|  rs1         |  rs2          |  0
 `srli       `|  rs1         |  imm          |  0
+`xc.psrl.i  `|  rs1         |  imm          |  0
 `sll        `|  rs1         |  rs2          |  0
+`xc.psll    `|  rs1         |  rs2          |  0
 `slli       `|  rs1         |  imm          |  0
+`xc.psll.i  `|  rs1         |  imm          |  0
 `c_slli     `|  rs1         |  imm          |  0
+`ror        `|  rs1         |  rs2          |  0
+`rori       `|  rs1         |  imm          |  0
+`xc.pror    `|  rs1         |  rs2          |  0
+`xc.pror.i  `|  rs1         |  imm          |  0
 
 
 **Control Flow Instructions:**
@@ -274,6 +287,11 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `lh         `|  rs1         |  imm          | 0
 `lhu        `|  rs1         |  imm          | 0
 `lw         `|  rs1         |  imm          | 0
+`xc.ldr.b   `|  rs1         |  rs2          | 0
+`xc.ldr.bu  `|  rs1         |  rs2          | 0
+`xc.ldr.h   `|  rs1         |  rs2<<1       | 0
+`xc.ldr.hu  `|  rs1         |  rs2<<1       | 0
+`xc.ldr.w   `|  rs1         |  rs2<<2       | 0
 `c_lw       `|  rs1         |  imm          | 0
 `c_lwsp     `|  rs1         |  imm          | 0
 `c_sw       `|  rs1         |  imm          | rs2
@@ -281,6 +299,13 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `sb         `|  rs1         |  imm          | rs2
 `sh         `|  rs1         |  imm          | rs2
 `sw         `|  rs1         |  imm          | rs2
+`xc.str.b   `|  rs1         |  rs2          | rs3
+`xc.str.h   `|  rs1         |  rs2<<1       | rs3
+`xc.str.w   `|  rs1         |  rs2<<2       | rs3
+`xc.scatter.h`| rs1         |  rs2          | rs3
+`xc.scatter.b`| rs1         |  rs2          | rs3
+`xc.gather.h `| rs1         |  rs2          | rs3
+`xc.gather.b `| rs1         |  rs2          | rs3
 
 
 **CSR Instructions:**
@@ -302,9 +327,72 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `div        `|  rs1         |  rs2          | 0
 `divu       `|  rs1         |  rs2          | 0
 `mul        `|  rs1         |  rs2          | 0
+`xc.pmul.l  `|  rs1         |  rs2          | 0
 `mulh       `|  rs1         |  rs2          | 0
+`xc.pmul.h  `|  rs1         |  rs2          | 0
 `mulhsu     `|  rs1         |  rs2          | 0
 `mulhu      `|  rs1         |  rs2          | 0
 `rem        `|  rs1         |  rs2          | 0
 `remu       `|  rs1         |  rs2          | 0
+`xc.pclmul.l`|  rs1         |  rs2          | 0
+`xc.pclmul.h`|  rs1         |  rs2          | 0
+`xc.clmul   `|  rs1         |  rs2          | 0
+`xc.clmulr  `|  rs1         |  rs2          | 0
+`xc.clmulh  `|  rs1         |  rs2          | 0
+
+
+**Bit Manipulation Instructions:**
+
+Instruction  | `opr_a`      | `opr_b`       | `opr_c`
+-------------|--------------|---------------|-----------------
+`bdep       `|  rs1         | rs2           | 0
+`bext       `|  rs1         | rs2           | 0
+`grev       `|  rs1         | rs2           | 0
+`grevi      `|  rs1         | rs2           | 0
+`xc.lut     `|  rs1         | rs2           | rs3
+`xc.bop     `|  rs1         | rs2           | rs3
+`fsl        `|  rs1         | rs2           | rs3
+`fsr        `|  rs1         | rs2           | rs3
+`fsri       `|  rs1         | rs2           | rs3
+
+
+**Algorithm Specific Instructions:**
+
+Instruction        |`opr_a`      | `opr_b`       | `opr_c`    
+-------------------|-------------|---------------|------------
+`xc.aessub.enc   ` | rs1         | rs2           | 0
+`xc.aessub.encrot` | rs1         | rs2           | 0
+`xc.aessub.dec   ` | rs1         | rs2           | 0
+`xc.aessub.decrot` | rs1         | rs2           | 0
+`xc.aesmix.enc   ` | rs1         | rs2           | 0
+`xc.aesmix.dec   ` | rs1         | rs2           | 0
+`xc.sha3.xy      ` | rs1         | rs2           | 0
+`xc.sha3.x1      ` | rs1         | rs2           | 0
+`xc.sha3.x2      ` | rs1         | rs2           | 0
+`xc.sha3.x4      ` | rs1         | rs2           | 0
+`xc.sha3.yx      ` | rs1         | rs2           | 0
+`xc.sha256.s0    ` | rs1         | rs2           | 0
+`xc.sha256.s1    ` | rs1         | rs2           | 0
+`xc.sha256.s2    ` | rs1         | rs2           | 0
+`xc.sha256.s3    ` | rs1         | rs2           | 0
+
+
+**RNG Instructions:**
+
+Instruction  |`opr_a`      | `opr_b`       | `opr_c`    
+-------------|-------------|---------------|------------
+`xc.rngtest` |             |               |
+`xc.rngseed` | rs1         |               |
+`xc.rngsamp` |             |               |
+
+
+**MP Instructions:**
+
+Instruction  |`opr_a`      | `opr_b`       | `opr_c`    
+-------------|-------------|---------------|------------
+`xc.mmul.3  `| rs1         | rs2           | rs3
+`xc.madd.3  `| rs1         | rs2           | rs3
+`xc.msub.3  `| rs1         | rs2           | rs3
+`xc.macc.1  `| rs1         | rs2           | rs3
+`xc.mror    `| rs1         | rs2           | rs3
 

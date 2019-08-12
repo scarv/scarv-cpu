@@ -14,8 +14,8 @@ input  wire        flush           , // Flush this pipeline stage.
 input  wire [ 4:0] s3_rd           , // Destination register address
 input  wire [XL:0] s3_opr_a        , // Operand A
 input  wire [XL:0] s3_opr_b        , // Operand B
-input  wire [ 4:0] s3_uop          , // Micro-op code
-input  wire [ 4:0] s3_fu           , // Functional Unit
+input  wire [OP:0] s3_uop          , // Micro-op code
+input  wire [FU:0] s3_fu           , // Functional Unit
 input  wire        s3_trap         , // Raise a trap?
 input  wire [ 1:0] s3_size         , // Size of the instruction.
 input  wire [31:0] s3_instr        , // The instruction word
@@ -60,8 +60,8 @@ input  wire        dmem_gnt        , // request accepted
 output wire [ 4:0] s4_rd           , // Destination register address
 output wire [XL:0] s4_opr_a        , // Operand A
 output wire [XL:0] s4_opr_b        , // Operand B
-output wire [ 4:0] s4_uop          , // Micro-op code
-output wire [ 4:0] s4_fu           , // Functional Unit
+output wire [OP:0] s4_uop          , // Micro-op code
+output wire [FU:0] s4_fu           , // Functional Unit
 output wire        s4_trap         , // Raise a trap?
 output wire [ 1:0] s4_size         , // Size of the instruction.
 output wire [31:0] s4_instr        , // The instruction word
@@ -147,8 +147,8 @@ wire[4:0] n_s4_rd     =     s3_trap  ? s3_rd         :
 
 wire [XL:0] n_s4_opr_a  = lsu_valid ? n_s4_opr_a_lsu : s3_opr_a; // Operand A
 wire [XL:0] n_s4_opr_b  = lsu_valid ? n_s4_opr_b_lsu : s3_opr_b; // Operand B
-wire [ 4:0] n_s4_uop    = s3_uop  ; // Micro-op code
-wire [ 4:0] n_s4_fu     = s3_fu   ; // Functional Unit
+wire [OP:0] n_s4_uop    = s3_uop  ; // Micro-op code
+wire [FU:0] n_s4_fu     = s3_fu   ; // Functional Unit
 wire [ 1:0] n_s4_size   = s3_size ; // Size of the instruction.
 wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 
@@ -206,7 +206,7 @@ frv_lsu #(
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam RL = 114;
+localparam RL = 106 + OP + FU;
 
 
 wire [RL-1:0] pipe_reg_out;

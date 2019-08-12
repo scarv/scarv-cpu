@@ -44,8 +44,9 @@ output wire [ 4:0] s2_rd         , // Destination register address
 output wire [XL:0] s2_opr_a      , // Operand A
 output wire [XL:0] s2_opr_b      , // Operand B
 output wire [XL:0] s2_opr_c      , // Operand C
-output wire [ 4:0] s2_uop        , // Micro-op code
-output wire [ 4:0] s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
+output wire [OP:0] s2_uop        , // Micro-op code
+output wire [FU:0] s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
+output wire [PW:0] s2_pw         , // Pack width specifier for IALU.
 output wire        s2_trap       , // Raise a trap?
 output wire [ 1:0] s2_size       , // Size of the instruction.
 output wire [31:0] s2_instr        // The instruction word
@@ -92,12 +93,13 @@ wire [XL:0] n_s2_opr_b      ; // Operand B
 wire [XL:0] n_s2_opr_c      ; // Operand C
 wire [XL:0] n_s2_imm        ; // 
 wire [XL:0] n_s2_pc_imm     ; // 
-wire [ 4:0] n_s2_uop        ; // Micro-op code
-wire [ 4:0] n_s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
+wire [OP:0] n_s2_uop        ; // Micro-op code
+wire [FU:0] n_s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
+wire [PW:0] n_s2_pw         ; // IALU pack width specifier.
 wire        n_s2_trap       ; // Raise a trap?
 wire [ 1:0] n_s2_size       ; // Size of the instruction.
 wire [31:0] n_s2_instr      ; // The instruction word
-wire [ 7:0] n_s2_opr_src    ; // Operand sourcing.
+wire [ 8:0] n_s2_opr_src    ; // Operand sourcing.
 
 //
 // Instruction Decoding
@@ -122,11 +124,16 @@ assign n_s2_fu[P_FU_ALU] =
     dec_slt        || dec_slti       || dec_sltu       || dec_sltiu      ||
     dec_sra        || dec_srai       || dec_c_srai     || dec_c_srli     ||
     dec_srl        || dec_srli       || dec_sll        || dec_slli       ||
-    dec_c_slli     ;
+    dec_c_slli     ||
+    dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
+    dec_xc_psll    || dec_xc_psrl_i  || dec_xc_pror    || dec_xc_pror_i  ||
+    dec_b_ror      || dec_b_rori     ;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
-    dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ;
+    dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ||
+    dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
+    dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ;
 
 assign n_s2_fu[P_FU_CFU] = 
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
@@ -138,11 +145,36 @@ assign n_s2_fu[P_FU_CFU] =
 assign n_s2_fu[P_FU_LSU] = 
     dec_lb         || dec_lbu       || dec_lh          || dec_lhu        ||
     dec_lw         || dec_c_lw      || dec_c_lwsp      || dec_c_sw       ||
-    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ;
+    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ||
+    dec_xc_ldr_b   || dec_xc_ldr_h  || dec_xc_ldr_w    || dec_xc_ldr_d   ||
+    dec_xc_ldr_bu  || dec_xc_ldr_hu || dec_xc_str_b    || dec_xc_str_h   ||
+    dec_xc_str_w   ||
+    dec_xc_scatter_b || dec_xc_scatter_h || dec_xc_gather_b || dec_xc_gather_h;
 
 assign n_s2_fu[P_FU_CSR] =
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
     dec_csrrw      || dec_csrrwi     ;
+
+assign n_s2_fu[P_FU_BIT] = 
+    dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
+    dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
+    dec_b_fsri     ;
+
+assign n_s2_fu[P_FU_ASI] = 
+    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
+    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
+    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
+    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
+    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3      ;
+
+assign n_s2_fu[P_FU_RNG] = 
+    dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ;
+
+assign n_s2_fu[P_FU_MPI] = 
+    dec_xc_mmul_3   || dec_xc_madd_3   || dec_xc_msub_3   || dec_xc_macc_1   ||
+    dec_xc_mror     ;
+
+
 
 //
 // Encoding field extraction
@@ -169,8 +201,9 @@ end endgenerate
 // Micro-OP Decoding / Selection
 // -------------------------------------------------------------------------
 
-wire [4:0] uop_alu = 
+wire [OP:0] uop_alu = 
     {5{dec_add       }} & ALU_ADD   |
+    {5{dec_xc_padd   }} & ALU_ADD   |
     {5{dec_addi      }} & ALU_ADD   |
     {5{dec_c_add     }} & ALU_ADD   |
     {5{dec_c_addi    }} & ALU_ADD   |
@@ -180,6 +213,7 @@ wire [4:0] uop_alu =
     {5{dec_auipc     }} & ALU_ADD   |
     {5{dec_c_sub     }} & ALU_SUB   |
     {5{dec_sub       }} & ALU_SUB   |
+    {5{dec_xc_psub   }} & ALU_SUB   |
     {5{dec_and       }} & ALU_AND   |
     {5{dec_andi      }} & ALU_AND   |
     {5{dec_c_and     }} & ALU_AND   |
@@ -204,11 +238,19 @@ wire [4:0] uop_alu =
     {5{dec_c_srli    }} & ALU_SRL   |
     {5{dec_srl       }} & ALU_SRL   |
     {5{dec_srli      }} & ALU_SRL   |
+    {5{dec_xc_psrl   }} & ALU_SRL   |
+    {5{dec_xc_psrl_i }} & ALU_SRL   |
     {5{dec_sll       }} & ALU_SLL   |
     {5{dec_slli      }} & ALU_SLL   |
-    {5{dec_c_slli    }} & ALU_SLL   ;
+    {5{dec_c_slli    }} & ALU_SLL   |
+    {5{dec_xc_psll   }} & ALU_SRL   |
+    {5{dec_xc_psll_i }} & ALU_SRL   |
+    {5{dec_b_ror     }} & ALU_ROR   |
+    {5{dec_b_rori    }} & ALU_ROR   |
+    {5{dec_xc_pror   }} & ALU_ROR   |
+    {5{dec_xc_pror_i }} & ALU_ROR   ;
 
-wire [4:0] uop_cfu =
+wire [OP:0] uop_cfu =
     {5{dec_beq       }} & CFU_BEQ   |
     {5{dec_c_beqz    }} & CFU_BEQ   |
     {5{dec_bge       }} & CFU_BGE   |
@@ -231,52 +273,77 @@ wire [4:0] uop_cfu =
 wire [1:0] lsu_width = 
     {2{dec_lb        }} & LSU_BYTE |
     {2{dec_lbu       }} & LSU_BYTE |
+    {2{dec_xc_ldr_b  }} & LSU_BYTE |
+    {2{dec_xc_ldr_bu }} & LSU_BYTE |
+    {2{dec_sb        }} & LSU_BYTE |
+    {2{dec_xc_str_b  }} & LSU_BYTE |
     {2{dec_lh        }} & LSU_HALF |
     {2{dec_lhu       }} & LSU_HALF |
+    {2{dec_xc_ldr_h  }} & LSU_HALF |
+    {2{dec_xc_ldr_hu }} & LSU_HALF |
+    {2{dec_sh        }} & LSU_HALF |
+    {2{dec_xc_str_h  }} & LSU_HALF |
     {2{dec_lw        }} & LSU_WORD |
+    {2{dec_xc_ldr_w  }} & LSU_WORD |
     {2{dec_c_lw      }} & LSU_WORD |
     {2{dec_c_lwsp    }} & LSU_WORD |
     {2{dec_c_sw      }} & LSU_WORD |
     {2{dec_c_swsp    }} & LSU_WORD |
-    {2{dec_sb        }} & LSU_BYTE |
-    {2{dec_sh        }} & LSU_HALF |
-    {2{dec_sw        }} & LSU_WORD ;
+    {2{dec_sw        }} & LSU_WORD |
+    {2{dec_xc_str_w  }} & LSU_WORD ;
 
-wire [4:0] uop_lsu;
+wire [OP:0] uop_lsu;
 
 assign uop_lsu[2:1]      = lsu_width;
 
 assign uop_lsu[LSU_LOAD] = 
-    dec_lb     ||
-    dec_lbu    ||
-    dec_lh     ||
-    dec_lhu    ||
-    dec_lw     ||
-    dec_c_lw   ||
-    dec_c_lwsp ;
+    dec_lb          ||
+    dec_lbu         ||
+    dec_xc_ldr_b    ||
+    dec_xc_ldr_bu   ||
+    dec_lh          ||
+    dec_lhu         ||
+    dec_xc_ldr_h    ||
+    dec_xc_ldr_hu   ||
+    dec_lw          ||
+    dec_xc_ldr_w    ||
+    dec_c_lw        ||
+    dec_c_lwsp      ;
 
 assign uop_lsu[LSU_STORE] = 
-    dec_sb     ||
-    dec_sh     ||
-    dec_sw     ||
-    dec_c_sw   ||
-    dec_c_swsp ;
+    dec_sb          ||
+    dec_sh          ||
+    dec_sw          ||
+    dec_xc_str_b    ||
+    dec_xc_str_h    ||
+    dec_xc_str_w    ||
+    dec_c_sw        ||
+    dec_c_swsp      ;
 
 assign uop_lsu[LSU_SIGNED] = 
-    dec_lb     ||
-    dec_lh     ; 
+    dec_lb          ||
+    dec_xc_ldr_b    ||
+    dec_lh          ||
+    dec_xc_ldr_h    ; 
 
-wire [4:0] uop_mul = 
-    {5{dec_div   }} & MUL_DIV    |
-    {5{dec_divu  }} & MUL_DIVU   |
-    {5{dec_mul   }} & MUL_MUL    |
-    {5{dec_mulh  }} & MUL_MULH   |
-    {5{dec_mulhsu}} & MUL_MULHSU |
-    {5{dec_mulhu }} & MUL_MULHU  |
-    {5{dec_rem   }} & MUL_REM    |
-    {5{dec_remu  }} & MUL_REMU   ;
+wire [OP:0] uop_mul = 
+    {5{dec_div          }} & MUL_DIV    |
+    {5{dec_divu         }} & MUL_DIVU   |
+    {5{dec_mul          }} & MUL_MUL    |
+    {5{dec_xc_pmul_l    }} & MUL_MUL    |
+    {5{dec_mulh         }} & MUL_MULH   |
+    {5{dec_xc_pmul_h    }} & MUL_MULH   |
+    {5{dec_mulhsu       }} & MUL_MULHSU |
+    {5{dec_mulhu        }} & MUL_MULHU  |
+    {5{dec_rem          }} & MUL_REM    |
+    {5{dec_remu         }} & MUL_REMU   |
+    {5{dec_xc_pclmul_l  }} & MUL_CLMUL_L|
+    {5{dec_b_clmul      }} & MUL_CLMUL_L|
+    {5{dec_xc_pclmul_h  }} & MUL_CLMUL_H|
+    {5{dec_b_clmulh     }} & MUL_CLMUL_H|
+    {5{dec_b_clmulr     }} & MUL_CLMUL_R;
 
-wire [4:0] uop_csr;
+wire [OP:0] uop_csr;
 
 wire       csr_op = 
     dec_csrrc  || dec_csrrci || dec_csrrs  || dec_csrrsi || dec_csrrw  ||
@@ -293,12 +360,56 @@ assign uop_csr[CSR_SET  ] = dec_csrrs || dec_csrrsi ;
 assign uop_csr[CSR_CLEAR] = dec_csrrc || dec_csrrci ;
 assign uop_csr[CSR_SWAP ] = dec_csrrw || dec_csrrwi ;
 
+wire [OP:0] uop_bit =
+    {1+OP{dec_b_bdep          }} & BIT_BDEP         |
+    {1+OP{dec_b_bext          }} & BIT_BEXT         |
+    {1+OP{dec_b_grev          }} & BIT_GREV         |
+    {1+OP{dec_b_grevi         }} & BIT_GREVI        |
+    {1+OP{dec_xc_lut          }} & BIT_LUT          |
+    {1+OP{dec_xc_bop          }} & BIT_BOP          |
+    {1+OP{dec_b_fsl           }} & BIT_FSL          |
+    {1+OP{dec_b_fsr           }} & BIT_FSR          |
+    {1+OP{dec_b_fsr           }} & BIT_FSR          ;
+
+wire [OP:0] uop_asi =
+    {1+OP{dec_xc_aessub_enc   }} & ASI_AESSUB_ENC   |
+    {1+OP{dec_xc_aessub_encrot}} & ASI_AESSUB_ENCROT|
+    {1+OP{dec_xc_aessub_dec   }} & ASI_AESSUB_DEC   |
+    {1+OP{dec_xc_aessub_decrot}} & ASI_AESSUB_DECROT|
+    {1+OP{dec_xc_aesmix_enc   }} & ASI_AESMIX_ENC   |
+    {1+OP{dec_xc_aesmix_dec   }} & ASI_AESMIX_DEC   |
+    {1+OP{dec_xc_sha3_xy      }} & ASI_SHA3_XY      |
+    {1+OP{dec_xc_sha3_x1      }} & ASI_SHA3_X1      |
+    {1+OP{dec_xc_sha3_x2      }} & ASI_SHA3_X2      |
+    {1+OP{dec_xc_sha3_x4      }} & ASI_SHA3_X4      |
+    {1+OP{dec_xc_sha3_yx      }} & ASI_SHA3_YX      |
+    {1+OP{dec_xc_sha256_s0    }} & ASI_SHA256_S0    |
+    {1+OP{dec_xc_sha256_s1    }} & ASI_SHA256_S1    |
+    {1+OP{dec_xc_sha256_s2    }} & ASI_SHA256_S2    |
+    {1+OP{dec_xc_sha256_s3    }} & ASI_SHA256_S3    ;
+
+wire [OP:0] uop_rng =
+    {1+OP{dec_xc_rngtest      }} & RNG_RNGTEST      |
+    {1+OP{dec_xc_rngseed      }} & RNG_RNGSEED      |
+    {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      ;
+
+wire [OP:0] uop_mpi =
+    {1+OP{dec_xc_mmul_3       }} & MPI_MMUL_3       |
+    {1+OP{dec_xc_madd_3       }} & MPI_MADD_3       |
+    {1+OP{dec_xc_msub_3       }} & MPI_MSUB_3       |
+    {1+OP{dec_xc_macc_1       }} & MPI_MACC_1       |
+    {1+OP{dec_xc_mror         }} & MPI_MROR         ;
+
 assign n_s2_uop =
     uop_alu |
     uop_cfu |
     uop_lsu |
     uop_mul |
-    uop_csr ;
+    uop_csr |
+    uop_bit |
+    uop_asi |
+    uop_rng |
+    uop_mpi ;
 
 //
 // Register Address Decoding
@@ -484,6 +595,16 @@ assign n_s2_imm =
     {32{use_imm_shfi  }} & {27'b0, s1_data[24:20]} ;
 
 //
+// Pack width decoding
+
+wire packed_instruction = 
+    dec_xc_padd   || dec_xc_psub   || dec_xc_pror     || dec_xc_psll    ||
+    dec_xc_psrl   || dec_xc_pror_i || dec_xc_psll_i   || dec_xc_psrl_i  ||
+    dec_xc_pmul_l || dec_xc_pmul_h || dec_xc_pclmul_l || dec_xc_pclmul_h ;
+
+assign n_s2_pw = packed_instruction ? {1'b0,d_data[31:30]} : PW_32;
+
+//
 // Operand Sourcing.
 // -------------------------------------------------------------------------
 
@@ -504,7 +625,25 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_c_swsp     || dec_sb         || dec_sh         || dec_sw         ||
     dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
     dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
-    dec_mulhu      || dec_rem        || dec_remu       ;
+    dec_mulhu      || dec_rem        || dec_remu       ||
+    dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
+    dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
+    dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
+    dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
+    dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
+    dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
+    dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
+    dec_b_fsri     ||
+    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
+    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
+    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
+    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
+    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ||
+    dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
+    dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
+    dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
+    dec_xc_scatter_h     ;
+
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
     dec_auipc       ;
@@ -522,7 +661,23 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_bgeu       || dec_blt        || dec_bltu       || dec_bne        ||
     dec_c_bnez     || dec_div        || dec_divu       || dec_mul        ||
     dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
-    dec_remu       || dec_c_mv        ;
+    dec_remu       || dec_c_mv       ||
+    dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || 
+    dec_xc_psll    || dec_xc_pror    || 
+    dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
+    dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
+    dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
+    dec_b_bdep     || dec_b_bext     || dec_b_grev     || 
+    dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
+    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
+    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
+    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
+    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
+    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ||
+    dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
+    dec_xc_macc_1        || dec_xc_mror          ||
+    dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
+    dec_xc_scatter_h     ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
@@ -533,12 +688,22 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_lbu        || dec_lh         || dec_lhu        || dec_lw         ||
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
     dec_sb         || dec_sh         || dec_sw         || dec_c_addi16sp ||
-    dec_c_addi4spn  ;
+    dec_c_addi4spn ||
+    dec_xc_psrl_i  || dec_xc_psll_i  || dec_xc_pror_i  || dec_b_grevi    ||
+    dec_b_rori     || dec_b_fsri     ;
 
 
 assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
     dec_sw          ;
+
+assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
+    dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||
+    dec_xc_madd_3  || dec_xc_msub_3  || dec_xc_macc_1  || dec_xc_mror    ||
+    dec_b_fsl      || dec_b_fsr      || dec_b_fsri     || dec_xc_lut     ||
+    dec_xc_bop     ||
+    dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
+    dec_xc_scatter_h     ;
 
 assign n_s2_opr_src[DIS_OPRC_CSRA] = // Operand C sources CSR address immediate
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
@@ -612,11 +777,13 @@ assign n_s2_opr_b =
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
+wire oprc_src_rs3  = n_s2_opr_src[DIS_OPRC_RS3 ];
 wire oprc_src_csra = n_s2_opr_src[DIS_OPRC_CSRA];
 wire oprc_src_pcim = n_s2_opr_src[DIS_OPRC_PCIM];
 
 assign n_s2_opr_c = 
     {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
+    {XLEN{oprc_src_rs3    }} & s1_rs3_rdata   |
     {XLEN{oprc_src_csra   }} & csr_addr       |
     {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
 
@@ -624,7 +791,7 @@ assign n_s2_opr_c =
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 146;
+localparam RL = 136 + (1+OP) + (1+FU) + (1+PW);
 
 `ifdef RVFI
 always @(posedge g_clk) begin
@@ -649,15 +816,16 @@ end
 wire [RL-1:0] p_mr;
 
 wire [RL-1:0] p_in = {
- s1_bubble ?  5'b0 : n_s2_rd   , // Destination register address
- n_s2_opr_a                , // Operand A
- n_s2_opr_b                , // Operand B
- n_s2_opr_c                , // Operand C
- s1_bubble ?  5'b0 : n_s2_uop  , // Micro-op code
- s1_bubble ?  5'b0 : n_s2_fu   , // Functional Unit (alu/mem/jump/mul/csr)
- s1_bubble ?  1'b0 : n_s2_trap , // Raise a trap?
- s1_bubble ?  2'b0 : n_s2_size , // Size of the instruction.
- s1_bubble ? 32'b0 : n_s2_instr  // The instruction word
+ s1_bubble ?  5'b0      : n_s2_rd   , // Destination register address
+ n_s2_opr_a                         , // Operand A
+ n_s2_opr_b                         , // Operand B
+ n_s2_opr_c                         , // Operand C
+ s1_bubble ?  {1+OP{1'b0}}: n_s2_uop, // Micro-op code
+ s1_bubble ?  {1+FU{1'b0}}: n_s2_fu , // Functional Unit (alu/mem/jump/mul/csr)
+ s1_bubble ?  {1+PW{1'b0}}: n_s2_pw , // IALU pack width specifier.
+ s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
+ s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
+ s1_bubble ? 32'b0      : n_s2_instr  // The instruction word
 };
 
 wire [RL-1:0] p_out;
@@ -669,6 +837,7 @@ assign {
  s2_opr_c      , // Operand C
  s2_uop        , // Micro-op code
  s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
+ s2_pw         , // IALU pack width.
  s2_trap       , // Raise a trap?
  s2_size       , // Size of the instruction.
  s2_instr        // The instruction word

@@ -190,8 +190,9 @@ wire [ 4:0] s2_rd         ; // Destination register address
 wire [XL:0] s2_opr_a      ; // Operand A
 wire [XL:0] s2_opr_b      ; // Operand B
 wire [XL:0] s2_opr_c      ; // Operand C
-wire [ 4:0] s2_uop        ; // Micro-op code
-wire [ 4:0] s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
+wire [OP:0] s2_uop        ; // Micro-op code
+wire [FU:0] s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
+wire [PW:0] s2_pw         ; // IALU pack width specifer.
 wire        s2_trap       ; // Raise a trap?
 wire [ 1:0] s2_size       ; // Size of the instruction.
 wire [31:0] s2_instr      ; // The instruction word
@@ -204,8 +205,8 @@ wire        fwd_s2_csr    ; // Writeback stage has CSR op in it.
 wire [ 4:0] s3_rd         ; // Destination register address
 wire [XL:0] s3_opr_a      ; // Operand A
 wire [XL:0] s3_opr_b      ; // Operand B
-wire [ 4:0] s3_uop        ; // Micro-op code
-wire [ 4:0] s3_fu         ; // Functional Unit
+wire [OP:0] s3_uop        ; // Micro-op code
+wire [FU:0] s3_fu         ; // Functional Unit
 wire        s3_trap       ; // Raise a trap?
 wire [ 1:0] s3_size       ; // Size of the instruction.
 wire [31:0] s3_instr      ; // The instruction word
@@ -220,8 +221,8 @@ wire        fwd_s3_csr    ; // Writeback stage has CSR op in it.
 wire [ 4:0] s4_rd         ; // Destination register address
 wire [XL:0] s4_opr_a      ; // Operand A
 wire [XL:0] s4_opr_b      ; // Operand B
-wire [ 4:0] s4_uop        ; // Micro-op code
-wire [ 4:0] s4_fu         ; // Functional Unit
+wire [OP:0] s4_uop        ; // Micro-op code
+wire [FU:0] s4_fu         ; // Functional Unit
 wire        s4_trap       ; // Raise a trap?
 wire [ 1:0] s4_size       ; // Size of the instruction.
 wire [31:0] s4_instr      ; // The instruction word
@@ -398,6 +399,7 @@ frv_pipeline_decode #(
 .s2_opr_c           (s2_opr_c           ), // Operand C
 .s2_uop             (s2_uop             ), // Micro-op code
 .s2_fu              (s2_fu              ), // Functional Unit
+.s2_pw              (s2_pw              ), // IALU Pack width
 .s2_trap            (s2_trap            ), // Raise a trap?
 .s2_size            (s2_size            ), // Size of the instruction.
 .s2_instr           (s2_instr           )  // The instruction word
@@ -427,6 +429,7 @@ frv_pipeline_execute #(
 .s2_opr_c         (s2_opr_c         ), // Operand C
 .s2_uop           (s2_uop           ), // Micro-op code
 .s2_fu            (s2_fu            ), // Functional Unit
+.s2_pw            (s2_pw            ), // IALU Pack width
 .s2_trap          (s2_trap          ), // Raise a trap?
 .s2_size          (s2_size          ), // Size of the instruction.
 .s2_instr         (s2_instr         ), // The instruction word

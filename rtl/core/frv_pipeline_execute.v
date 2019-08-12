@@ -13,8 +13,9 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [XL:0] s2_opr_a        , // Operand A
 input  wire [XL:0] s2_opr_b        , // Operand B
 input  wire [XL:0] s2_opr_c        , // Operand C
-input  wire [ 4:0] s2_uop          , // Micro-op code
-input  wire [ 4:0] s2_fu           , // Functional Unit
+input  wire [OP:0] s2_uop          , // Micro-op code
+input  wire [FU:0] s2_fu           , // Functional Unit
+input  wire [PW:0] s2_pw           , // IALU pack width specifer.
 input  wire        s2_trap         , // Raise a trap?
 input  wire [ 1:0] s2_size         , // Size of the instruction.
 input  wire [31:0] s2_instr        , // The instruction word
@@ -46,8 +47,8 @@ output reg  [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
 output wire [ 4:0] s3_rd           , // Destination register address
 output wire [XL:0] s3_opr_a        , // Operand A
 output wire [XL:0] s3_opr_b        , // Operand B
-output wire [ 4:0] s3_uop          , // Micro-op code
-output wire [ 4:0] s3_fu           , // Functional Unit
+output wire [OP:0] s3_uop          , // Micro-op code
+output wire [FU:0] s3_fu           , // Functional Unit
 output wire        s3_trap         , // Raise a trap?
 output wire [ 1:0] s3_size         , // Size of the instruction.
 output wire [31:0] s3_instr        , // The instruction word
@@ -284,10 +285,10 @@ frv_alu_muldiv i_alu_muldiv(
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam PIPE_REG_W = 114;
+localparam PIPE_REG_W = 106 + OP + FU;
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
-wire [ 4:0] n_s3_fu    = s2_fu   ; // Functional Unit
+wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit
 wire [ 1:0] n_s3_size  = s2_size ; // Size of the instruction.
 wire [31:0] n_s3_instr = s2_instr; // The instruction word
 
