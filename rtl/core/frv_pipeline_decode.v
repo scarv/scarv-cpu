@@ -243,8 +243,8 @@ wire [OP:0] uop_alu =
     {5{dec_sll       }} & ALU_SLL   |
     {5{dec_slli      }} & ALU_SLL   |
     {5{dec_c_slli    }} & ALU_SLL   |
-    {5{dec_xc_psll   }} & ALU_SRL   |
-    {5{dec_xc_psll_i }} & ALU_SRL   |
+    {5{dec_xc_psll   }} & ALU_SLL   |
+    {5{dec_xc_psll_i }} & ALU_SLL   |
     {5{dec_b_ror     }} & ALU_ROR   |
     {5{dec_b_rori    }} & ALU_ROR   |
     {5{dec_xc_pror   }} & ALU_ROR   |
@@ -557,7 +557,9 @@ wire use_imm32_b = dec_beq  || dec_bge    || dec_bgeu   || dec_blt    ||
                    dec_bltu || dec_bne  ;
 wire use_imm_csr = dec_csrrc || dec_csrrs || dec_csrrw;
 wire use_imm_csri= dec_csrrci || dec_csrrsi || dec_csrrwi;
-wire use_imm_shfi= dec_slli || dec_srli || dec_srai;
+wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     || 
+                   dec_xc_psll_i || dec_xc_psrl_i   || dec_xc_pror_i||
+                   dec_b_rori    || dec_b_fsri;
 
 wire use_pc_imm  = use_imm32_b  || use_imm32_j  || dec_c_beqz   ||
                    dec_c_bnez   || dec_c_j      || dec_c_jal     ;
