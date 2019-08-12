@@ -21,7 +21,6 @@ parameter XL                = XLEN - 1 ;
 assume property (reset == $initstate);
 
 reg [7:0] cycle_reg = 0;
-wire [7:0] cycle = reset ? 0 : cycle_reg;
 
 always @(posedge clock) begin
 	cycle_reg <= reset ? 1 : cycle_reg + (cycle_reg != 255);

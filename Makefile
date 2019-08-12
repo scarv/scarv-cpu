@@ -6,8 +6,12 @@ ifndef RISCV
     $(error "Please set the RISCV environment variable")
 endif
 
+export XCRYPTO_RTL  = $(FRV_HOME)/external/xcrypto-rtl/rtl
+
 export CPU_RTL_DIR  = $(FRV_HOME)/rtl/core
-export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v)
+export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
+                      $(XCRYPTO_RTL)/p_addsub/p_addsub.v \
+                      $(XCRYPTO_RTL)/p_shfrot/p_shfrot.v
 
 export PATH:=$(RISCV)/bin:$(YOSYS_ROOT)/:$(PATH)
 

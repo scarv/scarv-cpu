@@ -58,11 +58,17 @@ parameter channel_idx = 0;
 (* keep *) wire [XLEN/8 - 1 : 0] mem_wmask = rvfi_mem_wmask[channel_idx*XLEN/8 +: XLEN/8];
 (* keep *) wire [XLEN   - 1 : 0] mem_rdata = rvfi_mem_rdata[channel_idx*XLEN   +: XLEN];
 (* keep *) wire [XLEN   - 1 : 0] mem_wdata = rvfi_mem_wdata[channel_idx*XLEN   +: XLEN];
+		
+wire insn_pma_x = 1;
+wire mem_pma_r = 1;
+wire mem_pma_w = 1;
+
+wire mem_access_fault = (spec_mem_rmask && !mem_pma_r) || (spec_mem_wmask && !mem_pma_w) ||
+        ((spec_mem_rmask || spec_mem_wmask));
 
 reg integer i;
 
 always @* begin
-
 	if (!reset) begin
 		cover(spec_valid);
 		cover(spec_valid && !trap);
@@ -71,44 +77,51 @@ always @* begin
 	end
 	if (!reset && check) begin
 		assume(spec_valid);
-        
-        assert(spec_trap == trap);
 
-        if(spec_trap) begin
-            
-            assert(rd_addr   ==    0);
+		if (!insn_pma_x || mem_access_fault) begin
+			assert(trap);
+			assert(rd_addr == 0);
+			assert(rd_wdata == 0);
+			assert(mem_wmask == 0);
+		end else begin
 
-        end else if (!spec_trap) begin
-            if (spec_rs1_addr != 0)
-                assert(spec_rs1_addr == rs1_addr);
+			if (rs1_addr == 0)
+				assert(rs1_rdata == 0);
 
-            if (spec_rs2_addr != 0)
-                assert(spec_rs2_addr == rs2_addr);
-            
-            if (spec_rs3_addr != 0)
-                assert(spec_rs3_addr == rs3_addr);
+			if (rs2_addr == 0)
+				assert(rs2_rdata == 0);
 
-            assert(spec_rd_addr  == rd_addr);
-            assert(spec_rd_wdata == rd_wdata);
-            assert(spec_pc_wdata == pc_wdata);
+			if (!spec_trap) begin
+				if (spec_rs1_addr != 0)
+					assert(spec_rs1_addr == rs1_addr);
 
-            if (spec_mem_wmask || spec_mem_rmask) begin
-                assert(spec_mem_addr == mem_addr);
-            end
+				if (spec_rs2_addr != 0)
+					assert(spec_rs2_addr == rs2_addr);
 
-            for (i = 0; i < XLEN/8; i = i+1) begin
-                if (spec_mem_wmask[i]) begin
-                    assert(mem_wmask[i]);
-                    assert(spec_mem_wdata[i*8 +: 8] == mem_wdata[i*8 +: 8]);
-                end else if (mem_wmask[i]) begin
-                    assert(mem_rmask[i]);
-                    assert(mem_rdata[i*8 +: 8] == mem_wdata[i*8 +: 8]);
-                end
-                if (spec_mem_rmask[i]) begin
-                    assert(mem_rmask[i]);
-                end
-            end
-        end
+				assert(spec_rd_addr == rd_addr);
+				assert(spec_rd_wdata == rd_wdata);
+				assert(spec_pc_wdata == pc_wdata);
+
+				if (spec_mem_wmask || spec_mem_rmask) begin
+					assert(spec_mem_addr == mem_addr);
+				end
+
+				for (i = 0; i < XLEN/8; i = i+1) begin
+					if (spec_mem_wmask[i]) begin
+						assert(mem_wmask[i]);
+						assert(spec_mem_wdata[i*8 +: 8] == mem_wdata[i*8 +: 8]);
+					end else if (mem_wmask[i]) begin
+						assert(mem_rmask[i]);
+						assert(mem_rdata[i*8 +: 8] == mem_wdata[i*8 +: 8]);
+					end
+					if (spec_mem_rmask[i]) begin
+						assert(mem_rmask[i]);
+					end
+				end
+			end
+
+			assert(spec_trap == trap);
+		end
 	end
 end
 
