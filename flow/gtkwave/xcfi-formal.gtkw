@@ -1,0 +1,221 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Mon Aug 12 13:24:43 2019
+[*]
+[dumpfile] "(null)"
+[savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/xcfi-formal.gtkw"
+[timestart] 0
+[size] 1920 1025
+[pos] -1 -1
+*-5.142160 39 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] xcfi_testbench.
+[treeopen] xcfi_testbench.i_insn_checker.
+[treeopen] xcfi_testbench.i_wrapper.
+[treeopen] xcfi_testbench.i_wrapper.i_dut.
+[treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.
+[treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.
+[treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.
+[sst_width] 268
+[signals_width] 274
+[sst_expanded] 1
+[sst_vpaned_height] 290
+@420
+smt_step
+@28
+smt_clock
+xcfi_testbench.reset
+@200
+-
+@28
+xcfi_testbench.i_wrapper.dmem_gnt
+xcfi_testbench.i_wrapper.dmem_req
+xcfi_testbench.i_wrapper.imem_gnt
+xcfi_testbench.i_wrapper.imem_req
+@200
+-
+@22
+xcfi_testbench.i_insn_checker.spec_mem_addr[31:0]
+xcfi_testbench.i_insn_checker.spec_mem_rmask[3:0]
+xcfi_testbench.i_insn_checker.spec_mem_wdata[31:0]
+xcfi_testbench.i_insn_checker.spec_mem_wmask[3:0]
+xcfi_testbench.i_insn_checker.spec_pc_wdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.spec_rd_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.spec_rd_wdata[31:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs1_rdata[31:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs2_rdata[31:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs3_rdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.spec_rs1_addr[4:0]
+xcfi_testbench.i_insn_checker.spec_rs2_addr[4:0]
+xcfi_testbench.i_insn_checker.spec_rs3_addr[4:0]
+@28
+xcfi_testbench.i_insn_checker.spec_trap
+xcfi_testbench.i_insn_checker.spec_valid
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_ror
+@23
+xcfi_testbench.i_insn_checker.i_insn_spec.shamt[4:0]
+@200
+-
+@22
+xcfi_testbench.i_insn_checker.rvfi_insn[31:0]
+@24
+xcfi_testbench.i_insn_checker.rvfi_order[63:0]
+@22
+xcfi_testbench.i_insn_checker.rvfi_pc_rdata[31:0]
+xcfi_testbench.i_insn_checker.rvfi_pc_wdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.rvfi_rd_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.rvfi_rd_wdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.rvfi_rs1_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.rvfi_rs1_rdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.rvfi_rs2_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.rvfi_rs2_rdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.rvfi_rs3_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.rvfi_rs3_rdata[31:0]
+@28
+xcfi_testbench.i_insn_checker.rvfi_trap
+xcfi_testbench.i_insn_checker.rvfi_valid
+@24
+xcfi_testbench.cycle_reg[7:0]
+@28
+xcfi_testbench.check
+@200
+-
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.instr_ret
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_ror
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.s2_instr[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.s3_instr[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.s4_instr[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.trs_instr[31:0]
+@200
+-
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_add_result[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_eq
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_flush
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_lhs[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_result[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_rhs[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_lt
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_add
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_and
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_cmp
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_or
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_rot
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_shf
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_shf_arith
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_shf_left
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_sub
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_unsigned
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_xor
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_ready
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_valid
+@200
+-
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.crs1[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.w_32
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.left
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.pw[4:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.result[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.right
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.rotate
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.shamt[4:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.i_p_shfrot.shift
+@200
+-
+@c00200
+-XCrypto Decode
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aesmix_dec
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aesmix_enc
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aessub_dec
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aessub_decrot
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aessub_enc
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aessub_encrot
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_bop
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_gather_b
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_gather_h
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_b
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_bu
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_d
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_h
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_hu
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_w
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_lut
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_macc_1
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_madd_3
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_mmul_3
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_mror
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_msub_3
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_padd
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_pclmul_h
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_pclmul_l
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_pmul_h
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_pmul_l
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_pror
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_pror_i
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_psll
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_psll_i
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_psrl
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_psrl_i
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_psub
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_rngsamp
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_rngseed
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_rngtest
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_scatter_b
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_scatter_h
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha3_x1
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha3_x2
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha3_x4
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha3_xy
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha3_yx
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha256_s0
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha256_s1
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha256_s2
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha256_s3
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_str_b
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_str_h
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_str_w
+@1401200
+-XCrypto Decode
+@c00200
+-Bitmanip Decode
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_bdep
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_bext
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_clmul
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_clmulh
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_clmulr
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_cmov
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_fsl
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_fsr
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_fsri
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_grev
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_grevi
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_ror
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_rori
+@1401200
+-Bitmanip Decode
+[pattern_trace] 1
+[pattern_trace] 0

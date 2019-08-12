@@ -11,7 +11,7 @@ module xcfi_testbench (
     input reset
 );
 
-parameter XCFI_CHECK_CYCLE  = 20       ;
+parameter XCFI_CHECK_CYCLE  = 15       ;
 
 parameter ILEN              = 32       ;
 parameter NRET              = 1        ;

@@ -3,14 +3,15 @@ mode bmc
 expect pass,fail
 append 0
 tbtop xcfi_wrapper.uut
-depth 21
-skip 20
+depth 16
+skip 15
 
 [engines]
 smtbmc boolector
 
 [files]
 ./verif/rvfi/xcfi_macros.sv
+./verif/rvfi/xcfi_macros_packed.vh
 ./rtl/core/frv_pipeline_decode.vh
 
 [script]
