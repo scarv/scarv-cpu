@@ -97,6 +97,7 @@ localparam BIT_GREV          = {2'b10, 3'b000};
 localparam BIT_GREVI         = {2'b10, 3'b001};
 localparam BIT_LUT           = {2'b11, 3'b000};
 localparam BIT_BOP           = {2'b11, 3'b001};
+localparam BIT_CMOV          = {2'b11, 3'b100};
 localparam BIT_FSL           = {2'b00, 3'b000};
 localparam BIT_FSR           = {2'b00, 3'b001};
 

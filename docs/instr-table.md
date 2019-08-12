@@ -151,6 +151,7 @@ Instruction  | Action                   | uOP code
 `grevi      `| rd <= f(rs1,rs2)         | {10, 001} 
 `xc.lut     `| rd <= f(rs1,rs2,rs3)     | {11, 000} 
 `xc.bop     `| rd <= f(rs1,rs2,rs3)     | {11, 001} 
+`cmov       `| rd <= rs3 ? rs1 : rs2    | {11, 100}
 `fsl        `| rd <= rs1 || rs2 << rs3  | {00, 000}
 `fsr        `| rd <= rs1 || rs2 << rs3  | {00, 001}
 `fsri       `| rd <= rs1 || rs2 << imm  | {00, 001}
@@ -351,6 +352,7 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `grevi      `|  rs1         | rs2           | 0
 `xc.lut     `|  rs1         | rs2           | rs3
 `xc.bop     `|  rs1         | rs2           | rs3
+`cmov       `|  rs1         | rs2           | rs3
 `fsl        `|  rs1         | rs2           | rs3
 `fsr        `|  rs1         | rs2           | rs3
 `fsri       `|  rs1         | rs2           | rs3

@@ -158,7 +158,7 @@ assign n_s2_fu[P_FU_CSR] =
 assign n_s2_fu[P_FU_BIT] = 
     dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
-    dec_b_fsri     ;
+    dec_b_fsri     || dec_b_cmov     ;
 
 assign n_s2_fu[P_FU_ASI] = 
     dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
