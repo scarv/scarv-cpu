@@ -1,0 +1,461 @@
+#
+# From Git Commit 880c444d8177eda1734687caad635238ea9e6f5b
+#   
+#   Yosys synthesis targeting internal cells.
+#
+
+21. Printing statistics.
+
+=== $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_counters ===
+
+   Number of wires:               1693
+   Number of wire bits:           2604
+   Number of public wires:          32
+   Number of public wire bits:     660
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               2234
+     $_ANDNOT_                     457
+     $_AND_                          4
+     $_AOI3_                        75
+     $_AOI4_                        32
+     $_DFF_P_                      290
+     $_MUX_                        414
+     $_NAND_                       100
+     $_NOR_                         25
+     $_NOT_                        225
+     $_OAI3_                        53
+     $_ORNOT_                       96
+     $_OR_                         207
+     $_XNOR_                        12
+     $_XOR_                        244
+
+=== $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_lsu ===
+
+   Number of wires:                143
+   Number of wire bits:            332
+   Number of public wires:          31
+   Number of public wire bits:     220
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                155
+     $_ANDNOT_                       9
+     $_AND_                          2
+     $_AOI4_                        17
+     $_DFF_P_                        2
+     $_NAND_                        66
+     $_NOR_                          2
+     $_NOT_                          4
+     $_OAI3_                        20
+     $_ORNOT_                        5
+     $_OR_                          28
+
+=== $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_pipeline_memory ===
+
+   Number of wires:                 81
+   Number of wire bits:            886
+   Number of public wires:          68
+   Number of public wire bits:     873
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 91
+     $_ANDNOT_                      32
+     $_AND_                          2
+     $_AOI3_                         3
+     $_MUX_                         41
+     $_NAND_                         5
+     $_NOT_                          5
+     $_OR_                           1
+     $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_lsu      1
+     $paramod\frv_pipeline_register\RLEN=114\BUFFER_HANDSHAKE=1'0      1
+
+=== $paramod$3075b6d2c2f81d98aec0007df588f1902e19adc4\frv_pipeline_decode ===
+
+   Number of wires:               2246
+   Number of wire bits:           3784
+   Number of public wires:         189
+   Number of public wire bits:    1696
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               2279
+     $_ANDNOT_                     378
+     $_AND_                         15
+     $_AOI3_                       147
+     $_AOI4_                         8
+     $_DFF_P_                       32
+     $_MUX_                         75
+     $_NAND_                        52
+     $_NOR_                        114
+     $_NOT_                        201
+     $_OAI3_                       165
+     $_OAI4_                        87
+     $_ORNOT_                      111
+     $_OR_                         800
+     $_XNOR_                        20
+     $_XOR_                         73
+     $paramod\frv_pipeline_register\RLEN=146\BUFFER_HANDSHAKE=1'0      1
+
+=== $paramod$7e0b1eae02dacfe413059c5da7df6b3ef0fb12db\frv_pipeline ===
+
+   Number of wires:                340
+   Number of wire bits:           1766
+   Number of public wires:         138
+   Number of public wire bits:    1564
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                275
+     $_ANDNOT_                      11
+     $_AND_                          2
+     $_AOI4_                         1
+     $_MUX_                        192
+     $_NAND_                         2
+     $_NOR_                          1
+     $_OAI4_                         3
+     $_OR_                          26
+     $_XNOR_                         2
+     $_XOR_                         28
+     $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_pipeline_memory      1
+     $paramod$3075b6d2c2f81d98aec0007df588f1902e19adc4\frv_pipeline_decode      1
+     $paramod\frv_gprs\BRAM_REGFILE=0      1
+     $paramod\frv_pipeline_fetch\FRV_PC_RESET_VALUE=32'10000000000000000000000000000000      1
+     $paramod\frv_pipeline_writeback\FRV_PC_RESET_VALUE=32'10000000000000000000000000000000      1
+     frv_csrs                        1
+     frv_pipeline_execute            1
+
+=== $paramod\frv_alu_mul_serial\LEN=32 ===
+
+   Number of wires:                550
+   Number of wire bits:            944
+   Number of public wires:          24
+   Number of public wire bits:     350
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                666
+     $_ANDNOT_                     108
+     $_AND_                         33
+     $_AOI3_                        19
+     $_DFF_P_                       71
+     $_MUX_                        102
+     $_NAND_                         7
+     $_NOR_                         11
+     $_NOT_                         57
+     $_OAI3_                        26
+     $_ORNOT_                       45
+     $_OR_                          81
+     $_XNOR_                        16
+     $_XOR_                         90
+
+=== $paramod\frv_gprs\BRAM_REGFILE=0 ===
+
+   Number of wires:               3995
+   Number of wire bits:           6053
+   Number of public wires:          41
+   Number of public wire bits:    1138
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               5971
+     $_ANDNOT_                    1235
+     $_AND_                        192
+     $_AOI3_                        81
+     $_AOI4_                       192
+     $_DFF_P_                      992
+     $_MUX_                        992
+     $_NAND_                         8
+     $_NOR_                          2
+     $_NOT_                        835
+     $_OAI3_                        65
+     $_OAI4_                       768
+     $_ORNOT_                       14
+     $_OR_                         595
+
+=== $paramod\frv_pipeline_fetch\FRV_PC_RESET_VALUE=32'10000000000000000000000000000000 ===
+
+   Number of wires:                278
+   Number of wire bits:            510
+   Number of public wires:          39
+   Number of public wire bits:     236
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                319
+     $_ANDNOT_                      63
+     $_AND_                          4
+     $_AOI3_                         2
+     $_DFF_P_                       40
+     $_MUX_                         65
+     $_NAND_                        15
+     $_NOR_                          2
+     $_NOT_                         61
+     $_OAI3_                         1
+     $_ORNOT_                        5
+     $_OR_                          21
+     $_XNOR_                         5
+     $_XOR_                         34
+     frv_core_fetch_buffer           1
+
+=== $paramod\frv_pipeline_register\RLEN=114\BUFFER_HANDSHAKE=1'0 ===
+
+   Number of wires:                241
+   Number of wire bits:            693
+   Number of public wires:          11
+   Number of public wire bits:     350
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                457
+     $_ANDNOT_                     114
+     $_DFF_P_                      114
+     $_MUX_                        114
+     $_ORNOT_                      115
+
+=== $paramod\frv_pipeline_register\RLEN=146\BUFFER_HANDSHAKE=1'0 ===
+
+   Number of wires:                305
+   Number of wire bits:            885
+   Number of public wires:          11
+   Number of public wire bits:     446
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                585
+     $_ANDNOT_                     146
+     $_DFF_P_                      146
+     $_MUX_                        146
+     $_ORNOT_                      147
+
+=== $paramod\frv_pipeline_writeback\FRV_PC_RESET_VALUE=32'10000000000000000000000000000000 ===
+
+   Number of wires:                801
+   Number of wire bits:           1743
+   Number of public wires:         106
+   Number of public wire bits:    1017
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                846
+     $_ANDNOT_                     113
+     $_AND_                         35
+     $_AOI3_                        61
+     $_AOI4_                        66
+     $_DFF_P_                       36
+     $_MUX_                        134
+     $_NAND_                        51
+     $_NOR_                         10
+     $_NOT_                        135
+     $_OAI3_                        47
+     $_OAI4_                         9
+     $_ORNOT_                       21
+     $_OR_                          96
+     $_XNOR_                         2
+     $_XOR_                         30
+
+=== frv_alu ===
+
+   Number of wires:                969
+   Number of wire bits:           1409
+   Number of public wires:          38
+   Number of public wire bits:     478
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                997
+     $_ANDNOT_                      82
+     $_AND_                         33
+     $_AOI3_                        78
+     $_AOI4_                         3
+     $_MUX_                        344
+     $_NAND_                        21
+     $_NOR_                         49
+     $_NOT_                         67
+     $_OAI3_                        49
+     $_OAI4_                        56
+     $_ORNOT_                       17
+     $_OR_                          68
+     $_XNOR_                        68
+     $_XOR_                         62
+
+=== frv_alu_muldiv ===
+
+   Number of wires:               1767
+   Number of wire bits:           2272
+   Number of public wires:          52
+   Number of public wire bits:     429
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               2016
+     $_ANDNOT_                     341
+     $_AND_                          4
+     $_AOI3_                       105
+     $_DFF_P_                      136
+     $_MUX_                        549
+     $_NAND_                        16
+     $_NOR_                         24
+     $_NOT_                        219
+     $_OAI3_                        29
+     $_OAI4_                        32
+     $_ORNOT_                       55
+     $_OR_                         300
+     $_XNOR_                        24
+     $_XOR_                        181
+     $paramod\frv_alu_mul_serial\LEN=32      1
+
+=== frv_core ===
+
+   Number of wires:                 51
+   Number of wire bits:            592
+   Number of public wires:          51
+   Number of public wire bits:     592
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  3
+     $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_counters      1
+     $paramod$7e0b1eae02dacfe413059c5da7df6b3ef0fb12db\frv_pipeline      1
+     frv_interrupt                   1
+
+=== frv_core_fetch_buffer ===
+
+   Number of wires:                839
+   Number of wire bits:           1048
+   Number of public wires:          26
+   Number of public wire bits:     186
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                919
+     $_ANDNOT_                      62
+     $_AND_                          2
+     $_AOI3_                        55
+     $_DFF_P_                       53
+     $_MUX_                        478
+     $_NAND_                        54
+     $_NOR_                          1
+     $_NOT_                         93
+     $_OAI3_                        62
+     $_OAI4_                        52
+     $_ORNOT_                        2
+     $_OR_                           5
+
+=== frv_csrs ===
+
+   Number of wires:               2082
+   Number of wire bits:           3359
+   Number of public wires:         129
+   Number of public wire bits:    1247
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               2321
+     $_ANDNOT_                     209
+     $_AND_                          7
+     $_AOI3_                       212
+     $_AOI4_                        16
+     $_DFF_P_                      177
+     $_MUX_                        571
+     $_NAND_                       204
+     $_NOR_                        193
+     $_NOT_                        298
+     $_OAI3_                       133
+     $_OAI4_                        13
+     $_ORNOT_                      173
+     $_OR_                         115
+
+=== frv_interrupt ===
+
+   Number of wires:                 31
+   Number of wire bits:             36
+   Number of public wires:          18
+   Number of public wire bits:      23
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 20
+     $_ANDNOT_                       2
+     $_AND_                          3
+     $_DFF_P_                        3
+     $_NAND_                         3
+     $_NOR_                          1
+     $_NOT_                          3
+     $_OAI4_                         2
+     $_OR_                           3
+
+=== frv_pipeline_execute ===
+
+   Number of wires:                411
+   Number of wire bits:           1557
+   Number of public wires:         112
+   Number of public wire bits:    1258
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                424
+     $_ANDNOT_                      47
+     $_AND_                          3
+     $_AOI3_                        41
+     $_AOI4_                        32
+     $_MUX_                         38
+     $_NAND_                       131
+     $_NOR_                          3
+     $_NOT_                         17
+     $_OAI3_                        33
+     $_OAI4_                         2
+     $_ORNOT_                        4
+     $_OR_                          70
+     $paramod\frv_pipeline_register\RLEN=114\BUFFER_HANDSHAKE=1'0      1
+     frv_alu                         1
+     frv_alu_muldiv                  1
+
+=== design hierarchy ===
+
+   frv_core                          1
+     $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_counters      1
+     $paramod$7e0b1eae02dacfe413059c5da7df6b3ef0fb12db\frv_pipeline      1
+       $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_pipeline_memory      1
+         $paramod$13feeab239c84815306fb6bda9497ee05ca18808\frv_lsu      1
+         $paramod\frv_pipeline_register\RLEN=114\BUFFER_HANDSHAKE=1'0      1
+       $paramod$3075b6d2c2f81d98aec0007df588f1902e19adc4\frv_pipeline_decode      1
+         $paramod\frv_pipeline_register\RLEN=146\BUFFER_HANDSHAKE=1'0      1
+       $paramod\frv_gprs\BRAM_REGFILE=0      1
+       $paramod\frv_pipeline_fetch\FRV_PC_RESET_VALUE=32'10000000000000000000000000000000      1
+         frv_core_fetch_buffer       1
+       $paramod\frv_pipeline_writeback\FRV_PC_RESET_VALUE=32'10000000000000000000000000000000      1
+       frv_csrs                      1
+       frv_pipeline_execute          1
+         $paramod\frv_pipeline_register\RLEN=114\BUFFER_HANDSHAKE=1'0      1
+         frv_alu                     1
+         frv_alu_muldiv              1
+           $paramod\frv_alu_mul_serial\LEN=32      1
+     frv_interrupt                   1
+
+   Number of wires:              17064
+   Number of wire bits:          31166
+   Number of public wires:        1127
+   Number of public wire bits:   13113
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:              21017
+     $_ANDNOT_                    3523
+     $_AND_                        341
+     $_AOI3_                       879
+     $_AOI4_                       367
+     $_DFF_P_                     2206
+     $_MUX_                       4369
+     $_NAND_                       735
+     $_NOR_                        438
+     $_NOT_                       2220
+     $_OAI3_                       683
+     $_OAI4_                      1024
+     $_ORNOT_                      925
+     $_OR_                        2416
+     $_XNOR_                       149
+     $_XOR_                        742
+
