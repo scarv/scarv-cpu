@@ -1,5 +1,6 @@
 
 `include "xcfi_macros.sv"
+`include "xcfi_macros_packed.vh"
 
 module xcfi_insn_spec (
 
@@ -11,12 +12,16 @@ module xcfi_insn_spec (
 
 `XCFI_INSN_CHECK_COMMON
 
-wire [ 4:0] shamt       = `RS2;
+wire [ 1:0] pw          = `INSTR_PACK_WIDTH;
 
-wire [31:0] insn_result = 
-    (`RS1 >> shamt) | (`RS1 << (32-shamt));
+wire [ 4:0] shamt       = d_data[25:20];
 
-wire                  spec_valid       = dec_b_ror;
+`PACK_WIDTH_ROTATE_RIGHT_OPERATION(shamt)
+
+ // From the PACK_WIDTH_ARITH_OPERATION_RESULT macro.
+wire [31:0] insn_result = result;
+
+wire                  spec_valid       = dec_xc_pror_i;
 wire                  spec_trap        = 1'b0   ;
 wire [         4 : 0] spec_rs1_addr    = `FIELD_RS1_ADDR;
 wire [         4 : 0] spec_rs2_addr    = `FIELD_RS2_ADDR;
@@ -30,3 +35,4 @@ wire [XLEN/8 - 1 : 0] spec_mem_wmask   = 0;
 wire [XLEN   - 1 : 0] spec_mem_wdata   = 0;
 
 endmodule
+

@@ -11,12 +11,12 @@ module xcfi_insn_spec (
 
 `XCFI_INSN_CHECK_COMMON
 
-wire [ 4:0] shamt       = `RS2;
+wire [ 4:0] shamt       = d_data[24:20];
 
 wire [31:0] insn_result = 
     (`RS1 >> shamt) | (`RS1 << (32-shamt));
 
-wire                  spec_valid       = dec_b_ror;
+wire                  spec_valid       = dec_b_rori;
 wire                  spec_trap        = 1'b0   ;
 wire [         4 : 0] spec_rs1_addr    = `FIELD_RS1_ADDR;
 wire [         4 : 0] spec_rs2_addr    = `FIELD_RS2_ADDR;
