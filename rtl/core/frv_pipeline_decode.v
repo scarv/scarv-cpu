@@ -634,7 +634,8 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
     dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
-    dec_b_fsri     ||
+    dec_b_fsri     || dec_b_cmov     || dec_b_clmul    || dec_b_clmulr   ||
+    dec_b_clmulh   ||
     dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
     dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
     dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
@@ -664,12 +665,13 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
     dec_remu       || dec_c_mv       ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || 
-    dec_xc_psll    || dec_xc_pror    || 
+    dec_xc_psll    || dec_xc_pror    || dec_b_cmov     ||
     dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
     dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
     dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
     dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_ror      ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
+    dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ||
     dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
     dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
     dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
@@ -702,7 +704,7 @@ assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
     dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||
     dec_xc_madd_3  || dec_xc_msub_3  || dec_xc_macc_1  || dec_xc_mror    ||
     dec_b_fsl      || dec_b_fsr      || dec_b_fsri     || dec_xc_lut     ||
-    dec_xc_bop     ||
+    dec_xc_bop     || dec_b_cmov     ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
     dec_xc_scatter_h     ;
 
