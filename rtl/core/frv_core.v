@@ -82,6 +82,22 @@ parameter BRAM_REGFILE = 0;
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
 
+//
+// XCrypto feature class config bits.
+parameter XC_CLASS_BASELINE   = 1'b1;
+parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MEMORY     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+
+//
+// Partial Bitmanip Extension Support
+parameter BITMANIP_BASELINE   = 1'b1;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -127,11 +143,21 @@ wire        mmio_error       ; // MMIO error
 //  The top level of the CPU data pipeline
 //
 frv_pipeline #(
-.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE),
-.BRAM_REGFILE(BRAM_REGFILE),
-.TRACE_INSTR_WORD(TRACE_INSTR_WORD),
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
+.FRV_PC_RESET_VALUE (FRV_PC_RESET_VALUE ),
+.BRAM_REGFILE       (BRAM_REGFILE       ),
+.TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
+.MMIO_BASE_ADDR     (MMIO_BASE_ADDR     ),
+.MMIO_BASE_MASK     (MMIO_BASE_MASK     ),
+.XC_CLASS_BASELINE  (XC_CLASS_BASELINE  ),
+.XC_CLASS_RANDOMNESS(XC_CLASS_RANDOMNESS),
+.XC_CLASS_MEMORY    (XC_CLASS_MEMORY    ),
+.XC_CLASS_BIT       (XC_CLASS_BIT       ),
+.XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
+.XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
+.XC_CLASS_AES       (XC_CLASS_AES       ),
+.XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
+.XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset

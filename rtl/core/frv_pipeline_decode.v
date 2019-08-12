@@ -62,6 +62,22 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
 
+//
+// XCrypto feature class config bits.
+parameter XC_CLASS_BASELINE   = 1'b1;
+parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MEMORY     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+
+//
+// Partial Bitmanip Extension Support
+parameter BITMANIP_BASELINE   = 1'b1;
+
 // From (buffered) pipeline register of next stage.
 wire   p_s2_busy;
 

@@ -109,6 +109,22 @@ parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
 
+//
+// XCrypto feature class config bits.
+parameter XC_CLASS_BASELINE   = 1'b1;
+parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MEMORY     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+
+//
+// Partial Bitmanip Extension Support
+parameter BITMANIP_BASELINE   = 1'b1;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -336,8 +352,18 @@ frv_pipeline_fetch #(
 //  instructions into wider pipeline encodings.
 //
 frv_pipeline_decode #(
-.FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE),
-.TRACE_INSTR_WORD(TRACE_INSTR_WORD)
+.FRV_PC_RESET_VALUE (FRV_PC_RESET_VALUE ),
+.TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
+.XC_CLASS_BASELINE  (XC_CLASS_BASELINE  ),
+.XC_CLASS_RANDOMNESS(XC_CLASS_RANDOMNESS),
+.XC_CLASS_MEMORY    (XC_CLASS_MEMORY    ),
+.XC_CLASS_BIT       (XC_CLASS_BIT       ),
+.XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
+.XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
+.XC_CLASS_AES       (XC_CLASS_AES       ),
+.XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
+.XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
 .g_resetn           (g_resetn           ), // synchronous reset
@@ -382,7 +408,17 @@ frv_pipeline_decode #(
 //
 //  Execute stage of the pipeline, responsible for ALU / LSU / Branch compare.
 //
-frv_pipeline_execute i_pipeline_s2_execute (
+frv_pipeline_execute #(
+.XC_CLASS_RANDOMNESS(XC_CLASS_RANDOMNESS),
+.XC_CLASS_MEMORY    (XC_CLASS_MEMORY    ),
+.XC_CLASS_BIT       (XC_CLASS_BIT       ),
+.XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
+.XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
+.XC_CLASS_AES       (XC_CLASS_AES       ),
+.XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
+.XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
+) i_pipeline_s2_execute (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
 .s2_rd            (s2_rd            ), // Destination register address
@@ -592,7 +628,18 @@ frv_pipeline_writeback #(
 //
 //  Responsible for keeping control/status registers up to date.
 //
-frv_csrs i_csrs (
+frv_csrs #(
+.XC_CLASS_BASELINE  (XC_CLASS_BASELINE  ),
+.XC_CLASS_RANDOMNESS(XC_CLASS_RANDOMNESS),
+.XC_CLASS_MEMORY    (XC_CLASS_MEMORY    ),
+.XC_CLASS_BIT       (XC_CLASS_BIT       ),
+.XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
+.XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
+.XC_CLASS_AES       (XC_CLASS_AES       ),
+.XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
+.XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
+) i_csrs (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
 .csr_en           (csr_en           ), // CSR Access Enable
