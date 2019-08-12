@@ -105,6 +105,7 @@ wire        alu_op_and      = fu_alu && s2_uop == ALU_AND;
 wire        alu_op_shf      = fu_alu && (s2_uop == ALU_SLL ||
                                          s2_uop == ALU_SRL ||
                                          s2_uop == ALU_SRA );
+wire        alu_op_rot      = fu_alu && (s2_uop == ALU_ROR );
 
 wire        alu_op_shf_left = fu_alu && s2_uop == ALU_SLL;
 wire        alu_op_shf_arith= fu_alu && s2_uop == ALU_SRA;
@@ -241,12 +242,14 @@ frv_alu i_alu (
 .alu_valid       (alu_valid       ), // Stall this stage
 .alu_flush       (alu_flush       ), // flush the stage
 .alu_ready       (alu_ready       ), // stage ready to progress
+.alu_pw          (s2_pw           ), // Pack width specifier.
 .alu_op_add      (alu_op_add      ), // 
 .alu_op_sub      (alu_op_sub      ), // 
 .alu_op_xor      (alu_op_xor      ), // 
 .alu_op_or       (alu_op_or       ), // 
 .alu_op_and      (alu_op_and      ), // 
 .alu_op_shf      (alu_op_shf      ), // 
+.alu_op_rot      (alu_op_rot      ), // 
 .alu_op_shf_left (alu_op_shf_left ), // 
 .alu_op_shf_arith(alu_op_shf_arith), // 
 .alu_op_cmp      (alu_op_cmp      ), // 

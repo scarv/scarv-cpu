@@ -625,7 +625,8 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_c_swsp     || dec_sb         || dec_sh         || dec_sw         ||
     dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
     dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
-    dec_mulhu      || dec_rem        || dec_remu       ||
+    dec_mulhu      || dec_rem        || dec_remu       || dec_b_ror      ||
+    dec_b_rori     ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
     dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
     dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
@@ -667,7 +668,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
     dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
     dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
-    dec_b_bdep     || dec_b_bext     || dec_b_grev     || 
+    dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_ror      ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
     dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
     dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
