@@ -65,14 +65,18 @@ wire [XL:0] aes_sub_rs2 = {XLEN{insn_aes_sub}} & asi_rs2;
 wire        aes_sub_enc = !asi_uop[0];
 wire        aes_sub_rot =  asi_uop[1];
 
+wire [XL:0] aes_mix_rs1 = {XLEN{insn_aes_mix}} & asi_rs1;
+wire [XL:0] aes_mix_rs2 = {XLEN{insn_aes_mix}} & asi_rs2;
+wire        aes_mix_enc = !asi_uop[0];
+
 //
 // Result Selection
 // -------------------------------------------------------------
 
-wire [XL:0] result_aessub ;
-wire [XL:0] result_aesmix = 32'b0;
-wire [XL:0] result_sha2  ;
-wire [XL:0] result_sha3  ;
+wire [XL:0] result_aessub   ;
+wire [XL:0] result_aesmix   ;
+wire [XL:0] result_sha2     ;
+wire [XL:0] result_sha3     ;
 
 assign asi_result =
     {32{insn_aes_mix }} & result_aesmix |
@@ -81,7 +85,7 @@ assign asi_result =
     {32{insn_sha3    }} & result_sha3   ;
 
 wire aes_sub_ready;
-wire aes_mix_ready = 1'b0;
+wire aes_mix_ready;
 
 assign asi_ready = insn_sha2                       || 
                    insn_sha3                       || 
@@ -136,6 +140,22 @@ xc_aessub i_xc_aessub(
 .rot   (aes_sub_rot     ), // Perform encrypt (set) or decrypt (clear).
 .ready (aes_sub_ready   ), // Is the instruction complete?
 .result(result_aessub   )  // 
+);
+
+//
+// instance: xc_aesmix
+//
+//  Implements the lightweight AES MixColumns instructions.
+//
+xc_aesmix i_xc_aesmix(
+.clock (g_clk           ),
+.reset (!g_resetn       ),
+.valid (insn_aes_mix    ), // Are the inputs valid?
+.rs1   (aes_mix_rs1     ), // Input source register 1
+.rs2   (aes_mix_rs2     ), // Input source register 2
+.enc   (aes_mix_enc     ), // Perform encrypt (set) or decrypt (clear).
+.ready (aes_mix_ready   ), // Is the instruction complete?
+.result(result_aesmix   )  // 
 );
 
 endmodule
