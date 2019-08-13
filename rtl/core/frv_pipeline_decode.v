@@ -773,11 +773,21 @@ assign n_s2_opr_a =
     {XLEN{opra_src_csri   }} & csr_imm        ;
 
 // Operand B sourcing.
+
+wire oprb_rs2_shf_1 = dec_xc_ldr_h     || dec_xc_ldr_hu    || dec_xc_str_h || 
+                      dec_xc_scatter_h || dec_xc_gather_h  ;
+
+wire oprb_rs2_shf_2 = dec_xc_ldr_w     || dec_xc_str_w     ;
+
+wire [XL:0] s1_rs2_shf = oprb_rs2_shf_1 ? {s1_rs2_rdata[30:0],1'b0} :
+                         oprb_rs2_shf_2 ? {s1_rs2_rdata[29:0],2'b0} :
+                                           s1_rs2_rdata             ;
+
 wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
 assign n_s2_opr_b =
-    {XLEN{oprb_src_rs2    }} & s1_rs2_rdata   |
+    {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
     {XLEN{oprb_src_imm    }} & n_s2_imm       ;
 
 // Operand C sourcing.
