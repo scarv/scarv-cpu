@@ -6,7 +6,12 @@ XCFI_COMMON     = $(XCFI_SRC_DIR)/fi_fairness.sv \
                   $(XCFI_SRC_DIR)/xcfi_insn_checker.sv \
                   $(XCFI_SRC_DIR)/xcfi_macros.sv \
                   $(XCFI_SRC_DIR)/xcfi_testbench.v \
-                  $(XCFI_SRC_DIR)/xcfi_wrapper.sv
+                  $(XCFI_SRC_DIR)/xcfi_wrapper.sv \
+                  $(XCRYPTO_RTL)/xc_sha3/xc_sha3_ftb.v \
+                  $(XCRYPTO_RTL)/xc_sha256/xc_sha256_ftb.v \
+                  $(XCRYPTO_RTL)/xc_aessub/xc_aessub_ftb.v \
+                  $(XCRYPTO_RTL)/xc_aesmix/xc_aesmix_ftb.v
+
 
 XCFI_MODELS     = $(notdir $(basename $(shell find $(XCFI_SRC_DIR)/models -name '*.v')))
 

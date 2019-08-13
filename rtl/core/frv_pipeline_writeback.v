@@ -154,6 +154,10 @@ wire fu_mul = s4_fu[P_FU_MUL];
 wire fu_lsu = s4_fu[P_FU_LSU];
 wire fu_cfu = s4_fu[P_FU_CFU];
 wire fu_csr = s4_fu[P_FU_CSR];
+wire fu_asi = s4_fu[P_FU_ASI];
+wire fu_bit = s4_fu[P_FU_BIT];
+wire fu_rng = s4_fu[P_FU_RNG];
+wire fu_mpi = s4_fu[P_FU_MPI];
 
 //
 // Functional Unit: ALU
@@ -168,6 +172,13 @@ wire [XL:0] alu_gpr_wdata   = s4_opr_a;
 
 wire        mul_gpr_wen     = fu_mul;
 wire [XL:0] mul_gpr_wdata   = s4_opr_a;
+
+//
+// Functional Unit: ASI
+// -------------------------------------------------------------------------
+
+wire        asi_gpr_wen     = fu_asi;
+wire [XL:0] asi_gpr_wdata   = s4_opr_a;
 
 //
 // Functional Unit: CSR
@@ -371,13 +382,14 @@ assign gpr_rd   = s4_rd;
 
 assign gpr_wen  = !s4_trap &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
-     cfu_gpr_wen || mul_gpr_wen );
+     cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen );
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
                   {32{lsu_gpr_wen}} & lsu_gpr_wdata |
                   {32{cfu_gpr_wen}} & cfu_gpr_wdata |
-                  {32{mul_gpr_wen}} & mul_gpr_wdata ;
+                  {32{mul_gpr_wen}} & mul_gpr_wdata |
+                  {32{asi_gpr_wen}} & asi_gpr_wdata ;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;

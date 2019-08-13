@@ -362,21 +362,21 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 
 Instruction        |`opr_a`      | `opr_b`       | `opr_c`    
 -------------------|-------------|---------------|------------
-`xc.aessub.enc   ` | rs1         | rs2           | 0
-`xc.aessub.encrot` | rs1         | rs2           | 0
-`xc.aessub.dec   ` | rs1         | rs2           | 0
-`xc.aessub.decrot` | rs1         | rs2           | 0
-`xc.aesmix.enc   ` | rs1         | rs2           | 0
-`xc.aesmix.dec   ` | rs1         | rs2           | 0
-`xc.sha3.xy      ` | rs1         | rs2           | 0
-`xc.sha3.x1      ` | rs1         | rs2           | 0
-`xc.sha3.x2      ` | rs1         | rs2           | 0
-`xc.sha3.x4      ` | rs1         | rs2           | 0
-`xc.sha3.yx      ` | rs1         | rs2           | 0
-`xc.sha256.s0    ` | rs1         | rs2           | 0
-`xc.sha256.s1    ` | rs1         | rs2           | 0
-`xc.sha256.s2    ` | rs1         | rs2           | 0
-`xc.sha256.s3    ` | rs1         | rs2           | 0
+`xc.aessub.enc   ` | rs1         | 0             | rs2
+`xc.aessub.encrot` | rs1         | 0             | rs2
+`xc.aessub.dec   ` | rs1         | 0             | rs2
+`xc.aessub.decrot` | rs1         | 0             | rs2
+`xc.aesmix.enc   ` | rs1         | 0             | rs2
+`xc.aesmix.dec   ` | rs1         | 0             | rs2
+`xc.sha3.xy      ` | rs1         | shamt         | rs2
+`xc.sha3.x1      ` | rs1         | shamt         | rs2
+`xc.sha3.x2      ` | rs1         | shamt         | rs2
+`xc.sha3.x4      ` | rs1         | shamt         | rs2
+`xc.sha3.yx      ` | rs1         | shamt         | rs2
+`xc.sha256.s0    ` | rs1         | 0             | rs2
+`xc.sha256.s1    ` | rs1         | 0             | rs2
+`xc.sha256.s2    ` | rs1         | 0             | rs2
+`xc.sha256.s3    ` | rs1         | 0             | rs2
 
 
 **RNG Instructions:**

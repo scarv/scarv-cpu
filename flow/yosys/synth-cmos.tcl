@@ -5,6 +5,10 @@ yosys -import
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/*.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/p_addsub/p_addsub.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/p_shfrot/p_shfrot.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_sha3/xc_sha3.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_sha256/xc_sha256.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_aessub/xc_aessub.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_aesmix/xc_aesmix.v
 
 # Synthesise processes ready for SCC check.
 procs

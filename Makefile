@@ -11,7 +11,11 @@ export XCRYPTO_RTL  = $(FRV_HOME)/external/xcrypto-rtl/rtl
 export CPU_RTL_DIR  = $(FRV_HOME)/rtl/core
 export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
                       $(XCRYPTO_RTL)/p_addsub/p_addsub.v \
-                      $(XCRYPTO_RTL)/p_shfrot/p_shfrot.v
+                      $(XCRYPTO_RTL)/p_shfrot/p_shfrot.v \
+                      $(XCRYPTO_RTL)/xc_sha3/xc_sha3.v \
+                      $(XCRYPTO_RTL)/xc_sha256/xc_sha256.v \
+                      $(XCRYPTO_RTL)/xc_aessub/xc_aessub.v \
+                      $(XCRYPTO_RTL)/xc_aesmix/xc_aesmix.v
 
 export PATH:=$(RISCV)/bin:$(YOSYS_ROOT)/:$(PATH)
 

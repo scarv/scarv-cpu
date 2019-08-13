@@ -564,6 +564,10 @@ wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     ||
 wire use_pc_imm  = use_imm32_b  || use_imm32_j  || dec_c_beqz   ||
                    dec_c_bnez   || dec_c_j      || dec_c_jal     ;
 
+wire use_imm_sha3= 
+    dec_xc_sha3_xy || dec_xc_sha3_x1 || dec_xc_sha3_x2 || dec_xc_sha3_x4 ||
+    dec_xc_sha3_yx ;
+
 // Immediate which will be added to the program counter.
 wire [31:0] n_s2_imm_pc = 
     {32{use_imm32_b   }} & imm32_b      |
@@ -576,6 +580,7 @@ wire [31:0] n_s2_imm_pc =
 
 assign n_s2_imm = 
                            n_s2_imm_pc     |
+    {32{use_imm_sha3  }} & {30'b0,d_data[31:30]} |
     {32{use_imm32_i   }} & imm32_i      |
     {32{use_imm32_s   }} & imm32_s      |
     {32{dec_c_addi    }} & imm_c_addi   |
@@ -674,11 +679,6 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_ror      ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
     dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ||
-    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
-    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
-    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
-    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
-    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ||
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
@@ -694,13 +694,20 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
     dec_sb         || dec_sh         || dec_sw         || dec_c_addi16sp ||
     dec_c_addi4spn ||
+    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
+    dec_xc_sha3_x4       || dec_xc_sha3_yx       ||
     dec_xc_psrl_i  || dec_xc_psll_i  || dec_xc_pror_i  || dec_b_grevi    ||
     dec_b_rori     || dec_b_fsri     ;
 
 
 assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
-    dec_sw          ;
+    dec_sw         ||
+    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
+    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
+    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
+    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
+    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ;
 
 assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
     dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||

@@ -87,6 +87,10 @@ wire fu_mul = s2_fu[P_FU_MUL];
 wire fu_lsu = s2_fu[P_FU_LSU];
 wire fu_cfu = s2_fu[P_FU_CFU];
 wire fu_csr = s2_fu[P_FU_CSR];
+wire fu_asi = s2_fu[P_FU_ASI];
+wire fu_bit = s2_fu[P_FU_BIT];
+wire fu_rng = s2_fu[P_FU_RNG];
+wire fu_mpi = s2_fu[P_FU_MPI];
 
 //
 // Functional Unit Interfacing: ALU
@@ -218,6 +222,16 @@ wire [XL:0] n_s3_opr_a_csr = s2_opr_a;
 wire [XL:0] n_s3_opr_b_csr = s2_opr_c;
 
 //
+// Functional Unit Interfacing: Algorithm Specific Instructions
+// -------------------------------------------------------------------------
+
+wire        asi_valid  = fu_asi;
+wire        asi_ready  ;
+wire [XL:0] asi_result ;
+
+wire [XL:0] n_s3_opr_a_asi = asi_result ;
+
+//
 // Stalling / Pipeline Progression
 // -------------------------------------------------------------------------
 
@@ -235,6 +249,19 @@ wire   p_busy    ;
 //
 // Submodule instances
 // -------------------------------------------------------------------------
+
+frv_asi i_asi(
+.g_clk     (g_clk           ), // global clock
+.g_resetn  (g_resetn        ), // synchronous reset
+.asi_valid (asi_valid       ), // Stall this stage
+.asi_flush (flush           ), // flush the stage
+.asi_ready (asi_ready       ), // stage ready to progress
+.asi_uop   (s2_uop          ), // Exactly which operation to perform.
+.asi_rs1   (s2_opr_a        ), // Source register 1
+.asi_rs2   (s2_opr_c        ), // Source register 2
+.asi_shamt (s2_opr_b[1:0]   ), // Shift amount for SHA3 instructions.
+.asi_result(asi_result      )  // Instruction result.
+);
 
 frv_alu i_alu (
 .g_clk           (g_clk           ), // global clock
@@ -307,6 +334,7 @@ wire [5:0]  n_trap_cause =
                                           6'b0          ;
 
 wire [XL:0] n_s3_opr_a = 
+    {XLEN{fu_asi}} & n_s3_opr_a_asi |
     {XLEN{fu_alu}} & n_s3_opr_a_alu |
     {XLEN{fu_mul}} & n_s3_opr_a_mul |
     {XLEN{fu_lsu}} & n_s3_opr_a_lsu |
@@ -325,7 +353,7 @@ wire [XL:0] n_s3_opr_b =
 
 // Forwaring / bubbling signals.
 assign fwd_s2_rd    = s2_rd             ; // Writeback stage destination reg.
-assign fwd_s2_wdata = alu_result | imul_result ;
+assign fwd_s2_wdata = alu_result | imul_result | asi_result;
 assign fwd_s2_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s2_csr   = fu_csr            ; // Writeback stage has CSR op in it.
 
