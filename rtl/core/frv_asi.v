@@ -57,14 +57,19 @@ wire insn_sha256_s3     = asi_valid && asi_uop == ASI_SHA256_S3    ;
 // Input Gating
 // -------------------------------------------------------------
 
-wire [XL:0] sha2_rs1 = {XLEN{insn_sha2}} & asi_rs1;
-wire [ 1:0] sha2_ss  = asi_uop[1:0];
+wire [XL:0] sha2_rs1    = {XLEN{insn_sha2}} & asi_rs1;
+wire [ 1:0] sha2_ss     = asi_uop[1:0];
+
+wire [XL:0] aes_sub_rs1 = {XLEN{insn_aes_sub}} & asi_rs1;
+wire [XL:0] aes_sub_rs2 = {XLEN{insn_aes_sub}} & asi_rs2;
+wire        aes_sub_enc = !asi_uop[0];
+wire        aes_sub_rot =  asi_uop[1];
 
 //
 // Result Selection
 // -------------------------------------------------------------
 
-wire [XL:0] result_aessub = 32'b0;
+wire [XL:0] result_aessub ;
 wire [XL:0] result_aesmix = 32'b0;
 wire [XL:0] result_sha2  ;
 wire [XL:0] result_sha3  ;
@@ -75,7 +80,7 @@ assign asi_result =
     {32{insn_sha2    }} & result_sha2   |
     {32{insn_sha3    }} & result_sha3   ;
 
-wire aes_sub_ready = 1'b0;
+wire aes_sub_ready;
 wire aes_mix_ready = 1'b0;
 
 assign asi_ready = insn_sha2                       || 
@@ -110,10 +115,27 @@ xc_sha3 i_xc_sha3(
 //
 //  Implements the light-weight SHA256 instruction functions.
 //
-xc_sha256 i_sha256 (
+xc_sha256 i_xc_sha256 (
 .rs1   (sha2_rs1    ), // Input source register 1
 .ss    (sha2_ss     ), // Exactly which transformation to perform?
 .result(result_sha2 )  // 
+);
+
+//
+// instance : xc_aessub
+//
+//  Implements the lightweight AES SubBytes instructions.
+//
+xc_aessub i_xc_aessub(
+.clock (g_clk           ),
+.reset (!g_resetn       ),
+.valid (insn_aes_sub    ), // Are the inputs valid?
+.rs1   (aes_sub_rs1     ), // Input source register 1
+.rs2   (aes_sub_rs2     ), // Input source register 2
+.enc   (aes_sub_enc     ), // Perform encrypt (set) or decrypt (clear).
+.rot   (aes_sub_rot     ), // Perform encrypt (set) or decrypt (clear).
+.ready (aes_sub_ready   ), // Is the instruction complete?
+.result(result_aessub   )  // 
 );
 
 endmodule
