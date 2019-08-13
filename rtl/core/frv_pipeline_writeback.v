@@ -501,7 +501,9 @@ reg [XL:0] saved_mem_rdata;
 reg        use_saved_mem_rdata;
 
 wire       n_use_saved_mem_rdata =
-    !pipe_progress && (use_saved_mem_rdata || (dmem_recv && dmem_ack));
+    !pipe_progress && (
+        use_saved_mem_rdata || ((dmem_recv && dmem_ack) || lsu_mmio)
+    );
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -514,8 +516,8 @@ end
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         saved_mem_rdata <= 0;
-    end else if(dmem_recv && dmem_ack) begin
-        saved_mem_rdata <= dmem_rdata;
+    end else if(n_use_saved_mem_rdata && !use_saved_gpr_wdata) begin
+        saved_mem_rdata <= lsu_mmio ? mmio_rdata : dmem_rdata;
     end
 end
 
@@ -565,9 +567,9 @@ assign rvfi_pc_wdata = cf_req_noint ? cf_target_noint            :
 assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
 assign rvfi_mem_rmask= fu_lsu && lsu_load  ? lsu_strb : 4'b0000 ;
 assign rvfi_mem_wmask= fu_lsu && lsu_store ? lsu_strb : 4'b0000 ;
-assign rvfi_mem_rdata= lsu_mmio            ? mmio_rdata      :
-                       use_saved_mem_rdata ? saved_mem_rdata :
-                                             dmem_rdata;
+assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata :
+                       lsu_mmio            ? mmio_rdata      :
+                                             dmem_rdata      ;
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 // Constant assignments to features of RVFI not supported/relevent.
