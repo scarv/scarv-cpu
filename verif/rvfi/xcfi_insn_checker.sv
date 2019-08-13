@@ -96,6 +96,9 @@ always @* begin
 
 				if (spec_rs2_addr != 0)
 					assert(spec_rs2_addr == rs2_addr);
+				
+                if (spec_rs3_addr != 0)
+					assert(spec_rs3_addr == rs3_addr);
 
 				assert(spec_rd_addr == rd_addr);
 				assert(spec_rd_wdata == rd_wdata);
