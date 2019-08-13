@@ -1,13 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Aug 12 13:24:43 2019
+[*] Mon Aug 12 14:48:01 2019
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/xcfi/xc_ldr_w/engine_0/trace.vcd"
+[dumpfile_mtime] "Mon Aug 12 14:45:11 2019"
+[dumpfile_size] 626600
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/xcfi-formal.gtkw"
 [timestart] 0
-[size] 1920 1025
+[size] 1162 1025
 [pos] -1 -1
-*-5.142160 39 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.883635 157 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] xcfi_testbench.
 [treeopen] xcfi_testbench.i_insn_checker.
 [treeopen] xcfi_testbench.i_wrapper.
@@ -50,12 +52,15 @@ xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs3_rdata[31:0]
 xcfi_testbench.i_insn_checker.spec_rs1_addr[4:0]
 xcfi_testbench.i_insn_checker.spec_rs2_addr[4:0]
 xcfi_testbench.i_insn_checker.spec_rs3_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.spec_mem_addr[31:0]
+xcfi_testbench.i_insn_checker.spec_mem_rmask[3:0]
+xcfi_testbench.i_insn_checker.spec_mem_wdata[31:0]
+xcfi_testbench.i_insn_checker.spec_mem_wmask[3:0]
 @28
 xcfi_testbench.i_insn_checker.spec_trap
 xcfi_testbench.i_insn_checker.spec_valid
 xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_ror
-@23
-xcfi_testbench.i_insn_checker.i_insn_spec.shamt[4:0]
 @200
 -
 @22
@@ -71,16 +76,15 @@ xcfi_testbench.i_insn_checker.rvfi_rd_addr[4:0]
 xcfi_testbench.i_insn_checker.rvfi_rd_wdata[31:0]
 @24
 xcfi_testbench.i_insn_checker.rvfi_rs1_addr[4:0]
-@22
-xcfi_testbench.i_insn_checker.rvfi_rs1_rdata[31:0]
-@24
 xcfi_testbench.i_insn_checker.rvfi_rs2_addr[4:0]
-@22
-xcfi_testbench.i_insn_checker.rvfi_rs2_rdata[31:0]
-@24
 xcfi_testbench.i_insn_checker.rvfi_rs3_addr[4:0]
 @22
+xcfi_testbench.i_insn_checker.rvfi_rs1_rdata[31:0]
+xcfi_testbench.i_insn_checker.rvfi_rs2_rdata[31:0]
 xcfi_testbench.i_insn_checker.rvfi_rs3_rdata[31:0]
+xcfi_testbench.i_insn_checker.rvfi_mem_addr[31:0]
+xcfi_testbench.i_insn_checker.rvfi_mem_rdata[31:0]
+xcfi_testbench.i_insn_checker.rvfi_mem_rmask[3:0]
 @28
 xcfi_testbench.i_insn_checker.rvfi_trap
 xcfi_testbench.i_insn_checker.rvfi_valid
@@ -92,6 +96,7 @@ xcfi_testbench.check
 -
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.instr_ret
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_ldr_w
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_ror
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
@@ -101,6 +106,20 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.s4_instr[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.trs_instr[31:0]
 @200
 -
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_ldr_w
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_rd_32[4:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.n_s2_rd[4:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.lsu_load
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.lsu_word
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.n_s4_rd[4:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.s3_rd[4:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.s4_rd[4:0]
+@200
+-
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_add_result[31:0]
 @28
@@ -108,8 +127,9 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_eq
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_flush
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_lhs[31:0]
-xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_result[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_rhs[31:0]
+@23
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_result[31:0]
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_lt
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_add

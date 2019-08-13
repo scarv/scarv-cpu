@@ -1,22 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Jul 30 12:28:48 2019
+[*] Tue Aug 13 08:46:38 2019
 [*]
-[dumpfile] "/home/ben/projects/riscv-faster/work/riscv-formal/insn_lw_ch0/engine_0/trace.vcd"
-[dumpfile_mtime] "Tue Jul 30 12:26:57 2019"
-[dumpfile_size] 505916
-[savefile] "/home/ben/projects/riscv-faster/flow/gtkwave/riscv-formal.gtkw"
-[timestart] 0
-[size] 1920 1025
+[dumpfile] "(null)"
+[savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/riscv-formal.gtkw"
+[timestart] 2
+[size] 1253 1025
 [pos] -1 -1
-*-5.331912 150 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.326076 202 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
 [treeopen] rvfi_testbench.wrapper.i_dut.
 [treeopen] rvfi_testbench.wrapper.i_dut.i_pipeline.
+[treeopen] rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.
 [sst_width] 346
-[signals_width] 367
+[signals_width] 331
 [sst_expanded] 1
 [sst_vpaned_height] 279
 @28
@@ -75,15 +74,11 @@ rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.cf_target[31:0]
 @22
 rvfi_testbench.checker_inst.pc_rdata[31:0]
 rvfi_testbench.checker_inst.insn_spec.spec_pc_wdata[31:0]
-@24
-rvfi_testbench.checker_inst.insn_spec.spec_rd_addr[4:0]
-@22
 rvfi_testbench.checker_inst.insn_spec.spec_rd_wdata[31:0]
 @28
 rvfi_testbench.checker_inst.insn_spec.spec_valid
 @24
 rvfi_testbench.checker_inst.insn_spec.spec_rs2_addr[4:0]
-rvfi_testbench.checker_inst.insn_spec.spec_rs1_addr[4:0]
 @200
 -
 @22
@@ -96,6 +91,12 @@ rvfi_testbench.wrapper.i_dut.i_pipeline.mmio_rdata[31:0]
 rvfi_testbench.wrapper.i_dut.i_pipeline.mmio_wdata[31:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_pipeline.mmio_wen
+@23
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.saved_mem_rdata[31:0]
+@29
+rvfi_testbench.wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.use_saved_mem_rdata
+@200
+-
 @c00200
 -DMEM
 @28

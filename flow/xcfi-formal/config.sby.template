@@ -2,7 +2,7 @@
 mode bmc
 expect pass,fail
 append 0
-tbtop xcfi_wrapper.uut
+tbtop i_wrapper.uut
 depth 16
 skip 15
 
