@@ -54,12 +54,19 @@ wire insn_sha256_s2     = asi_valid && asi_uop == ASI_SHA256_S2    ;
 wire insn_sha256_s3     = asi_valid && asi_uop == ASI_SHA256_S3    ;
 
 //
+// Input Gating
+// -------------------------------------------------------------
+
+wire [XL:0] sha2_rs1 = {XLEN{insn_sha2}} & asi_rs1;
+wire [ 1:0] sha2_ss  = asi_uop[1:0];
+
+//
 // Result Selection
 // -------------------------------------------------------------
 
 wire [XL:0] result_aessub = 32'b0;
 wire [XL:0] result_aesmix = 32'b0;
-wire [XL:0] result_sha2   = 32'b0;
+wire [XL:0] result_sha2  ;
 wire [XL:0] result_sha3  ;
 
 assign asi_result =
@@ -96,6 +103,17 @@ xc_sha3 i_xc_sha3(
 .f_x4     (insn_sha3_x4 ), // xc.sha3.x4 instruction function
 .f_yx     (insn_sha3_yx ), // xc.sha3.yx instruction function
 .result   (result_sha3  )  //
+);
+
+//
+// instance: xc_sha256
+//
+//  Implements the light-weight SHA256 instruction functions.
+//
+xc_sha256 i_sha256 (
+.rs1   (sha2_rs1    ), // Input source register 1
+.ss    (sha2_ss     ), // Exactly which transformation to perform?
+.result(result_sha2 )  // 
 );
 
 endmodule
