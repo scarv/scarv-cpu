@@ -86,7 +86,6 @@ wire dec_c_swsp     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd6;
 wire dec_xc_ldr_b       = XC_CLASS_BASELINE   && (d_data & 32'hfe00707f) == 32'h7003;
 wire dec_xc_ldr_h       = XC_CLASS_BASELINE   && (d_data & 32'hfe00707f) == 32'h2007003;
 wire dec_xc_ldr_w       = XC_CLASS_BASELINE   && (d_data & 32'hfe00707f) == 32'h4007003;
-wire dec_xc_ldr_d       = XC_CLASS_BASELINE   && (d_data & 32'hfe00707f) == 32'h6007003;
 wire dec_xc_ldr_bu      = XC_CLASS_BASELINE   && (d_data & 32'hfe00707f) == 32'h8007003;
 wire dec_xc_ldr_hu      = XC_CLASS_BASELINE   && (d_data & 32'hfe00707f) == 32'ha007003;
 wire dec_xc_str_b       = XC_CLASS_BASELINE   && (d_data & 32'h6007fff) == 32'h4023;
