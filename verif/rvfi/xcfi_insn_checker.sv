@@ -63,8 +63,7 @@ wire insn_pma_x = 1;
 wire mem_pma_r = 1;
 wire mem_pma_w = 1;
 
-wire mem_access_fault = (spec_mem_rmask && !mem_pma_r) || (spec_mem_wmask && !mem_pma_w) ||
-        ((spec_mem_rmask || spec_mem_wmask));
+wire mem_access_fault = 1'b0;
 
 reg integer i;
 

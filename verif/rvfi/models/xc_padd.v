@@ -19,7 +19,7 @@ wire [ 1:0] pw          = `INSTR_PACK_WIDTH;
  // From the PACK_WIDTH_ARITH_OPERATION_RESULT macro.
 wire [31:0] insn_result = result;
 
-wire                  spec_valid       = dec_xc_padd;
+wire                  spec_valid       = rvfi_valid && dec_xc_padd;
 wire                  spec_trap        = 1'b0   ;
 wire [         4 : 0] spec_rs1_addr    = `FIELD_RS1_ADDR;
 wire [         4 : 0] spec_rs2_addr    = `FIELD_RS2_ADDR;

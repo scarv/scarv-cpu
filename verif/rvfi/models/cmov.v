@@ -12,7 +12,7 @@ module xcfi_insn_spec (
 
 wire [31:0] insn_result = `RS3 ? `RS1 : `RS2;
 
-wire                  spec_valid       = dec_b_cmov;
+wire                  spec_valid       = rvfi_valid && dec_b_cmov;
 wire                  spec_trap        = 1'b0   ;
 wire [         4 : 0] spec_rs1_addr    = `FIELD_RS1_ADDR;
 wire [         4 : 0] spec_rs2_addr    = `FIELD_RS2_ADDR;
