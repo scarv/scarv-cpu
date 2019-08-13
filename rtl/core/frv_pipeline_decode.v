@@ -146,7 +146,7 @@ assign n_s2_fu[P_FU_LSU] =
     dec_lb         || dec_lbu       || dec_lh          || dec_lhu        ||
     dec_lw         || dec_c_lw      || dec_c_lwsp      || dec_c_sw       ||
     dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ||
-    dec_xc_ldr_b   || dec_xc_ldr_h  || dec_xc_ldr_w    || dec_xc_ldr_d   ||
+    dec_xc_ldr_b   || dec_xc_ldr_h  || dec_xc_ldr_w    ||
     dec_xc_ldr_bu  || dec_xc_ldr_hu || dec_xc_str_b    || dec_xc_str_h   ||
     dec_xc_str_w   ||
     dec_xc_scatter_b || dec_xc_scatter_h || dec_xc_gather_b || dec_xc_gather_h;
