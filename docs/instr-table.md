@@ -3,55 +3,56 @@
 
 **Integer ALU Instructions:**
 
-Instruction  | Action                   | uOP code    | Pack Widths | Done
--------------|--------------------------|-------------|-------------|---------
-`add        `| rd <= rs1 + rs2          | {00, 001}   | 32          | [x]
-`xc.padd    `| rd <= rs1 p+ rs2         | {00, 001}   | 16/8/4/2    | [ ]
-`addi       `| rd <= rs1 + imm          | {00, 001}   | 32          | [x]
-`c_add      `| rd <= rs1 + rs2          | {00, 001}   | 32          | [x]
-`c_addi     `| rd <= rs1 + imm          | {00, 001}   | 32          | [x]
-`c_addi16sp `| rd <= rs1 + imm          | {00, 001}   | 32          | [x]
-`c_addi4spn `| rd <= rs1 + imm          | {00, 001}   | 32          | [x]
-`c_mv       `| rd <= rs1                | {00, 001}   | 32          | [x]
-`auipc      `| rd <= pc + imm20         | {00, 001}   | 32          | [x]
-`c_sub      `| rd <= rs1 - rs2          | {00, 000}   | 32          | [x]
-`sub        `| rd <= rs1 - rs2          | {00, 000}   | 32          | [x]
-`xc.psub    `| rd <= rs1 p- rs2         | {00, 000}   | 16/8/4/2    | [ ]
-`and        `| rd <= rs1 & rs2          | {01, 001}   | 32          | [x]
-`andi       `| rd <= rs1 & rs2          | {01, 001}   | 32          | [x]
-`c_and      `| rd <= rs1 & rs2          | {01, 001}   | 32          | [x]
-`c_andi     `| rd <= rs1 & imm          | {01, 001}   | 32          | [x]
-`lui        `| rd <= {imm20, 12'b0}     | {01, 010}   | 32          | [x]
-`c_li       `| rd <= imm                | {01, 010}   | 32          | [x]
-`c_lui      `| rd <= imm                | {01, 010}   | 32          | [x]
-`c_nop      `| nop                      | {01, 010}   | 32          | [x]
-`or         `| rd <= rs1 or rs2         | {01, 010}   | 32          | [x]
-`ori        `| rd <= rs1 or rs2         | {01, 010}   | 32          | [x]
-`c_or       `| rd <= rs1 or rs2         | {01, 010}   | 32          | [x]
-`c_xor      `| rd <= rs1 ^ rs2          | {01, 100}   | 32          | [x]
-`xor        `| rd <= rs1 ^ rs2          | {01, 100}   | 32          | [x]
-`xori       `| rd <= rs1 ^ imm          | {01, 100}   | 32          | [x]
-`slt        `| rd <= rs1 < rs2          | {10, 001}   | 32          | [x]
-`slti       `| rd <= rs1 < imm          | {10, 001}   | 32          | [x]
-`sltu       `| rd <= rs1 < rs2          | {10, 010}   | 32          | [x]
-`sltiu      `| rd <= rs1 < imm          | {10, 010}   | 32          | [x]
-`sra        `| rd <= rs1 >>> rs2        | {11, 001}   | 32          | [x]
-`srai       `| rd <= rs1 >>> rs2        | {11, 001}   | 32          | [x]
-`c_srai     `| rd <= rs1 >>> imm        | {11, 001}   | 32          | [x]
-`c_srli     `| rd <= rs1 >>  imm        | {11, 010}   | 32          | [x]
-`srl        `| rd <= rs1 >> rs2         | {11, 010}   | 32          | [x]
-`srli       `| rd <= rs1 >> rs2         | {11, 010}   | 32          | [x]
-`xc.psrl    `| rd <= rs1 p>> rs2        | {11, 010}   | 16/8/4/2    | [ ]
-`xc.psrl.i  `| rd <= rs1 p>> imm        | {11, 010}   | 16/8/4/2    | [ ]
-`sll        `| rd <= rs1 << rs2         | {11, 100}   | 32          | [x]
-`slli       `| rd <= rs1 << rs2         | {11, 100}   | 32          | [x]
-`xc.psll    `| rd <= rs1 p>> rs2        | {11, 100}   | 16/8/4/2    | [ ]
-`xc.psll.i  `| rd <= rs1 p>> imm        | {11, 100}   | 16/8/4/2    | [ ]
-`c_slli     `| rd <= rs1 <<  imm        | {11, 100}   | 32          | [x]
-`ror        `| rd <= rs1 >> rs2         | {11, 110}   | 32          | [x]
-`rori       `| rd <= rs1 >> rs2         | {11, 110}   | 32          | [x]
-`xc.pror    `| rd <= rs1 p>> rs2        | {11, 110}   | 16/8/4/2    | [ ]
-`xc.pror.i  `| rd <= rs1 p>> imm        | {11, 110}   | 16/8/4/2    | [ ]
+Instruction  | Action                   | uOP code    | Pack Widths 
+-------------|--------------------------|-------------|-------------
+`add        `| rd <= rs1 + rs2          | {00, 001}   | 32          
+`xc.padd    `| rd <= rs1 p+ rs2         | {00, 001}   | 16/8/4/2    
+`addi       `| rd <= rs1 + imm          | {00, 001}   | 32          
+`c_add      `| rd <= rs1 + rs2          | {00, 001}   | 32          
+`c_addi     `| rd <= rs1 + imm          | {00, 001}   | 32          
+`c_addi16sp `| rd <= rs1 + imm          | {00, 001}   | 32          
+`c_addi4spn `| rd <= rs1 + imm          | {00, 001}   | 32          
+`c_mv       `| rd <= rs1                | {00, 001}   | 32          
+`auipc      `| rd <= pc + imm20         | {00, 001}   | 32          
+`c_sub      `| rd <= rs1 - rs2          | {00, 000}   | 32          
+`sub        `| rd <= rs1 - rs2          | {00, 000}   | 32          
+`xc.psub    `| rd <= rs1 p- rs2         | {00, 000}   | 16/8/4/2    
+`and        `| rd <= rs1 & rs2          | {01, 001}   | 32          
+`andi       `| rd <= rs1 & rs2          | {01, 001}   | 32          
+`c_and      `| rd <= rs1 & rs2          | {01, 001}   | 32          
+`c_andi     `| rd <= rs1 & imm          | {01, 001}   | 32          
+`lui        `| rd <= {imm20, 12'b0}     | {01, 010}   | 32          
+`c_li       `| rd <= imm                | {01, 010}   | 32          
+`c_lui      `| rd <= imm                | {01, 010}   | 32          
+`c_nop      `| nop                      | {01, 010}   | 32          
+`or         `| rd <= rs1 or rs2         | {01, 010}   | 32          
+`ori        `| rd <= rs1 or rs2         | {01, 010}   | 32          
+`c_or       `| rd <= rs1 or rs2         | {01, 010}   | 32          
+`c_xor      `| rd <= rs1 ^ rs2          | {01, 100}   | 32          
+`xor        `| rd <= rs1 ^ rs2          | {01, 100}   | 32          
+`xori       `| rd <= rs1 ^ imm          | {01, 100}   | 32          
+`slt        `| rd <= rs1 < rs2          | {10, 001}   | 32          
+`slti       `| rd <= rs1 < imm          | {10, 001}   | 32          
+`sltu       `| rd <= rs1 < rs2          | {10, 010}   | 32          
+`sltiu      `| rd <= rs1 < imm          | {10, 010}   | 32          
+`sra        `| rd <= rs1 >>> rs2        | {11, 001}   | 32          
+`srai       `| rd <= rs1 >>> rs2        | {11, 001}   | 32          
+`c_srai     `| rd <= rs1 >>> imm        | {11, 001}   | 32          
+`c_srli     `| rd <= rs1 >>  imm        | {11, 010}   | 32          
+`srl        `| rd <= rs1 >> rs2         | {11, 010}   | 32          
+`srli       `| rd <= rs1 >> rs2         | {11, 010}   | 32          
+`xc.psrl    `| rd <= rs1 p>> rs2        | {11, 010}   | 16/8/4/2    
+`xc.psrl.i  `| rd <= rs1 p>> imm        | {11, 010}   | 16/8/4/2    
+`sll        `| rd <= rs1 << rs2         | {11, 100}   | 32          
+`slli       `| rd <= rs1 << rs2         | {11, 100}   | 32          
+`xc.psll    `| rd <= rs1 p>> rs2        | {11, 100}   | 16/8/4/2    
+`xc.psll.i  `| rd <= rs1 p>> imm        | {11, 100}   | 16/8/4/2    
+`c_slli     `| rd <= rs1 <<  imm        | {11, 100}   | 32          
+`ror        `| rd <= rs1 >> rs2         | {11, 110}   | 32          
+`rori       `| rd <= rs1 >> rs2         | {11, 110}   | 32          
+`xc.pror    `| rd <= rs1 p>> rs2        | {11, 110}   | 16/8/4/2    
+`xc.pror.i  `| rd <= rs1 p>> imm        | {11, 110}   | 16/8/4/2    
+`xc.mror    `| rdm <= rs1||rs2 >> rs3   | {11, 111}   | 64
 
 
 **Control Flow Instructions:**
@@ -126,14 +127,18 @@ Instruction  | Action                   | uOP code  | Pack Widths
 -------------|--------------------------|-----------|-------------------------
 `div        `| rd <= rs1 / rs2          | {11, 000} | 32
 `divu       `| rd <= rs1 / rs2          | {11, 001} | 32
+`rem        `| rd <= rs1 % rs2          | {11, 100} | 32
+`remu       `| rd <= rs1 % rs2          | {11, 101} | 32
 `mul        `| rd <= rs1 * rs2          | {01, 000} | 32
 `xc.pmul.l  `| rd <= rs1 * rs2          | {01, 000} | 16/8/4/2
 `mulh       `| rd <= rs1 * rs2          | {01, 100} | 32
 `xc.pmul.h  `| rd <= rs1 * rs2          | {01, 001} | 16/8/4/2
 `mulhsu     `| rd <= rs1 * rs2          | {01, 111} | 32
 `mulhu      `| rd <= rs1 * rs2          | {01, 101} | 32
-`rem        `| rd <= rs1 % rs2          | {10, 000} | 32
-`remu       `| rd <= rs1 % rs2          | {10, 001} | 32
+`xc.mmul.3  `|  .                       | {10, 000} | 32
+`xc.madd.3  `|  .                       | {10, 001} | 32
+`xc.msub.3  `|  .                       | {10, 010} | 32
+`xc.macc.1  `|  .                       | {10, 100} | 32
 `clmul      `| rd <= rs1 x rs2          | {00, 000} | 32
 `clmulr     `| rd <= rs1 x rs2          | {00, 001} | 32
 `clmulh     `| rd <= rs1 x rs2          | {00, 010} | 32
@@ -185,18 +190,6 @@ Instruction  | Action                   | uOP code
 `xc.rngtest` |  .                       | {00,001}
 `xc.rngseed` |  .                       | {00,010}
 `xc.rngsamp` |  .                       | {00,100}
-
-
-**MP Instructions:**
-
-Instruction  | Action                   | uOP code  
--------------|--------------------------|------------------------
-`xc.mmul.3  `|  .                       | {00,000}
-`xc.madd.3  `|  .                       | {01,001}
-`xc.msub.3  `|  .                       | {01,010}
-`xc.macc.1  `|  .                       | {01,100}
-`xc.mror    `|  .                       | {10,000}
-
 
 ---
 
@@ -253,6 +246,7 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `rori       `|  rs1         |  imm          |  0
 `xc.pror    `|  rs1         |  rs2          |  0
 `xc.pror.i  `|  rs1         |  imm          |  0
+`xc.mror    `| rs1          | rs2           | rs3
 
 
 **Control Flow Instructions:**
@@ -340,6 +334,10 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `xc.clmul   `|  rs1         |  rs2          | 0
 `xc.clmulr  `|  rs1         |  rs2          | 0
 `xc.clmulh  `|  rs1         |  rs2          | 0
+`xc.mmul.3  `|  rs1         | rs2           | rs3
+`xc.madd.3  `|  rs1         | rs2           | rs3
+`xc.msub.3  `|  rs1         | rs2           | rs3
+`xc.macc.1  `|  rs1         | rs2           | rs3
 
 
 **Bit Manipulation Instructions:**
@@ -386,15 +384,4 @@ Instruction  |`opr_a`      | `opr_b`       | `opr_c`
 `xc.rngtest` |             |               |
 `xc.rngseed` | rs1         |               |
 `xc.rngsamp` |             |               |
-
-
-**MP Instructions:**
-
-Instruction  |`opr_a`      | `opr_b`       | `opr_c`    
--------------|-------------|---------------|------------
-`xc.mmul.3  `| rs1         | rs2           | rs3
-`xc.madd.3  `| rs1         | rs2           | rs3
-`xc.msub.3  `| rs1         | rs2           | rs3
-`xc.macc.1  `| rs1         | rs2           | rs3
-`xc.mror    `| rs1         | rs2           | rs3
 
