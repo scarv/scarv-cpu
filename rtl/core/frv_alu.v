@@ -69,6 +69,8 @@ p_addsub i_p_addsub (
 .rhs    (alu_rhs        ), // Right hand input.
 .pw     (pw_d           ), // Pack width to operate on
 .sub    (alu_op_sub     ), // Subtract if set, else add.
+.cin    (1'b0           ), // Carry in. Forced to 1 internally if `sub` set.
+.c_en   (1'b1           ), // Global carry enable
 .c_out  (               ), // Carry bits
 .result (adder_result   )  // Result of the operation
 );
