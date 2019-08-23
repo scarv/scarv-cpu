@@ -27,9 +27,8 @@ localparam P_FU_CSR     = 4;    // CSR accesses
 localparam P_FU_BIT     = 5;    // Bitwise
 localparam P_FU_ASI     = 6;    // Algorithm specific (AES/SHA2/SHA3)
 localparam P_FU_RNG     = 7;    // Algorithm specific (AES/SHA2/SHA3)
-localparam P_FU_MPI     = 8;    // Multi-precision arithmetic
 
-localparam FU           = 8;    // Width of functional unit specifier field
+localparam FU           = 7;    // Width of functional unit specifier field
 localparam OP           = 4;    // Width of micro-op specifier field.
 localparam PW           = 2;    // Width of IALU pack width field.
 
@@ -50,6 +49,7 @@ localparam ALU_SRA      = {2'b11, 3'b001};
 localparam ALU_SRL      = {2'b11, 3'b010};
 localparam ALU_SLL      = {2'b11, 3'b100};
 localparam ALU_ROR      = {2'b11, 3'b110};
+localparam ALU_RORW     = {2'b11, 3'b111};
 
 localparam CFU_BEQ      = {2'b00, 3'b001};
 localparam CFU_BGE      = {2'b00, 3'b010};
@@ -75,15 +75,23 @@ localparam LSU_WORD     = 2'b11;
 
 localparam MUL_DIV      = {2'b11, 3'b000};
 localparam MUL_DIVU     = {2'b11, 3'b001};
+localparam MUL_REM      = {2'b11, 3'b100};
+localparam MUL_REMU     = {2'b11, 3'b101};
+localparam MUL_PMUL_L   = {2'b01, 3'b000};
+localparam MUL_PMUL_H   = {2'b01, 3'b001};
 localparam MUL_MUL      = {2'b01, 3'b000};
 localparam MUL_MULH     = {2'b01, 3'b100};
 localparam MUL_MULHSU   = {2'b01, 3'b111};
 localparam MUL_MULHU    = {2'b01, 3'b101};
-localparam MUL_REM      = {2'b10, 3'b000};
-localparam MUL_REMU     = {2'b10, 3'b001};
+localparam MUL_MMUL     = {2'b10, 3'b000};
+localparam MUL_MADD     = {2'b10, 3'b001};
+localparam MUL_MSUB     = {2'b10, 3'b010};
+localparam MUL_MACC     = {2'b10, 3'b100};
 localparam MUL_CLMUL_L  = {2'b00, 3'b001};
 localparam MUL_CLMUL_H  = {2'b00, 3'b010};
 localparam MUL_CLMUL_R  = {2'b00, 3'b100};
+localparam MUL_PCLMUL_L = {2'b00, 3'b101};
+localparam MUL_PCLMUL_H = {2'b00, 3'b111};
 
 localparam CSR_READ     = 4;
 localparam CSR_WRITE    = 3;
@@ -124,12 +132,6 @@ localparam ASI_SHA256_S3     = {ASI_SHA2, 3'b011};
 localparam RNG_RNGTEST       = {2'b00, 3'b001};
 localparam RNG_RNGSEED       = {2'b00, 3'b010};
 localparam RNG_RNGSAMP       = {2'b00, 3'b100};
-
-localparam MPI_MMUL_3        = {2'b00, 3'b000};
-localparam MPI_MADD_3        = {2'b01, 3'b001};
-localparam MPI_MSUB_3        = {2'b01, 3'b010};
-localparam MPI_MACC_1        = {2'b01, 3'b100};
-localparam MPI_MROR          = {2'b10, 3'b000};
 
 //
 // Dispatch stage operand register sources

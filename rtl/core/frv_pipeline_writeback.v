@@ -157,7 +157,6 @@ wire fu_csr = s4_fu[P_FU_CSR];
 wire fu_asi = s4_fu[P_FU_ASI];
 wire fu_bit = s4_fu[P_FU_BIT];
 wire fu_rng = s4_fu[P_FU_RNG];
-wire fu_mpi = s4_fu[P_FU_MPI];
 
 //
 // Functional Unit: ALU

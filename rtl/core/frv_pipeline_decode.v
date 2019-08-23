@@ -127,13 +127,14 @@ assign n_s2_fu[P_FU_ALU] =
     dec_c_slli     ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
     dec_xc_psll    || dec_xc_psrl_i  || dec_xc_pror    || dec_xc_pror_i  ||
-    dec_b_ror      || dec_b_rori     ;
+    dec_b_ror      || dec_b_rori     || dec_xc_mror    ;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
     dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ||
     dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
-    dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ;
+    dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ||
+    dec_xc_mmul_3  || dec_xc_madd_3  || dec_xc_msub_3  || dec_xc_macc_1  ;
 
 assign n_s2_fu[P_FU_CFU] = 
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
@@ -169,11 +170,6 @@ assign n_s2_fu[P_FU_ASI] =
 
 assign n_s2_fu[P_FU_RNG] = 
     dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ;
-
-assign n_s2_fu[P_FU_MPI] = 
-    dec_xc_mmul_3   || dec_xc_madd_3   || dec_xc_msub_3   || dec_xc_macc_1   ||
-    dec_xc_mror     ;
-
 
 
 //
@@ -248,7 +244,8 @@ wire [OP:0] uop_alu =
     {5{dec_b_ror     }} & ALU_ROR   |
     {5{dec_b_rori    }} & ALU_ROR   |
     {5{dec_xc_pror   }} & ALU_ROR   |
-    {5{dec_xc_pror_i }} & ALU_ROR   ;
+    {5{dec_xc_pror_i }} & ALU_ROR   |
+    {5{dec_xc_mror   }} & ALU_RORW  ;
 
 wire [OP:0] uop_cfu =
     {5{dec_beq       }} & CFU_BEQ   |
@@ -329,14 +326,18 @@ assign uop_lsu[LSU_SIGNED] =
 wire [OP:0] uop_mul = 
     {5{dec_div          }} & MUL_DIV    |
     {5{dec_divu         }} & MUL_DIVU   |
+    {5{dec_rem          }} & MUL_REM    |
+    {5{dec_remu         }} & MUL_REMU   |
     {5{dec_mul          }} & MUL_MUL    |
     {5{dec_xc_pmul_l    }} & MUL_MUL    |
     {5{dec_mulh         }} & MUL_MULH   |
     {5{dec_xc_pmul_h    }} & MUL_MULH   |
     {5{dec_mulhsu       }} & MUL_MULHSU |
     {5{dec_mulhu        }} & MUL_MULHU  |
-    {5{dec_rem          }} & MUL_REM    |
-    {5{dec_remu         }} & MUL_REMU   |
+    {5{dec_xc_mmul_3    }} & MUL_MMUL   |
+    {5{dec_xc_madd_3    }} & MUL_MADD   |
+    {5{dec_xc_msub_3    }} & MUL_MSUB   |
+    {5{dec_xc_macc_1    }} & MUL_MACC   |
     {5{dec_xc_pclmul_l  }} & MUL_CLMUL_L|
     {5{dec_b_clmul      }} & MUL_CLMUL_L|
     {5{dec_xc_pclmul_h  }} & MUL_CLMUL_H|
@@ -393,13 +394,6 @@ wire [OP:0] uop_rng =
     {1+OP{dec_xc_rngseed      }} & RNG_RNGSEED      |
     {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      ;
 
-wire [OP:0] uop_mpi =
-    {1+OP{dec_xc_mmul_3       }} & MPI_MMUL_3       |
-    {1+OP{dec_xc_madd_3       }} & MPI_MADD_3       |
-    {1+OP{dec_xc_msub_3       }} & MPI_MSUB_3       |
-    {1+OP{dec_xc_macc_1       }} & MPI_MACC_1       |
-    {1+OP{dec_xc_mror         }} & MPI_MROR         ;
-
 assign n_s2_uop =
     uop_alu |
     uop_cfu |
@@ -408,8 +402,7 @@ assign n_s2_uop =
     uop_csr |
     uop_bit |
     uop_asi |
-    uop_rng |
-    uop_mpi ;
+    uop_rng ;
 
 //
 // Register Address Decoding
