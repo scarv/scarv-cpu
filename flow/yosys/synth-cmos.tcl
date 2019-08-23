@@ -5,6 +5,12 @@ yosys -import
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/*.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/p_addsub/p_addsub.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/p_shfrot/p_shfrot.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu_divrem.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu_long.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu_mul.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu_muldivrem.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu_pmul.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_sha3/xc_sha3.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_sha256/xc_sha256.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_aessub/xc_aessub.v
