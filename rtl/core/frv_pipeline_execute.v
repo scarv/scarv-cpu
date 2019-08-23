@@ -90,7 +90,6 @@ wire fu_csr = s2_fu[P_FU_CSR];
 wire fu_asi = s2_fu[P_FU_ASI];
 wire fu_bit = s2_fu[P_FU_BIT];
 wire fu_rng = s2_fu[P_FU_RNG];
-wire fu_mpi = s2_fu[P_FU_MPI];
 
 //
 // Functional Unit Interfacing: ALU
@@ -137,23 +136,43 @@ wire [XL:0] n_s3_opr_b_alu = 32'b0;
 // -------------------------------------------------------------------------
 
 wire        imul_valid      = fu_mul;
-wire        imul_div        = fu_mul && s2_uop == MUL_DIV   ;
-wire        imul_divu       = fu_mul && s2_uop == MUL_DIVU  ;
-wire        imul_mul        = fu_mul && s2_uop == MUL_MUL   ;
-wire        imul_mulh       = fu_mul && s2_uop == MUL_MULH  ;
-wire        imul_mulhsu     = fu_mul && s2_uop == MUL_MULHSU;
-wire        imul_mulhu      = fu_mul && s2_uop == MUL_MULHU ;
-wire        imul_rem        = fu_mul && s2_uop == MUL_REM   ;
-wire        imul_remu       = fu_mul && s2_uop == MUL_REMU  ;
+wire        imul_div        = s2_uop == MUL_DIV   ;
+wire        imul_divu       = s2_uop == MUL_DIVU  ;
+wire        imul_mul        = s2_uop == MUL_MUL   ;
+wire        imul_mulh       = s2_uop == MUL_MULH  ;
+wire        imul_mulhsu     = s2_uop == MUL_MULHSU;
+wire        imul_mulhu      = s2_uop == MUL_MULHU ;
+wire        imul_rem        = s2_uop == MUL_REM   ;
+wire        imul_remu       = s2_uop == MUL_REMU  ;
+wire        imul_pmul       = s2_uop == MUL_PMUL_L      ||
+                              s2_uop == MUL_PMUL_H;
+wire        imul_pclmul     = s2_uop == MUL_PCLMUL_L    ||
+                              s2_uop == MUL_PCLMUL_H;
+wire        imul_clmul      = s2_uop == MUL_CLMUL_L     || 
+                              s2_uop == MUL_CLMUL_H     ||
+                              s2_uop == MUL_CLMUL_R     ;
+wire        imul_madd       = s2_uop == MUL_MADD  ;
+wire        imul_msub       = s2_uop == MUL_MSUB  ;
+wire        imul_macc       = s2_uop == MUL_MACC  ;
+wire        imul_mmul       = s2_uop == MUL_MMUL  ;
 
-wire [31:0] imul_lhs        = s2_opr_a;
-wire [31:0] imul_rhs        = s2_opr_b;
+wire [31:0] imul_rs1        = s2_opr_a;
+wire [31:0] imul_rs2        = s2_opr_b;
+wire [31:0] imul_rs3        = s2_opr_c;
+
+wire        imul_flush      = pipe_progress || flush;
+
+wire        imul_pw_2       = s2_pw == PW_2 ;
+wire        imul_pw_4       = s2_pw == PW_4 ;
+wire        imul_pw_8       = s2_pw == PW_8 ;
+wire        imul_pw_16      = s2_pw == PW_16;
+wire        imul_pw_32      = s2_pw == PW_32;
 
 wire        imul_ready      ;
-wire [31:0] imul_result     ;
+wire [63:0] imul_result     ;
 
-wire [XL:0] n_s3_opr_a_mul  = imul_result;
-wire [XL:0] n_s3_opr_b_mul  = 32'b0;
+wire [XL:0] n_s3_opr_a_mul  = imul_result[31: 0];
+wire [XL:0] n_s3_opr_b_mul  = imul_result[63:32];
 
 //
 // Functional Unit Interfacing: LSU
@@ -289,27 +308,50 @@ frv_alu i_alu (
 .alu_result      (alu_result      )  // result of the ALU operation
 );
 
-
-frv_alu_muldiv i_alu_muldiv(
-.g_clk        (g_clk        ), // Global clock
-.g_resetn     (g_resetn     ), // Global negative level triggered reset
-.exu_stall    (s2_busy      ), // stalled due to other stages
-.exu_flush    (flush        ), // should flush everything.
-.pipe_progress(pipe_progress), // Pipe is progressing.
-.imul_valid   (imul_valid   ), // IMUL instruction / op valid
-.imul_mul     (imul_mul     ), // 
-.imul_mulh    (imul_mulh    ), // 
-.imul_mulhu   (imul_mulhu   ), // 
-.imul_mulhsu  (imul_mulhsu  ), // 
-.imul_div     (imul_div     ), // 
-.imul_divu    (imul_divu    ), // 
-.imul_rem     (imul_rem     ), // 
-.imul_remu    (imul_remu    ), // 
-.imul_lhs     (imul_lhs     ), // Left hand operand
-.imul_rhs     (imul_rhs     ), // Left hand operand
-.imul_ready   (imul_ready   ), // ready to progress
-.imul_result  (imul_result  )  // Result of the IMUL operation.
+//
+// instance: xc_malu
+//
+//  Implements a multi-cycle arithmetic logic unit for some of
+//  the bigger / more complex instructions in XCrypto.
+//
+//  Instructions handled:
+//  - div, divu, rem, remu
+//  - mul, mulh, mulhu, mulhsu
+//  - pmul.l, pmul.h
+//  - clmul, clmulr, clmulh
+//  - madd, msub, macc, mmul
+//
+xc_malu i_xc_malu (
+.clock      (g_clk      ),
+.resetn     (g_resetn   ),
+.rs1        (imul_rs1   ), //
+.rs2        (imul_rs2   ), //
+.rs3        (imul_rs3   ), //
+.flush      (imul_flush ), // Flush state / pipeline progress
+.valid      (imul_valid ), // Inputs valid.
+.uop_div    (imul_div   ), //
+.uop_divu   (imul_divu  ), //
+.uop_rem    (imul_rem   ), //
+.uop_remu   (imul_remu  ), //
+.uop_mul    (imul_mul   ), //
+.uop_mulu   (imul_mulhu ), //
+.uop_mulsu  (imul_mulhsu), //
+.uop_clmul  (imul_clmul ), //
+.uop_pmul   (imul_pmul  ), //
+.uop_pclmul (imul_pclmul), //
+.uop_madd   (imul_madd  ), //
+.uop_msub   (imul_msub  ), //
+.uop_macc   (imul_macc  ), //
+.uop_mmul   (imul_mmul  ), //
+.pw_32      (imul_pw_32 ), // 32-bit width packed elements.
+.pw_16      (imul_pw_16 ), // 16-bit width packed elements.
+.pw_8       (imul_pw_8  ), //  8-bit width packed elements.
+.pw_4       (imul_pw_4  ), //  4-bit width packed elements.
+.pw_2       (imul_pw_2  ), //  2-bit width packed elements.
+.result     (imul_result), // 64-bit result
+.ready      (imul_ready )  // Outputs ready.
 );
+
 
 //
 // Pipeline Register
