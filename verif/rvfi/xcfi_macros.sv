@@ -18,7 +18,9 @@
     input [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   , \
     input [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   , \
     input [NRET *    5   - 1 : 0] rvfi_rd_addr     , \
+    input [NRET          - 1 : 0] rvfi_rd_wide     , \
     input [NRET * XLEN   - 1 : 0] rvfi_rd_wdata    , \
+    input [NRET * XLEN   - 1 : 0] rvfi_rd_wdatahi  , \
     input [NRET * XLEN   - 1 : 0] rvfi_pc_rdata    , \
     input [NRET * XLEN   - 1 : 0] rvfi_pc_wdata    , \
     input [NRET * XLEN   - 1 : 0] rvfi_mem_addr    , \
@@ -43,7 +45,9 @@
     output [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   , \
     output [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   , \
     output [NRET *    5   - 1 : 0] rvfi_rd_addr     , \
+    output [NRET          - 1 : 0] rvfi_rd_wide     , \
     output [NRET * XLEN   - 1 : 0] rvfi_rd_wdata    , \
+    output [NRET * XLEN   - 1 : 0] rvfi_rd_wdatahi  , \
     output [NRET * XLEN   - 1 : 0] rvfi_pc_rdata    , \
     output [NRET * XLEN   - 1 : 0] rvfi_pc_wdata    , \
     output [NRET * XLEN   - 1 : 0] rvfi_mem_addr    , \
@@ -68,7 +72,9 @@
     wire [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   ; \
     wire [NRET *    5   - 1 : 0] rvfi_rd_addr     ; \
+    wire [NRET          - 1 : 0] rvfi_rd_wide     ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rd_wdata    ; \
+    wire [NRET * XLEN   - 1 : 0] rvfi_rd_wdatahi  ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_pc_rdata    ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_pc_wdata    ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_mem_addr    ; \
@@ -93,7 +99,9 @@
     .rvfi_rs2_rdata   (rvfi_rs2_rdata   ), \
     .rvfi_rs3_rdata   (rvfi_rs3_rdata   ), \
     .rvfi_rd_addr     (rvfi_rd_addr     ), \
+    .rvfi_rd_wide     (rvfi_rd_wide     ), \
     .rvfi_rd_wdata    (rvfi_rd_wdata    ), \
+    .rvfi_rd_wdatahi  (rvfi_rd_wdatahi  ), \
     .rvfi_pc_rdata    (rvfi_pc_rdata    ), \
     .rvfi_pc_wdata    (rvfi_pc_wdata    ), \
     .rvfi_mem_addr    (rvfi_mem_addr    ), \
@@ -109,7 +117,9 @@
     output [         4 : 0] spec_rs2_addr  , \
     output [         4 : 0] spec_rs3_addr  , \
     output [         4 : 0] spec_rd_addr   , \
+    output                  spec_rd_wide   , \
     output [XLEN   - 1 : 0] spec_rd_wdata  , \
+    output [XLEN   - 1 : 0] spec_rd_wdatahi, \
     output [XLEN   - 1 : 0] spec_pc_wdata  , \
     output [XLEN   - 1 : 0] spec_mem_addr  , \
     output [XLEN/8 - 1 : 0] spec_mem_rmask , \
@@ -123,7 +133,9 @@
     .spec_rs2_addr  (spec_rs2_addr  ), \
     .spec_rs3_addr  (spec_rs3_addr  ), \
     .spec_rd_addr   (spec_rd_addr   ), \
+    .spec_rd_wide   (spec_rd_wide   ), \
     .spec_rd_wdata  (spec_rd_wdata  ), \
+    .spec_rd_wdatahi(spec_rd_wdatahi), \
     .spec_pc_wdata  (spec_pc_wdata  ), \
     .spec_mem_addr  (spec_mem_addr  ), \
     .spec_mem_rmask (spec_mem_rmask ), \
@@ -160,6 +172,7 @@ parameter BITMANIP_BASELINE   = 1'b1;
 `define RS2            rvfi_rs2_rdata
 `define RS3            rvfi_rs3_rdata
 `define RD             rvfi_rd_wdata 
+`define RD_HI          rvfi_rd_wdatahi
 
 `define FIELD_RS1_ADDR d_data[19:15]
 `define FIELD_RS2_ADDR d_data[24:20]

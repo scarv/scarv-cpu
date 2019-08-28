@@ -28,7 +28,9 @@ wire [         4 : 0] spec_rs1_addr ;
 wire [         4 : 0] spec_rs2_addr ;
 wire [         4 : 0] spec_rs3_addr ;
 wire [         4 : 0] spec_rd_addr  ;
+wire                  spec_rd_wide  ;
 wire [XLEN   - 1 : 0] spec_rd_wdata ;
+wire [XLEN   - 1 : 0] spec_rd_wdatahi;
 wire [XLEN   - 1 : 0] spec_pc_wdata ;
 wire [XLEN   - 1 : 0] spec_mem_addr ;
 wire [XLEN/8 - 1 : 0] spec_mem_rmask;
@@ -50,6 +52,8 @@ parameter channel_idx = 0;
 (* keep *) wire [XLEN   - 1 : 0] rs3_rdata = rvfi_rs3_rdata[channel_idx*XLEN   +: XLEN];
 (* keep *) wire [         4 : 0] rd_addr   = rvfi_rd_addr  [channel_idx*5  +:  5];
 (* keep *) wire [XLEN   - 1 : 0] rd_wdata  = rvfi_rd_wdata [channel_idx*XLEN   +: XLEN];
+(* keep *) wire                  rd_wide   = rvfi_rd_wide  [channel_idx];
+(* keep *) wire [XLEN   - 1 : 0] rd_wdatahi=rvfi_rd_wdatahi[channel_idx*XLEN   +: XLEN];
 (* keep *) wire [XLEN   - 1 : 0] pc_rdata  = rvfi_pc_rdata [channel_idx*XLEN   +: XLEN];
 (* keep *) wire [XLEN   - 1 : 0] pc_wdata  = rvfi_pc_wdata [channel_idx*XLEN   +: XLEN];
 
@@ -81,6 +85,7 @@ always @* begin
 			assert(trap);
 			assert(rd_addr == 0);
 			assert(rd_wdata == 0);
+			assert(rd_wdatahi == 0);
 			assert(mem_wmask == 0);
 		end else begin
 
@@ -101,7 +106,9 @@ always @* begin
 					assert(spec_rs3_addr == rs3_addr);
 
 				assert(spec_rd_addr == rd_addr);
+				assert(spec_rd_wide == rd_wide);
 				assert(spec_rd_wdata == rd_wdata);
+				assert(spec_rd_wdatahi == rd_wdatahi);
 				assert(spec_pc_wdata == pc_wdata);
 
 				if (spec_mem_wmask || spec_mem_rmask) begin
