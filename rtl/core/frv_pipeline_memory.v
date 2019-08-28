@@ -22,10 +22,12 @@ input  wire [31:0] s3_instr        , // The instruction word
 output wire        s3_busy         , // Can this stage accept new inputs?
 input  wire        s3_valid        , // Is this input valid?
 
-output wire [ 4:0] fwd_s3_rd       , // Writeback stage destination reg.
+output wire [ 4:0] fwd_s3_rd       , // stage destination reg.
+output wire        fwd_s3_wide     , // stage wide writeback
 output wire [XL:0] fwd_s3_wdata    , // Write data for writeback stage.
-output wire        fwd_s3_load     , // Writeback stage has load in it.
-output wire        fwd_s3_csr      , // Writeback stage has CSR op in it.
+output wire [XL:0] fwd_s3_wdata_hi , // Write data for writeback stage.
+output wire        fwd_s3_load     , // stage has load in it.
+output wire        fwd_s3_csr      , // stage has CSR op in it.
 
 `ifdef RVFI
 input  wire [XL:0] rvfi_s3_rs1_rdata, // Source register data 1
@@ -101,6 +103,7 @@ wire pipe_progress = !s3_busy && s3_valid;
 
 wire fu_lsu = s3_fu[P_FU_LSU];
 wire fu_csr = s3_fu[P_FU_CSR];
+wire fu_mul = s3_fu[P_FU_MUL];
 
 
 //
@@ -156,8 +159,17 @@ wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 // Forwaring / bubbling signals.
 // -------------------------------------------------------------------------
 
+wire        imul_madd       = s3_uop == MUL_MADD        ;
+wire        imul_msub       = s3_uop == MUL_MSUB        ;
+wire        imul_macc       = s3_uop == MUL_MACC        ;
+wire        imul_mmul       = s3_uop == MUL_MMUL        ;
+
 assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
 assign fwd_s3_wdata = s3_opr_a          ;
+assign fwd_s3_wdata_hi = s3_opr_b       ;
+assign fwd_s3_wide  = fu_mul && (
+    imul_madd || imul_msub || imul_madd || imul_mmul
+);
 assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
 

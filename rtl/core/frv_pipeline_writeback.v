@@ -28,7 +28,9 @@ output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
+output [NRET        - 1 : 0] rvfi_rd_wide   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
+output [NRET * XLEN - 1 : 0] rvfi_rd_wdatahi,
 
 output [NRET * XLEN - 1 : 0] rvfi_pc_rdata  ,
 output [NRET * XLEN - 1 : 0] rvfi_pc_wdata  ,
@@ -65,8 +67,10 @@ output wire        fwd_s4_load     , // Writeback stage has load in it.
 output wire        fwd_s4_csr      , // Writeback stage has CSR op in it.
 
 output wire        gpr_wen         , // GPR write enable.
+output wire        gpr_wide        , // GPR wide writeback enable.
 output wire [ 4:0] gpr_rd          , // GPR destination register.
-output wire [XL:0] gpr_wdata       , // GPR write data.
+output wire [XL:0] gpr_wdata       , // GPR write data [31: 0].
+output wire [XL:0] gpr_wdata_hi    , // GPR write data [63:32].
 
 input  wire        int_trap_req    , // Request WB stage trap an interrupt
 input  wire [ 5:0] int_trap_cause  , // Cause of interrupt
@@ -379,6 +383,12 @@ end
 
 assign gpr_rd   = s4_rd;
 
+assign gpr_wide = fu_mul && (
+    s4_uop == MUL_MMUL ||
+    s4_uop == MUL_MADD ||
+    s4_uop == MUL_MSUB ||
+    s4_uop == MUL_MACC );
+
 assign gpr_wen  = !s4_trap &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
      cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen );
@@ -389,6 +399,8 @@ assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{cfu_gpr_wen}} & cfu_gpr_wdata |
                   {32{mul_gpr_wen}} & mul_gpr_wdata |
                   {32{asi_gpr_wen}} & asi_gpr_wdata ;
+
+assign gpr_wdata_hi = s4_opr_b;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;
@@ -482,6 +494,7 @@ end
 // wrote so we report it correctly.
 reg [ 4:0] saved_gpr_waddr;
 reg [XL:0] saved_gpr_wdata;
+reg [XL:0] saved_gpr_wdata_hi;
 reg        use_saved_gpr_wdata;
 
 wire       n_use_saved_gpr_wdata =
@@ -497,11 +510,13 @@ end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        saved_gpr_wdata <= 0;
-        saved_gpr_waddr <= 0;
+        saved_gpr_wdata     <= 0;
+        saved_gpr_wdata_hi  <= 0;
+        saved_gpr_waddr     <= 0;
     end else if(gpr_wen) begin
-        saved_gpr_wdata <= gpr_wdata;
-        saved_gpr_waddr <= gpr_rd   ;
+        saved_gpr_wdata     <= gpr_wdata;
+        saved_gpr_wdata_hi  <= gpr_wdata_hi;
+        saved_gpr_waddr     <= gpr_rd   ;
     end
 end
 
@@ -570,6 +585,11 @@ assign rvfi_rd_addr  = use_saved_gpr_wdata ? saved_gpr_waddr :
                        gpr_wen             ? gpr_rd          : 0;
 assign rvfi_rd_wdata = |s4_rd && !trap_cpu ?
                        (use_saved_gpr_wdata ? saved_gpr_wdata : gpr_wdata) : 0;
+assign rvfi_rd_wdatahi =
+               !trap_cpu ?
+    (use_saved_gpr_wdata ? saved_gpr_wdata_hi : gpr_wdata_hi) : 0;
+
+assign rvfi_rd_wide  = gpr_wide ;
 
 assign rvfi_pc_rdata = trs_pc   ; 
 assign rvfi_pc_wdata = cf_req_noint ? cf_target_noint            :

@@ -25,7 +25,9 @@ input  wire        s2_valid        , // Is this input valid?
 input  wire        flush           , // Flush this pipeline stage.
 
 output wire [ 4:0] fwd_s2_rd       , // Writeback stage destination reg.
+output wire        fwd_s2_wide     , // stage wide writeback
 output wire [XL:0] fwd_s2_wdata    , // Write data for writeback stage.
+output wire [XL:0] fwd_s2_wdata_hi , // Write data for writeback stage.
 output wire        fwd_s2_load     , // Writeback stage has load in it.
 output wire        fwd_s2_csr      , // Writeback stage has CSR op in it.
 
@@ -410,6 +412,10 @@ wire [XL:0] n_s3_opr_b =
 // Forwaring / bubbling signals.
 assign fwd_s2_rd    = s2_rd             ; // Writeback stage destination reg.
 assign fwd_s2_wdata = alu_result | imul_result | asi_result;
+assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32] : 32'b0;
+assign fwd_s2_wide  = fu_mul && (
+    imul_madd || imul_msub || imul_madd || imul_mmul
+);
 assign fwd_s2_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s2_csr   = fu_csr            ; // Writeback stage has CSR op in it.
 

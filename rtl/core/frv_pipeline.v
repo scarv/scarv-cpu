@@ -25,7 +25,9 @@ output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
+output [NRET        - 1 : 0] rvfi_rd_wide   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
+output [NRET * XLEN - 1 : 0] rvfi_rd_wdatahi,
 
 output [NRET * XLEN - 1 : 0] rvfi_pc_rdata  ,
 output [NRET * XLEN - 1 : 0] rvfi_pc_wdata  ,
@@ -197,10 +199,12 @@ wire        s2_trap       ; // Raise a trap?
 wire [ 1:0] s2_size       ; // Size of the instruction.
 wire [31:0] s2_instr      ; // The instruction word
 
-wire [ 4:0] fwd_s2_rd     ; // Writeback stage destination reg.
+wire [ 4:0] fwd_s2_rd     ; // stage destination reg.
+wire        fwd_s2_wide   ; // Wide writeback
 wire [XL:0] fwd_s2_wdata  ; // Write data for writeback stage.
-wire        fwd_s2_load   ; // Writeback stage has load in it.
-wire        fwd_s2_csr    ; // Writeback stage has CSR op in it.
+wire [XL:0] fwd_s2_wdata_hi;// Write data for writeback stage.
+wire        fwd_s2_load   ; // stage has load in it.
+wire        fwd_s2_csr    ; // stage has CSR op in it.
 
 wire [ 4:0] s3_rd         ; // Destination register address
 wire [XL:0] s3_opr_a      ; // Operand A
@@ -214,7 +218,9 @@ wire        s3_busy       ; // Can this stage accept new inputs?
 wire        s3_valid      ; // Is this input valid?
 
 wire [ 4:0] fwd_s3_rd     ; // Writeback stage destination reg.
+wire        fwd_s3_wide   ; // Wide writeback
 wire [XL:0] fwd_s3_wdata  ; // Write data for writeback stage.
+wire [XL:0] fwd_s3_wdata_hi;// Write data for writeback stage.
 wire        fwd_s3_load   ; // Writeback stage has load in it.
 wire        fwd_s3_csr    ; // Writeback stage has CSR op in it.
 
@@ -235,8 +241,10 @@ wire        fwd_s4_load   ; // Writeback stage has load in it.
 wire        fwd_s4_csr    ; // Writeback stage has CSR op in it.
 
 wire        gpr_wen       ; // GPR write enable.
+wire        gpr_wide      ; // GPR wide writeback.
 wire [ 4:0] gpr_rd        ; // GPR destination register.
-wire [XL:0] gpr_wdata     ; // GPR write data.
+wire [XL:0] gpr_wdata     ; // GPR write data [31:0].
+wire [XL:0] gpr_wdata_hi  ; // GPR write data [63:32].
 
 wire        hold_lsu_req  ; // Don't make LSU requests yet.
 
@@ -271,17 +279,40 @@ wire nz_s1_rs1     = |s1_rs1_addr;
 wire nz_s1_rs2     = |s1_rs2_addr;
 wire nz_s1_rs3     = |s1_rs3_addr;
 
-wire hzd_rs1_s4 = s1_rs1_addr == fwd_s4_rd && nz_s1_rs1;
-wire hzd_rs1_s3 = s1_rs1_addr == fwd_s3_rd && nz_s1_rs1;
-wire hzd_rs1_s2 = s1_rs1_addr == fwd_s2_rd && nz_s1_rs1;
+// Top 4 bits of address match AND
+// Address is non-zero AND
+// LSB matches OR RD[0] clear and wide
+`define HAZARD(A, F, NZ, W) (               \
+    (A[4:1] == F[4:1]) &&                   \
+    (NZ || !NZ && A[0] && !F[0] && W  ) &&  \
+    (A[0] == F[0] || A[0] && !F[0] && W)    \
+)
 
-wire hzd_rs2_s4 = s1_rs2_addr == fwd_s4_rd && nz_s1_rs2;
-wire hzd_rs2_s3 = s1_rs2_addr == fwd_s3_rd && nz_s1_rs2;
-wire hzd_rs2_s2 = s1_rs2_addr == fwd_s2_rd && nz_s1_rs2;
+wire hzd_rs1_s4 = `HAZARD(s1_rs1_addr, fwd_s4_rd, nz_s1_rs1, gpr_wide   );
+wire hzd_rs1_s3 = `HAZARD(s1_rs1_addr, fwd_s3_rd, nz_s1_rs1, fwd_s3_wide);
+wire hzd_rs1_s2 = `HAZARD(s1_rs1_addr, fwd_s2_rd, nz_s1_rs1, fwd_s2_wide);
 
-wire hzd_rs3_s4 = s1_rs3_addr == fwd_s4_rd && nz_s1_rs3;
-wire hzd_rs3_s3 = s1_rs3_addr == fwd_s3_rd && nz_s1_rs3;
-wire hzd_rs3_s2 = s1_rs3_addr == fwd_s2_rd && nz_s1_rs3;
+wire hzd_rs2_s4 = `HAZARD(s1_rs2_addr, fwd_s4_rd, nz_s1_rs2, gpr_wide   );
+wire hzd_rs2_s3 = `HAZARD(s1_rs2_addr, fwd_s3_rd, nz_s1_rs2, fwd_s3_wide);
+wire hzd_rs2_s2 = `HAZARD(s1_rs2_addr, fwd_s2_rd, nz_s1_rs2, fwd_s2_wide);
+
+wire hzd_rs3_s4 = `HAZARD(s1_rs3_addr, fwd_s4_rd, nz_s1_rs3, gpr_wide   );
+wire hzd_rs3_s3 = `HAZARD(s1_rs3_addr, fwd_s3_rd, nz_s1_rs3, fwd_s3_wide);
+wire hzd_rs3_s2 = `HAZARD(s1_rs3_addr, fwd_s2_rd, nz_s1_rs3, fwd_s2_wide);
+
+`undef HAZARD
+
+wire fwd_s2_rs1_hi = s1_rs1_addr[1] && fwd_s2_wide;
+wire fwd_s3_rs1_hi = s1_rs1_addr[1] && fwd_s3_wide;
+wire fwd_s4_rs1_hi = s1_rs1_addr[1] && gpr_wide   ;
+
+wire fwd_s2_rs2_hi = s1_rs2_addr[1] && fwd_s2_wide;
+wire fwd_s3_rs2_hi = s1_rs2_addr[1] && fwd_s3_wide;
+wire fwd_s4_rs2_hi = s1_rs2_addr[1] && gpr_wide   ;
+
+wire fwd_s2_rs3_hi = s1_rs3_addr[1] && fwd_s2_wide;
+wire fwd_s3_rs3_hi = s1_rs3_addr[1] && fwd_s3_wide;
+wire fwd_s4_rs3_hi = s1_rs3_addr[1] && gpr_wide   ;
 
 //
 // Bubbling occurs when:
@@ -294,21 +325,21 @@ wire   s1_bubble   =
 
 
 wire [XL:0] fwd_rs1_rdata =
-     hzd_rs1_s2 ? fwd_s2_wdata   :
-     hzd_rs1_s3 ? fwd_s3_wdata   :
-     hzd_rs1_s4 ? fwd_s4_wdata   :
+     hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
+     hzd_rs1_s3 ? (fwd_s3_rs1_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
+     hzd_rs1_s4 ? (fwd_s4_rs1_hi ? gpr_wdata_hi    : gpr_wdata   )  :
                   s1_rs1_rdata   ;
 
 wire [XL:0] fwd_rs2_rdata =
-     hzd_rs2_s2 ? fwd_s2_wdata   :
-     hzd_rs2_s3 ? fwd_s3_wdata   :
-     hzd_rs2_s4 ? fwd_s4_wdata   :
+     hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
+     hzd_rs2_s3 ? (fwd_s3_rs2_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
+     hzd_rs2_s4 ? (fwd_s4_rs2_hi ? gpr_wdata_hi    : gpr_wdata   )  :
                   s1_rs2_rdata   ;
 
 wire [XL:0] fwd_rs3_rdata =
-     hzd_rs3_s2 ? fwd_s2_wdata   :
-     hzd_rs3_s3 ? fwd_s3_wdata   :
-     hzd_rs3_s4 ? fwd_s4_wdata   :
+     hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
+     hzd_rs3_s3 ? (fwd_s3_rs3_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
+     hzd_rs3_s4 ? (fwd_s4_rs3_hi ? gpr_wdata_hi    : gpr_wdata   )  :
                   s1_rs3_rdata   ;
 
 //
@@ -437,7 +468,9 @@ frv_pipeline_execute #(
 .s2_valid         (s2_valid         ), // Is this input valid?
 .flush            (s2_flush         ), // Flush this pipeline stage.
 .fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
+.fwd_s2_wide      (fwd_s2_wide      ), // Write writeback
 .fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.
+.fwd_s2_wdata_hi  (fwd_s2_wdata_hi  ), // Write data for writeback stage.
 .fwd_s2_load      (fwd_s2_load      ), // Writeback stage has load in it.
 .fwd_s2_csr       (fwd_s2_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
@@ -490,7 +523,9 @@ frv_pipeline_memory #(
 .s3_busy          (s3_busy          ), // Can this stage accept new inputs?
 .s3_valid         (s3_valid         ), // Is this input valid?
 .fwd_s3_rd        (fwd_s3_rd        ), // Writeback stage destination reg.
+.fwd_s3_wide      (fwd_s3_wide      ), // Write writeback
 .fwd_s3_wdata     (fwd_s3_wdata     ), // Write data for writeback stage.
+.fwd_s3_wdata_hi  (fwd_s3_wdata_hi  ), // Write data for writeback stage.
 .fwd_s3_load      (fwd_s3_load      ), // Writeback stage has load in it.
 .fwd_s3_csr       (fwd_s3_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
@@ -560,7 +595,9 @@ frv_pipeline_writeback #(
 .rvfi_rs2_rdata   (rvfi_rs2_rdata   ),
 .rvfi_rs3_rdata   (rvfi_rs3_rdata   ),
 .rvfi_rd_addr     (rvfi_rd_addr     ),
+.rvfi_rd_wide     (rvfi_rd_wide     ),
 .rvfi_rd_wdata    (rvfi_rd_wdata    ),
+.rvfi_rd_wdatahi  (rvfi_rd_wdatahi  ),
 .rvfi_pc_rdata    (rvfi_pc_rdata    ),
 .rvfi_pc_wdata    (rvfi_pc_wdata    ),
 .rvfi_mem_addr    (rvfi_mem_addr    ),
@@ -591,8 +628,10 @@ frv_pipeline_writeback #(
 .fwd_s4_load      (fwd_s4_load      ), // Writeback stage has load in it.
 .fwd_s4_csr       (fwd_s4_csr       ), // Writeback stage has CSR op in it.
 .gpr_wen          (gpr_wen          ), // GPR write enable.
+.gpr_wide         (gpr_wide         ), // GPR wide writeback.
 .gpr_rd           (gpr_rd           ), // GPR destination register.
-.gpr_wdata        (gpr_wdata        ), // GPR write data.
+.gpr_wdata        (gpr_wdata        ), // GPR write data [31: 0].
+.gpr_wdata_hi     (gpr_wdata_hi     ), // GPR write data [63:32].
 .int_trap_req     (int_trap_req     ), // Request WB stage trap an interrupt
 .int_trap_cause   (int_trap_cause   ), // Cause of interrupt
 .int_trap_ack     (int_trap_ack     ), // WB stage acknowledge the taken trap.
@@ -693,8 +732,10 @@ frv_gprs #(
 .rs3_addr   (s1_rs3_addr    ), // Source register 3 address
 .rs3_data   (s1_rs3_rdata   ), // Source register 3 read data
 .rd_wen     (gpr_wen        ), // Destination register write enable
+.rd_wide    (gpr_wide       ), // Wide register writeback.
 .rd_addr    (gpr_rd         ), // Destination register address
-.rd_data    (gpr_wdata      )  // Destination register write data
+.rd_wdata   (gpr_wdata      ), // Destination register write data [31: 0]
+.rd_wdata_hi(gpr_wdata_hi   )  // Destination register write data [63:32]
 );
 
 endmodule
