@@ -12,6 +12,8 @@ smtbmc boolector
 [files]
 ./verif/rvfi/xcfi_macros.sv
 ./verif/rvfi/xcfi_macros_packed.vh
+./verif/rvfi/xcfi_shared.vh
+./rtl/core/frv_common.vh
 ./rtl/core/frv_pipeline_decode.vh
 
 [script]

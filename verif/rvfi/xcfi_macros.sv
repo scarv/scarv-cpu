@@ -130,13 +130,31 @@
     .spec_mem_wmask (spec_mem_wmask ), \
     .spec_mem_wdata (spec_mem_wdata )  \
 
+`define XCFI_XC_CLASS_PARAMETERS                            \
+parameter XC_CLASS_BASELINE   = 1'b1;                       \
+parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_MEMORY     = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;  \
+parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+
+`define XCFI_BITMANIP_CLASS_PARAMETERS                      \
+parameter BITMANIP_BASELINE   = 1'b1;
+
 `define XCFI_INSN_CHECK_COMMON \
     parameter ILEN = 32                    ; \
     parameter NRET = 1                     ; \
     parameter XLEN = 32                    ; \
     parameter XL   = XLEN - 1              ; \
     wire [31:0] d_data = rvfi_insn;          \
-    `include "frv_pipeline_decode.vh"        
+    `XCFI_XC_CLASS_PARAMETERS                \
+    `XCFI_BITMANIP_CLASS_PARAMETERS          \
+    `include "frv_common.vh"                 \
+    `include "frv_pipeline_decode.vh"        \
+    `include "xcfi_shared.vh"        
 
 `define RS1            rvfi_rs1_rdata
 `define RS2            rvfi_rs2_rdata
