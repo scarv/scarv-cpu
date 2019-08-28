@@ -135,26 +135,26 @@ wire [XL:0] n_s3_opr_b_alu = 32'b0;
 // Functional Unit Interfacing: Multiplier
 // -------------------------------------------------------------------------
 
-wire        imul_valid      = fu_mul;
-wire        imul_div        = s2_uop == MUL_DIV   ;
-wire        imul_divu       = s2_uop == MUL_DIVU  ;
-wire        imul_mul        = s2_uop == MUL_MUL   ;
-wire        imul_mulh       = s2_uop == MUL_MULH  ;
-wire        imul_mulhsu     = s2_uop == MUL_MULHSU;
-wire        imul_mulhu      = s2_uop == MUL_MULHU ;
-wire        imul_rem        = s2_uop == MUL_REM   ;
-wire        imul_remu       = s2_uop == MUL_REMU  ;
+wire        imul_valid      = fu_mul                    ;
+wire        imul_div        = s2_uop == MUL_DIV         ;
+wire        imul_divu       = s2_uop == MUL_DIVU        ;
+wire        imul_mul        = s2_uop == MUL_MUL         ||
+                              s2_uop == MUL_MULH        ;
+wire        imul_mulhsu     = s2_uop == MUL_MULHSU      ;
+wire        imul_mulhu      = s2_uop == MUL_MULHU       ;
+wire        imul_rem        = s2_uop == MUL_REM         ;
+wire        imul_remu       = s2_uop == MUL_REMU        ;
 wire        imul_pmul       = s2_uop == MUL_PMUL_L      ||
-                              s2_uop == MUL_PMUL_H;
+                              s2_uop == MUL_PMUL_H      ;
 wire        imul_pclmul     = s2_uop == MUL_PCLMUL_L    ||
-                              s2_uop == MUL_PCLMUL_H;
+                              s2_uop == MUL_PCLMUL_H    ;
 wire        imul_clmul      = s2_uop == MUL_CLMUL_L     || 
                               s2_uop == MUL_CLMUL_H     ||
                               s2_uop == MUL_CLMUL_R     ;
-wire        imul_madd       = s2_uop == MUL_MADD  ;
-wire        imul_msub       = s2_uop == MUL_MSUB  ;
-wire        imul_macc       = s2_uop == MUL_MACC  ;
-wire        imul_mmul       = s2_uop == MUL_MMUL  ;
+wire        imul_madd       = s2_uop == MUL_MADD        ;
+wire        imul_msub       = s2_uop == MUL_MSUB        ;
+wire        imul_macc       = s2_uop == MUL_MACC        ;
+wire        imul_mmul       = s2_uop == MUL_MMUL        ;
 
 wire [31:0] imul_rs1        = s2_opr_a;
 wire [31:0] imul_rs2        = s2_opr_b;
@@ -169,10 +169,24 @@ wire        imul_pw_16      = s2_pw == PW_16;
 wire        imul_pw_32      = s2_pw == PW_32;
 
 wire        imul_ready      ;
-wire [63:0] imul_result     ;
+wire [63:0] imul_result_wide;
 
-wire [XL:0] n_s3_opr_a_mul  = imul_result[31: 0];
-wire [XL:0] n_s3_opr_b_mul  = imul_result[63:32];
+// Source the high 32-bits of the multiplier output.
+wire        imul_result_hi  = imul_mulhu || imul_mulhsu ||
+                              s2_uop == MUL_PMUL_H    ||
+                              s2_uop == MUL_MULH      ||
+                              s2_uop == MUL_PCLMUL_H  ||
+                              s2_uop == MUL_CLMUL_H   ||
+                              s2_uop == MUL_CLMUL_R   ; // TODO: shift right 1
+
+wire [31:0] imul_result     = imul_result_hi ? imul_result_wide[63:32]  :
+                                               imul_result_wide[31: 0]  ;
+
+wire [XL:0] n_s3_opr_a_mul  = imul_result;
+
+// Always source the high half of the result. Whether it gets written
+// back is decided in the writeback stage.
+wire [XL:0] n_s3_opr_b_mul  = imul_result_wide[63:32];
 
 //
 // Functional Unit Interfacing: LSU
@@ -322,34 +336,34 @@ frv_alu i_alu (
 //  - madd, msub, macc, mmul
 //
 xc_malu i_xc_malu (
-.clock      (g_clk      ),
-.resetn     (g_resetn   ),
-.rs1        (imul_rs1   ), //
-.rs2        (imul_rs2   ), //
-.rs3        (imul_rs3   ), //
-.flush      (imul_flush ), // Flush state / pipeline progress
-.valid      (imul_valid ), // Inputs valid.
-.uop_div    (imul_div   ), //
-.uop_divu   (imul_divu  ), //
-.uop_rem    (imul_rem   ), //
-.uop_remu   (imul_remu  ), //
-.uop_mul    (imul_mul   ), //
-.uop_mulu   (imul_mulhu ), //
-.uop_mulsu  (imul_mulhsu), //
-.uop_clmul  (imul_clmul ), //
-.uop_pmul   (imul_pmul  ), //
-.uop_pclmul (imul_pclmul), //
-.uop_madd   (imul_madd  ), //
-.uop_msub   (imul_msub  ), //
-.uop_macc   (imul_macc  ), //
-.uop_mmul   (imul_mmul  ), //
-.pw_32      (imul_pw_32 ), // 32-bit width packed elements.
-.pw_16      (imul_pw_16 ), // 16-bit width packed elements.
-.pw_8       (imul_pw_8  ), //  8-bit width packed elements.
-.pw_4       (imul_pw_4  ), //  4-bit width packed elements.
-.pw_2       (imul_pw_2  ), //  2-bit width packed elements.
-.result     (imul_result), // 64-bit result
-.ready      (imul_ready )  // Outputs ready.
+.clock      (g_clk           ),
+.resetn     (g_resetn        ),
+.rs1        (imul_rs1        ), //
+.rs2        (imul_rs2        ), //
+.rs3        (imul_rs3        ), //
+.flush      (imul_flush      ), // Flush state / pipeline progress
+.valid      (imul_valid      ), // Inputs valid.
+.uop_div    (imul_div        ), //
+.uop_divu   (imul_divu       ), //
+.uop_rem    (imul_rem        ), //
+.uop_remu   (imul_remu       ), //
+.uop_mul    (imul_mul        ), //
+.uop_mulu   (imul_mulhu      ), //
+.uop_mulsu  (imul_mulhsu     ), //
+.uop_clmul  (imul_clmul      ), //
+.uop_pmul   (imul_pmul       ), //
+.uop_pclmul (imul_pclmul     ), //
+.uop_madd   (imul_madd       ), //
+.uop_msub   (imul_msub       ), //
+.uop_macc   (imul_macc       ), //
+.uop_mmul   (imul_mmul       ), //
+.pw_32      (imul_pw_32      ), // 32-bit width packed elements.
+.pw_16      (imul_pw_16      ), // 16-bit width packed elements.
+.pw_8       (imul_pw_8       ), //  8-bit width packed elements.
+.pw_4       (imul_pw_4       ), //  4-bit width packed elements.
+.pw_2       (imul_pw_2       ), //  2-bit width packed elements.
+.result     (imul_result_wide), // 64-bit result
+.ready      (imul_ready      )  // Outputs ready.
 );
 
 
