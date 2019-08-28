@@ -18,18 +18,20 @@ wire [31:0] insn_result = (`ROR32(`RS1,17)) ^
                           (`ROR32(`RS1,19)) ^
                           (`SRL32(`RS1,10)) ;
 
-wire                  spec_valid       = rvfi_valid && dec_xc_sha256_s1;
-wire                  spec_trap        = 1'b0;
-wire [         4 : 0] spec_rs1_addr    = `FIELD_RS1_ADDR;
-wire [         4 : 0] spec_rs2_addr    = `FIELD_RS2_ADDR;
-wire [         4 : 0] spec_rs3_addr    = `FIELD_RS3_ADDR;
-wire [         4 : 0] spec_rd_addr     = `FIELD_RD_ADDR;
-wire [XLEN   - 1 : 0] spec_rd_wdata    = |spec_rd_addr ? insn_result : 0;
-wire [XLEN   - 1 : 0] spec_pc_wdata    = rvfi_pc_rdata + 4;
-wire [XLEN   - 1 : 0] spec_mem_addr    = 0;
-wire [XLEN/8 - 1 : 0] spec_mem_rmask   = 0;
+assign spec_valid       = rvfi_valid && dec_xc_sha256_s1;
+assign spec_trap        = 1'b0;
+assign spec_rs1_addr    = `FIELD_RS1_ADDR;
+assign spec_rs2_addr    = `FIELD_RS2_ADDR;
+assign spec_rs3_addr    = `FIELD_RS3_ADDR;
+assign spec_rd_addr     = `FIELD_RD_ADDR;
+assign spec_rd_wdata    = |spec_rd_addr ? insn_result : 0;
+assign spec_rd_wide     = 1'b0;
+assign spec_rd_wdatahi  = 32'b0;
+assign spec_pc_wdata    = rvfi_pc_rdata + 4;
+assign spec_mem_addr    = 0;
+assign spec_mem_rmask   = 0;
 
-wire [XLEN/8 - 1 : 0] spec_mem_wmask   = 0;
-wire [XLEN   - 1 : 0] spec_mem_wdata   = 0;
+assign spec_mem_wmask   = 0;
+assign spec_mem_wdata   = 0;
 
 endmodule

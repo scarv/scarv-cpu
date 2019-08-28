@@ -586,7 +586,7 @@ assign rvfi_rd_addr  = use_saved_gpr_wdata ? saved_gpr_waddr :
 assign rvfi_rd_wdata = |s4_rd && !trap_cpu ?
                        (use_saved_gpr_wdata ? saved_gpr_wdata : gpr_wdata) : 0;
 assign rvfi_rd_wdatahi =
-               !trap_cpu ?
+     gpr_wide && !trap_cpu ?
     (use_saved_gpr_wdata ? saved_gpr_wdata_hi : gpr_wdata_hi) : 0;
 
 assign rvfi_rd_wide  = gpr_wide ;
