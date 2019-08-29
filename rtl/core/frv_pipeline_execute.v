@@ -150,9 +150,10 @@ wire        imul_pmul       = s2_uop == MUL_PMUL_L      ||
                               s2_uop == MUL_PMUL_H      ;
 wire        imul_pclmul     = s2_uop == MUL_PCLMUL_L    ||
                               s2_uop == MUL_PCLMUL_H    ;
+wire        imul_clmul_r    = s2_uop == MUL_CLMUL_R     ;
 wire        imul_clmul      = s2_uop == MUL_CLMUL_L     || 
                               s2_uop == MUL_CLMUL_H     ||
-                              s2_uop == MUL_CLMUL_R     ;
+                              imul_clmul_r              ;
 wire        imul_madd       = s2_uop == MUL_MADD        ;
 wire        imul_msub       = s2_uop == MUL_MSUB        ;
 wire        imul_macc       = s2_uop == MUL_MACC        ;
@@ -184,7 +185,8 @@ wire        imul_result_hi  = imul_mulhu || imul_mulhsu ||
 wire [31:0] imul_result     = imul_result_hi ? imul_result_wide[63:32]  :
                                                imul_result_wide[31: 0]  ;
 
-wire [XL:0] n_s3_opr_a_mul  = imul_result;
+wire [XL:0] n_s3_opr_a_mul  = imul_clmul_r ? {1'b0,imul_result_wide[63:33]} :
+                                             imul_result                    ;
 
 // Always source the high half of the result. Whether it gets written
 // back is decided in the writeback stage.
