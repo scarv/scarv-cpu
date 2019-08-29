@@ -49,7 +49,6 @@ localparam ALU_SRA      = {2'b11, 3'b001};
 localparam ALU_SRL      = {2'b11, 3'b010};
 localparam ALU_SLL      = {2'b11, 3'b100};
 localparam ALU_ROR      = {2'b11, 3'b110};
-localparam ALU_RORW     = {2'b11, 3'b111};
 
 localparam CFU_BEQ      = {2'b00, 3'b001};
 localparam CFU_BGE      = {2'b00, 3'b010};
@@ -108,6 +107,7 @@ localparam BIT_BOP           = {2'b11, 3'b001};
 localparam BIT_CMOV          = {2'b11, 3'b100};
 localparam BIT_FSL           = {2'b00, 3'b000};
 localparam BIT_FSR           = {2'b00, 3'b001};
+localparam BIT_RORW          = {2'b00, 3'b011};
 
 localparam ASI_AES  = 2'b01;
 localparam ASI_SHA2 = 2'b10;

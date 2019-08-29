@@ -127,7 +127,7 @@ assign n_s2_fu[P_FU_ALU] =
     dec_c_slli     ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
     dec_xc_psll    || dec_xc_psrl_i  || dec_xc_pror    || dec_xc_pror_i  ||
-    dec_b_ror      || dec_b_rori     || dec_xc_mror    ;
+    dec_b_ror      || dec_b_rori     ;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
@@ -159,7 +159,7 @@ assign n_s2_fu[P_FU_CSR] =
 assign n_s2_fu[P_FU_BIT] = 
     dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
-    dec_b_fsri     || dec_b_cmov     ;
+    dec_b_fsri     || dec_b_cmov     || dec_xc_mror    ;
 
 assign n_s2_fu[P_FU_ASI] = 
     dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
@@ -244,8 +244,7 @@ wire [OP:0] uop_alu =
     {5{dec_b_ror     }} & ALU_ROR   |
     {5{dec_b_rori    }} & ALU_ROR   |
     {5{dec_xc_pror   }} & ALU_ROR   |
-    {5{dec_xc_pror_i }} & ALU_ROR   |
-    {5{dec_xc_mror   }} & ALU_RORW  ;
+    {5{dec_xc_pror_i }} & ALU_ROR   ;
 
 wire [OP:0] uop_cfu =
     {5{dec_beq       }} & CFU_BEQ   |
@@ -362,6 +361,7 @@ assign uop_csr[CSR_CLEAR] = dec_csrrc || dec_csrrci ;
 assign uop_csr[CSR_SWAP ] = dec_csrrw || dec_csrrwi ;
 
 wire [OP:0] uop_bit =
+    {1+OP{dec_b_cmov          }} & BIT_CMOV         |
     {1+OP{dec_b_bdep          }} & BIT_BDEP         |
     {1+OP{dec_b_bext          }} & BIT_BEXT         |
     {1+OP{dec_b_grev          }} & BIT_GREV         |
@@ -370,7 +370,8 @@ wire [OP:0] uop_bit =
     {1+OP{dec_xc_bop          }} & BIT_BOP          |
     {1+OP{dec_b_fsl           }} & BIT_FSL          |
     {1+OP{dec_b_fsr           }} & BIT_FSR          |
-    {1+OP{dec_b_fsr           }} & BIT_FSR          ;
+    {1+OP{dec_b_fsr           }} & BIT_FSR          |
+    {1+OP{dec_xc_mror         }} & BIT_RORW         ;
 
 wire [OP:0] uop_asi =
     {1+OP{dec_xc_aessub_enc   }} & ASI_AESSUB_ENC   |
@@ -469,7 +470,10 @@ wire [4:0] dec_rd_16 =
 
 assign s1_rs1_addr = instr_16bit ? dec_rs1_16 : dec_rs1_32;
 assign s1_rs2_addr = instr_16bit ? dec_rs2_16 : dec_rs2_32;
-assign s1_rs3_addr =                            dec_rs3_32;
+
+wire   rd_as_rs3   = dec_xc_bop;
+
+assign s1_rs3_addr = rd_as_rs3 ? dec_rd_32 :    dec_rs3_32;
 
 wire lsu_no_rd = uop_lsu[LSU_STORE] && n_s2_fu[P_FU_LSU];
 wire cfu_no_rd = (uop_cfu!=CFU_JALI && uop_cfu!=CFU_JALR) &&

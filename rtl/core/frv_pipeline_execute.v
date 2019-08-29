@@ -274,6 +274,34 @@ wire [XL:0] asi_result ;
 wire [XL:0] n_s3_opr_a_asi = asi_result ;
 
 //
+// Functional Unit Interfacing: Bitwise instructions.
+// -------------------------------------------------------------------------
+
+wire [31:0]  bitw_rs1         = s2_opr_a; //
+wire [31:0]  bitw_rs2         = s2_opr_b; //
+wire [31:0]  bitw_rs3         = s2_opr_c; //
+
+// TODO: allow selecting between b0/1
+wire [ 7:0]  bitw_bop_lut     = uxcrypto_b0 ; // LUT for xc.bop
+
+wire         bitw_flush       = flush || pipe_progress;
+wire         bitw_valid       = fu_bit;
+
+wire         bitw_fsl         = fu_bit && s2_uop == BIT_FSL ;
+wire         bitw_fsr         = fu_bit && s2_uop == BIT_FSR ;
+wire         bitw_mror        = fu_bit && s2_uop == BIT_RORW;
+wire         bitw_cmov        = fu_bit && s2_uop == BIT_CMOV;
+wire         bitw_lut         = fu_bit && s2_uop == BIT_LUT ;
+wire         bitw_bop         = fu_bit && s2_uop == BIT_BOP ;
+wire [63:0]  bitw_result_wide ; // 64-bit result
+wire         bitw_ready       ; // Outputs ready.
+
+wire [31:0]  n_s3_opr_a_bit   = bitw_result_wide[31: 0];
+wire [31:0]  n_s3_opr_b_bit   = bitw_result_wide[63:32];
+
+wire         bitw_gpr_wide    = bitw_mror;
+
+//
 // Stalling / Pipeline Progression
 // -------------------------------------------------------------------------
 
@@ -283,7 +311,8 @@ wire   p_valid   = s2_valid && !s2_busy;
 // Is this stage currently busy?
 assign s2_busy = p_busy                   ||
                  lsu_valid  && !lsu_ready ||
-                 imul_valid && !imul_ready;
+                 imul_valid && !imul_ready||
+                 bitw_valid && !bitw_ready;
 
 // Is the next stage currently busy?
 wire   p_busy    ;
@@ -375,6 +404,28 @@ xc_malu i_xc_malu (
 .ready      (imul_ready      )  // Outputs ready.
 );
 
+//
+// instance: frv_bitwise
+//
+//  This module is responsible for many of the bitwise operations the
+//  core performs, both from XCrypto and Bitmanip
+//
+frv_bitwise i_frv_bitwise (
+.rs1     (bitw_rs1        ), //
+.rs2     (bitw_rs2        ), //
+.rs3     (bitw_rs3        ), //
+.bop_lut (bitw_bop_lut    ), // LUT for xc.bop
+.flush   (bitw_flush      ), // Flush state / pipeline progress
+.valid   (bitw_valid      ), // Inputs valid.
+.uop_fsl (bitw_fsl        ), // Funnel shift Left
+.uop_fsr (bitw_fsr        ), // Funnel shift right
+.uop_mror(bitw_mror       ), // Wide rotate right
+.uop_cmov(bitw_cmov       ), // Conditional move
+.uop_lut (bitw_lut        ), // xc.lut
+.uop_bop (bitw_bop        ), // xc.bop
+.result  (bitw_result_wide), // 64-bit result
+.ready   (bitw_ready      )  // Outputs ready.
+);
 
 //
 // Pipeline Register
@@ -401,6 +452,7 @@ wire [5:0]  n_trap_cause =
 wire [XL:0] n_s3_opr_a = 
     {XLEN{fu_asi}} & n_s3_opr_a_asi |
     {XLEN{fu_alu}} & n_s3_opr_a_alu |
+    {XLEN{fu_bit}} & n_s3_opr_a_bit |
     {XLEN{fu_mul}} & n_s3_opr_a_mul |
     {XLEN{fu_lsu}} & n_s3_opr_a_lsu |
     {XLEN{fu_cfu}} & n_s3_opr_a_cfu |
@@ -409,6 +461,7 @@ wire [XL:0] n_s3_opr_a =
 wire [XL:0] n_s3_opr_b =
     n_s3_trap ? {26'b0,n_trap_cause} : (
         {XLEN{fu_alu}} & n_s3_opr_b_alu |
+        {XLEN{fu_bit}} & n_s3_opr_b_bit |
         {XLEN{fu_mul}} & n_s3_opr_b_mul |
         {XLEN{fu_lsu}} & n_s3_opr_b_lsu |
         {XLEN{fu_cfu}} & n_s3_opr_b_cfu |
@@ -418,11 +471,13 @@ wire [XL:0] n_s3_opr_b =
 
 // Forwaring / bubbling signals.
 assign fwd_s2_rd    = s2_rd             ; // Writeback stage destination reg.
-assign fwd_s2_wdata = alu_result | imul_result | asi_result;
-assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32] : 32'b0;
-assign fwd_s2_wide  = fu_mul && (
-    imul_madd || imul_msub || imul_madd || imul_mmul
-);
+assign fwd_s2_wdata = alu_result | imul_result | asi_result ;
+assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32]   :
+                                  n_s3_opr_b_bit            ;
+assign fwd_s2_wide  =
+    fu_mul && (imul_madd || imul_msub || imul_madd || imul_mmul) ||
+    fu_bit && (bitw_gpr_wide                                   ) ;
+
 assign fwd_s2_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s2_csr   = fu_csr            ; // Writeback stage has CSR op in it.
 

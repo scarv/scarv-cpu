@@ -186,6 +186,13 @@ wire        asi_gpr_wen     = fu_asi;
 wire [XL:0] asi_gpr_wdata   = s4_opr_a;
 
 //
+// Functional Unit: BIT
+// -------------------------------------------------------------------------
+
+wire        bit_gpr_wen     = fu_bit;
+wire [XL:0] bit_gpr_wdata   = s4_opr_a;
+
+//
 // Functional Unit: CSR
 // -------------------------------------------------------------------------
 
@@ -393,10 +400,12 @@ assign gpr_wide = fu_mul && (
 
 assign gpr_wen  = !s4_trap &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
-     cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen );
+     cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen ||
+     bit_gpr_wen                               );
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
+                  {32{bit_gpr_wen}} & bit_gpr_wdata |
                   {32{lsu_gpr_wen}} & lsu_gpr_wdata |
                   {32{cfu_gpr_wen}} & cfu_gpr_wdata |
                   {32{mul_gpr_wen}} & mul_gpr_wdata |
