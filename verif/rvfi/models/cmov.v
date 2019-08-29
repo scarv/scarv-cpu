@@ -10,7 +10,7 @@ module xcfi_insn_spec (
 );
 `XCFI_INSN_CHECK_COMMON
 
-wire [31:0] insn_result = `RS3 ? `RS1 : `RS2;
+wire [31:0] insn_result = `RS2 ? `RS1 : `RS3;
 
 assign spec_valid       = rvfi_valid && dec_b_cmov;
 assign spec_trap        = 1'b0   ;
@@ -18,7 +18,7 @@ assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = `FIELD_RS2_ADDR;
 assign spec_rs3_addr    = `FIELD_RS3_ADDR;
 assign spec_rd_addr     = `FIELD_RD_ADDR;
-assign spec_rd_wdata    = insn_result;
+assign spec_rd_wdata    = spec_rd_addr ? insn_result : {XLEN{1'b0}};
 assign spec_rd_wide     = 1'b0;
 assign spec_rd_wdatahi  = 32'b0;
 assign spec_pc_wdata    = rvfi_pc_rdata + 4;
