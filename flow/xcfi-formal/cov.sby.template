@@ -1,0 +1,21 @@
+[options]
+mode cover
+expect pass,fail
+append 0
+tbtop i_wrapper.uut
+depth 16
+skip 15
+
+[engines]
+smtbmc boolector
+
+[files]
+./verif/rvfi/xcfi_macros.sv
+./verif/rvfi/xcfi_macros_packed.vh
+./verif/rvfi/xcfi_shared.vh
+./rtl/core/frv_common.vh
+./rtl/core/frv_pipeline_decode.vh
+
+[script]
+
+
