@@ -9,6 +9,8 @@ int test_main() {
 
     __asm__ ("clmul %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
 
+    __asm__ ("xc.pclmul.l h, %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rd));
+
     if(rd) {
 
         return 0;
