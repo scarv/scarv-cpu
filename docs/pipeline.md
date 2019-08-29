@@ -89,7 +89,7 @@ The pipeline will be organised into a module hierarchy:
     |       |         |Valid   | Data                 |
     |       |Ready    |        |                      |
     |   +-------------*--------*-----------------+    |
-    |   |              frv_execute         s2    |    |
+    |   |              frv_execute         s2    |----|---# RNG I/F
     |   +---^------------------------------------+    |
     |       |         |Valid   | Data                 |
     |       |Ready    |        |                      |
