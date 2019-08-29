@@ -3,6 +3,8 @@
 `define __XCFI_MACROS__
 
 `define XCFI_TRACE_INPUTS \
+    input                         clock            , \
+    input                         reset            , \
     input [NRET          - 1 : 0] rvfi_valid       , \
     input [NRET * 64     - 1 : 0] rvfi_order       , \
     input [NRET * ILEN   - 1 : 0] rvfi_insn        , \

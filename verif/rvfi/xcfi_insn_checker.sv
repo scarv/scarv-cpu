@@ -135,6 +135,8 @@ always @* begin
 end
 
 xcfi_insn_spec i_insn_spec(
+    .clock(clock),
+    .reset(reset),
     `XCFI_TRACE_CONNECT,
     `XCFI_SPEC_CONNECT
 );
