@@ -392,11 +392,15 @@ end
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wide = fu_mul && (
-    s4_uop == MUL_MMUL ||
-    s4_uop == MUL_MADD ||
-    s4_uop == MUL_MSUB ||
-    s4_uop == MUL_MACC );
+assign gpr_wide = 
+    fu_mul && (
+        s4_uop == MUL_MMUL ||
+        s4_uop == MUL_MADD ||
+        s4_uop == MUL_MSUB ||
+        s4_uop == MUL_MACC 
+    )    ||
+    fu_bit && (s4_uop == BIT_RORW) ;
+
 
 assign gpr_wen  = !s4_trap &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
