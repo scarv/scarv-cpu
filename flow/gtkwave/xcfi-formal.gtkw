@@ -1,19 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Wed Aug 28 14:07:53 2019
+[*] Thu Aug 29 12:01:45 2019
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/xcfi/cmov_bmc/engine_0/trace.vcd"
+[dumpfile_mtime] "Thu Aug 29 11:59:56 2019"
+[dumpfile_size] 1085329
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/xcfi-formal.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-5.363748 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.363748 150 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] xcfi_testbench.
 [treeopen] xcfi_testbench.i_insn_checker.
 [treeopen] xcfi_testbench.i_wrapper.
 [treeopen] xcfi_testbench.i_wrapper.i_dut.
 [treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.
-[treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.
 [sst_width] 268
 [signals_width] 357
 [sst_expanded] 1
@@ -122,6 +123,8 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:0
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wen
 @200
 -
+@c00200
+-IMUL
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.imul_madd
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.imul_ready
@@ -139,7 +142,6 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.s4_opr_a[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.s4_opr_b[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_rd[4:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:0]
-@23
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wdata_hi[31:0]
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wen
@@ -150,6 +152,8 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.rvfi_rd_wdata[
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.rvfi_rd_wdatahi[31:0]
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.rvfi_rd_wide
+@1401200
+-IMUL
 @c00200
 -ALU
 @22
@@ -277,6 +281,30 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha
 @1401200
 -group_end
 -ASI
+@800201
+-BITW
+@29
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_bop
+@23
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_bop_lut[7:0]
+@29
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_cmov
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_flush
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_fsl
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_fsr
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_gpr_wide
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_lut
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_mror
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_ready
+@23
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_result_wide[63:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs1[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs2[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs3[31:0]
+@29
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_valid
+@1000201
+-BITW
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.n_s3_rd[4:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.s2_rd[4:0]
@@ -285,7 +313,7 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.s3_rd[4:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.s4_rd[4:0]
 @200
 -
-@800200
+@c00200
 -XCrypto Decode
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_aesmix_dec
@@ -337,7 +365,7 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_sha256_s3
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_str_b
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_str_h
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_xc_str_w
-@1000200
+@1401200
 -XCrypto Decode
 @c00200
 -Bitmanip Decode
