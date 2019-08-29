@@ -310,17 +310,17 @@ wire hzd_rs3_s2 = `HAZARD(s1_rs3_addr, fwd_s2_rd, nz_s1_rs3, fwd_s2_wide);
 
 `undef HAZARD
 
-wire fwd_s2_rs1_hi = s1_rs1_addr[1] && fwd_s2_wide;
-wire fwd_s3_rs1_hi = s1_rs1_addr[1] && fwd_s3_wide;
-wire fwd_s4_rs1_hi = s1_rs1_addr[1] && gpr_wide   ;
+wire fwd_s2_rs1_hi = s1_rs1_addr[0] && fwd_s2_wide;
+wire fwd_s3_rs1_hi = s1_rs1_addr[0] && fwd_s3_wide;
+wire fwd_s4_rs1_hi = s1_rs1_addr[0] && gpr_wide   ;
 
-wire fwd_s2_rs2_hi = s1_rs2_addr[1] && fwd_s2_wide;
-wire fwd_s3_rs2_hi = s1_rs2_addr[1] && fwd_s3_wide;
-wire fwd_s4_rs2_hi = s1_rs2_addr[1] && gpr_wide   ;
+wire fwd_s2_rs2_hi = s1_rs2_addr[0] && fwd_s2_wide;
+wire fwd_s3_rs2_hi = s1_rs2_addr[0] && fwd_s3_wide;
+wire fwd_s4_rs2_hi = s1_rs2_addr[0] && gpr_wide   ;
 
-wire fwd_s2_rs3_hi = s1_rs3_addr[1] && fwd_s2_wide;
-wire fwd_s3_rs3_hi = s1_rs3_addr[1] && fwd_s3_wide;
-wire fwd_s4_rs3_hi = s1_rs3_addr[1] && gpr_wide   ;
+wire fwd_s2_rs3_hi = s1_rs3_addr[0] && fwd_s2_wide;
+wire fwd_s3_rs3_hi = s1_rs3_addr[0] && fwd_s3_wide;
+wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 
 //
 // Bubbling occurs when:
