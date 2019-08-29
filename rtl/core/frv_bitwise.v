@@ -46,12 +46,16 @@ wire [63:0] rword_l;
 
 wire [63:0] r_in    = uop_fsl ? rword_l : rword_r;
 
-wire [63:0] rout_r  = r_in >> (   ramt) |
-                      r_in << (64-ramt) ;
+wire [63:0] rt_5    = ramt[5] ? {r_in[31:0], r_in[63:32]} : r_in;   // 32
+wire [63:0] rt_4    = ramt[4] ? {rt_5[15:0], rt_5[63:16]} : rt_5;   // 16
+wire [63:0] rt_3    = ramt[3] ? {rt_4[ 7:0], rt_4[63: 8]} : rt_4;   // 8 
+wire [63:0] rt_2    = ramt[2] ? {rt_3[ 3:0], rt_3[63: 4]} : rt_3;   // 4 
+wire [63:0] rt_1    = ramt[1] ? {rt_2[ 1:0], rt_2[63: 2]} : rt_2;   // 2 
+wire [63:0] rt_0    = ramt[0] ? {rt_1[   0], rt_1[63: 1]} : rt_1;   // 1 
 
 wire [63:0] rout_l  ;
 
-wire [63:0] r_out   = uop_fsl ? rout_l  : rout_r ;
+wire [63:0] r_out   = uop_fsl ? rout_l  : rt_0   ;
 
 genvar i;
 
@@ -59,7 +63,7 @@ generate for(i = 0; i < 64; i = i +1) begin
     
     assign rword_l[i] = rword_r[63-i];
     
-    assign rout_l[i]  = rout_r [63-i];
+    assign rout_l[i]  = rt_0   [63-i];
 
 end endgenerate
 
