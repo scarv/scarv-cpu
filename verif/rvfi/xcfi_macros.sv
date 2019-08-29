@@ -181,4 +181,6 @@ parameter BITMANIP_BASELINE   = 1'b1;
 `define FIELD_RS3_ADDR d_data[31:27]
 `define FIELD_RD_ADDR  d_data[11: 7]
 
+`define FIELD_SHAMT5   d_data[25:20]
+
 `endif

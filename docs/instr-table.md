@@ -52,7 +52,6 @@ Instruction  | Action                   | uOP code    | Pack Widths
 `rori       `| rd <= rs1 >> rs2         | {11, 110}   | 32          
 `xc.pror    `| rd <= rs1 p>> rs2        | {11, 110}   | 16/8/4/2    
 `xc.pror.i  `| rd <= rs1 p>> imm        | {11, 110}   | 16/8/4/2    
-`xc.mror    `| rdm <= rs1||rs2 >> rs3   | {11, 111}   | 64
 
 
 **Control Flow Instructions:**
@@ -160,6 +159,7 @@ Instruction  | Action                   | uOP code
 `fsl        `| rd <= rs1 || rs2 << rs3  | {00, 000}
 `fsr        `| rd <= rs1 || rs2 << rs3  | {00, 001}
 `fsri       `| rd <= rs1 || rs2 << imm  | {00, 001}
+`xc.mror    `| rdm <= rs1||rs2 >> rs3   | {00, 011}
 
 
 **Algorithm Specific Instructions:**
