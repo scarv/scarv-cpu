@@ -132,6 +132,11 @@ parameter BITMANIP_BASELINE   = 1'b1;
 
 // -------------------------------------------------------------------------
 
+
+wire        uxcrypto_ct; // UXCrypto constant time bit.
+wire [ 7:0] uxcrypto_b0; // UXCrypto lookup table 0.
+wire [ 7:0] uxcrypto_b1; // UXCrypto lookup table 1.
+
 //
 // Alias'd / miscellaneous signals.
 assign      instr_ret = trs_valid;
@@ -466,6 +471,9 @@ frv_pipeline_execute #(
 .s2_instr         (s2_instr         ), // The instruction word
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
+.uxcrypto_ct      (uxcrypto_ct      ), // UXCrypto constant time bit.
+.uxcrypto_b0      (uxcrypto_b0      ), // UXCrypto lookup table 0.
+.uxcrypto_b1      (uxcrypto_b1      ), // UXCrypto lookup table 1.
 .flush            (s2_flush         ), // Flush this pipeline stage.
 .fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
 .fwd_s2_wide      (fwd_s2_wide      ), // Write writeback
@@ -707,6 +715,9 @@ frv_csrs #(
 .inhibit_cy       (inhibit_cy       ), // Stop cycle counter incrementing.
 .inhibit_tm       (inhibit_tm       ), // Stop time counter incrementing.
 .inhibit_ir       (inhibit_ir       ), // Stop instret incrementing.
+.uxcrypto_ct      (uxcrypto_ct      ), // UXCrypto constant time bit.
+.uxcrypto_b0      (uxcrypto_b0      ), // UXCrypto lookup table 0.
+.uxcrypto_b1      (uxcrypto_b1      ), // UXCrypto lookup table 1.
 .trap_cpu         (trap_cpu         ), // A trap occured due to CPU
 .trap_int         (trap_int         ), // A trap occured due to interrupt
 .trap_cause       (trap_cause       ), // Cause of a trap.

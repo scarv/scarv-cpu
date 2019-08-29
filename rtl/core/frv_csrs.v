@@ -39,6 +39,10 @@ output wire        inhibit_cy       , // Stop cycle counter incrementing.
 output wire        inhibit_tm       , // Stop time counter incrementing.
 output wire        inhibit_ir       , // Stop instret incrementing.
 
+output reg         uxcrypto_ct      , // UXCrypto constant time bit.
+output reg  [ 7:0] uxcrypto_b0      , // UXCrypto lookup table 0.
+output reg  [ 7:0] uxcrypto_b1      , // UXCrypto lookup table 1.
+
 input  wire        trap_cpu         , // A trap occured due to CPU
 input  wire        trap_int         , // A trap occured due to interrupt
 input  wire [ 5:0] trap_cause       , // A trap occured due to interrupt
@@ -493,9 +497,10 @@ wire [31:0] reg_mcountin = {
 // UXCRYPTO
 // -------------------------------------------------------------------------
 
-reg         uxcrypto_ct;
-reg  [ 7:0] uxcrypto_b0;
-reg  [ 7:0] uxcrypto_b1;
+// Output register ports:
+// - [0:0] uxcrypto_ct
+// - [7:0] uxcrypto_b0
+// - [7:0] uxcrypto_b1
 
 wire [10:0] uxcrypto_features = {
     XC_CLASS_BIT        ,

@@ -22,6 +22,10 @@ input  wire [31:0] s2_instr        , // The instruction word
 output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
 
+input  wire        uxcrypto_ct     , // UXCrypto constant time bit.
+input  wire [ 7:0] uxcrypto_b0     , // UXCrypto lookup table 0.
+input  wire [ 7:0] uxcrypto_b1     , // UXCrypto lookup table 1.
+
 input  wire        flush           , // Flush this pipeline stage.
 
 output wire [ 4:0] fwd_s2_rd       , // Writeback stage destination reg.
