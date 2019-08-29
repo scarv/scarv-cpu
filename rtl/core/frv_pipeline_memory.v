@@ -36,12 +36,14 @@ input  wire [XL:0] rvfi_s3_rs3_rdata, // Source register data 3
 input  wire [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
 input  wire [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
+input  wire [XL:0] rvfi_s3_aux      , // Auxiliary needed information.
 output reg  [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 output reg  [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
 output reg  [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
 output reg  [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 output reg  [ 4:0] rvfi_s4_rs3_addr , // Source register address 3
+output reg  [XL:0] rvfi_s4_aux      , // Auxiliary needed information.
 output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
 
@@ -272,6 +274,7 @@ always @(posedge g_clk) begin
         rvfi_s4_rs1_addr  <= 0; // Source register address 1
         rvfi_s4_rs2_addr  <= 0; // Source register address 2
         rvfi_s4_rs3_addr  <= 0; // Source register address 3
+        rvfi_s4_aux       <= 0; // Auxiliary data
     end else if(pipe_progress) begin
         rvfi_s4_rs1_rdata <= rvfi_s3_rs1_rdata;
         rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
@@ -279,6 +282,7 @@ always @(posedge g_clk) begin
         rvfi_s4_rs1_addr  <= rvfi_s3_rs1_addr ;
         rvfi_s4_rs2_addr  <= rvfi_s3_rs2_addr ;
         rvfi_s4_rs3_addr  <= rvfi_s3_rs3_addr ;
+        rvfi_s4_aux       <= rvfi_s3_aux      ;
     end
 end
 

@@ -27,6 +27,7 @@ output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
+output [NRET * XLEN -1  : 0] rvfi_aux       ,
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
 output [NRET        - 1 : 0] rvfi_rd_wide   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
@@ -47,6 +48,7 @@ input  wire [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
 input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 input  wire [ 4:0] rvfi_s4_rs3_addr , // Source register address 3
+input  wire [XL:0] rvfi_s4_aux      , // Auxiliary needed information.
 input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
 
@@ -602,6 +604,8 @@ assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata :
                        lsu_mmio            ? mmio_rdata      :
                                              dmem_rdata      ;
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
+
+assign rvfi_aux      = rvfi_s4_aux;
 
 // Constant assignments to features of RVFI not supported/relevent.
 assign rvfi_halt  = 0;

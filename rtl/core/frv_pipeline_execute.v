@@ -48,6 +48,7 @@ output reg  [XL:0] rvfi_s3_rs3_rdata, // Source register data 3
 output reg  [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
 output reg  [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
+output reg  [XL:0] rvfi_s3_aux      , // Auxiliary needed information.
 `endif
 
 output wire [ 4:0] s3_rd           , // Destination register address
@@ -474,6 +475,9 @@ frv_pipeline_register #(
 
 `ifdef RVFI
 
+// Only use aux signal to carry EX stage aligned uxcrypto content for now.
+wire [XL:0] n_rvfi_s3_aux = {16'b0, uxcrypto_b1, uxcrypto_b0};
+
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         rvfi_s3_rs1_rdata <= 0; // Source register data 1
@@ -482,6 +486,7 @@ always @(posedge g_clk) begin
         rvfi_s3_rs1_addr  <= 0; // Source register address 1
         rvfi_s3_rs2_addr  <= 0; // Source register address 2
         rvfi_s3_rs3_addr  <= 0; // Source register address 3
+        rvfi_s3_aux       <= 0; // Auxiliary data
     end else if(pipe_progress) begin
         rvfi_s3_rs1_rdata <= rvfi_s2_rs1_rdata;
         rvfi_s3_rs2_rdata <= rvfi_s2_rs2_rdata;
@@ -489,6 +494,7 @@ always @(posedge g_clk) begin
         rvfi_s3_rs1_addr  <= rvfi_s2_rs1_addr ;
         rvfi_s3_rs2_addr  <= rvfi_s2_rs2_addr ;
         rvfi_s3_rs3_addr  <= rvfi_s2_rs3_addr ;
+        rvfi_s3_aux       <= n_rvfi_s3_aux    ;
     end
 end
 
