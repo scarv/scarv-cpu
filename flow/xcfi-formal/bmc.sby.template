@@ -5,6 +5,7 @@ append 0
 tbtop i_wrapper.uut
 depth 16
 skip 15
+timeout 7200
 
 [engines]
 smtbmc boolector
