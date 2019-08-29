@@ -94,6 +94,7 @@ frv_core #(
 .rvfi_rs1_rdata (rvfi_rs1_rdata ),
 .rvfi_rs2_rdata (rvfi_rs2_rdata ),
 .rvfi_rs3_rdata (rvfi_rs3_rdata ),
+.rvfi_aux       (rvfi_aux       ),
 .rvfi_rd_addr   (rvfi_rd_addr   ),
 .rvfi_rd_wide   (rvfi_rd_wide   ),
 .rvfi_rd_wdata  (rvfi_rd_wdata  ),

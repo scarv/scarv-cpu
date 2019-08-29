@@ -50,6 +50,7 @@ parameter channel_idx = 0;
 (* keep *) wire [XLEN   - 1 : 0] rs1_rdata = rvfi_rs1_rdata[channel_idx*XLEN   +: XLEN];
 (* keep *) wire [XLEN   - 1 : 0] rs2_rdata = rvfi_rs2_rdata[channel_idx*XLEN   +: XLEN];
 (* keep *) wire [XLEN   - 1 : 0] rs3_rdata = rvfi_rs3_rdata[channel_idx*XLEN   +: XLEN];
+(* keep *) wire [XLEN   - 1 : 0] aux_data  = rvfi_aux      [channel_idx*XLEN   +: XLEN];
 (* keep *) wire [         4 : 0] rd_addr   = rvfi_rd_addr  [channel_idx*5  +:  5];
 (* keep *) wire [XLEN   - 1 : 0] rd_wdata  = rvfi_rd_wdata [channel_idx*XLEN   +: XLEN];
 (* keep *) wire                  rd_wide   = rvfi_rd_wide  [channel_idx];
