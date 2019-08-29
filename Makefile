@@ -21,7 +21,9 @@ export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu_long.v \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu_mul.v \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu_pmul.v \
-                      $(XCRYPTO_RTL)/xc_malu/xc_malu_muldivrem.v
+                      $(XCRYPTO_RTL)/xc_malu/xc_malu_muldivrem.v \
+                      $(XCRYPTO_RTL)/b_bop/b_bop.v \
+                      $(XCRYPTO_RTL)/b_lut/b_lut.v
 
 export PATH:=$(RISCV)/bin:$(YOSYS_ROOT)/:$(PATH)
 
