@@ -1,5 +1,6 @@
 
 `include "xcfi_macros.sv"
+`include "xcfi_macros_packed.vh"
 
 module xcfi_insn_spec (
 
@@ -11,9 +12,11 @@ module xcfi_insn_spec (
 
 `XCFI_INSN_CHECK_COMMON
 
-wire [63:0] insn_result = clmul_ref(`RS1, `RS2);
+wire [ 2:0] pw          = `INSTR_PACK_WIDTH << 1;
 
-assign spec_valid       = rvfi_valid && dec_b_clmul;
+wire [63:0] insn_result = `PW_CLMUL32(`RS1, `RS2, 32);
+
+assign spec_valid       = rvfi_valid && dec_xc_pclmul_l;
 assign spec_trap        = 1'b0   ;
 assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = `FIELD_RS2_ADDR;
