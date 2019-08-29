@@ -65,7 +65,7 @@ The `rng_rsp_status` signal is encoded thusly:
 
 Encoding | Meaning
 ---------|--------------------------
-`001`    | Un-initialised
-`010`    | Initialised - not enough entropy.
-`100`    | Initialised - ready to be sampled.
+`000`    | Un-initialised
+`100`    | Initialised - not enough entropy.
+`101`    | Initialised - ready to be sampled.
 *Else*   | Reserved for future use.
