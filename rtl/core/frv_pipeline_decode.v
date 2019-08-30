@@ -126,7 +126,7 @@ assign n_s2_fu[P_FU_ALU] =
     dec_srl        || dec_srli       || dec_sll        || dec_slli       ||
     dec_c_slli     ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
-    dec_xc_psll    || dec_xc_psrl_i  || dec_xc_pror    || dec_xc_pror_i  ||
+    dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
     dec_b_ror      || dec_b_rori     ;
 
 assign n_s2_fu[P_FU_MUL] = 
