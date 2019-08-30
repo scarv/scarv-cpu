@@ -46,6 +46,15 @@ parameter XL   = XLEN - 1;
 (*keep*) `rvformal_rand_reg         dmem_error; // Error
 (*keep*) `rvformal_rand_reg [XL:0]  dmem_rdata; // Read data
 
+(*keep*) wire        rng_req_valid  ; // Signal a new request to the RNG
+(*keep*) wire [ 2:0] rng_req_op     ; // Operation to perform on the RNG
+(*keep*) wire [31:0] rng_req_data   ; // Suplementary seed/init data
+(*keep*) reg         rng_req_ready  = $anyseq; // RNG accepts request
+(*keep*) reg         rng_rsp_valid  = $anyseq; // RNG response data valid
+(*keep*) reg  [ 2:0] rng_rsp_status = $anyseq; // RNG status
+(*keep*) reg  [31:0] rng_rsp_data   = $anyseq; // RNG response / sample data.
+(*keep*) wire        rng_rsp_ready  ; // CPU accepts response.
+
 // Unused by RVFI, but used by XCrypto formal checkers.
 wire [NRET *    5 - 1 : 0] rvfi_rs3_addr  ;
 wire [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ;
@@ -100,6 +109,14 @@ frv_core #(
 .trs_pc         (trs_pc         ), // Trace program counter.
 .trs_instr      (trs_instr      ), // Trace instruction.
 .trs_valid      (trs_valid      ), // Trace output valid.
+.rng_req_valid  (rng_req_valid  ), // Signal a new request to the RNG
+.rng_req_op     (rng_req_op     ), // Operation to perform on the RNG
+.rng_req_data   (rng_req_data   ), // Suplementary seed/init data
+.rng_req_ready  (rng_req_ready  ), // RNG accepts request
+.rng_rsp_valid  (rng_rsp_valid  ), // RNG response data valid
+.rng_rsp_status (rng_rsp_status ), // RNG status
+.rng_rsp_data   (rng_rsp_data   ), // RNG response / sample data.
+.rng_rsp_ready  (rng_rsp_ready  ), // CPU accepts response.
 .int_external   (int_external   ), // External interrupt trigger line.
 .int_software   (int_software   ), // Software interrupt trigger line.
 .imem_req       (imem_req       ), // Start memory request
