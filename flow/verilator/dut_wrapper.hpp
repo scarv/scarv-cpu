@@ -9,6 +9,7 @@
 
 #include "memory_device.hpp"
 #include "sram_agent.hpp"
+#include "rng_agent.hpp"
 
 #ifndef DUT_WRAPPER_HPP
 #define DUT_WRAPPER_HPP
@@ -81,6 +82,9 @@ protected:
 
     //! Data memory SRAM agent
     sram_agent * dmem_agent;
+
+    //! Randomness interface agent
+    rng_agent  * rng_if_agent;
 
     //! Number of model evaluations per clock cycle
     const uint32_t  evals_per_clock = 10;

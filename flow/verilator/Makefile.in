@@ -13,6 +13,7 @@ VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
            $(VL_CSRC_DIR)/dut_wrapper.cpp \
            $(VL_CSRC_DIR)/testbench.cpp \
            $(VL_CSRC_DIR)/sram_agent.cpp \
+           $(VL_CSRC_DIR)/rng_agent.cpp \
            $(VL_CSRC_DIR)/memory_bus.cpp \
            $(VL_CSRC_DIR)/memory_device.cpp \
            $(VL_CSRC_DIR)/memory_device_ram.cpp \
