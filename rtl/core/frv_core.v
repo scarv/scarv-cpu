@@ -44,14 +44,14 @@ output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
 
-output wire [ 1:0]  rng_req_valid   , // Signal a new request to the RNG
-output wire [ 3:0]  rng_req_op      , // Operation to perform on the RNG
-output wire [32:0]  rng_req_data    , // Suplementary seed/init data
-input  wire [ 1:0]  rng_req_ready   , // RNG accepts request
-input  wire [ 1:0]  rng_rsp_valid   , // RNG response data valid
-input  wire [ 3:0]  rng_rsp_status  , // RNG status
-input  wire [32:0]  rng_rsp_data    , // RNG response / sample data.
-output wire [ 1:0]  rng_rsp_ready   , // CPU accepts response.
+output wire         rng_req_valid   , // Signal a new request to the RNG
+output wire [ 2:0]  rng_req_op      , // Operation to perform on the RNG
+output wire [31:0]  rng_req_data    , // Suplementary seed/init data
+input  wire         rng_req_ready   , // RNG accepts request
+input  wire         rng_rsp_valid   , // RNG response data valid
+input  wire [ 2:0]  rng_rsp_status  , // RNG status
+input  wire [31:0]  rng_rsp_data    , // RNG response / sample data.
+output wire         rng_rsp_ready   , // CPU accepts response.
 
 input  wire         int_external    , // External interrupt trigger line.
 input  wire         int_software    , // Software interrupt trigger line.

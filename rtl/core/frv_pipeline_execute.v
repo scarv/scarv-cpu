@@ -22,14 +22,14 @@ input  wire [31:0] s2_instr        , // The instruction word
 output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
 
-output wire [ 1:0] rng_req_valid   , // Signal a new request to the RNG
-output wire [ 3:0] rng_req_op      , // Operation to perform on the RNG
-output wire [32:0] rng_req_data    , // Suplementary seed/init data
-input  wire [ 1:0] rng_req_ready   , // RNG accepts request
-input  wire [ 1:0] rng_rsp_valid   , // RNG response data valid
-input  wire [ 3:0] rng_rsp_status  , // RNG status
-input  wire [32:0] rng_rsp_data    , // RNG response / sample data.
-output wire [ 1:0] rng_rsp_ready   , // CPU accepts response.
+output wire        rng_req_valid   , // Signal a new request to the RNG
+output wire [ 2:0] rng_req_op      , // Operation to perform on the RNG
+output wire [31:0] rng_req_data    , // Suplementary seed/init data
+input  wire        rng_req_ready   , // RNG accepts request
+input  wire        rng_rsp_valid   , // RNG response data valid
+input  wire [ 2:0] rng_rsp_status  , // RNG status
+input  wire [31:0] rng_rsp_data    , // RNG response / sample data.
+output wire        rng_rsp_ready   , // CPU accepts response.
 
 input  wire        uxcrypto_ct     , // UXCrypto constant time bit.
 input  wire [ 7:0] uxcrypto_b0     , // UXCrypto lookup table 0.
@@ -462,7 +462,7 @@ frv_rngif i_frv_rngif (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
 .flush            (flush            ), // Flush any internal resources.
-.pipeline_progress(pipeline_progress), // Pipeline is progressing this cycle.
+.pipeline_progress(pipe_progress    ), // Pipeline is progressing this cycle.
 .valid            (rng_valid        ), // Inputs valid
 .rs1              (rng_rs1          ), // Input source register 1.
 .rng_req_valid    (rng_req_valid    ), // Signal a new request to the RNG

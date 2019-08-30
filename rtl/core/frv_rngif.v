@@ -15,15 +15,15 @@ input  wire        pipeline_progress, // Pipeline is progressing this cycle.
 input  wire        valid            , // Inputs valid
 input  wire [XL:0] rs1              , // Input source register 1.
 
-output wire [ 1:0] rng_req_valid    , // Signal a new request to the RNG
-output wire [ 3:0] rng_req_op       , // Operation to perform on the RNG
-output wire [32:0] rng_req_data     , // Suplementary seed/init data
-input  wire [ 1:0] rng_req_ready    , // RNG accepts request
+output wire        rng_req_valid    , // Signal a new request to the RNG
+output wire [ 2:0] rng_req_op       , // Operation to perform on the RNG
+output wire [31:0] rng_req_data     , // Suplementary seed/init data
+input  wire        rng_req_ready    , // RNG accepts request
 
-input  wire [ 1:0] rng_rsp_valid    , // RNG response data valid
-input  wire [ 3:0] rng_rsp_status   , // RNG status
-input  wire [32:0] rng_rsp_data     , // RNG response / sample data.
-output wire [ 1:0] rng_rsp_ready    , // CPU accepts response.
+input  wire        rng_rsp_valid    , // RNG response data valid
+input  wire [ 2:0] rng_rsp_status   , // RNG status
+input  wire [31:0] rng_rsp_data     , // RNG response / sample data.
+output wire        rng_rsp_ready    , // CPU accepts response.
 
 input  wire        uop_test         , // Test the RNG status
 input  wire        uop_seed         , // Seed the RNG with new entropy
@@ -33,6 +33,8 @@ output wire [XL:0] result           , // Result to write back
 output wire        ready              // Result ready.
 
 );
+
+`include "frv_common.vh"
 
 //
 // Request channel
