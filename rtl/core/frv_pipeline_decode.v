@@ -370,7 +370,7 @@ wire [OP:0] uop_bit =
     {1+OP{dec_xc_bop          }} & BIT_BOP          |
     {1+OP{dec_b_fsl           }} & BIT_FSL          |
     {1+OP{dec_b_fsr           }} & BIT_FSR          |
-    {1+OP{dec_b_fsr           }} & BIT_FSR          |
+    {1+OP{dec_b_fsri          }} & BIT_FSR          |
     {1+OP{dec_xc_mror         }} & BIT_RORW         ;
 
 wire [OP:0] uop_asi =
@@ -556,7 +556,9 @@ wire use_imm_csr = dec_csrrc || dec_csrrs || dec_csrrw;
 wire use_imm_csri= dec_csrrci || dec_csrrsi || dec_csrrwi;
 wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     || 
                    dec_xc_psll_i || dec_xc_psrl_i   || dec_xc_pror_i||
-                   dec_b_rori    || dec_b_fsri;
+                   dec_b_rori    ;
+
+wire use_imm_wshf= dec_b_fsri; // Wide shift immediate
 
 wire use_pc_imm  = use_imm32_b  || use_imm32_j  || dec_c_beqz   ||
                    dec_c_bnez   || dec_c_j      || dec_c_jal     ;
@@ -596,7 +598,8 @@ assign n_s2_imm =
     {32{use_imm_csri  }} & {imm_csr_a, 15'b0, s1_data[19:15]} |
     {32{use_imm_csr   }} & {imm_csr_a, 20'b0} |
     {32{dec_fence_i   }} & 32'd4        |
-    {32{use_imm_shfi  }} & {27'b0, s1_data[24:20]} ;
+    {32{use_imm_shfi  }} & {27'b0, s1_data[24:20]} |
+    {32{use_imm_wshf  }} & {26'b0, s1_data[25:20]} ;
 
 //
 // Pack width decoding

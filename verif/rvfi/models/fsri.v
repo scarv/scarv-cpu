@@ -16,7 +16,7 @@ wire [63:0] ror_in      = {`RS1, `RS3};
 wire [63:0] insn_result = (ror_in >> (   shamt)) |
                           (ror_in << (64-shamt)) ;
 
-assign spec_valid       = rvfi_valid && dec_b_fsr;
+assign spec_valid       = rvfi_valid && dec_b_fsri;
 assign spec_trap        = 1'b0   ;
 assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = `FIELD_RS2_ADDR;
