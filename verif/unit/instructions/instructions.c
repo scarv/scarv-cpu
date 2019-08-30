@@ -15,6 +15,15 @@ int test_main() {
 
     sum += (rd1+rd2+rd3);
 
+    __asm__("xc.rngseed %0" : : "r"(sum));
+
+    do {
+        __asm__ volatile ("xc.rngtest %0" : "=r"(rd1) :);
+        __asm__ volatile ("xc.rngsamp %0" : "=r"(rd2) :);
+    } while(rd1 == 0);
+
+    sum += rd2;
+
     if(sum) {
 
         return 0;
