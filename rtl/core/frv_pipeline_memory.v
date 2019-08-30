@@ -37,6 +37,8 @@ input  wire [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
 input  wire [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
 input  wire [XL:0] rvfi_s3_aux      , // Auxiliary needed information.
+input  wire [31:0] rvfi_s3_rng_data , // RNG read data
+input  wire [ 2:0] rvfi_s3_rng_stat , // RNG status
 output reg  [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 output reg  [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
 output reg  [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
@@ -44,6 +46,8 @@ output reg  [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 output reg  [ 4:0] rvfi_s4_rs3_addr , // Source register address 3
 output reg  [XL:0] rvfi_s4_aux      , // Auxiliary needed information.
+output reg  [31:0] rvfi_s4_rng_data , // RNG read data
+output reg  [ 2:0] rvfi_s4_rng_stat , // RNG status
 output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
 
@@ -275,6 +279,8 @@ always @(posedge g_clk) begin
         rvfi_s4_rs2_addr  <= 0; // Source register address 2
         rvfi_s4_rs3_addr  <= 0; // Source register address 3
         rvfi_s4_aux       <= 0; // Auxiliary data
+        rvfi_s4_rng_data  <= 0; // RNG read data
+        rvfi_s4_rng_stat  <= 0; // RNG status 
     end else if(pipe_progress) begin
         rvfi_s4_rs1_rdata <= rvfi_s3_rs1_rdata;
         rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
@@ -283,6 +289,8 @@ always @(posedge g_clk) begin
         rvfi_s4_rs2_addr  <= rvfi_s3_rs2_addr ;
         rvfi_s4_rs3_addr  <= rvfi_s3_rs3_addr ;
         rvfi_s4_aux       <= rvfi_s3_aux      ;
+        rvfi_s4_rng_data  <= rvfi_s3_rng_data ; // RNG read data
+        rvfi_s4_rng_stat  <= rvfi_s3_rng_stat ; // RNG status 
     end
 end
 

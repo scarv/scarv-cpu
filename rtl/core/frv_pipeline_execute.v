@@ -58,6 +58,8 @@ output reg  [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
 output reg  [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
 output reg  [XL:0] rvfi_s3_aux      , // Auxiliary needed information.
+output reg  [31:0] rvfi_s3_rng_data , // RNG read data
+output reg  [ 2:0] rvfi_s3_rng_stat , // RNG status
 `endif
 
 output wire [ 4:0] s3_rd           , // Destination register address
@@ -587,6 +589,30 @@ frv_pipeline_register #(
 // Only use aux signal to carry EX stage aligned uxcrypto content for now.
 wire [XL:0] n_rvfi_s3_aux = {16'b0, uxcrypto_b1, uxcrypto_b0};
 
+reg [31:0] saved_rng_data;
+reg [ 2:0] saved_rng_stat;
+reg        use_saved_rng ;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        saved_rng_data <= 0;
+        saved_rng_stat <= 0;
+    end else if(rng_rsp_valid && rng_rsp_ready) begin
+        saved_rng_data <= rng_rsp_data;
+        saved_rng_stat <= rng_rsp_status;
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        use_saved_rng <= 1'b0;
+    end else if(pipe_progress || flush) begin
+        use_saved_rng <= 1'b0;
+    end else begin
+        use_saved_rng <= rng_rsp_valid && rng_rsp_ready && !pipe_progress;
+    end
+end
+
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         rvfi_s3_rs1_rdata <= 0; // Source register data 1
@@ -596,6 +622,8 @@ always @(posedge g_clk) begin
         rvfi_s3_rs2_addr  <= 0; // Source register address 2
         rvfi_s3_rs3_addr  <= 0; // Source register address 3
         rvfi_s3_aux       <= 0; // Auxiliary data
+        rvfi_s3_rng_data  <= 0; // RNG read data
+        rvfi_s3_rng_stat  <= 0; // RNG Status
     end else if(pipe_progress) begin
         rvfi_s3_rs1_rdata <= rvfi_s2_rs1_rdata;
         rvfi_s3_rs2_rdata <= rvfi_s2_rs2_rdata;
@@ -604,6 +632,8 @@ always @(posedge g_clk) begin
         rvfi_s3_rs2_addr  <= rvfi_s2_rs2_addr ;
         rvfi_s3_rs3_addr  <= rvfi_s2_rs3_addr ;
         rvfi_s3_aux       <= n_rvfi_s3_aux    ;
+        rvfi_s3_rng_data  <= use_saved_rng ? saved_rng_data : rng_rsp_data  ;
+        rvfi_s3_rng_stat  <= use_saved_rng ? saved_rng_stat : rng_rsp_status;
     end
 end
 
