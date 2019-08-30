@@ -609,7 +609,14 @@ wire packed_instruction =
     dec_xc_psrl   || dec_xc_pror_i || dec_xc_psll_i   || dec_xc_psrl_i  ||
     dec_xc_pmul_l || dec_xc_pmul_h || dec_xc_pclmul_l || dec_xc_pclmul_h ;
 
-assign n_s2_pw = packed_instruction ? {1'b0,d_data[31:30]} : PW_32;
+// Lut select is MS bit of instruction word.
+wire bop_lut_sel = d_data[31];
+
+// LSB of PW is used to select which uxcrpyto CSR field is fed to bop
+// instructions as the lookup table.
+assign n_s2_pw = packed_instruction ? {1'b0,d_data[31:30]} : 
+                 dec_xc_bop         ? {2'b0,bop_lut_sel  } :
+                                      PW_32                ;
 
 //
 // Operand Sourcing.

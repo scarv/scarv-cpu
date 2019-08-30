@@ -29,7 +29,7 @@ generate for(i = 0; i < 32; i = i + 1) begin
 
 end endgenerate
 
-assign spec_valid       = rvfi_valid && dec_b_fsl;
+assign spec_valid       = rvfi_valid && dec_xc_bop;
 assign spec_trap        = 1'b0   ;
 assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = `FIELD_RS2_ADDR;

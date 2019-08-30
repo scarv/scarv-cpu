@@ -292,8 +292,8 @@ wire [31:0]  bitw_rs1         = s2_opr_a; //
 wire [31:0]  bitw_rs2         = s2_opr_b; //
 wire [31:0]  bitw_rs3         = s2_opr_c; //
 
-// TODO: allow selecting between b0/1
-wire [ 7:0]  bitw_bop_lut     = uxcrypto_b0 ; // LUT for xc.bop
+// LSB of pipeline pw field switches between LUTs.
+wire [ 7:0]  bitw_bop_lut     = s2_pw[0] ? uxcrypto_b1 : uxcrypto_b0 ;
 
 wire         bitw_flush       = flush || pipe_progress;
 wire         bitw_valid       = fu_bit;

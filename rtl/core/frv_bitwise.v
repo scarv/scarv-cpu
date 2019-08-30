@@ -88,9 +88,9 @@ b_lut i_b_lut (
 wire [31:0] result_bop  ;
 
 b_bop i_b_bop(
-.rd    (rs3         ),
 .rs1   (rs1         ),
 .rs2   (rs2         ),
+.rd    (rs3         ),
 .lut   (bop_lut     ),
 .result(result_bop  ) 
 );
