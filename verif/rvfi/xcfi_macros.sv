@@ -17,6 +17,8 @@
     input [NRET *    5   - 1 : 0] rvfi_rs2_addr    , \
     input [NRET *    5   - 1 : 0] rvfi_rs3_addr    , \
     input [NRET * XLEN   - 1 : 0] rvfi_aux         , \
+    input [NRET * 32     - 1 : 0] rvfi_rng_data    , \
+    input [NRET *  3     - 1 : 0] rvfi_rng_stat    , \
     input [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata   , \
     input [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   , \
     input [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   , \
@@ -45,6 +47,8 @@
     output [NRET *    5   - 1 : 0] rvfi_rs2_addr    , \
     output [NRET *    5   - 1 : 0] rvfi_rs3_addr    , \
     output [NRET * XLEN   - 1 : 0] rvfi_aux         , \
+    output [NRET * 32     - 1 : 0] rvfi_rng_data    , \
+    output [NRET *  3     - 1 : 0] rvfi_rng_stat    , \
     output [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata   , \
     output [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   , \
     output [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   , \
@@ -73,6 +77,8 @@
     wire [NRET *    5   - 1 : 0] rvfi_rs2_addr    ; \
     wire [NRET *    5   - 1 : 0] rvfi_rs3_addr    ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_aux         ; \
+    wire [NRET * 32     - 1 : 0] rvfi_rng_data    ; \
+    wire [NRET *  3     - 1 : 0] rvfi_rng_stat    ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata   ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   ; \
@@ -101,6 +107,8 @@
     .rvfi_rs2_addr    (rvfi_rs2_addr    ), \
     .rvfi_rs3_addr    (rvfi_rs3_addr    ), \
     .rvfi_aux         (rvfi_aux         ), \
+    .rvfi_rng_data    (rvfi_rng_data    ), \
+    .rvfi_rng_stat    (rvfi_rng_stat    ), \
     .rvfi_rs1_rdata   (rvfi_rs1_rdata   ), \
     .rvfi_rs2_rdata   (rvfi_rs2_rdata   ), \
     .rvfi_rs3_rdata   (rvfi_rs3_rdata   ), \
