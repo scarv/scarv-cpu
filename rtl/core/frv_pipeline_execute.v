@@ -22,6 +22,15 @@ input  wire [31:0] s2_instr        , // The instruction word
 output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
 
+output wire [ 1:0] rng_req_valid   , // Signal a new request to the RNG
+output wire [ 3:0] rng_req_op      , // Operation to perform on the RNG
+output wire [32:0] rng_req_data    , // Suplementary seed/init data
+input  wire [ 1:0] rng_req_ready   , // RNG accepts request
+input  wire [ 1:0] rng_rsp_valid   , // RNG response data valid
+input  wire [ 3:0] rng_rsp_status  , // RNG status
+input  wire [32:0] rng_rsp_data    , // RNG response / sample data.
+output wire [ 1:0] rng_rsp_ready   , // CPU accepts response.
+
 input  wire        uxcrypto_ct     , // UXCrypto constant time bit.
 input  wire [ 7:0] uxcrypto_b0     , // UXCrypto lookup table 0.
 input  wire [ 7:0] uxcrypto_b1     , // UXCrypto lookup table 1.
@@ -185,7 +194,7 @@ wire        imul_result_hi  = imul_mulhu || imul_mulhsu ||
                               s2_uop == MUL_MULH      ||
                               s2_uop == MUL_PCLMUL_H  ||
                               s2_uop == MUL_CLMUL_H   ||
-                              s2_uop == MUL_CLMUL_R   ; // TODO: shift right 1
+                              s2_uop == MUL_CLMUL_R   ;
 
 wire [31:0] imul_result     = imul_result_hi ? imul_result_wide[63:32]  :
                                                imul_result_wide[31: 0]  ;
@@ -302,6 +311,22 @@ wire [31:0]  n_s3_opr_b_bit   = bitw_result_wide[63:32];
 wire         bitw_gpr_wide    = bitw_mror;
 
 //
+// Functional Unit Interfacing: Randomness Interface
+// -------------------------------------------------------------------------
+
+wire [XL:0]  rng_rs1          = s2_opr_a;
+wire         rng_valid        = fu_rng  ;
+
+wire         rng_uop_test     = fu_rng && s2_uop == RNG_RNGTEST;
+wire         rng_uop_seed     = fu_rng && s2_uop == RNG_RNGSEED;
+wire         rng_uop_samp     = fu_rng && s2_uop == RNG_RNGSAMP;
+
+wire         rng_ready        ;
+wire [XL:0]  rng_result       ;
+
+wire [XL:0]  n_s3_opr_a_rng   = rng_result;
+
+//
 // Stalling / Pipeline Progression
 // -------------------------------------------------------------------------
 
@@ -309,10 +334,11 @@ wire         bitw_gpr_wide    = bitw_mror;
 wire   p_valid   = s2_valid && !s2_busy;
 
 // Is this stage currently busy?
-assign s2_busy = p_busy                   ||
-                 lsu_valid  && !lsu_ready ||
-                 imul_valid && !imul_ready||
-                 bitw_valid && !bitw_ready;
+assign s2_busy = p_busy                    ||
+                 lsu_valid  && !lsu_ready  ||
+                 rng_valid  && !rng_ready  ||
+                 imul_valid && !imul_ready ||
+                 bitw_valid && !bitw_ready ;
 
 // Is the next stage currently busy?
 wire   p_busy    ;
@@ -428,6 +454,33 @@ frv_bitwise i_frv_bitwise (
 );
 
 //
+// instance: frv_rng_if
+//
+//  Handles interfacing with the external random number generator.
+//
+frv_rngif i_frv_rngif (
+.g_clk            (g_clk            ), // global clock
+.g_resetn         (g_resetn         ), // synchronous reset
+.flush            (flush            ), // Flush any internal resources.
+.pipeline_progress(pipeline_progress), // Pipeline is progressing this cycle.
+.valid            (rng_valid        ), // Inputs valid
+.rs1              (rng_rs1          ), // Input source register 1.
+.rng_req_valid    (rng_req_valid    ), // Signal a new request to the RNG
+.rng_req_op       (rng_req_op       ), // Operation to perform on the RNG
+.rng_req_data     (rng_req_data     ), // Suplementary seed/init data
+.rng_req_ready    (rng_req_ready    ), // RNG accepts request
+.rng_rsp_valid    (rng_rsp_valid    ), // RNG response data valid
+.rng_rsp_status   (rng_rsp_status   ), // RNG status
+.rng_rsp_data     (rng_rsp_data     ), // RNG response / sample data.
+.rng_rsp_ready    (rng_rsp_ready    ), // CPU accepts response.
+.uop_test         (rng_uop_test     ), // Test the RNG status
+.uop_seed         (rng_uop_seed     ), // Seed the RNG with new entropy
+.uop_samp         (rng_uop_samp     ), // Sample from the RNG
+.result           (rng_result       ), // Result to write back
+.ready            (rng_ready        )  // Result ready.
+);
+
+//
 // Pipeline Register
 // -------------------------------------------------------------------------
 
@@ -451,6 +504,7 @@ wire [5:0]  n_trap_cause =
 
 wire [XL:0] n_s3_opr_a = 
     {XLEN{fu_asi}} & n_s3_opr_a_asi |
+    {XLEN{fu_rng}} & n_s3_opr_a_rng |
     {XLEN{fu_alu}} & n_s3_opr_a_alu |
     {XLEN{fu_bit}} & n_s3_opr_a_bit |
     {XLEN{fu_mul}} & n_s3_opr_a_mul |

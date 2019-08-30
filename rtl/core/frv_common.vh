@@ -129,9 +129,17 @@ localparam ASI_SHA256_S1     = {ASI_SHA2, 3'b001};
 localparam ASI_SHA256_S2     = {ASI_SHA2, 3'b010};
 localparam ASI_SHA256_S3     = {ASI_SHA2, 3'b011};
 
-localparam RNG_RNGTEST       = {2'b00, 3'b001};
-localparam RNG_RNGSEED       = {2'b00, 3'b010};
-localparam RNG_RNGSAMP       = {2'b00, 3'b100};
+localparam RNG_RNGSEED       = {2'b00, 3'b001};
+localparam RNG_RNGSAMP       = {2'b00, 3'b010};
+localparam RNG_RNGTEST       = {2'b00, 3'b100};
+
+localparam RNG_IF_SEED       = 3'b001;
+localparam RNG_IF_SAMP       = 3'b010;
+localparam RNG_IF_TEST       = 3'b100;
+
+localparam RNG_IF_STAT_NO_INIT = 3'b000; // Un-initialised
+localparam RNG_IF_INIT_NO_ENTR = 3'b100; // Initialised - not enough entropy.
+localparam RNG_IF_INIT_HEALTHY = 3'b101; // Initialised - ready to be sampled.
 
 //
 // Dispatch stage operand register sources
