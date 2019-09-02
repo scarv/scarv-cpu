@@ -108,6 +108,11 @@ parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
 
+// Single cycle implementations of AES instructions?
+parameter AES_SUB_FAST        = 1'b1;
+parameter AES_MIX_FAST        = 1'b1;
+
+
 //
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
@@ -171,6 +176,8 @@ frv_pipeline #(
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.AES_SUB_FAST       (AES_SUB_FAST       ),
+.AES_MIX_FAST       (AES_MIX_FAST       ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock

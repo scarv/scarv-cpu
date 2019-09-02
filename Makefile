@@ -15,6 +15,7 @@ export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
                       $(XCRYPTO_RTL)/xc_sha3/xc_sha3.v \
                       $(XCRYPTO_RTL)/xc_sha256/xc_sha256.v \
                       $(XCRYPTO_RTL)/xc_aessub/xc_aessub.v \
+                      $(XCRYPTO_RTL)/xc_aessub/xc_aessub_sbox.v \
                       $(XCRYPTO_RTL)/xc_aesmix/xc_aesmix.v \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu.v \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu_divrem.v \

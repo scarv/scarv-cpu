@@ -92,6 +92,10 @@ parameter XC_CLASS_AES        = 1'b1;
 parameter XC_CLASS_SHA2       = 1'b1;
 parameter XC_CLASS_SHA3       = 1'b1;
 
+// Single cycle implementations of AES instructions?
+parameter AES_SUB_FAST = 1'b1;
+parameter AES_MIX_FAST = 1'b1;
+
 //
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
@@ -349,7 +353,10 @@ wire   p_busy    ;
 // Submodule instances
 // -------------------------------------------------------------------------
 
-frv_asi i_asi(
+frv_asi #(
+.AES_SUB_FAST(AES_SUB_FAST),
+.AES_MIX_FAST(AES_MIX_FAST)
+) i_asi(
 .g_clk     (g_clk           ), // global clock
 .g_resetn  (g_resetn        ), // synchronous reset
 .asi_valid (asi_valid       ), // Stall this stage

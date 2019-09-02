@@ -14,6 +14,7 @@ read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_malu/xc_malu_pmul.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_sha3/xc_sha3.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_sha256/xc_sha256.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_aessub/xc_aessub.v
+read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_aessub/xc_aessub_sbox.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/xc_aesmix/xc_aesmix.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/b_bop/b_bop.v
 read_verilog $::env(FRV_HOME)/external/xcrypto-rtl/rtl/b_lut/b_lut.v
