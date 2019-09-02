@@ -27,6 +27,10 @@ output wire [XL:0]  asi_result        // Instruction result.
 
 `include "frv_common.vh"
 
+// Single cycle implementations of AES instructions?
+parameter AES_SUB_FAST = 1'b1;
+parameter AES_MIX_FAST = 1'b1;
+
 //
 // Exact Instruction Decoding
 // -------------------------------------------------------------
@@ -72,6 +76,9 @@ wire        aes_mix_enc = !asi_uop[0];
 //
 // Result Selection
 // -------------------------------------------------------------
+
+wire aes_sub_flush      = insn_aes_sub && asi_flush;
+wire aes_mix_flush      = insn_aes_mix && asi_flush;
 
 wire [XL:0] result_aessub   ;
 wire [XL:0] result_aesmix   ;
@@ -130,9 +137,12 @@ xc_sha256 i_xc_sha256 (
 //
 //  Implements the lightweight AES SubBytes instructions.
 //
-xc_aessub i_xc_aessub(
+xc_aessub  #(
+.FAST(AES_SUB_FAST)
+)i_xc_aessub(
 .clock (g_clk           ),
 .reset (!g_resetn       ),
+.flush (aes_sub_flush   ),
 .valid (insn_aes_sub    ), // Are the inputs valid?
 .rs1   (aes_sub_rs1     ), // Input source register 1
 .rs2   (aes_sub_rs2     ), // Input source register 2
@@ -147,10 +157,13 @@ xc_aessub i_xc_aessub(
 //
 //  Implements the lightweight AES MixColumns instructions.
 //
-xc_aesmix i_xc_aesmix(
+xc_aesmix #(
+.FAST(AES_MIX_FAST)
+) i_xc_aesmix(
 .clock (g_clk           ),
 .reset (!g_resetn       ),
 .valid (insn_aes_mix    ), // Are the inputs valid?
+.flush (aes_mix_flush   ),
 .rs1   (aes_mix_rs1     ), // Input source register 1
 .rs2   (aes_mix_rs2     ), // Input source register 2
 .enc   (aes_mix_enc     ), // Perform encrypt (set) or decrypt (clear).
