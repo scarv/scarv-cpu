@@ -107,6 +107,10 @@ parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
+
+// Randomise registers (if set) or zero them (if clear)
+parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST        = 1'b1;
@@ -176,6 +180,8 @@ frv_pipeline #(
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
+.XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
 .AES_SUB_FAST       (AES_SUB_FAST       ),
 .AES_MIX_FAST       (AES_MIX_FAST       ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 

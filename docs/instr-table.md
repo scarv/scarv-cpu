@@ -190,6 +190,8 @@ Instruction  | Action                   | uOP code
 `xc.rngtest` |  .                       | {00,001}
 `xc.rngseed` |  .                       | {00,010}
 `xc.rngsamp` |  .                       | {00,100}
+`xc.alcfgset`|  .                       | {11,001}
+`xc.alfence` |  .                       | {11,010}
 
 ---
 
@@ -384,4 +386,6 @@ Instruction  |`opr_a`      | `opr_b`       | `opr_c`
 `xc.rngtest` |             |               |
 `xc.rngseed` | rs1         |               |
 `xc.rngsamp` |             |               |
+`xc.alcfgset`| rs1         |               |         
+`xc.alfence` |             |               |         
 

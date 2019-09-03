@@ -22,6 +22,9 @@ input  wire [31:0] s2_instr        , // The instruction word
 output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
 
+input  wire [XL:0] leak_prng       , // Current PRNG value.
+input  wire [12:0] leak_alcfg      , // Current alcfg register value.
+
 output wire        rng_req_valid   , // Signal a new request to the RNG
 output wire [ 2:0] rng_req_op      , // Operation to perform on the RNG
 output wire [31:0] rng_req_data    , // Suplementary seed/init data

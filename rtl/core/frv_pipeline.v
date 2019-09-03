@@ -134,6 +134,10 @@ parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
+
+// Randomise registers (if set) or zero them (if clear)
+parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
@@ -162,6 +166,13 @@ assign      instr_ret = trs_valid;
 wire        cf_req     ; // Control flow change request
 wire [XL:0] cf_target  ; // Control flow change destination
 wire        cf_ack     ; // Control flow change acknolwedge
+
+//
+// Leakage barrier instruction wiring.
+wire        leak_cfg_load ; // Load a new configuration word.
+wire [XL:0] leak_cfg_wdata; // The new configuration word to load.
+wire [XL:0] leak_prng     ; // Current PRNG value.
+wire [12:0] leak_alcfg    ; // Current alcfg register value.
 
 //
 // CSR access bus.
@@ -422,6 +433,8 @@ frv_pipeline_decode #(
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
+.XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
@@ -438,6 +451,10 @@ frv_pipeline_decode #(
 .s1_rs1_rdata       (fwd_rs1_rdata      ),
 .s1_rs2_rdata       (fwd_rs2_rdata      ),
 .s1_rs3_rdata       (fwd_rs3_rdata      ),
+.leak_cfg_load      (leak_cfg_load      ), // load a new configuration word.
+.leak_cfg_wdata     (leak_cfg_wdata     ), // new configuration word to load.
+.leak_prng          (leak_prng          ), // current prng value.
+.leak_alcfg         (leak_alcfg         ), // current alcfg register value.
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change
@@ -495,6 +512,8 @@ frv_pipeline_execute #(
 .s2_instr         (s2_instr         ), // The instruction word
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
+.leak_prng        (leak_prng        ), // current prng value.
+.leak_alcfg       (leak_alcfg       ), // current alcfg register value.
 .rng_req_valid    (rng_req_valid    ), // Signal a new request to the RNG
 .rng_req_op       (rng_req_op       ), // Operation to perform on the RNG
 .rng_req_data     (rng_req_data     ), // Suplementary seed/init data
@@ -565,6 +584,8 @@ frv_pipeline_memory #(
 .s3_instr         (s3_instr         ), // The instruction word
 .s3_busy          (s3_busy          ), // Can this stage accept new inputs?
 .s3_valid         (s3_valid         ), // Is this input valid?
+.leak_prng        (leak_prng        ), // current prng value.
+.leak_alcfg       (leak_alcfg       ), // current alcfg register value.
 .fwd_s3_rd        (fwd_s3_rd        ), // Writeback stage destination reg.
 .fwd_s3_wide      (fwd_s3_wide      ), // Write writeback
 .fwd_s3_wdata     (fwd_s3_wdata     ), // Write data for writeback stage.
@@ -682,6 +703,8 @@ frv_pipeline_writeback #(
 .fwd_s4_wdata     (fwd_s4_wdata     ), // Write data for writeback stage.
 .fwd_s4_load      (fwd_s4_load      ), // Writeback stage has load in it.
 .fwd_s4_csr       (fwd_s4_csr       ), // Writeback stage has CSR op in it.
+.leak_cfg_load    (leak_cfg_load    ), // Load a new configuration word.
+.leak_cfg_wdata   (leak_cfg_wdata   ), // The new configuration word to load.
 .gpr_wen          (gpr_wen          ), // GPR write enable.
 .gpr_wide         (gpr_wide         ), // GPR wide writeback.
 .gpr_rd           (gpr_rd           ), // GPR destination register.
@@ -735,6 +758,7 @@ frv_csrs #(
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_csrs (
 .g_clk            (g_clk            ), // global clock

@@ -25,6 +25,11 @@ input  wire [XL:0] s1_rs1_rdata  ,
 input  wire [XL:0] s1_rs2_rdata  ,
 input  wire [XL:0] s1_rs3_rdata  ,
 
+input  wire        leak_cfg_load , // Load a new configuration word.
+input  wire [XL:0] leak_cfg_wdata, // The new configuration word to load.
+output wire [XL:0] leak_prng     , // Current PRNG value.
+output wire [12:0] leak_alcfg    , // Current alcfg register value.
+
 input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
 input  wire        cf_ack        , // Control flow change acknowledge.
@@ -74,6 +79,10 @@ parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
+
+// Randomise registers (if set) or zero them (if clear)
+parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 
 //
 // Partial Bitmanip Extension Support
@@ -771,6 +780,31 @@ end
 wire [XL:0] pc_plus_imm             ; // Sum of PC and immediate.
 
 assign      pc_plus_imm = program_counter + n_s2_imm_pc;
+
+//
+// Leakage Fencing
+// -------------------------------------------------------------------------
+
+wire         leak_fence      = 1'b0;  // Fence instruction flying past.
+
+//
+// instance: frv_leak
+//
+//  Handles the leakage barrier instruction state and some functionality.
+//  Contains the configuration register and pseudo random number source.
+//
+frv_leak #(
+.XC_CLASS_LEAK       (XC_CLASS_LEAK       ),
+.XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG) 
+) i_frv_leak(
+.g_clk         (g_clk         ),
+.g_resetn      (g_resetn      ),
+.leak_cfg_load (leak_cfg_load ), // load a new configuration word.
+.leak_cfg_wdata(leak_cfg_wdata), // the new configuration word to load.
+.leak_prng     (leak_prng     ), // current prng value.
+.leak_alcfg    (leak_alcfg    ), // current alcfg register value.
+.leak_fence    (leak_fence    )  // Fence instruction flying past.
+);
 
 //
 // Operand Source decoding

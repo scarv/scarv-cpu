@@ -111,6 +111,7 @@ parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 
 //
 // Partial Bitmanip Extension Support
@@ -502,7 +503,8 @@ wire [31:0] reg_mcountin = {
 // - [7:0] uxcrypto_b0
 // - [7:0] uxcrypto_b1
 
-wire [10:0] uxcrypto_features = {
+wire [11:0] uxcrypto_features = {
+    XC_CLASS_LEAK       ,
     XC_CLASS_BIT        ,
     XC_CLASS_MEMORY     ,
     XC_CLASS_RANDOMNESS ,
@@ -519,7 +521,7 @@ wire [10:0] uxcrypto_features = {
 wire [31:0] reg_uxcrypto = {
     uxcrypto_b1      ,
     uxcrypto_b0      ,
-    4'b0000          ,
+    3'b000           ,
     uxcrypto_features,
     uxcrypto_ct
 };

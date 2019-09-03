@@ -22,6 +22,9 @@ input  wire [31:0] s3_instr        , // The instruction word
 output wire        s3_busy         , // Can this stage accept new inputs?
 input  wire        s3_valid        , // Is this input valid?
 
+input  wire [XL:0] leak_prng       , // Current PRNG value.
+input  wire [12:0] leak_alcfg      , // Current alcfg register value.
+
 output wire [ 4:0] fwd_s3_rd       , // stage destination reg.
 output wire        fwd_s3_wide     , // stage wide writeback
 output wire [XL:0] fwd_s3_wdata    , // Write data for writeback stage.

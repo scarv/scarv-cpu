@@ -132,6 +132,8 @@ localparam ASI_SHA256_S3     = {ASI_SHA2, 3'b011};
 localparam RNG_RNGSEED       = {2'b00, 3'b001};
 localparam RNG_RNGSAMP       = {2'b00, 3'b010};
 localparam RNG_RNGTEST       = {2'b00, 3'b100};
+localparam RNG_ALSETCFG      = {2'b11, 3'b001};
+localparam RNG_ALFENCE       = {2'b11, 3'b010};
 
 localparam RNG_IF_SEED       = 3'b001;
 localparam RNG_IF_SAMP       = 3'b010;
@@ -140,6 +142,20 @@ localparam RNG_IF_TEST       = 3'b100;
 localparam RNG_IF_STAT_NO_INIT = 3'b000; // Un-initialised
 localparam RNG_IF_INIT_NO_ENTR = 3'b100; // Initialised - not enough entropy.
 localparam RNG_IF_INIT_HEALTHY = 3'b101; // Initialised - ready to be sampled.
+
+localparam LEAK_CFG_S2_OPR_A  = 0 ; // Decode -> Execute operand A
+localparam LEAK_CFG_S2_OPR_B  = 1 ; // Decode -> Execute operand B
+localparam LEAK_CFG_S2_OPR_C  = 2 ; // Decode -> Execute operand C
+localparam LEAK_CFG_S3_OPR_A  = 3 ; // Execute -> Memory result register A
+localparam LEAK_CFG_S3_OPR_B  = 4 ; // Execute -> Memory result register B
+localparam LEAK_CFG_FU_MULT   = 5 ; // Multiplier accumulate registers.
+localparam LEAK_CFG_FU_AESSUB = 6 ; // AES sub-bytes registers.
+localparam LEAK_CFG_FU_AESMIX = 7 ; // AES mix registers.
+localparam LEAK_CFG_S4_OPR_A  = 8 ; // Memory -> Writeback result register A
+localparam LEAK_CFG_S4_OPR_B  = 9 ; // Memory -> Writeback result register B
+localparam LEAK_CFG_UNCORE_0  = 10; // Un-core resource 0
+localparam LEAK_CFG_UNCORE_1  = 11; // Un-core resource 1
+localparam LEAK_CFG_UNCORE_2  = 12; // Un-core resource 2
 
 //
 // Dispatch stage operand register sources
