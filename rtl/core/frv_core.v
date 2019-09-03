@@ -46,6 +46,11 @@ output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
 
+output wire [XL:0]  leak_prng       , // Current PRNG value.
+output wire         leak_fence_unc0 , // uncore 0 fence
+output wire         leak_fence_unc1 , // uncore 1 fence
+output wire         leak_fence_unc2 , // uncore 2 fence
+
 output wire         rng_req_valid   , // Signal a new request to the RNG
 output wire [ 2:0]  rng_req_op      , // Operation to perform on the RNG
 output wire [31:0]  rng_req_data    , // Suplementary seed/init data
@@ -220,6 +225,10 @@ frv_pipeline #(
 .trs_pc        (trs_pc        ), // Trace program counter.
 .trs_instr     (trs_instr     ), // Trace instruction.
 .trs_valid     (trs_valid     ), // Trace output valid.
+.leak_prng      (leak_prng      ), // Leakage fence PRNG value
+.leak_fence_unc0(leak_fence_unc0), // Leakage fence uncore resource 0
+.leak_fence_unc1(leak_fence_unc1), // Leakage fence uncore resource 1
+.leak_fence_unc2(leak_fence_unc2), // Leakage fence uncore resource 2
 .rng_req_valid  (rng_req_valid  ), // Signal a new request to the RNG
 .rng_req_op     (rng_req_op     ), // Operation to perform on the RNG
 .rng_req_data   (rng_req_data   ), // Suplementary seed/init data

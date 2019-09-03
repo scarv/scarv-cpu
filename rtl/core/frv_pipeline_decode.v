@@ -819,6 +819,10 @@ frv_leak #(
 // Operand Source decoding
 // -------------------------------------------------------------------------
 
+wire opra_flush = s1_flush || (leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_A]);
+wire oprb_flush = s1_flush || (leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_B]);
+wire oprc_flush = s1_flush || (leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_C]);
+
 // Operand A sourcing.
 wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];
 wire opra_src_pcim = n_s2_opr_src[DIS_OPRA_PCIM];
@@ -951,7 +955,7 @@ frv_pipeline_register #(
 .i_valid  (opra_ld_en   ), // Input data valid?
 .o_busy   (             ), // Stage N+1 ready to continue?
 .mr_data  (             ), // Most recent data into the stage.
-.flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush    (opra_flush   ), // Flush the contents of the pipeline
 .flush_dat(leak_prng    ), // Data flushed into the pipeline.
 .o_data   (s2_opr_a     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?
@@ -968,7 +972,7 @@ frv_pipeline_register #(
 .i_valid  (oprb_ld_en   ), // Input data valid?
 .o_busy   (             ), // Stage N+1 ready to continue?
 .mr_data  (             ), // Most recent data into the stage.
-.flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush    (oprb_flush   ), // Flush the contents of the pipeline
 .flush_dat(leak_prng    ), // Data flushed into the pipeline.
 .o_data   (s2_opr_b     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?
@@ -985,7 +989,7 @@ frv_pipeline_register #(
 .i_valid  (oprc_ld_en   ), // Input data valid?
 .o_busy   (             ), // Stage N+1 ready to continue?
 .mr_data  (             ), // Most recent data into the stage.
-.flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush    (oprc_flush   ), // Flush the contents of the pipeline
 .flush_dat(leak_prng    ), // Data flushed into the pipeline.
 .o_data   (s2_opr_c     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?

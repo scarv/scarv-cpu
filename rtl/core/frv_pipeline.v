@@ -46,6 +46,11 @@ output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
 
+output wire [XL:0]  leak_prng       , // Current PRNG value.
+output wire         leak_fence_unc0 , // uncore 0 fence
+output wire         leak_fence_unc1 , // uncore 1 fence
+output wire         leak_fence_unc2 , // uncore 2 fence
+
 output wire         rng_req_valid   , // Signal a new request to the RNG
 output wire [ 2:0]  rng_req_op      , // Operation to perform on the RNG
 output wire [31:0]  rng_req_data    , // Suplementary seed/init data
@@ -171,7 +176,6 @@ wire        cf_ack     ; // Control flow change acknolwedge
 // Leakage barrier instruction wiring.
 wire        leak_cfg_load ; // Load a new configuration word.
 wire [XL:0] leak_cfg_wdata; // The new configuration word to load.
-wire [XL:0] leak_prng     ; // Current PRNG value.
 wire [12:0] leak_alcfg    ; // Current alcfg register value.
 
 //
@@ -586,6 +590,9 @@ frv_pipeline_memory #(
 .s3_valid         (s3_valid         ), // Is this input valid?
 .leak_prng        (leak_prng        ), // current prng value.
 .leak_alcfg       (leak_alcfg       ), // current alcfg register value.
+.leak_fence_unc0  (leak_fence_unc0  ), // Leakage fence uncore resource 0
+.leak_fence_unc1  (leak_fence_unc1  ), // Leakage fence uncore resource 1
+.leak_fence_unc2  (leak_fence_unc2  ), // Leakage fence uncore resource 2
 .fwd_s3_rd        (fwd_s3_rd        ), // Writeback stage destination reg.
 .fwd_s3_wide      (fwd_s3_wide      ), // Write writeback
 .fwd_s3_wdata     (fwd_s3_wdata     ), // Write data for writeback stage.

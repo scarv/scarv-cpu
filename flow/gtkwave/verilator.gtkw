@@ -1,20 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Sep  3 12:16:12 2019
+[*] Tue Sep  3 13:43:13 2019
 [*]
 [dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/unit/instructions/instructions.vcd"
-[dumpfile_mtime] "Tue Sep  3 12:15:51 2019"
-[dumpfile_size] 2204780
+[dumpfile_mtime] "Tue Sep  3 12:33:45 2019"
+[dumpfile_size] 2163016
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-11.850608 6407 2626 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-11.850608 6206 2626 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
 [treeopen] TOP.frv_core.i_pipeline.i_gprs.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.
+[treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [sst_width] 270
 [signals_width] 400
@@ -202,7 +203,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_error
 TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_valid
 @1401200
 -Pipe - S0 - Fetch
-@c00200
+@800200
 -Pipe - S1 Decode
 @22
 TOP.frv_core.i_pipeline.s1_data[31:0]
@@ -235,11 +236,23 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_program_counter[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_a[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_b[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_c[31:0]
-@200
--
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.flush
-@1401200
+@800201
+-Leakage Instructions
+@23
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_alcfg[12:0]
+@29
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_cfg_load
+@23
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_cfg_wdata[31:0]
+@29
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_fence
+@23
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_prng[31:0]
+@1000201
+-Leakage Instructions
+@1000200
 -Pipe - S1 Decode
 @800200
 -Pipe - S2 Execute
@@ -333,7 +346,6 @@ TOP.frv_core.i_pipeline.s3_busy
 @22
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
-@23
 TOP.frv_core.i_pipeline.s3_opr_b[31:0]
 @2024
 ^2 /home/ben/scarv/repos/scarv-cpu/flow/gtkwave/filter-gprs.txt

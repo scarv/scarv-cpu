@@ -23,7 +23,7 @@ int test_main() {
     } while(rd1 == 0);
 
     
-    rs1 = 0xFF;
+    rs1 = 0x1FFF;
     __asm__ volatile ("xc.alsetcfg %0" : :"r"(rs1) );
 
     volatile int arry[10];

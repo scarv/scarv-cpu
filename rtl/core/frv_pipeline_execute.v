@@ -186,7 +186,8 @@ wire [31:0] imul_rs1        = s2_opr_a;
 wire [31:0] imul_rs2        = s2_opr_b;
 wire [31:0] imul_rs3        = s2_opr_c;
 
-wire        imul_flush      = pipe_progress || flush;
+wire        imul_flush      = pipe_progress || flush ||
+                              leak_fence && leak_alcfg[LEAK_CFG_FU_MULT];
 
 wire        imul_pw_2       = s2_pw == PW_2 ;
 wire        imul_pw_4       = s2_pw == PW_4 ;
@@ -290,6 +291,9 @@ wire [XL:0] n_s3_opr_b_csr = s2_opr_c;
 wire        asi_valid  = fu_asi;
 wire        asi_ready  ;
 wire [XL:0] asi_result ;
+
+wire        asi_flush_aessub = leak_fence && leak_alcfg[LEAK_CFG_FU_AESSUB];
+wire        asi_flush_aesmix = leak_fence && leak_alcfg[LEAK_CFG_FU_AESMIX];
 
 wire [XL:0] n_s3_opr_a_asi = asi_result ;
 
@@ -502,6 +506,11 @@ frv_rngif i_frv_rngif (
 
 localparam RL = 42 + OP + FU;
 
+wire leak_fence    = fu_rng && s2_uop == RNG_ALFENCE;
+
+wire opra_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_A]);
+wire oprb_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_B]);
+
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit
 wire [ 1:0] n_s3_size  = s2_size ; // Size of the instruction.
@@ -609,7 +618,7 @@ frv_pipeline_register #(
 .i_valid  (opra_ld_en       ), // Input data valid?
 .o_busy   (                 ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
-.flush    (flush            ), // Flush the contents of the pipeline
+.flush    (opra_flush       ), // Flush the contents of the pipeline
 .flush_dat(leak_prng        ), // Data flushed into the pipeline.
 .o_data   (s3_opr_a         ), // Output data for stage N+1
 .o_valid  (                 ), // Input data from stage N valid?
@@ -626,7 +635,7 @@ frv_pipeline_register #(
 .i_valid  (oprb_ld_en       ), // Input data valid?
 .o_busy   (                 ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
-.flush    (flush            ), // Flush the contents of the pipeline
+.flush    (oprb_flush       ), // Flush the contents of the pipeline
 .flush_dat(leak_prng        ), // Data flushed into the pipeline.
 .o_data   (s3_opr_b         ), // Output data for stage N+1
 .o_valid  (                 ), // Input data from stage N valid?

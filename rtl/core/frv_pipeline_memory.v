@@ -25,6 +25,10 @@ input  wire        s3_valid        , // Is this input valid?
 input  wire [XL:0] leak_prng       , // Current PRNG value.
 input  wire [12:0] leak_alcfg      , // Current alcfg register value.
 
+output wire        leak_fence_unc0 , // uncore 0 fence
+output wire        leak_fence_unc1 , // uncore 1 fence
+output wire        leak_fence_unc2 , // uncore 2 fence
+
 output wire [ 4:0] fwd_s3_rd       , // stage destination reg.
 output wire        fwd_s3_wide     , // stage wide writeback
 output wire [XL:0] fwd_s3_wdata    , // Write data for writeback stage.
@@ -119,6 +123,14 @@ wire fu_asi = s3_fu[P_FU_ASI];
 wire fu_bit = s3_fu[P_FU_BIT];
 wire fu_rng = s3_fu[P_FU_RNG];
 
+
+//
+// Uncore leakage fence signalling
+// -------------------------------------------------------------------------
+
+assign leak_fence_unc0 = leak_fence && leak_alcfg[LEAK_CFG_UNCORE_0];
+assign leak_fence_unc1 = leak_fence && leak_alcfg[LEAK_CFG_UNCORE_1];
+assign leak_fence_unc2 = leak_fence && leak_alcfg[LEAK_CFG_UNCORE_2];
 
 //
 // Functional Unit Interfacing: LSU
@@ -250,6 +262,10 @@ frv_lsu #(
 
 localparam RL = 42 + OP + FU;
 
+wire leak_fence    = fu_rng && s3_uop == RNG_ALFENCE;
+
+wire opra_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_A]);
+wire oprb_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_B]);
 
 wire [RL-1:0] pipe_reg_out;
 
@@ -298,7 +314,7 @@ frv_pipeline_register #(
 .i_valid  (opra_ld_en       ), // Input data valid?
 .o_busy   (                 ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
-.flush    (flush            ), // Flush the contents of the pipeline
+.flush    (opra_flush       ), // Flush the contents of the pipeline
 .flush_dat(leak_prng        ), // Data flushed into the pipeline.
 .o_data   (s4_opr_a         ), // Output data for stage N+1
 .o_valid  (                 ), // Input data from stage N valid?
@@ -315,7 +331,7 @@ frv_pipeline_register #(
 .i_valid  (oprb_ld_en       ), // Input data valid?
 .o_busy   (                 ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
-.flush    (flush            ), // Flush the contents of the pipeline
+.flush    (oprb_flush       ), // Flush the contents of the pipeline
 .flush_dat(leak_prng        ), // Data flushed into the pipeline.
 .o_data   (s4_opr_b         ), // Output data for stage N+1
 .o_valid  (                 ), // Input data from stage N valid?
