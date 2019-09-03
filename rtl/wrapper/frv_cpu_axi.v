@@ -17,6 +17,11 @@ output wire         trs_valid       , // Trace output valid.
 output wire [31:0]  trs_pc          , // Trace program counter object.
 output wire [31:0]  trs_instr       , // Instruction traced out.
 
+output wire [31:0]  leak_prng       , // Current PRNG value.
+output wire         leak_fence_unc0 , // uncore 0 fence
+output wire         leak_fence_unc1 , // uncore 1 fence
+output wire         leak_fence_unc2 , // uncore 2 fence
+
 `ifdef MRV_VERIF_TRACE
 
 output [NRET        - 1 : 0] rvfi_valid     ,
@@ -170,6 +175,10 @@ frv_core #(
 .trs_valid       (trs_valid       ), // Trace output valid.
 .trs_pc          (trs_pc          ), // Trace program counter object.
 .trs_instr       (trs_instr       ), // Instruction traced out.
+.leak_prng       (leak_prng       ), // Leakage fence PRNG value
+.leak_fence_unc0 (leak_fence_unc0 ), // Leakage fence uncore resource 0
+.leak_fence_unc1 (leak_fence_unc1 ), // Leakage fence uncore resource 1
+.leak_fence_unc2 (leak_fence_unc2 ), // Leakage fence uncore resource 2
 `ifdef RVFI
 .rvfi_valid      (rvfi_valid      ),
 .rvfi_order      (rvfi_order      ),
