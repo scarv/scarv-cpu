@@ -917,6 +917,7 @@ frv_pipeline_register #(
 .o_busy   (p_s2_busy    ), // Stage N+1 ready to continue?
 .mr_data  (p_mr         ), // Most recent data into the stage.
 .flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush_dat({RL{1'b0}}   ), // Data flushed into the pipeline.
 .o_data   (p_out        ), // Output data for stage N+1
 .o_valid  (s2_valid     ), // Input data from stage N valid?
 .i_busy   (s2_busy      )  // Stage N+1 ready to continue?

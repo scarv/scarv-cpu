@@ -496,7 +496,7 @@ frv_rngif i_frv_rngif (
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam PIPE_REG_W = 106 + OP + FU;
+localparam RL = 106 + OP + FU;
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit
@@ -548,9 +548,9 @@ assign fwd_s2_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s2_csr   = fu_csr            ; // Writeback stage has CSR op in it.
 
 
-wire [PIPE_REG_W-1:0] pipe_reg_out;
+wire [RL-1:0] pipe_reg_out;
 
-wire [PIPE_REG_W-1:0] pipe_reg_in = {
+wire [RL-1:0] pipe_reg_in = {
     n_s3_rd           , // Destination register address
     n_s3_opr_a        , // Operand A
     n_s3_opr_b        , // Operand B
@@ -574,7 +574,7 @@ assign {
 } = pipe_reg_out;
 
 frv_pipeline_register #(
-.RLEN(PIPE_REG_W),
+.RLEN(RL),
 .BUFFER_HANDSHAKE(1'b0)
 ) i_execute_pipe_reg(
 .g_clk    (g_clk            ), // global clock
@@ -584,6 +584,7 @@ frv_pipeline_register #(
 .o_busy   (p_busy           ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
 .flush    (flush            ), // Flush the contents of the pipeline
+.flush_dat({RL{1'b0}}       ), // Data flushed into the pipeline.
 .o_data   (pipe_reg_out     ), // Output data for stage N+1
 .o_valid  (s3_valid         ), // Input data from stage N valid?
 .i_busy   (s3_busy          )  // Stage N+1 ready to continue?
