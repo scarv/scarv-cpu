@@ -110,9 +110,14 @@ wire pipe_progress = !s3_busy && s3_valid;
 // Operation Decoding
 // -------------------------------------------------------------------------
 
-wire fu_lsu = s3_fu[P_FU_LSU];
-wire fu_csr = s3_fu[P_FU_CSR];
+wire fu_alu = s3_fu[P_FU_ALU];
 wire fu_mul = s3_fu[P_FU_MUL];
+wire fu_lsu = s3_fu[P_FU_LSU];
+wire fu_cfu = s3_fu[P_FU_CFU];
+wire fu_csr = s3_fu[P_FU_CSR];
+wire fu_asi = s3_fu[P_FU_ASI];
+wire fu_bit = s3_fu[P_FU_BIT];
+wire fu_rng = s3_fu[P_FU_RNG];
 
 
 //
@@ -157,8 +162,21 @@ wire[4:0] n_s4_rd     =     s3_trap  ? s3_rd         :
 // Next pipestage value progression.
 // -------------------------------------------------------------------------
 
+wire        imul_gpr_wide   = imul_madd || imul_msub || imul_madd || imul_mmul;
+wire         bitw_gpr_wide    = bitw_mror;
+
+wire opra_ld_en = p_valid && (
+    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_asi || fu_bit ||
+    fu_rng ); 
+
+wire oprb_ld_en = p_valid && (
+    (fu_lsu                 )  ||
+     fu_csr                    ||
+    (fwd_s3_wide            )  ); 
+
 wire [XL:0] n_s4_opr_a  = lsu_valid ? n_s4_opr_a_lsu : s3_opr_a; // Operand A
 wire [XL:0] n_s4_opr_b  = lsu_valid ? n_s4_opr_b_lsu : s3_opr_b; // Operand B
+
 wire [OP:0] n_s4_uop    = s3_uop  ; // Micro-op code
 wire [FU:0] n_s4_fu     = s3_fu   ; // Functional Unit
 wire [ 1:0] n_s4_size   = s3_size ; // Size of the instruction.
@@ -173,12 +191,15 @@ wire        imul_msub       = s3_uop == MUL_MSUB        ;
 wire        imul_macc       = s3_uop == MUL_MACC        ;
 wire        imul_mmul       = s3_uop == MUL_MMUL        ;
 
+wire        bitw_mror       = s3_uop == BIT_RORW        ;
+
 assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
 assign fwd_s3_wdata = s3_opr_a          ;
 assign fwd_s3_wdata_hi = s3_opr_b       ;
 assign fwd_s3_wide  = fu_mul && (
-    imul_madd || imul_msub || imul_madd || imul_mmul
-);
+        imul_madd || imul_msub || imul_madd || imul_mmul
+    ) ||
+    fu_bit && (bitw_mror);
 assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
 
@@ -227,15 +248,13 @@ frv_lsu #(
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam RL = 106 + OP + FU;
+localparam RL = 42 + OP + FU;
 
 
 wire [RL-1:0] pipe_reg_out;
 
 wire [RL-1:0] pipe_reg_in = {
     n_s4_rd           , // Destination register address
-    n_s4_opr_a        , // Operand A
-    n_s4_opr_b        , // Operand B
     n_s4_uop          , // Micro-op code
     n_s4_fu           , // Functional Unit
     n_s4_trap         , // Raise a trap?
@@ -243,11 +262,8 @@ wire [RL-1:0] pipe_reg_in = {
     n_s4_instr          // The instruction word
 };
 
-
 assign {
     s4_rd             , // Destination register address
-    s4_opr_a          , // Operand A
-    s4_opr_b          , // Operand B
     s4_uop            , // Micro-op code
     s4_fu             , // Functional Unit
     s4_trap           , // Raise a trap?
@@ -271,6 +287,44 @@ frv_pipeline_register #(
 .o_valid  (s4_valid         ), // Input data from stage N valid?
 .i_busy   (s4_busy          )  // Stage N+1 ready to continue?
 );
+
+frv_pipeline_register #(
+.RLEN(XLEN),
+.BUFFER_HANDSHAKE(1'b0)
+) i_mem_pipereg_opr_a(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (n_s4_opr_a       ), // Input data from stage N
+.i_valid  (opra_ld_en       ), // Input data valid?
+.o_busy   (                 ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Most recent data into the stage.
+.flush    (flush            ), // Flush the contents of the pipeline
+.flush_dat(leak_prng        ), // Data flushed into the pipeline.
+.o_data   (s4_opr_a         ), // Output data for stage N+1
+.o_valid  (                 ), // Input data from stage N valid?
+.i_busy   (s4_busy          )  // Stage N+1 ready to continue?
+);
+
+frv_pipeline_register #(
+.RLEN(XLEN),
+.BUFFER_HANDSHAKE(1'b0)
+) i_mem_pipereg_opr_b(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (n_s4_opr_b       ), // Input data from stage N
+.i_valid  (oprb_ld_en       ), // Input data valid?
+.o_busy   (                 ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Most recent data into the stage.
+.flush    (flush            ), // Flush the contents of the pipeline
+.flush_dat(leak_prng        ), // Data flushed into the pipeline.
+.o_data   (s4_opr_b         ), // Output data for stage N+1
+.o_valid  (                 ), // Input data from stage N valid?
+.i_busy   (s4_busy          )  // Stage N+1 ready to continue?
+);
+
+//
+// RVFI Tracing
+// ------------------------------------------------------------
 
 `ifdef RVFI
 
