@@ -22,6 +22,20 @@ int test_main() {
         __asm__ volatile ("xc.rngsamp %0" : "=r"(rd2) :);
     } while(rd1 == 0);
 
+    
+    rs1 = 0xFF;
+    __asm__ volatile ("xc.alsetcfg %0" : :"r"(rs1) );
+
+    volatile int arry[10];
+
+    for(int i = 0; i < 10; i ++) {
+        sum += i;
+        sum = sum << 2;
+        __asm__ volatile ("xc.alfence");
+        arry[i] = sum;
+        sum += arry[i];
+    }
+    
     sum += rd2;
 
     if(sum) {
