@@ -329,11 +329,13 @@ wire         rng_valid        = fu_rng  ;
 wire         rng_uop_test     = fu_rng && s2_uop == RNG_RNGTEST;
 wire         rng_uop_seed     = fu_rng && s2_uop == RNG_RNGSEED;
 wire         rng_uop_samp     = fu_rng && s2_uop == RNG_RNGSAMP;
+wire         rng_uop_alsetcfg = fu_rng && s2_uop == RNG_ALSETCFG;
 
 wire         rng_ready        ;
 wire [XL:0]  rng_result       ;
 
-wire [XL:0]  n_s3_opr_a_rng   = rng_result;
+wire [XL:0]  n_s3_opr_a_rng   = rng_uop_alsetcfg ? s2_opr_a   :
+                                                   rng_result ;
 
 //
 // Stalling / Pipeline Progression

@@ -96,6 +96,8 @@ wire dec_xc_macc_1      = XC_CLASS_MULTIARITH && (d_data & 32'h60070ff) == 32'h4
 wire dec_xc_madd_3      = XC_CLASS_MULTIARITH && (d_data & 32'h60070ff) == 32'h6004023;
 wire dec_xc_msub_3      = XC_CLASS_MULTIARITH && (d_data & 32'h60070ff) == 32'h60050a3;
 wire dec_xc_mror        = XC_CLASS_MULTIARITH && (d_data & 32'h60070ff) == 32'h5023;
+wire dec_xc_alfence     = XC_CLASS_LEAK       && (d_data & 32'hffffffff) == 32'h308073;
+wire dec_xc_alsetcfg    = XC_CLASS_LEAK       && (d_data & 32'hfff07fff) == 32'h7000f3;
 wire dec_xc_rngtest     = XC_CLASS_RANDOMNESS && (d_data & 32'hfffff07f) == 32'h300073;
 wire dec_xc_rngsamp     = XC_CLASS_RANDOMNESS && (d_data & 32'hfffff07f) == 32'h500073;
 wire dec_xc_rngseed     = XC_CLASS_RANDOMNESS && (d_data & 32'hfff07fff) == 32'h700073;
@@ -180,4 +182,5 @@ dec_xc_scatter_b   || dec_xc_scatter_h || dec_xc_sha256_s0   ||
 dec_xc_sha256_s1   || dec_xc_sha256_s2   || dec_xc_sha256_s3   ||
 dec_xc_sha3_x1   || dec_xc_sha3_x2   || dec_xc_sha3_x4 || dec_xc_sha3_xy  ||
 dec_xc_sha3_yx || dec_xc_str_b
-|| dec_xc_str_h   || dec_xc_str_w   );
+|| dec_xc_str_h   || dec_xc_str_w   ||
+dec_xc_alfence || dec_xc_alsetcfg);

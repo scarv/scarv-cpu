@@ -178,7 +178,8 @@ assign n_s2_fu[P_FU_ASI] =
     dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3      ;
 
 assign n_s2_fu[P_FU_RNG] = 
-    dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ;
+    dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ||
+    dec_xc_alsetcfg || dec_xc_alfence  ;
 
 
 //
@@ -402,7 +403,9 @@ wire [OP:0] uop_asi =
 wire [OP:0] uop_rng =
     {1+OP{dec_xc_rngtest      }} & RNG_RNGTEST      |
     {1+OP{dec_xc_rngseed      }} & RNG_RNGSEED      |
-    {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      ;
+    {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      |
+    {1+OP{dec_xc_alsetcfg     }} & RNG_ALSETCFG     |
+    {1+OP{dec_xc_alfence      }} & RNG_ALFENCE      ;
 
 assign n_s2_uop =
     uop_alu |
@@ -667,7 +670,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ;
+    dec_xc_scatter_h     || dec_xc_alsetcfg;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -785,7 +788,8 @@ assign      pc_plus_imm = program_counter + n_s2_imm_pc;
 // Leakage Fencing
 // -------------------------------------------------------------------------
 
-wire         leak_fence      = 1'b0;  // Fence instruction flying past.
+// Fence instruction flying past.
+wire         leak_fence      = dec_xc_alfence;
 
 //
 // instance: frv_leak
