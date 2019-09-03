@@ -819,9 +819,9 @@ frv_leak #(
 // Operand Source decoding
 // -------------------------------------------------------------------------
 
-wire opra_flush = s1_flush || (leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_A]);
-wire oprb_flush = s1_flush || (leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_B]);
-wire oprc_flush = s1_flush || (leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_C]);
+wire opra_flush = s1_flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_A]);
+wire oprb_flush = s1_flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_B]);
+wire oprc_flush = s1_flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_C]);
 
 // Operand A sourcing.
 wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];

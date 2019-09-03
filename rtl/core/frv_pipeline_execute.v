@@ -508,8 +508,8 @@ localparam RL = 42 + OP + FU;
 
 wire leak_fence    = fu_rng && s2_uop == RNG_ALFENCE;
 
-wire opra_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_A]);
-wire oprb_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_B]);
+wire opra_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_A]);
+wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_B]);
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit

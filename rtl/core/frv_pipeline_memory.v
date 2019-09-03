@@ -264,8 +264,8 @@ localparam RL = 42 + OP + FU;
 
 wire leak_fence    = fu_rng && s3_uop == RNG_ALFENCE;
 
-wire opra_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_A]);
-wire oprb_flush    = flush || (leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_B]);
+wire opra_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_A]);
+wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_B]);
 
 wire [RL-1:0] pipe_reg_out;
 
