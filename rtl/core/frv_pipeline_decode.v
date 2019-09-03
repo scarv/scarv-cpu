@@ -679,6 +679,8 @@ assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
 assign n_s2_opr_src[DIS_OPRA_CSRI] = // Operand A sources CSR mask immediate
     dec_csrrci     || dec_csrrsi     || dec_csrrwi     ;
 
+wire opra_src_zero = 
+    dec_lui || dec_c_li || dec_c_lui ;
 
 assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_add        || dec_c_add      || 
@@ -718,6 +720,9 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_xc_psrl_i  || dec_xc_psll_i  || dec_xc_pror_i  || dec_b_grevi    ||
     dec_b_rori     || dec_b_fsri     ;
 
+wire   oprb_src_zero =  // Operand B sources zero
+    dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||
+    dec_jal        ;
 
 assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
@@ -819,7 +824,12 @@ wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];
 wire opra_src_pcim = n_s2_opr_src[DIS_OPRA_PCIM];
 wire opra_src_csri = n_s2_opr_src[DIS_OPRA_CSRI];
 
+wire opra_ld_en    = n_s2_valid && (
+    opra_src_rs1 || opra_src_pcim || opra_src_csri || opra_src_zero
+);
+
 assign n_s2_opr_a = 
+    {XLEN{opra_src_zero   }} & 32'b0          |
     {XLEN{opra_src_rs1    }} & s1_rs1_rdata   |
     {XLEN{opra_src_pcim   }} & pc_plus_imm    |
     {XLEN{opra_src_csri   }} & csr_imm        ;
@@ -838,7 +848,12 @@ wire [XL:0] s1_rs2_shf = oprb_rs2_shf_1 ? {s1_rs2_rdata[30:0],1'b0} :
 wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
+wire oprb_ld_en    = n_s2_valid && (
+    oprb_src_rs2 || oprb_src_imm || oprb_src_zero
+);
+
 assign n_s2_opr_b =
+    {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
     {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
     {XLEN{oprb_src_imm    }} & n_s2_imm       ;
 
@@ -847,6 +862,10 @@ wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
 wire oprc_src_rs3  = n_s2_opr_src[DIS_OPRC_RS3 ];
 wire oprc_src_csra = n_s2_opr_src[DIS_OPRC_CSRA];
 wire oprc_src_pcim = n_s2_opr_src[DIS_OPRC_PCIM];
+
+wire oprc_ld_en    = n_s2_valid && (
+    oprc_src_rs2  || oprc_src_rs3  || oprc_src_csra || oprc_src_pcim
+);
 
 assign n_s2_opr_c = 
     {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
@@ -858,7 +877,7 @@ assign n_s2_opr_c =
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 136 + (1+OP) + (1+FU) + (1+PW);
+localparam RL = 40 + (1+OP) + (1+FU) + (1+PW);
 
 `ifdef RVFI
 always @(posedge g_clk) begin
@@ -884,9 +903,6 @@ wire [RL-1:0] p_mr;
 
 wire [RL-1:0] p_in = {
  s1_bubble ?  5'b0      : n_s2_rd   , // Destination register address
- n_s2_opr_a                         , // Operand A
- n_s2_opr_b                         , // Operand B
- n_s2_opr_c                         , // Operand C
  s1_bubble ?  {1+OP{1'b0}}: n_s2_uop, // Micro-op code
  s1_bubble ?  {1+FU{1'b0}}: n_s2_fu , // Functional Unit (alu/mem/jump/mul/csr)
  s1_bubble ?  {1+PW{1'b0}}: n_s2_pw , // IALU pack width specifier.
@@ -899,9 +915,6 @@ wire [RL-1:0] p_out;
 
 assign {
  s2_rd         , // Destination register address
- s2_opr_a      , // Operand A
- s2_opr_b      , // Operand B
- s2_opr_c      , // Operand C
  s2_uop        , // Micro-op code
  s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
  s2_pw         , // IALU pack width.
@@ -924,6 +937,58 @@ frv_pipeline_register #(
 .flush_dat({RL{1'b0}}   ), // Data flushed into the pipeline.
 .o_data   (p_out        ), // Output data for stage N+1
 .o_valid  (s2_valid     ), // Input data from stage N valid?
+.i_busy   (s2_busy      )  // Stage N+1 ready to continue?
+);
+
+
+frv_pipeline_register #(
+.BUFFER_HANDSHAKE(1'b0),
+.RLEN(32)
+) i_decode_pipereg_opr_a (
+.g_clk    (g_clk        ), // global clock
+.g_resetn (g_resetn     ), // synchronous reset
+.i_data   (n_s2_opr_a   ), // Input data from stage N
+.i_valid  (opra_ld_en   ), // Input data valid?
+.o_busy   (             ), // Stage N+1 ready to continue?
+.mr_data  (             ), // Most recent data into the stage.
+.flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.o_data   (s2_opr_a     ), // Output data for stage N+1
+.o_valid  (             ), // Input data from stage N valid?
+.i_busy   (s2_busy      )  // Stage N+1 ready to continue?
+);
+
+frv_pipeline_register #(
+.BUFFER_HANDSHAKE(1'b0),
+.RLEN(32)
+) i_decode_pipereg_opr_b (
+.g_clk    (g_clk        ), // global clock
+.g_resetn (g_resetn     ), // synchronous reset
+.i_data   (n_s2_opr_b   ), // Input data from stage N
+.i_valid  (oprb_ld_en   ), // Input data valid?
+.o_busy   (             ), // Stage N+1 ready to continue?
+.mr_data  (             ), // Most recent data into the stage.
+.flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.o_data   (s2_opr_b     ), // Output data for stage N+1
+.o_valid  (             ), // Input data from stage N valid?
+.i_busy   (s2_busy      )  // Stage N+1 ready to continue?
+);
+
+frv_pipeline_register #(
+.BUFFER_HANDSHAKE(1'b0),
+.RLEN(32)
+) i_decode_pipereg_opr_c (
+.g_clk    (g_clk        ), // global clock
+.g_resetn (g_resetn     ), // synchronous reset
+.i_data   (n_s2_opr_c   ), // Input data from stage N
+.i_valid  (oprc_ld_en   ), // Input data valid?
+.o_busy   (             ), // Stage N+1 ready to continue?
+.mr_data  (             ), // Most recent data into the stage.
+.flush    (s1_flush     ), // Flush the contents of the pipeline
+.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.o_data   (s2_opr_c     ), // Output data for stage N+1
+.o_valid  (             ), // Input data from stage N valid?
 .i_busy   (s2_busy      )  // Stage N+1 ready to continue?
 );
 
