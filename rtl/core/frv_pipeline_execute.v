@@ -208,6 +208,8 @@ wire        imul_result_hi  = imul_mulhu || imul_mulhsu ||
 wire [31:0] imul_result     = imul_result_hi ? imul_result_wide[63:32]  :
                                                imul_result_wide[31: 0]  ;
 
+wire        imul_gpr_wide   = imul_madd || imul_msub || imul_madd || imul_mmul;
+
 wire [XL:0] n_s3_opr_a_mul  = imul_clmul_r ? {1'b0,imul_result_wide[63:33]} :
                                              imul_result                    ;
 
@@ -498,7 +500,7 @@ frv_rngif i_frv_rngif (
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam RL = 106 + OP + FU;
+localparam RL = 42 + OP + FU;
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit
@@ -536,6 +538,15 @@ wire [XL:0] n_s3_opr_b =
         {XLEN{fu_csr}} & n_s3_opr_b_csr 
     );
 
+wire opra_ld_en = p_valid && (
+    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_asi || fu_bit ||
+    fu_rng ); 
+
+wire oprb_ld_en = p_valid && (
+    (fu_mul && imul_gpr_wide)  || 
+    (fu_lsu && lsu_store    )  ||
+     fu_csr                    ||
+    (fu_bit && bitw_gpr_wide)  ); 
 
 // Forwaring / bubbling signals.
 assign fwd_s2_rd    = s2_rd             ; // Writeback stage destination reg.
@@ -543,8 +554,8 @@ assign fwd_s2_wdata = alu_result | imul_result | asi_result ;
 assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32]   :
                                   n_s3_opr_b_bit            ;
 assign fwd_s2_wide  =
-    fu_mul && (imul_madd || imul_msub || imul_madd || imul_mmul) ||
-    fu_bit && (bitw_gpr_wide                                   ) ;
+    fu_mul && (imul_gpr_wide) ||
+    fu_bit && (bitw_gpr_wide  );
 
 assign fwd_s2_load  = fu_lsu && lsu_load; // Writeback stage has load in it.
 assign fwd_s2_csr   = fu_csr            ; // Writeback stage has CSR op in it.
@@ -554,8 +565,6 @@ wire [RL-1:0] pipe_reg_out;
 
 wire [RL-1:0] pipe_reg_in = {
     n_s3_rd           , // Destination register address
-    n_s3_opr_a        , // Operand A
-    n_s3_opr_b        , // Operand B
     n_s3_uop          , // Micro-op code
     n_s3_fu           , // Functional Unit
     n_s3_trap         , // Raise a trap?
@@ -566,8 +575,6 @@ wire [RL-1:0] pipe_reg_in = {
 
 assign {
     s3_rd             , // Destination register address
-    s3_opr_a          , // Operand A
-    s3_opr_b          , // Operand B
     s3_uop            , // Micro-op code
     s3_fu             , // Functional Unit
     s3_trap           , // Raise a trap?
@@ -589,6 +596,40 @@ frv_pipeline_register #(
 .flush_dat({RL{1'b0}}       ), // Data flushed into the pipeline.
 .o_data   (pipe_reg_out     ), // Output data for stage N+1
 .o_valid  (s3_valid         ), // Input data from stage N valid?
+.i_busy   (s3_busy          )  // Stage N+1 ready to continue?
+);
+
+frv_pipeline_register #(
+.RLEN(XLEN),
+.BUFFER_HANDSHAKE(1'b0)
+) i_execute_pipe_reg_opr_a(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (n_s3_opr_a       ), // Input data from stage N
+.i_valid  (opra_ld_en       ), // Input data valid?
+.o_busy   (                 ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Most recent data into the stage.
+.flush    (flush            ), // Flush the contents of the pipeline
+.flush_dat(leak_prng        ), // Data flushed into the pipeline.
+.o_data   (s3_opr_a         ), // Output data for stage N+1
+.o_valid  (                 ), // Input data from stage N valid?
+.i_busy   (s3_busy          )  // Stage N+1 ready to continue?
+);
+
+frv_pipeline_register #(
+.RLEN(XLEN),
+.BUFFER_HANDSHAKE(1'b0)
+) i_execute_pipe_reg_opr_b(
+.g_clk    (g_clk            ), // global clock
+.g_resetn (g_resetn         ), // synchronous reset
+.i_data   (n_s3_opr_b       ), // Input data from stage N
+.i_valid  (oprb_ld_en       ), // Input data valid?
+.o_busy   (                 ), // Stage N+1 ready to continue?
+.mr_data  (                 ), // Most recent data into the stage.
+.flush    (flush            ), // Flush the contents of the pipeline
+.flush_dat(leak_prng        ), // Data flushed into the pipeline.
+.o_data   (s3_opr_b         ), // Output data for stage N+1
+.o_valid  (                 ), // Input data from stage N valid?
 .i_busy   (s3_busy          )  // Stage N+1 ready to continue?
 );
 
