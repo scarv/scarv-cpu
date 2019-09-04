@@ -189,7 +189,11 @@ assign n_s2_fu[P_FU_RNG] =
 wire [4:0] dec_rs1_32 = s1_data[19:15];
 wire [4:0] dec_rs2_32 = s1_data[24:20];
 wire [4:0] dec_rs3_32 = s1_data[31:27];
-wire [4:0] dec_rd_32  = s1_data[11: 7];
+
+wire       clr_rd_lsb = dec_xc_mror   || dec_xc_madd_3 || dec_xc_msub_3 ||
+                        dec_xc_mmul_3 || dec_xc_macc_1 || dec_xc_alsetcfg;
+
+wire [4:0] dec_rd_32  = {s1_data[11: 8], clr_rd_lsb ? 1'b0 : s1_data[7]};
 
 wire       instr_16bit= s1_data[1:0] != 2'b11;
 wire       instr_32bit= s1_data[1:0] == 2'b11;
