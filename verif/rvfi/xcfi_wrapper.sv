@@ -69,6 +69,10 @@ wire [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ;
 fi_fairness i_fairness (
 .clock       (clock       ),
 .reset       (reset       ),
+.rng_req_valid(rng_req_valid), // Signal a new request to the RNG
+.rng_req_ready(rng_req_ready), // RNG accepts request
+.rng_rsp_valid(rng_rsp_valid), // RNG response data valid
+.rng_rsp_ready(rng_rsp_ready), // CPU accepts response.
 .imem_req    (imem_req    ),
 .imem_gnt    (imem_gnt    ),
 .imem_recv   (imem_recv   ),

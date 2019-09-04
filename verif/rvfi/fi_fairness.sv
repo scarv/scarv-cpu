@@ -7,20 +7,25 @@
 //
 module fi_fairness (
 
-input wire          clock       ,
-input wire          reset       ,
+input wire          clock           ,
+input wire          reset           ,
 
-input wire          imem_req    ,
-input wire          imem_gnt    ,
-input wire          imem_recv   ,
-input wire          imem_ack    ,
-input wire          imem_error  ,
+input wire          rng_req_valid   , // Signal a new request to the RNG
+input wire          rng_req_ready   , // RNG accepts request
+input wire          rng_rsp_valid   , // RNG response data valid
+input wire          rng_rsp_ready   , // CPU accepts response.
 
-input wire          dmem_req    ,
-input wire          dmem_gnt    ,
-input wire          dmem_recv   ,
-input wire          dmem_ack    ,
-input wire          dmem_error   
+input wire          imem_req        ,
+input wire          imem_gnt        ,
+input wire          imem_recv       ,
+input wire          imem_ack        ,
+input wire          imem_error      ,
+
+input wire          dmem_req        ,
+input wire          dmem_gnt        ,
+input wire          dmem_recv       ,
+input wire          dmem_ack        ,
+input wire          dmem_error       
 
 );
 
@@ -33,6 +38,62 @@ parameter MAX_OUTSTANDING_MEM_REQUESTS = 3;
 // The maximum number of cycles a request can be outstanding for before
 // the formal simulus *must* accept the request.
 parameter MAX_MEM_REQUEST_STALL        = 3;
+
+//
+// The maximum number of cycles for which a randomness interface
+// request can be outstanding.
+parameter MAX_RNG_IF_REQUEST_STALL      = 5;
+
+//
+// The maximum number of cycles for which a randomness interface
+// response be outstanding.
+parameter MAX_RNG_IF_RESPONSE_STALL     = 5;
+
+//
+// Randomness interface request/response counters
+// --------------------------------------------------------------------
+
+// Total number of request transactions
+reg  [31:0] rng_reqs;
+wire [31:0] n_rng_reqs = rng_reqs + (rng_req_valid && rng_req_ready);
+
+reg  [ 4:0] rng_req_stall;
+wire [ 4:0] n_rng_req_stall = rng_req_stall + (rng_req_valid && !rng_req_ready);
+
+// Total number of response transactions
+reg  [31:0] rng_rsps;
+wire [31:0] n_rng_rsps = rng_rsps + (rng_rsp_valid && rng_rsp_ready);
+
+// Track cycles for which there is atleast one outstanding request.
+reg  [31:0] rng_rsp_stall;
+wire [31:0] n_rng_rsp_stall = rng_rsp_stall + (rng_reqs > rng_rsps);
+
+always @(posedge clock) begin
+    if(reset) begin
+        rng_reqs <= 0;
+        rng_rsps <= 0;
+    end else begin
+        rng_reqs <= n_rng_reqs;
+        rng_rsps <= n_rng_rsps;
+    end
+end
+
+always @(posedge clock) begin
+    if(reset || rng_reqs <= rng_rsps) begin
+        rng_rsp_stall <= 0;
+    end else begin
+        rng_rsp_stall <= n_rng_rsp_stall;
+    end
+end
+
+always @(posedge clock) begin
+    if(reset || rng_req_valid && rng_req_ready) begin
+        rng_req_stall <= 0;
+    end else begin
+        rng_req_stall <= n_rng_req_stall;
+    end
+end
+
 
 //
 // Memory request/response counters
@@ -62,8 +123,8 @@ always @(posedge clock) begin
         imem_reqs <= 0;
         imem_rsps <= 0;
     end else begin
-        imem_reqs <= imem_reqs + (imem_req  && imem_gnt);
-        imem_rsps <= imem_rsps + (imem_recv && imem_ack);
+        imem_reqs <= n_imem_reqs;
+        imem_rsps <= n_imem_rsps;
     end
 end
 
@@ -91,8 +152,8 @@ always @(posedge clock) begin
         dmem_reqs <= 0;
         dmem_rsps <= 0;
     end else begin
-        dmem_reqs <= dmem_reqs + (dmem_req  && dmem_gnt);
-        dmem_rsps <= dmem_rsps + (dmem_recv && dmem_ack);
+        dmem_reqs <= n_dmem_reqs;
+        dmem_rsps <= n_dmem_rsps;
     end
 end
 
@@ -164,6 +225,27 @@ always @(posedge clock) begin
     if(dmem_recv) begin
         assume(dmem_error == 1'b0);
     end
+end
+
+//
+// Fairness restrictions so we never get a randomness interface
+// response we didn't ask for.
+always @(posedge clock) begin
+    restrict(rng_rsps <= rng_reqs);
+end
+
+//
+// Fairness restriction on maximum number of cycles we wait for the
+// RNG interface to accept a request
+always @(posedge clock) begin
+    restrict(rng_req_stall < MAX_RNG_IF_RESPONSE_STALL);
+end
+
+//
+// Fairness restriction on maximum number of cycles we wait for the
+// RNG interface to send a respone transaction to a request.
+always @(posedge clock) begin
+    restrict(rng_rsp_stall < MAX_RNG_IF_RESPONSE_STALL);
 end
 
 endmodule
