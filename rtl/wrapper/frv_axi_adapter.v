@@ -34,16 +34,16 @@ output wire        mem_axi_rready   ,
 input  wire [31:0] mem_axi_rdata    ,
 input  wire [ 1:0] mem_axi_rresp    ,
 
-output wire         mem_req         , // Start memory request
-output wire         mem_wen         , // Write enable
-output wire [3:0]   mem_strb        , // Write strobe
-output wire [31:0]  mem_wdata       , // Write data
-output wire [31:0]  mem_addr        , // Read/Write address
-input  wire         mem_gnt         , // request accepted
-input  wire         mem_recv        , // Instruction memory recieve response.
-output wire         mem_ack         , // Instruction memory ack response.
-input  wire         mem_error       , // Error
-input  wire [31:0]  mem_rdata         // Read data
+input  wire         mem_req         , // Start memory request
+input  wire         mem_wen         , // Write enable
+input  wire [3:0]   mem_strb        , // Write strobe
+input  wire [31:0]  mem_wdata       , // Write data
+input  wire [31:0]  mem_addr        , // Read/Write address
+output wire         mem_gnt         , // request accepted
+output wire         mem_recv        , // Instruction memory recieve response.
+input  wire         mem_ack         , // Instruction memory ack response.
+output wire         mem_error       , // Error
+output wire [31:0]  mem_rdata         // Read data
 );
 
 // Is this an instruction (wrt. data) interface.

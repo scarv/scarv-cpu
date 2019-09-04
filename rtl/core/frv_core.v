@@ -121,7 +121,6 @@ parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 parameter AES_SUB_FAST        = 1'b0;
 parameter AES_MIX_FAST        = 1'b0;
 
-
 //
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;

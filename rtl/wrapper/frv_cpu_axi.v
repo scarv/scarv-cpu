@@ -22,6 +22,15 @@ output wire         leak_fence_unc0 , // uncore 0 fence
 output wire         leak_fence_unc1 , // uncore 1 fence
 output wire         leak_fence_unc2 , // uncore 2 fence
 
+output wire         rng_req_valid   , // Signal a new request to the RNG
+output wire [ 2:0]  rng_req_op      , // Operation to perform on the RNG
+output wire [31:0]  rng_req_data    , // Suplementary seed/init data
+input  wire         rng_req_ready   , // RNG accepts request
+input  wire         rng_rsp_valid   , // RNG response data valid
+input  wire [ 2:0]  rng_rsp_status  , // RNG status
+input  wire [31:0]  rng_rsp_data    , // RNG response / sample data.
+output wire         rng_rsp_ready   , // CPU accepts response.
+
 `ifdef MRV_VERIF_TRACE
 
 output [NRET        - 1 : 0] rvfi_valid     ,
@@ -134,6 +143,30 @@ parameter   MMIO_MTIMECMP_RESET   = 64'hFFFFFFFFFFFFFFFF;
 parameter TRACE_INSTR_WORD = 1'b0;
 
 //
+// XCrypto feature class config bits.
+parameter XC_CLASS_BASELINE   = 1'b1;
+parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MEMORY     = 1'b0 && XC_CLASS_BASELINE;
+parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
+
+// Randomise registers (if set) or zero them (if clear)
+parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
+
+// Single cycle implementations of AES instructions?
+parameter AES_SUB_FAST        = 1'b0;
+parameter AES_MIX_FAST        = 1'b0;
+
+//
+// Partial Bitmanip Extension Support
+parameter BITMANIP_BASELINE   = 1'b1;
+
+//
 // Instruction Memory interface
 wire         i_req        ; // Start memory request
 wire         i_wen        ; // Write enable
@@ -164,9 +197,25 @@ wire [31:0]  d_rdata      ; // Read data
 // CPU core instance
 //
 frv_core #(
-.BRAM_REGFILE         (BRAM_REGFILE         ),
-.FRV_PC_RESET_VALUE   (FRV_PC_RESET_VALUE   ),
-.TRACE_INSTR_WORD     (TRACE_INSTR_WORD     )
+.FRV_PC_RESET_VALUE (FRV_PC_RESET_VALUE ),
+.BRAM_REGFILE       (BRAM_REGFILE       ),
+.TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
+.MMIO_BASE_ADDR     (MMIO_BASE_ADDR     ),
+.MMIO_BASE_MASK     (MMIO_BASE_MASK     ),
+.XC_CLASS_BASELINE  (XC_CLASS_BASELINE  ),
+.XC_CLASS_RANDOMNESS(XC_CLASS_RANDOMNESS),
+.XC_CLASS_MEMORY    (XC_CLASS_MEMORY    ),
+.XC_CLASS_BIT       (XC_CLASS_BIT       ),
+.XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
+.XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
+.XC_CLASS_AES       (XC_CLASS_AES       ),
+.XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
+.XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
+.XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
+.AES_SUB_FAST       (AES_SUB_FAST       ),
+.AES_MIX_FAST       (AES_MIX_FAST       ),
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_frv_cpu (
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset
@@ -179,6 +228,14 @@ frv_core #(
 .leak_fence_unc0 (leak_fence_unc0 ), // Leakage fence uncore resource 0
 .leak_fence_unc1 (leak_fence_unc1 ), // Leakage fence uncore resource 1
 .leak_fence_unc2 (leak_fence_unc2 ), // Leakage fence uncore resource 2
+.rng_req_valid   (rng_req_valid   ), // Signal a new request to the RNG
+.rng_req_op      (rng_req_op      ), // Operation to perform on the RNG
+.rng_req_data    (rng_req_data    ), // Suplementary seed/init data
+.rng_req_ready   (rng_req_ready   ), // RNG accepts request
+.rng_rsp_valid   (rng_rsp_valid   ), // RNG response data valid
+.rng_rsp_status  (rng_rsp_status  ), // RNG status
+.rng_rsp_data    (rng_rsp_data    ), // RNG response / sample data.
+.rng_rsp_ready   (rng_rsp_ready   ), // CPU accepts response.
 `ifdef RVFI
 .rvfi_valid      (rvfi_valid      ),
 .rvfi_order      (rvfi_order      ),
