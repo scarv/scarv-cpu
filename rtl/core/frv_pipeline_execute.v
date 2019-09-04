@@ -564,7 +564,9 @@ wire oprb_ld_en = p_valid && (
 
 // Forwaring / bubbling signals.
 assign fwd_s2_rd    = s2_rd             ; // Writeback stage destination reg.
-assign fwd_s2_wdata = alu_result | imul_result | asi_result ;
+
+assign fwd_s2_wdata = n_s3_opr_a;
+
 assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32]   :
                                   n_s3_opr_b_bit            ;
 assign fwd_s2_wide  =
