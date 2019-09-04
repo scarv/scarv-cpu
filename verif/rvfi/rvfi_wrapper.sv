@@ -59,6 +59,18 @@ parameter XL   = XLEN - 1;
 wire [NRET *    5 - 1 : 0] rvfi_rs3_addr  ;
 wire [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ;
 
+//
+// Fairness Assumptions / Restrictions
+// --------------------------------------------------------------------
+
+//
+// Assume that we never get a wide writeback in the RVFI checking
+// environment, since the RVFI checks can't handle this.
+// Write writebacks are checked in the XCFI environment for consistency.
+always @(posedge clock) begin
+    assume(rvfi_rd_wide == 1'b0);
+end
+
 
 fi_fairness i_fairness (
 .clock       (clock       ),
@@ -84,7 +96,8 @@ fi_fairness i_fairness (
 // --------------------------------------------------------------------
 
 frv_core #(
-.TRACE_INSTR_WORD(1'b1) // Require tracing of instruction words.
+.TRACE_INSTR_WORD(1'b1), // Require tracing of instruction words.
+.XC_CLASS_MEMORY (1'b0)  // Scatter/gather not implemented
 ) i_dut(
 .g_clk          (clock          ), // global clock
 .g_resetn       (g_resetn       ), // synchronous reset
@@ -102,7 +115,9 @@ frv_core #(
 .rvfi_rs2_rdata (rvfi_rs2_rdata ),
 .rvfi_rs3_rdata (rvfi_rs3_rdata ),
 .rvfi_rd_addr   (rvfi_rd_addr   ),
+.rvfi_rd_wide   (rvfi_rd_wide   ),
 .rvfi_rd_wdata  (rvfi_rd_wdata  ),
+.rvfi_rd_wdatahi(rvfi_rd_wdatahi),
 .rvfi_pc_rdata  (rvfi_pc_rdata  ),
 .rvfi_pc_wdata  (rvfi_pc_wdata  ),
 .rvfi_mem_addr  (rvfi_mem_addr  ),

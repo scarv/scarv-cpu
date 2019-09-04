@@ -90,7 +90,8 @@ fi_fairness i_fairness (
 // --------------------------------------------------------------------
 
 frv_core #(
-.TRACE_INSTR_WORD(1'b1) // Require tracing of instruction words.
+.TRACE_INSTR_WORD(1'b1), // Require tracing of instruction words.
+.XC_CLASS_MEMORY (1'b0)  // Scatter/gather not implemented
 ) i_dut(
 .g_clk          (clock          ), // global clock
 .g_resetn       (g_resetn       ), // synchronous reset
