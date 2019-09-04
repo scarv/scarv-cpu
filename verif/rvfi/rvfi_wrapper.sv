@@ -58,6 +58,7 @@ parameter XL   = XLEN - 1;
 // Unused by RVFI, but used by XCrypto formal checkers.
 wire [NRET *    5 - 1 : 0] rvfi_rs3_addr  ;
 wire [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ;
+wire [NRET * XLEN - 1 : 0] rvfi_rd_wdatahi;
 
 //
 // Fairness Assumptions / Restrictions
