@@ -337,7 +337,8 @@ wire         rng_uop_seed     = fu_rng && s2_uop == RNG_RNGSEED;
 wire         rng_uop_samp     = fu_rng && s2_uop == RNG_RNGSAMP;
 wire         rng_uop_alsetcfg = fu_rng && s2_uop == RNG_ALSETCFG;
 
-wire         rng_ready        ;
+wire         rng_if_ready     ;
+wire         rng_ready = rng_if_ready || rng_uop_alsetcfg || leak_fence;
 wire [XL:0]  rng_result       ;
 
 wire [XL:0]  n_s3_opr_a_rng   = rng_uop_alsetcfg ? s2_opr_a   :
@@ -497,7 +498,7 @@ frv_rngif i_frv_rngif (
 .uop_seed         (rng_uop_seed     ), // Seed the RNG with new entropy
 .uop_samp         (rng_uop_samp     ), // Sample from the RNG
 .result           (rng_result       ), // Result to write back
-.ready            (rng_ready        )  // Result ready.
+.ready            (rng_if_ready     )  // Result ready.
 );
 
 //
