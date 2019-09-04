@@ -13,8 +13,11 @@ input               g_clk           , // global clock
 input               g_resetn        , // synchronous reset
 
 input               asi_valid       , // Stall this stage
-input               asi_flush       , // flush the stage
 output              asi_ready       , // stage ready to progress
+
+input  wire         asi_flush_aessub, // Flush any state in AES sub submodule
+input  wire         asi_flush_aesmix, // Flush any state in AES mix submodule
+input  wire [31:0]  asi_flush_data  , // Data to flush into the submodules.
 
 input  wire [OP:0]  asi_uop         , // Exactly which operation to perform.
 input  wire [XL:0]  asi_rs1         , // Source register 1
@@ -76,9 +79,6 @@ wire        aes_mix_enc = !asi_uop[0];
 //
 // Result Selection
 // -------------------------------------------------------------
-
-wire aes_sub_flush      = insn_aes_sub && asi_flush;
-wire aes_mix_flush      = insn_aes_mix && asi_flush;
 
 wire [XL:0] result_aessub   ;
 wire [XL:0] result_aesmix   ;
@@ -142,7 +142,8 @@ xc_aessub  #(
 )i_xc_aessub(
 .clock (g_clk           ),
 .reset (!g_resetn       ),
-.flush (aes_sub_flush   ),
+.flush (asi_flush_aessub),
+.flush_data(asi_flush_data),
 .valid (insn_aes_sub    ), // Are the inputs valid?
 .rs1   (aes_sub_rs1     ), // Input source register 1
 .rs2   (aes_sub_rs2     ), // Input source register 2
@@ -163,7 +164,8 @@ xc_aesmix #(
 .clock (g_clk           ),
 .reset (!g_resetn       ),
 .valid (insn_aes_mix    ), // Are the inputs valid?
-.flush (aes_mix_flush   ),
+.flush (asi_flush_aesmix),
+.flush_data(asi_flush_data),
 .rs1   (aes_mix_rs1     ), // Input source register 1
 .rs2   (aes_mix_rs2     ), // Input source register 2
 .enc   (aes_mix_enc     ), // Perform encrypt (set) or decrypt (clear).

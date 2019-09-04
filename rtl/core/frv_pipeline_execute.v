@@ -294,6 +294,7 @@ wire [XL:0] asi_result ;
 
 wire        asi_flush_aessub = leak_fence && leak_alcfg[LEAK_CFG_FU_AESSUB];
 wire        asi_flush_aesmix = leak_fence && leak_alcfg[LEAK_CFG_FU_AESMIX];
+wire [31:0] asi_flush_data   = leak_prng;
 
 wire [XL:0] n_s3_opr_a_asi = asi_result ;
 
@@ -372,8 +373,10 @@ frv_asi #(
 .g_clk     (g_clk           ), // global clock
 .g_resetn  (g_resetn        ), // synchronous reset
 .asi_valid (asi_valid       ), // Stall this stage
-.asi_flush (flush           ), // flush the stage
 .asi_ready (asi_ready       ), // stage ready to progress
+.asi_flush_aessub(asi_flush_aessub), // Flush any state in AES sub submodule
+.asi_flush_aesmix(asi_flush_aesmix), // Flush any state in AES mix submodule
+.asi_flush_data  (asi_flush_data  ), // Data to flush into the submodules.
 .asi_uop   (s2_uop          ), // Exactly which operation to perform.
 .asi_rs1   (s2_opr_a        ), // Source register 1
 .asi_rs2   (s2_opr_c        ), // Source register 2
@@ -427,6 +430,7 @@ xc_malu i_xc_malu (
 .rs2        (imul_rs2        ), //
 .rs3        (imul_rs3        ), //
 .flush      (imul_flush      ), // Flush state / pipeline progress
+.flush_data (leak_prng       ), //
 .valid      (imul_valid      ), // Inputs valid.
 .uop_div    (imul_div        ), //
 .uop_divu   (imul_divu       ), //
