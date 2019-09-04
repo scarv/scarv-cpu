@@ -248,7 +248,6 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `rori       `|  rs1         |  imm          |  0
 `xc.pror    `|  rs1         |  rs2          |  0
 `xc.pror.i  `|  rs1         |  imm          |  0
-`xc.mror    `| rs1          | rs2           | rs3
 
 
 **Control Flow Instructions:**
@@ -356,6 +355,7 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `fsl        `|  rs1         | rs2           | rs3
 `fsr        `|  rs1         | rs2           | rs3
 `fsri       `|  rs1         | rs2           | rs3
+`xc.mror    `| rs1          | rs2           | rs3
 
 
 **Algorithm Specific Instructions:**
