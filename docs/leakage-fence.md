@@ -10,11 +10,11 @@ instructions.*
 
 The leakage barrier functionality consists of two instructions:
 
-- `xc.alsetcfg` - Writes a configuration register (`alcfg`) with a single
+- `xc.lkgconf` - Writes a configuration register (`lkgcfg`) with a single
   source register word.
 
-- `xc.alfence` - Clears / resets the micro-architectural state as
-  specified in the `alcfg` register.
+- `xc.lkgfence` - Clears / resets the micro-architectural state as
+  specified in the `lkgcfg` register.
 
 **Note:** Hereafter, the stating that a register is "cleared" should be
 read as meaning either "set to zero" or "randomised".
@@ -102,7 +102,7 @@ Bit | Resource    | Description
 
 Some notes on the RTL implementation of these instructions:
 
-- The `alcfg` register will live inside the decode stage.
+- The `lkgcfg` register will live inside the decode stage.
 
   - It's value will be made available to all downstream stages.
     
@@ -134,5 +134,5 @@ Some notes on the RTL implementation of these instructions:
 
   - The LFSR is updated *only* when a fence instruction is executed.
 
-  - The LFSR will live in the decode stage with the `alcfg` register.
+  - The LFSR will live in the decode stage with the `lkgcfg` register.
 

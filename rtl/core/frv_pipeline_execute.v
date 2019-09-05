@@ -23,7 +23,7 @@ output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
 
 input  wire [XL:0] leak_prng       , // Current PRNG value.
-input  wire [12:0] leak_alcfg      , // Current alcfg register value.
+input  wire [12:0] leak_lkgcfg      , // Current lkgcfg register value.
 
 output wire        rng_req_valid   , // Signal a new request to the RNG
 output wire [ 2:0] rng_req_op      , // Operation to perform on the RNG
@@ -187,7 +187,7 @@ wire [31:0] imul_rs2        = s2_opr_b;
 wire [31:0] imul_rs3        = s2_opr_c;
 
 wire        imul_flush      = pipe_progress || flush ||
-                              leak_fence && leak_alcfg[LEAK_CFG_FU_MULT];
+                              leak_fence && leak_lkgcfg[LEAK_CFG_FU_MULT];
 
 wire        imul_pw_2       = s2_pw == PW_2 ;
 wire        imul_pw_4       = s2_pw == PW_4 ;
@@ -292,8 +292,8 @@ wire        asi_valid  = fu_asi;
 wire        asi_ready  ;
 wire [XL:0] asi_result ;
 
-wire        asi_flush_aessub = leak_fence && leak_alcfg[LEAK_CFG_FU_AESSUB];
-wire        asi_flush_aesmix = leak_fence && leak_alcfg[LEAK_CFG_FU_AESMIX];
+wire        asi_flush_aessub = leak_fence && leak_lkgcfg[LEAK_CFG_FU_AESSUB];
+wire        asi_flush_aesmix = leak_fence && leak_lkgcfg[LEAK_CFG_FU_AESMIX];
 wire [31:0] asi_flush_data   = leak_prng;
 
 wire [XL:0] n_s3_opr_a_asi = asi_result ;
@@ -513,8 +513,8 @@ localparam RL = 42 + OP + FU;
 
 wire leak_fence    = fu_rng && s2_uop == RNG_ALFENCE;
 
-wire opra_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_A]);
-wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S3_OPR_B]);
+wire opra_flush    = flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S3_OPR_A]);
+wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S3_OPR_B]);
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit

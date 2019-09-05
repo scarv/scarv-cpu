@@ -28,7 +28,7 @@ input  wire [XL:0] s1_rs3_rdata  ,
 input  wire        leak_cfg_load , // Load a new configuration word.
 input  wire [XL:0] leak_cfg_wdata, // The new configuration word to load.
 output wire [XL:0] leak_prng     , // Current PRNG value.
-output wire [12:0] leak_alcfg    , // Current alcfg register value.
+output wire [12:0] leak_lkgcfg    , // Current lkgcfg register value.
 
 input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
@@ -179,7 +179,7 @@ assign n_s2_fu[P_FU_ASI] =
 
 assign n_s2_fu[P_FU_RNG] = 
     dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ||
-    dec_xc_alsetcfg || dec_xc_alfence  ;
+    dec_xc_lkgconf  || dec_xc_lkgfence ;
 
 
 //
@@ -191,7 +191,7 @@ wire [4:0] dec_rs2_32 = s1_data[24:20];
 wire [4:0] dec_rs3_32 = s1_data[31:27];
 
 wire       clr_rd_lsb = dec_xc_mror   || dec_xc_madd_3 || dec_xc_msub_3 ||
-                        dec_xc_mmul_3 || dec_xc_macc_1 || dec_xc_alsetcfg;
+                        dec_xc_mmul_3 || dec_xc_macc_1 || dec_xc_lkgfence;
 
 wire [4:0] dec_rd_32  = {s1_data[11: 8], clr_rd_lsb ? 1'b0 : s1_data[7]};
 
@@ -408,8 +408,8 @@ wire [OP:0] uop_rng =
     {1+OP{dec_xc_rngtest      }} & RNG_RNGTEST      |
     {1+OP{dec_xc_rngseed      }} & RNG_RNGSEED      |
     {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      |
-    {1+OP{dec_xc_alsetcfg     }} & RNG_ALSETCFG     |
-    {1+OP{dec_xc_alfence      }} & RNG_ALFENCE      ;
+    {1+OP{dec_xc_lkgconf      }} & RNG_ALSETCFG     |
+    {1+OP{dec_xc_lkgfence     }} & RNG_ALFENCE      ;
 
 assign n_s2_uop =
     uop_alu |
@@ -674,7 +674,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     || dec_xc_alsetcfg;
+    dec_xc_scatter_h     || dec_xc_lkgconf ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -798,7 +798,7 @@ assign      pc_plus_imm = program_counter + n_s2_imm_pc;
 // -------------------------------------------------------------------------
 
 // Fence instruction flying past.
-wire         leak_fence      = dec_xc_alfence;
+wire         leak_fence      = dec_xc_lkgfence;
 
 //
 // instance: frv_leak
@@ -815,7 +815,7 @@ frv_leak #(
 .leak_cfg_load (leak_cfg_load ), // load a new configuration word.
 .leak_cfg_wdata(leak_cfg_wdata), // the new configuration word to load.
 .leak_prng     (leak_prng     ), // current prng value.
-.leak_alcfg    (leak_alcfg    ), // current alcfg register value.
+.leak_lkgcfg    (leak_lkgcfg    ), // current lkgcfg register value.
 .leak_fence    (leak_fence    )  // Fence instruction flying past.
 );
 
@@ -823,9 +823,9 @@ frv_leak #(
 // Operand Source decoding
 // -------------------------------------------------------------------------
 
-wire opra_flush = s1_flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_A]);
-wire oprb_flush = s1_flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_B]);
-wire oprc_flush = s1_flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S2_OPR_C]);
+wire opra_flush = s1_flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_A]);
+wire oprb_flush = s1_flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_B]);
+wire oprc_flush = s1_flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_C]);
 
 // Operand A sourcing.
 wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];

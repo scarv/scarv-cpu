@@ -14,7 +14,7 @@ input  wire         leak_cfg_load   , // Load a new configuration word.
 input  wire [XL:0]  leak_cfg_wdata  , // The new configuration word to load.
 
 output reg  [XL:0]  leak_prng       , // Current PRNG value.
-output reg  [12:0]  leak_alcfg      , // Current alcfg register value.
+output reg  [12:0]  leak_lkgcfg      , // Current lkgcfg register value.
 
 input  wire         leak_fence        // Fence instruction flying past.
 
@@ -41,9 +41,9 @@ generate if(XC_CLASS_LEAK) begin // Leakage instructions are implemented
     // Process for updating the configuration register.
     always @(posedge g_clk) begin
         if(!g_resetn) begin
-            leak_alcfg <= ALCFG_RESET_VALUE;
+            leak_lkgcfg <= ALCFG_RESET_VALUE;
         end else if(leak_cfg_load) begin
-            leak_alcfg <= leak_cfg_wdata[12:0];
+            leak_lkgcfg <= leak_cfg_wdata[12:0];
         end
     end
 
@@ -68,7 +68,7 @@ end else begin // Leakage instructions are not implemented
 
     always @(*) leak_prng  = {XLEN{1'b0}};
 
-    always @(*) leak_alcfg = 0;
+    always @(*) leak_lkgcfg = 0;
 
 end endgenerate
 

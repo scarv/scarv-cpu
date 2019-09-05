@@ -23,7 +23,7 @@ output wire        s3_busy         , // Can this stage accept new inputs?
 input  wire        s3_valid        , // Is this input valid?
 
 input  wire [XL:0] leak_prng       , // Current PRNG value.
-input  wire [12:0] leak_alcfg      , // Current alcfg register value.
+input  wire [12:0] leak_lkgcfg      , // Current lkgcfg register value.
 
 output wire        leak_fence_unc0 , // uncore 0 fence
 output wire        leak_fence_unc1 , // uncore 1 fence
@@ -128,9 +128,9 @@ wire fu_rng = s3_fu[P_FU_RNG];
 // Uncore leakage fence signalling
 // -------------------------------------------------------------------------
 
-assign leak_fence_unc0 = leak_fence && leak_alcfg[LEAK_CFG_UNCORE_0];
-assign leak_fence_unc1 = leak_fence && leak_alcfg[LEAK_CFG_UNCORE_1];
-assign leak_fence_unc2 = leak_fence && leak_alcfg[LEAK_CFG_UNCORE_2];
+assign leak_fence_unc0 = leak_fence && leak_lkgcfg[LEAK_CFG_UNCORE_0];
+assign leak_fence_unc1 = leak_fence && leak_lkgcfg[LEAK_CFG_UNCORE_1];
+assign leak_fence_unc2 = leak_fence && leak_lkgcfg[LEAK_CFG_UNCORE_2];
 
 //
 // Functional Unit Interfacing: LSU
@@ -264,8 +264,8 @@ localparam RL = 42 + OP + FU;
 
 wire leak_fence    = fu_rng && s3_uop == RNG_ALFENCE;
 
-wire opra_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_A]);
-wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_alcfg[LEAK_CFG_S4_OPR_B]);
+wire opra_flush    = flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S4_OPR_A]);
+wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S4_OPR_B]);
 
 wire [RL-1:0] pipe_reg_out;
 

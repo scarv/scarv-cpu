@@ -176,7 +176,7 @@ wire        cf_ack     ; // Control flow change acknolwedge
 // Leakage barrier instruction wiring.
 wire        leak_cfg_load ; // Load a new configuration word.
 wire [XL:0] leak_cfg_wdata; // The new configuration word to load.
-wire [12:0] leak_alcfg    ; // Current alcfg register value.
+wire [12:0] leak_lkgcfg    ; // Current lkgcfg register value.
 
 //
 // CSR access bus.
@@ -458,7 +458,7 @@ frv_pipeline_decode #(
 .leak_cfg_load      (leak_cfg_load      ), // load a new configuration word.
 .leak_cfg_wdata     (leak_cfg_wdata     ), // new configuration word to load.
 .leak_prng          (leak_prng          ), // current prng value.
-.leak_alcfg         (leak_alcfg         ), // current alcfg register value.
+.leak_lkgcfg         (leak_lkgcfg         ), // current lkgcfg register value.
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change
@@ -517,7 +517,7 @@ frv_pipeline_execute #(
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
 .leak_prng        (leak_prng        ), // current prng value.
-.leak_alcfg       (leak_alcfg       ), // current alcfg register value.
+.leak_lkgcfg       (leak_lkgcfg       ), // current lkgcfg register value.
 .rng_req_valid    (rng_req_valid    ), // Signal a new request to the RNG
 .rng_req_op       (rng_req_op       ), // Operation to perform on the RNG
 .rng_req_data     (rng_req_data     ), // Suplementary seed/init data
@@ -589,7 +589,7 @@ frv_pipeline_memory #(
 .s3_busy          (s3_busy          ), // Can this stage accept new inputs?
 .s3_valid         (s3_valid         ), // Is this input valid?
 .leak_prng        (leak_prng        ), // current prng value.
-.leak_alcfg       (leak_alcfg       ), // current alcfg register value.
+.leak_lkgcfg       (leak_lkgcfg       ), // current lkgcfg register value.
 .leak_fence_unc0  (leak_fence_unc0  ), // Leakage fence uncore resource 0
 .leak_fence_unc1  (leak_fence_unc1  ), // Leakage fence uncore resource 1
 .leak_fence_unc2  (leak_fence_unc2  ), // Leakage fence uncore resource 2

@@ -24,14 +24,14 @@ int test_main() {
 
     
     rs1 = 0x1FFF;
-    __asm__ volatile ("xc.alsetcfg %0" : :"r"(rs1) );
+    __asm__ volatile ("xc.lkgconf %0" : :"r"(rs1) );
 
     volatile int arry[10];
 
     for(int i = 0; i < 10; i ++) {
         sum += i;
         sum = sum << 2;
-        __asm__ volatile ("xc.alfence");
+        __asm__ volatile ("xc.lkgfence");
         arry[i] = sum;
         sum += arry[i];
     }
