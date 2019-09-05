@@ -191,7 +191,7 @@ wire [4:0] dec_rs2_32 = s1_data[24:20];
 wire [4:0] dec_rs3_32 = s1_data[31:27];
 
 wire       clr_rd_lsb = dec_xc_mror   || dec_xc_madd_3 || dec_xc_msub_3 ||
-                        dec_xc_mmul_3 || dec_xc_macc_1 || dec_xc_lkgfence;
+                        dec_xc_mmul_3 || dec_xc_macc_1 || dec_xc_lkgconf;
 
 wire [4:0] dec_rd_32  = {s1_data[11: 8], clr_rd_lsb ? 1'b0 : s1_data[7]};
 
