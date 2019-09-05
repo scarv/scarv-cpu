@@ -10,7 +10,7 @@ input   wire          clk       ,
 input   wire          reset     ,
 
 input   wire          mem_cen   ,
-input   wire  [14:0]  mem_addr  ,
+input   wire  [11:0]  mem_addr  ,
 input   wire  [31:0]  mem_wdata ,
 input   wire  [ 3:0]  mem_wstrb ,
 output  reg   [31:0]  mem_rdata 
