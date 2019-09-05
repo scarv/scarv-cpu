@@ -18,6 +18,9 @@ input              f_err        , // Input error
 input  [XL:0]      f_in         , // Input data
 output             f_ready      , // Buffer can accept more bytes.
 
+output  [1:0]      buf_depth    , // Current buffer depth
+output             buf_16       , // 16 bit instruction next to be output
+output             buf_32       , // 32 bit instruction next to be output
 output [XL:0]      buf_out      , // Output data
 output             buf_out_2    , // Buffer has 2 byte instruction.
 output             buf_out_4    , // Buffer has 4 byte instruction.
@@ -42,8 +45,9 @@ assign f_ready = bdepth  < 2'd2                     ||
 assign buf_out   = {buffer[1][15:0], buffer[0][15:0]};
 assign buf_err   =  buffer[0][16  ];
 
-wire   buf_16    = buf_out[1:0] != 2'b11;
-wire   buf_32    = buf_out[1:0] == 2'b11;
+assign buf_16    = buf_out[1:0] != 2'b11;
+assign buf_32    = buf_out[1:0] == 2'b11;
+assign buf_depth = bdepth;
 
 assign buf_out_2 = bdepth >= 2'd1 && buf_16;
 assign buf_out_4 = bdepth >= 2'd2 && buf_32;

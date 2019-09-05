@@ -36,6 +36,9 @@ output wire         s1_error
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
+// Maximum outstanding memory requests
+parameter FRV_MAX_REQS_OUTSTANDING = 0;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -57,8 +60,12 @@ wire f_ready;   // Buffer ready to recieve input data.
 wire f_4byte;   // Buffer should store 4 bytes of input.
 wire f_2byte;   // Buffer should store 2 bytes of input.
 
-wire buf_out_2 ; // Buffer has 2 byte instruction.
-wire buf_out_4 ; // Buffer has 4 byte instruction.
+wire       buf_16;
+wire       buf_32;
+wire [1:0] buf_depth; // Current buffer depth.
+
+wire buf_out_2 ; // Buffer has entire valid 2 byte instruction.
+wire buf_out_4 ; // Buffer has entire valid 4 byte instruction.
 wire buf_valid ; // D output data is valid
 wire buf_ready = s1_valid && !s1_busy; // Eat 2/4 bytes
 
@@ -91,9 +98,14 @@ wire progress_imem_addr = imem_req && imem_gnt;
 
 wire [XL:0] n_imem_addr = imem_addr + 4;
 
+wire incomplete_instr = buf_32 && buf_depth == 1;
+
 // Don't start a memory fetch request if there are already a bunch of
 // outstanding, unrecieved responses.
-wire        n_imem_req  = (f_ready || cf_change) && reqs_outstanding<3;
+wire        n_imem_req  =
+    ((f_ready || cf_change) && reqs_outstanding<=FRV_MAX_REQS_OUTSTANDING &&
+     (buf_depth == 0 || incomplete_instr)) ||
+    (imem_req && !imem_gnt);
 
 //
 // Update the fetch address in terms of control flow changes and natural
@@ -188,7 +200,10 @@ frv_core_fetch_buffer i_core_fetch_buffer (
 .f_2byte  (f_2byte      ), // Load only the 2 MS bytes
 .f_err    (imem_error   ), // Input error
 .f_in     (imem_rdata   ), // Input data
+.buf_depth(buf_depth    ), // Number of halfwords in buffer.
 .buf_out  (s1_data      ), // Output data
+.buf_16   (buf_16       ), // 16 bit instruction next to be output
+.buf_32   (buf_32       ), // 32 bit instruction next to be output
 .buf_out_2(buf_out_2    ), // Output data
 .buf_out_4(buf_out_4    ), // Output data
 .buf_err  (s1_error     ), // Output error bit
