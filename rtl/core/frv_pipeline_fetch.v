@@ -156,8 +156,7 @@ end
 // should only store the "upper" halfword of the response.
 reg  fetch_misaligned;
 wire n_fetch_misaligned =
-    ((cf_change && cf_target[1]) || fetch_misaligned) &&
-    !f_2byte;
+    cf_change ? cf_target[1] : fetch_misaligned && !f_2byte;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin

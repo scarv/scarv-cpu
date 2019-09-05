@@ -45,7 +45,7 @@ assign f_ready = bdepth  < 2'd2                     ||
 assign buf_out   = {buffer[1][15:0], buffer[0][15:0]};
 assign buf_err   =  buffer[0][16  ];
 
-assign buf_16    = buf_out[1:0] != 2'b11;
+assign buf_16    = buf_out[1:0] != 2'b11 && |bdepth;
 assign buf_32    = buf_out[1:0] == 2'b11;
 assign buf_depth = bdepth;
 
