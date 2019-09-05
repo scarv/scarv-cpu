@@ -19,12 +19,15 @@ output  reg   [31:0]  mem_rdata
 
 parameter MEMFILE = "fsbl.hex";
 
-wire [7:0] idx = {mem_addr[7:2],2'b00};
+parameter MEMSIZE = 1024;
 
-reg [7:0] romdata [255:0]; 
+wire [9:0] idx = {mem_addr[9:2],2'b00};
+
+reg [7:0] romdata [MEMSIZE-1:0]; 
 
 initial begin
-    $display("LOAD MEM FILE", MEMFILE);
+    $display("LOAD MEM FILE");
+    $display(MEMFILE);
     $readmemh(MEMFILE,romdata);
 end
 
