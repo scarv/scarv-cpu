@@ -32,9 +32,43 @@ uint8_t uart_rd_char(){
 extern void __fsbl_goto_main(uint32_t * tgt);
 
 /*!
+@brief Setup the UART peripheral
+@details Configures the UART peripheral such that:
+- The TX and RX fifos are empty
+- Interrupts are disabled
+*/
+void fsbl_uart_setup() {
+
+    uart[UART_CT] = UART_CTRL_RST_TX_FIFO | UART_CTRL_RST_RX_FIFO ;
+
+}
+
+/*!
+@brief Print the simple welcome message to show we are ready.
+*/
+void fsbl_print_welcome() {
+
+    // Welcome message
+    char * welcome = "scarv-cpu fsbl\n";
+
+    for(char * p = welcome; *p != 0; p++ ) {
+        
+        while(uart[UART_ST] & UART_STATUS_TX_FULL) {
+            // Do nothing.
+        }   
+        uart[UART_TX] = *p;
+
+    }
+}
+
+/*!
 @brief First stage boot loader function.
 */
 void fsbl() {
+
+    fsbl_uart_setup();
+
+    fsbl_print_welcome();
     
     // First 4 bytes are the size of the program (in bytes).
     uint32_t    program_size =
