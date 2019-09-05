@@ -5,6 +5,12 @@
     #define UART_BASE 0x40600000
 #endif
 
+#ifndef GPIO_BASE
+    #define GPIO_BASE 0x40000000
+#endif
+
+#define GPIO_LEDS 2
+
 #define UART_RX 0
 #define UART_TX 1
 #define UART_ST 2
@@ -12,6 +18,8 @@
 
 // Pointer to the UART register space.
 static volatile uint32_t * uart = (volatile uint32_t*)(UART_BASE);
+
+static volatile uint32_t * gpio = (volatile uint32_t*)(GPIO_BASE);
 
 const uint32_t UART_CTRL_RST_TX_FIFO = 0x00000001;
 const uint32_t UART_CTRL_RST_RX_FIFO = 0x00000002;
@@ -51,12 +59,12 @@ void fsbl_print_welcome() {
     // Welcome message
     char * welcome = "scarv-cpu fsbl\n";
 
-    for(char * p = welcome; *p != 0; p++ ) {
+    for(int i = 0; welcome[i]; i ++) {
         
         while(uart[UART_ST] & UART_STATUS_TX_FULL) {
             // Do nothing.
         }   
-        uart[UART_TX] = *p;
+        uart[UART_TX] = welcome[i];
 
     }
 }
@@ -66,9 +74,15 @@ void fsbl_print_welcome() {
 */
 void fsbl() {
 
+    gpio[GPIO_LEDS] = 0x1;
+
     fsbl_uart_setup();
+    
+    gpio[GPIO_LEDS] = 0x3;
 
     fsbl_print_welcome();
+    
+    gpio[GPIO_LEDS] = 0x7;
     
     // First 4 bytes are the size of the program (in bytes).
     uint32_t    program_size =
@@ -77,12 +91,16 @@ void fsbl() {
         ((uint32_t)uart_rd_char() <<  8) |
         ((uint32_t)uart_rd_char() <<  0) ;
     
+    gpio[GPIO_LEDS] = 0xF;
+    
     // Next 4 bytes are a 32-bit destination address.
     uint32_t    program_dest =
         ((uint32_t)uart_rd_char() << 24) |
         ((uint32_t)uart_rd_char() << 16) |
         ((uint32_t)uart_rd_char() <<  8) |
         ((uint32_t)uart_rd_char() <<  0) ;
+    
+    gpio[GPIO_LEDS] = 0x1F;
 
     uint8_t * dest_ptr = (uint8_t*)program_dest;
 
@@ -92,6 +110,8 @@ void fsbl() {
         dest_ptr[i] = uart_rd_char();
 
     }
+    
+    gpio[GPIO_LEDS] = 0x3F;
 
     // Jump to the downloaded program.
     __fsbl_goto_main((uint32_t*)program_dest);

@@ -11,6 +11,9 @@ It is designed to work with the Xilinx UARTLite IP core.
 - That there is a Xilinx UARTLite IP core accessible at
   `0x4060000`.
 
+- That there is a Xilinx AXI GPIO IP core accessible at
+  `0x40000000`.
+
 - That the FSBL runs out of a *read only* memory.
 
 - That the core is set up such that the post-reset PC value points
@@ -43,3 +46,7 @@ It is designed to work with the Xilinx UARTLite IP core.
 
 6. The FSBL jumps to the specified start address, and relinquishes
    control to the downloaded program.
+
+At each step, an additional GPIO LED is turned on as a sort of "progress"
+indicator for debugging.
+
