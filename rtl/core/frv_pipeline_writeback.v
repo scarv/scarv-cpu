@@ -392,10 +392,25 @@ wire [15: 0] rdata_h1 =
 //                         31....16,15.....8,7......0
 wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
 
+reg  dmem_error_seen;
+
+wire n_dmem_error_seen = 
+    dmem_error_seen || (lsu_rsp_expected && dmem_error && dmem_recv);
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        dmem_error_seen <= 1'b0;
+    end else if(pipe_progress) begin
+        dmem_error_seen <= 1'b0;
+    end else begin
+        dmem_error_seen <= n_dmem_error_seen;
+    end
+end
+
 //
 // LSU Bus error? Due to MMIO or DMEM bus?
-wire        lsu_b_error = lsu_rsp_expected && dmem_error && dmem_recv ||
-                          lsu_mmio         && mmio_error              ;
+wire        lsu_b_error = n_dmem_error_seen       ||
+                          lsu_mmio && mmio_error  ;
 
 wire        lsu_trap    = lsu_b_error;
 
@@ -594,7 +609,7 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         intr_tracker <= 1'b0;
     end else if(intr_tracker) begin
-        intr_tracker <= !pipe_progress;
+        intr_tracker <= !rvfi_valid;
     end else if(pipe_progress) begin
         intr_tracker <= n_intr_tracker;
     end
