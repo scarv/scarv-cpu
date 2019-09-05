@@ -35,9 +35,9 @@ reg [31:0] gprs_odd  [15:0];
 // Used for debugging.
 wire [31:0] gprs      [31:0];
 
-assign rs1_data = rs1_addr[0] ? gprs_odd[rs1_addr[4:1]] : gprs_even[rs1_addr[4:1]];
-assign rs2_data = rs2_addr[0] ? gprs_odd[rs2_addr[4:1]] : gprs_even[rs2_addr[4:1]];
-assign rs3_data = rs3_addr[0] ? gprs_odd[rs3_addr[4:1]] : gprs_even[rs3_addr[4:1]];
+assign rs1_data = gprs[rs1_addr];
+assign rs2_data = gprs[rs2_addr];
+assign rs3_data = gprs[rs3_addr];
 
 wire        rd_odd       =  rd_addr[0];
 wire        rd_even      = !rd_addr[0];
@@ -56,7 +56,7 @@ generate for(i = 0; i < 16; i = i+1) begin
 
         always @(*) gprs_even[i] = 0;
         
-        assign gprs[2*i+0] = gprs_even[i];
+        assign gprs[2*i+0] = 32'b0;
         assign gprs[2*i+1] = gprs_odd [i];
         
         always @(posedge g_clk) if(rd_wen_odd && rd_top == i) begin
