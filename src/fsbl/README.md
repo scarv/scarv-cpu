@@ -9,7 +9,7 @@ It is designed to work with the Xilinx UARTLite IP core.
 ## FSBL Assumptions
 
 - That there is a Xilinx UARTLite IP core accessible at
-  `0x4060000`.
+  `0x40600000`.
 
 - That there is a Xilinx AXI GPIO IP core accessible at
   `0x40000000`.
