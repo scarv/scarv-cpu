@@ -119,7 +119,7 @@ input  [31:0] dmem_rdata
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
 // Use a BRAM/DMEM friendly register file?
-parameter BRAM_REGFILE = 0;
+parameter BRAM_REGFILE = 1'b0;
 
 parameter CSR_MTVEC_RESET_VALUE = 32'hC0000000;
 parameter CSR_MVENDORID         = 32'b0;
