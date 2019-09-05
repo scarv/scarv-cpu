@@ -65,32 +65,32 @@ int test_individual_interrupt_enable() {
     uint32_t mstatus = __rd_mstatus();
     uint32_t mie     = __rd_mie();
 
-    if(mstatus & MSTATUS_MIE){return 1;}
-    if(mstatus & MSTATUS_SIE){return 2;}
-    if(mstatus & MSTATUS_UIE){return 3;}
+    if(mstatus & MSTATUS_MIE){return 7;}
+    if(mstatus & MSTATUS_SIE){return 8;}
+    if(mstatus & MSTATUS_UIE){return 9;}
     
-    if(mie     & MIE_MEIE){return 4;}
-    if(mie     & MIE_MTIE){return 5;}
-    if(mie     & MIE_MSIE){return 6;}
+    if(mie     & MIE_MEIE){return 10;}
+    if(mie     & MIE_MTIE){return 11;}
+    if(mie     & MIE_MSIE){return 12;}
 
     // Check we can enable them one by one.
 
     // External interrupts
     __set_mie(MIE_MEIE);
     mie     = __rd_mie();
-    if(!(mie & MIE_MEIE)){return 7;}
+    if(!(mie & MIE_MEIE)){return 13;}
     __clr_mie(MIE_MEIE);
 
     // Software interrupts
     __set_mie(MIE_MSIE);
     mie     = __rd_mie();
-    if(!(mie & MIE_MSIE)){return 8;}
+    if(!(mie & MIE_MSIE)){return 14;}
     __clr_mie(MIE_MSIE);
 
     // Timer interrupts
     __set_mie(MIE_MTIE);
     mie     = __rd_mie();
-    if(!(mie & MIE_MTIE)){return 9;}
+    if(!(mie & MIE_MTIE)){return 15;}
     __clr_mie(MIE_MTIE);
 
     return 0;
