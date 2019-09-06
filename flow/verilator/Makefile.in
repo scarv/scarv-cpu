@@ -17,6 +17,7 @@ VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
            $(VL_CSRC_DIR)/memory_bus.cpp \
            $(VL_CSRC_DIR)/memory_device.cpp \
            $(VL_CSRC_DIR)/memory_device_ram.cpp \
+           $(VL_CSRC_DIR)/memory_device_uart.cpp \
            $(VL_CSRC_DIR)/srec.cpp
 
 VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 -CFLAGS -g\

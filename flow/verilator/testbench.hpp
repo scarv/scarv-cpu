@@ -2,6 +2,7 @@
 #include "memory_txns.hpp"
 #include "memory_device.hpp"
 #include "memory_device_ram.hpp"
+#include "memory_device_uart.hpp"
 #include "memory_bus.hpp"
 
 #include "dut_wrapper.hpp"
@@ -30,6 +31,9 @@ public:
     
     //! The default memory used in the testbench.
     memory_device_ram * default_ram;
+    
+    //! UART device used to print messages.
+    memory_device_uart * uart_0;
 
     //! The design under test.
     dut_wrapper * dut;
@@ -80,6 +84,9 @@ protected:
     
     //! Default base address of the default memory.
     size_t      default_ram_base_addr = 0x80000000;
+    
+    //! Default base address of the default memory.
+    size_t      uart_base_addr = 0x40600000;
 
     //! Default size of the default memory.
     size_t      default_ram_size = 0x20000;

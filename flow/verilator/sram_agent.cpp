@@ -42,6 +42,8 @@ void sram_agent::drive_signals(){
 
 }
 
+//
+// Called on each posedge of the clock, readies the *next* values.
 void sram_agent::drive_response(){
 
     //
@@ -80,20 +82,6 @@ void sram_agent::drive_response(){
 
 //! Compute any *next* signal values
 void sram_agent::posedge_clk(){
-    
-    if       (!*mem_recv  && !*mem_ack) {
-        drive_response();
-
-    } else if(!*mem_recv  &&  *mem_ack) {
-        drive_response();
-    
-    } else if( *mem_recv  && !*mem_ack) {
-        // Do nothing, waiting to accept response.
-    
-    } else if( *mem_recv  &&  *mem_ack) {
-        drive_response();
-
-    }
 
     //
     // Check for new transaction requests
@@ -132,5 +120,20 @@ void sram_agent::posedge_clk(){
     // Randomise the stall signal value.
     n_mem_gnt = this -> rand_chance(7,10) ||
                 (req_stall_len >= max_req_stall);
+
+    
+    if       (!*mem_recv  && !*mem_ack) {
+        drive_response();
+
+    } else if(!*mem_recv  &&  *mem_ack) {
+        drive_response();
+    
+    } else if( *mem_recv  && !*mem_ack) {
+        // Do nothing, waiting to accept response.
+    
+    } else if( *mem_recv  &&  *mem_ack) {
+        drive_response();
+
+    }
 
 }
