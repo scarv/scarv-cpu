@@ -20,13 +20,13 @@ void test_pass();
 // ----------- Defined in util.S -------------------
 
 // Base address of the memory mapped IO region
-volatile uint32_t * __mmio_base = (uint32_t*)0x00001000;
+volatile uint32_t * __mmio_base;
 
 //! Direct access to mtime
-volatile uint64_t * __mtime     = (uint64_t*)0x00001000;
+volatile uint64_t * __mtime;
 
 //! Direct access to mtimecmp
-volatile uint64_t * __mtimecmp  = (uint64_t*)0x00001008;
+volatile uint64_t * __mtimecmp;
 
 //! Read the memory mapped mtime register
 volatile uint64_t __rd_mtime();
@@ -72,6 +72,24 @@ volatile void __set_mie(uint32_t mask);
 
 //! Clear bits in the mie CSR
 volatile void __clr_mie(uint32_t mask);
+
+//! Write a character to the uart.
+void __putchar(char c) ;
+
+//! Write a null terminated string to the uart.
+void __putstr(char *s) ;
+
+//! Print a 64-bit number as hex
+void __puthex64(uint64_t w);
+
+//! Print a 64-bit number as hex, no leading zeros.
+void __puthex64_nlz(uint64_t w);
+
+//! Print a 32-bit number as hex
+void __puthex32(uint32_t w);
+
+//! Print an 8-bit number as hex
+void __puthex8(uint8_t w);
 
 #endif
 

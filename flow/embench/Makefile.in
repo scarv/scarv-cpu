@@ -10,6 +10,7 @@ EMBENCH_FAIL        = 0x8000000c
 EMBENCH_SRCS        = $(FRV_HOME)/flow/embench/boot.S \
                       $(FRV_HOME)/flow/embench/main.c \
                       $(FRV_HOME)/flow/embench/util.S \
+                      $(FRV_HOME)/flow/embench/embench.c \
                       $(EMBENCH_BUILD)/support/beebsc.o \
 
 EMBENCH_CFLAGS      = -O2 -mabi=ilp32 -march=rv32imc -nostartfiles \
@@ -24,6 +25,7 @@ EMBENCH_BENCHMARKS  = aha-mont64 crc32          cubic    edn      \
 
 EMBENCH_ELFS        = $(addsuffix /benchmark.elf,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
 EMBENCH_DISASM      = $(addsuffix /benchmark.dis,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
+EMBENCH_GTKW        = $(addsuffix /benchmark.gtkwl,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
 EMBENCH_SREC        = $(addsuffix /benchmark.srec,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
 EMBENCH_SIM_LOGS    = $(addsuffix /benchmark.log,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
 EMBENCH_SIM_VCD     = $(addsuffix /benchmark.vcd,$(addprefix $(EMBENCH_BUILD)/src/,$(EMBENCH_BENCHMARKS)))
@@ -33,17 +35,25 @@ $(EMBENCH_BUILD)/src/%/benchmark.elf : $(EMBENCH_SRCS) $(EMBENCH_BUILD)/src/%/*.
 
 $(EMBENCH_BUILD)/src/%/benchmark.dis : $(EMBENCH_BUILD)/src/%/benchmark.elf
 	$(OBJDUMP) -D $^ > $@
+        
+$(EMBENCH_BUILD)/src/%/benchmark.gtkwl : $(EMBENCH_BUILD)/src/%/benchmark.dis
+	grep "80.*:" $< \
+        | grep -v ">:" | cut -c 11- | sed 's/\t//' \
+        | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
+        | sed 's/\(^....    \)    /0000\1/' \
+        > $@
 
 $(EMBENCH_BUILD)/src/%/benchmark.srec: $(EMBENCH_BUILD)/src/%/benchmark.elf
 	$(OBJCOPY) -O srec --srec-forceS3 --srec-len=4 $< $@
 
-embench-benchmarks: $(EMBENCH_ELFS) $(EMBENCH_DISASM) $(EMBENCH_SREC)
+embench-benchmarks: $(EMBENCH_ELFS) $(EMBENCH_DISASM) $(EMBENCH_SREC) $(EMBENCH_GTKW)
 	
 embench-run-%: $(EMBENCH_BUILD)/src/%/benchmark.srec $(VL_OUT)
 	$(VL_OUT) +IMEM=$< \
               +IMEM_MAX_STALL=0 +DMEM_MAX_STALL=0 \
 	          +TIMEOUT=$(EMBENCH_TIMEOUT) \
-	          +PASS_ADDR=$(EMBENCH_PASS) +FAIL_ADDR=$(EMBENCH_FAIL)
+	          +PASS_ADDR=$(EMBENCH_PASS) +FAIL_ADDR=$(EMBENCH_FAIL) \
+        | tee $(basename $<).rpt
 
 embench-run-all: $(addprefix embench-run-,$(EMBENCH_BENCHMARKS))
 

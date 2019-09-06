@@ -16,7 +16,8 @@ UNIT_CFLAGS    += -march=rv32imc -mabi=ilp32
 UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
 
 UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
-                  $(UNIT_ROOT)/share/util.S
+                  $(UNIT_ROOT)/share/util.S \
+                  $(UNIT_ROOT)/share/unit_test.c
 
 define unit_test_elf
 $(UNIT_TEST_BUILD)/${1}/${1}.elf
