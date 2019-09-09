@@ -78,11 +78,11 @@ void fsbl() {
 
     fsbl_uart_setup();
     
-    gpio[GPIO_LEDS] = 0x3;
+    gpio[GPIO_LEDS] = 0x2;
 
     fsbl_print_welcome();
     
-    gpio[GPIO_LEDS] = 0x7;
+    gpio[GPIO_LEDS] = 0x4;
     
     // First 4 bytes are the size of the program (in bytes).
     uint32_t    program_size =
@@ -91,7 +91,7 @@ void fsbl() {
         ((uint32_t)uart_rd_char() <<  8) |
         ((uint32_t)uart_rd_char() <<  0) ;
     
-    gpio[GPIO_LEDS] = 0xF;
+    gpio[GPIO_LEDS] = 0x8;
     
     // Next 4 bytes are a 32-bit destination address.
     uint32_t    program_dest =
@@ -100,18 +100,29 @@ void fsbl() {
         ((uint32_t)uart_rd_char() <<  8) |
         ((uint32_t)uart_rd_char() <<  0) ;
     
-    gpio[GPIO_LEDS] = 0x1F;
+    gpio[GPIO_LEDS] = -1;
+
+    int bytes_per_led = program_size / 8;
+    int led_count     = 0;
 
     uint8_t * dest_ptr = (uint8_t*)program_dest;
 
     // Download the program and write it to the destination memory.
     for(uint32_t i = 0; i < program_size; i ++) {
+
+        led_count += 1;
         
         dest_ptr[i] = uart_rd_char();
 
+        if(led_count >= bytes_per_led) {
+            led_count = 0;
+
+            gpio[GPIO_LEDS] = gpio[GPIO_LEDS] << 1;
+        }
+
     }
     
-    gpio[GPIO_LEDS] = 0x3F;
+    gpio[GPIO_LEDS] = 0x0;
 
     // Jump to the downloaded program.
     __fsbl_goto_main((uint32_t*)program_dest);
