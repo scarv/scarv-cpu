@@ -76,5 +76,17 @@ void __putchar(char c) ;
 //! Write a null terminated string to the uart.
 void __putstr(char *s) ;
 
+//! Print a 64-bit number as hex
+void __puthex64(uint64_t w);
+
+//! Print a 64-bit number as hex, no leading zeros.
+void __puthex64_nlz(uint64_t w);
+
+//! Print a 32-bit number as hex
+void __puthex32(uint32_t w);
+
+//! Print an 8-bit number as hex
+void __puthex8(uint8_t w);
+
 #endif
 
