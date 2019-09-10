@@ -7,7 +7,7 @@ UNIT_TESTS_RUN  =
 
 UNIT_TESTS_CLEAN=
 
-UNIT_TIMEOUT    = 10000
+UNIT_TIMEOUT    = 20000
 UNIT_FAIL       = 0x80000084
 UNIT_PASS       = 0x8000008e
 
@@ -89,6 +89,7 @@ UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
 
 endef
 
+include $(FRV_HOME)/verif/unit/isw_mul/Makefile.in
 include $(FRV_HOME)/verif/unit/example/Makefile.in
 include $(FRV_HOME)/verif/unit/mtime-read/Makefile.in
 include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
