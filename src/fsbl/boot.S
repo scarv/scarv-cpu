@@ -36,9 +36,6 @@ _start:
     li x31, 0
 
     li sp, 0xC0007ff0
-    
-    csrrci  zero, mstatus, 0b1111   // Disable interrupts globally
-    csrw    mie    , zero           // Disable interrupts individually too
 
     j       fsbl                    // Jump to the first stage boot loader.
 

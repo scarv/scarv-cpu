@@ -74,16 +74,9 @@ void fsbl_print_welcome() {
 */
 void fsbl() {
     
-    uint32_t lconf = -1;
-    __asm__ volatile("xc.lkgconf %0" : : "r"(lconf));
-    __asm__ volatile("xc.lkgfence");
-
     gpio[GPIO_LEDS] = 0x1;
 
     fsbl_uart_setup();
-    
-    __asm__ volatile("xc.lkgconf %0" : : "r"(lconf));
-    __asm__ volatile("xc.lkgfence");
     
     gpio[GPIO_LEDS] = 0x2;
 
