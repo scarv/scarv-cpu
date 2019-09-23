@@ -117,6 +117,9 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 
+// Leakage fence instructions bubble the pipeline.
+parameter XC_CLASS_LEAK_BUBBLE= 1'b0 && XC_CLASS_LEAK;
+
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST        = 1'b0;
 parameter AES_MIX_FAST        = 1'b0;
@@ -186,6 +189,7 @@ frv_pipeline #(
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
 .XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
+.XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
 .AES_SUB_FAST       (AES_SUB_FAST       ),
 .AES_MIX_FAST       (AES_MIX_FAST       ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 

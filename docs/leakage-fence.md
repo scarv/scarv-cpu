@@ -136,3 +136,9 @@ Some notes on the RTL implementation of these instructions:
 
   - The LFSR will live in the decode stage with the `lkgcfg` register.
 
+- The `xc.lkgfence` instruction can be configured at *synthesis time* to
+  bubble the pipeline.
+
+  - This causes a 3-cycle performance penalty, but ensures that there
+    are no interractions with the forwarding network.
+

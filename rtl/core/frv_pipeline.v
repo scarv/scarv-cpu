@@ -144,6 +144,9 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 
+// Leakage fence instructions bubble the pipeline.
+parameter XC_CLASS_LEAK_BUBBLE= 1'b1 && XC_CLASS_LEAK;
+
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
 parameter AES_MIX_FAST = 1'b1;
@@ -176,7 +179,8 @@ wire        cf_ack     ; // Control flow change acknolwedge
 // Leakage barrier instruction wiring.
 wire        leak_cfg_load ; // Load a new configuration word.
 wire [XL:0] leak_cfg_wdata; // The new configuration word to load.
-wire [12:0] leak_lkgcfg    ; // Current lkgcfg register value.
+wire [12:0] leak_lkgcfg   ; // Current lkgcfg register value.
+wire        s1_leak_fence ; // Currently a lkgfence in decode.
 
 //
 // CSR access bus.
@@ -356,11 +360,19 @@ wire fwd_s2_rs3_hi = s1_rs3_addr[0] && fwd_s2_wide;
 wire fwd_s3_rs3_hi = s1_rs3_addr[0] && fwd_s3_wide;
 wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 
+wire bubble_lkgfence =
+    XC_CLASS_LEAK_BUBBLE                &&
+    s1_leak_fence                       &&
+    (|s2_size || |s3_size || |s4_size)  ;
+
 //
 // Bubbling occurs when:
 // - There is a data hazard due to a CSR read or a data load.
+// - There is a leakage fence in decode and subsequent stages still have
+//   an instruction in them.
 wire   s1_bubble   =
     !s1_valid && !s2_busy                                                   ||
+    bubble_lkgfence                                                         ||
     (fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4))) ||
     (fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3))) ||
     (fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2)))  ;
@@ -458,7 +470,8 @@ frv_pipeline_decode #(
 .leak_cfg_load      (leak_cfg_load      ), // load a new configuration word.
 .leak_cfg_wdata     (leak_cfg_wdata     ), // new configuration word to load.
 .leak_prng          (leak_prng          ), // current prng value.
-.leak_lkgcfg         (leak_lkgcfg         ), // current lkgcfg register value.
+.leak_lkgcfg        (leak_lkgcfg        ), // current lkgcfg register value.
+.s1_leak_fence      (s1_leak_fence      ),
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change

@@ -28,7 +28,8 @@ input  wire [XL:0] s1_rs3_rdata  ,
 input  wire        leak_cfg_load , // Load a new configuration word.
 input  wire [XL:0] leak_cfg_wdata, // The new configuration word to load.
 output wire [XL:0] leak_prng     , // Current PRNG value.
-output wire [12:0] leak_lkgcfg    , // Current lkgcfg register value.
+output wire [12:0] leak_lkgcfg   , // Current lkgcfg register value.
+output wire        s1_leak_fence , // Leakage fence currently in decode.
 
 input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
@@ -798,7 +799,8 @@ assign      pc_plus_imm = program_counter + n_s2_imm_pc;
 // -------------------------------------------------------------------------
 
 // Fence instruction flying past.
-wire         leak_fence      = dec_xc_lkgfence;
+wire         leak_fence      = dec_xc_lkgfence && s1_valid;
+assign       s1_leak_fence   = leak_fence;
 
 //
 // instance: frv_leak
