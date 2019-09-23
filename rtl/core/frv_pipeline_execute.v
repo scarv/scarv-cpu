@@ -331,7 +331,7 @@ wire         bitw_gpr_wide    = bitw_mror;
 // -------------------------------------------------------------------------
 
 wire [XL:0]  rng_rs1          = s2_opr_a;
-wire         rng_valid        = fu_rng  ;
+wire         rng_valid        = fu_rng && s2_uop != RNG_ALFENCE;
 
 wire         rng_uop_test     = fu_rng && s2_uop == RNG_RNGTEST;
 wire         rng_uop_seed     = fu_rng && s2_uop == RNG_RNGSEED;
@@ -513,8 +513,8 @@ localparam RL = 42 + OP + FU;
 
 wire leak_fence    = fu_rng && s2_uop == RNG_ALFENCE;
 
-wire opra_flush    = flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S3_OPR_A]);
-wire oprb_flush    = flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S3_OPR_B]);
+wire opra_flush    = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S3_OPR_A]);
+wire oprb_flush    = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S3_OPR_B]);
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit

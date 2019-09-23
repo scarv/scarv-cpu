@@ -85,6 +85,9 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 
+// Leakage fence instructions bubble the pipeline.
+parameter XC_CLASS_LEAK_BUBBLE= 1'b1 && XC_CLASS_LEAK;
+
 //
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
@@ -94,7 +97,7 @@ wire   p_s2_busy;
 
 wire pipe_progress = s1_valid && !s1_busy;
 
-assign s1_busy      = p_s2_busy || s1_bubble;
+assign s1_busy      = p_s2_busy || s1_bubble || leak_stall;
 wire   n_s2_valid   = s1_valid  || s1_bubble;
 
 wire [ 4:0] n_s2_rd         ; // Destination register address
@@ -802,6 +805,22 @@ assign      pc_plus_imm = program_counter + n_s2_imm_pc;
 wire         leak_fence      = dec_xc_lkgfence && s1_valid;
 assign       s1_leak_fence   = leak_fence;
 
+reg [1:0]    lf_count;
+wire[1:0]  n_lf_count = lf_count + 1;
+
+wire         leak_stall     = leak_fence    && 
+                              lf_count < 3  &&
+                              XC_CLASS_LEAK_BUBBLE;;
+wire         lf_count_ld    = leak_fence && !p_s2_busy && XC_CLASS_LEAK_BUBBLE;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        lf_count <= 0;
+    end else if(lf_count_ld) begin
+        lf_count <= n_lf_count;
+    end
+end
+
 //
 // instance: frv_leak
 //
@@ -817,7 +836,7 @@ frv_leak #(
 .leak_cfg_load (leak_cfg_load ), // load a new configuration word.
 .leak_cfg_wdata(leak_cfg_wdata), // the new configuration word to load.
 .leak_prng     (leak_prng     ), // current prng value.
-.leak_lkgcfg    (leak_lkgcfg    ), // current lkgcfg register value.
+.leak_lkgcfg   (leak_lkgcfg   ), // current lkgcfg register value.
 .leak_fence    (leak_fence    )  // Fence instruction flying past.
 );
 
@@ -825,9 +844,9 @@ frv_leak #(
 // Operand Source decoding
 // -------------------------------------------------------------------------
 
-wire opra_flush = s1_flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_A]);
-wire oprb_flush = s1_flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_B]);
-wire oprc_flush = s1_flush || (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_C]);
+wire opra_flush = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_A]);
+wire oprb_flush = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_B]);
+wire oprc_flush = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_C]);
 
 // Operand A sourcing.
 wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];
@@ -911,10 +930,16 @@ end
 
 wire [RL-1:0] p_mr;
 
+// When bubbling due to a leakage fence, insert dummy fence
+// operations into the pipeline which will randomise the registers,
+// but not increment the PC since the s*_valid signal won't be asserted.
+wire [OP:0] bubble_uop = leak_fence ? RNG_ALFENCE   : {1+OP{1'b0}};
+wire [FU:0] bubble_fu  = leak_fence ? 8'b1<<P_FU_RNG: {1+FU{1'b0}};
+
 wire [RL-1:0] p_in = {
  s1_bubble ?  5'b0      : n_s2_rd   , // Destination register address
- s1_bubble ?  {1+OP{1'b0}}: n_s2_uop, // Micro-op code
- s1_bubble ?  {1+FU{1'b0}}: n_s2_fu , // Functional Unit (alu/mem/jump/mul/csr)
+ s1_bubble ?  bubble_uop: n_s2_uop  , // Micro-op code
+ s1_bubble ?  bubble_fu : n_s2_fu   , // Functional Unit (alu/mem/jump/mul/csr)
  s1_bubble ?  {1+PW{1'b0}}: n_s2_pw , // IALU pack width specifier.
  s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
  s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.

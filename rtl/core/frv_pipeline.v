@@ -360,21 +360,6 @@ wire fwd_s2_rs3_hi = s1_rs3_addr[0] && fwd_s2_wide;
 wire fwd_s3_rs3_hi = s1_rs3_addr[0] && fwd_s3_wide;
 wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 
-wire bubble_lkgfence =
-    (leak_lkgcfg[LEAK_CFG_S2_OPR_A ] ||
-     leak_lkgcfg[LEAK_CFG_S2_OPR_B ] ||
-     leak_lkgcfg[LEAK_CFG_S2_OPR_C ] ||
-     leak_lkgcfg[LEAK_CFG_S3_OPR_A ] ||
-     leak_lkgcfg[LEAK_CFG_S3_OPR_B ] ||
-     leak_lkgcfg[LEAK_CFG_FU_MULT  ] ||
-     leak_lkgcfg[LEAK_CFG_FU_AESSUB] ||
-     leak_lkgcfg[LEAK_CFG_FU_AESMIX] ||
-     leak_lkgcfg[LEAK_CFG_S4_OPR_A ] ||
-     leak_lkgcfg[LEAK_CFG_S4_OPR_B ] )  &&
-    XC_CLASS_LEAK_BUBBLE                &&
-    s1_leak_fence                       &&
-    (|s2_size || |s3_size || |s4_size)  ;
-
 //
 // Bubbling occurs when:
 // - There is a data hazard due to a CSR read or a data load.
@@ -382,7 +367,6 @@ wire bubble_lkgfence =
 //   an instruction in them.
 wire   s1_bubble   =
     !s1_valid && !s2_busy                                                   ||
-    bubble_lkgfence                                                         ||
     (fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4))) ||
     (fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3))) ||
     (fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2)))  ;
@@ -461,6 +445,7 @@ frv_pipeline_decode #(
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
 .XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
+.XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
