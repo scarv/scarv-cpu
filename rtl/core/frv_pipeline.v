@@ -361,6 +361,16 @@ wire fwd_s3_rs3_hi = s1_rs3_addr[0] && fwd_s3_wide;
 wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 
 wire bubble_lkgfence =
+    (leak_lkgcfg[LEAK_CFG_S2_OPR_A ] ||
+     leak_lkgcfg[LEAK_CFG_S2_OPR_B ] ||
+     leak_lkgcfg[LEAK_CFG_S2_OPR_C ] ||
+     leak_lkgcfg[LEAK_CFG_S3_OPR_A ] ||
+     leak_lkgcfg[LEAK_CFG_S3_OPR_B ] ||
+     leak_lkgcfg[LEAK_CFG_FU_MULT  ] ||
+     leak_lkgcfg[LEAK_CFG_FU_AESSUB] ||
+     leak_lkgcfg[LEAK_CFG_FU_AESMIX] ||
+     leak_lkgcfg[LEAK_CFG_S4_OPR_A ] ||
+     leak_lkgcfg[LEAK_CFG_S4_OPR_B ] )  &&
     XC_CLASS_LEAK_BUBBLE                &&
     s1_leak_fence                       &&
     (|s2_size || |s3_size || |s4_size)  ;
