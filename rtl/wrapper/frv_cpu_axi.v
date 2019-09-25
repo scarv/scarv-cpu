@@ -112,7 +112,21 @@ output [ 2:0] dmem_arprot    ,
 input         dmem_rvalid    ,
 output        dmem_rready    ,
 input  [ 1:0] dmem_rresp     ,
-input  [31:0] dmem_rdata      
+input  [31:0] dmem_rdata     ,
+
+output        bram_i_cen     ,
+output [31:0] bram_i_addr    ,
+output [31:0] bram_i_wdata   ,
+output [ 3:0] bram_i_wstrb   ,
+input         bram_i_stall   ,
+input  [31:0] bram_i_rdata   ,
+
+output        bram_d_cen     ,
+output [31:0] bram_d_addr    ,
+output [31:0] bram_d_wdata   ,
+output [ 3:0] bram_d_wstrb   ,
+input         bram_d_stall   ,
+input  [31:0] bram_d_rdata    
 
 );
 
@@ -170,6 +184,11 @@ parameter AES_MIX_FAST        = 1'b0;
 parameter BITMANIP_BASELINE   = 1'b1;
 
 //
+// Address mapping to BRAMs
+parameter BRAM_ADDR_MASK = 32'hFFFF8000;
+parameter BRAM_ADDR_MATCH= 32'hC0000000;
+
+//
 // Instruction Memory interface
 wire         i_req        ; // Start memory request
 wire         i_wen        ; // Write enable
@@ -194,6 +213,59 @@ wire         d_recv       ; // Data memory recieve response.
 wire         d_ack        ; // Data memory ack response.
 wire         d_error      ; // Error
 wire [31:0]  d_rdata      ; // Read data
+
+
+//
+// BRAM Instruction Memory interface
+wire         i_ram_req        ; // Start memory request
+wire         i_ram_wen        ; // Write enable
+wire [3:0]   i_ram_strb       ; // Write strobe
+wire [31:0]  i_ram_wdata      ; // Write data
+wire [31:0]  i_ram_addr       ; // Read/Write address
+wire         i_ram_gnt        ; // request accepted
+wire         i_ram_recv       ; // Instruction memory recieve response.
+wire         i_ram_ack = i_ack; // Instruction memory ack response.
+wire         i_ram_error      ; // Error
+wire [31:0]  i_ram_rdata      ; // Read data
+
+//
+// BRAM Data Memory interface
+wire         d_ram_req        ; // Start memory request
+wire         d_ram_wen        ; // Write enable
+wire [3:0]   d_ram_strb       ; // Write strobe
+wire [31:0]  d_ram_wdata      ; // Write data
+wire [31:0]  d_ram_addr       ; // Read/Write address
+wire         d_ram_gnt        ; // request accepted
+wire         d_ram_recv       ; // Data memory recieve response.
+wire         d_ram_ack = d_ack; // Data memory ack response.
+wire         d_ram_error      ; // Error
+wire [31:0]  d_ram_rdata      ; // Read data
+
+//
+// AXI Instruction Memory interface
+wire         i_axi_req        ; // Start memory request
+wire         i_axi_wen        ; // Write enable
+wire [3:0]   i_axi_strb       ; // Write strobe
+wire [31:0]  i_axi_wdata      ; // Write data
+wire [31:0]  i_axi_addr       ; // Read/Write address
+wire         i_axi_gnt        ; // request accepted
+wire         i_axi_recv       ; // Instruction memory recieve response.
+wire         i_axi_ack = i_ack; // Instruction memory ack response.
+wire         i_axi_error      ; // Error
+wire [31:0]  i_axi_rdata      ; // Read data
+
+//
+// AXI Data Memory interface
+wire         d_axi_req        ; // Start memory request
+wire         d_axi_wen        ; // Write enable
+wire [3:0]   d_axi_strb       ; // Write strobe
+wire [31:0]  d_axi_wdata      ; // Write data
+wire [31:0]  d_axi_addr       ; // Read/Write address
+wire         d_axi_gnt        ; // request accepted
+wire         d_axi_recv       ; // Data memory recieve response.
+wire         d_axi_ack = d_ack; // Data memory ack response.
+wire         d_axi_error      ; // Error
+wire [31:0]  d_axi_rdata      ; // Read data
 
 
 //
@@ -312,16 +384,16 @@ frv_axi_adapter #(
 .mem_axi_rready  (imem_rready  ),
 .mem_axi_rdata   (imem_rdata   ),
 .mem_axi_rresp   (imem_rresp   ),
-.mem_req         (i_req        ), // Start memory request
-.mem_wen         (i_wen        ), // Write enable
-.mem_strb        (i_strb       ), // Write strobe
-.mem_wdata       (i_wdata      ), // Write data
-.mem_addr        (i_addr       ), // Read/Write address
-.mem_gnt         (i_gnt        ), // request accepted
-.mem_recv        (i_recv       ), // Instruction memory recieve response.
-.mem_ack         (i_ack        ), // Response acknowledge
-.mem_error       (i_error      ), // Error
-.mem_rdata       (i_rdata      )  // Read data
+.mem_req         (i_axi_req        ), // Start memory request
+.mem_wen         (i_axi_wen        ), // Write enable
+.mem_strb        (i_axi_strb       ), // Write strobe
+.mem_wdata       (i_axi_wdata      ), // Write data
+.mem_addr        (i_axi_addr       ), // Read/Write address
+.mem_gnt         (i_axi_gnt        ), // request accepted
+.mem_recv        (i_axi_recv       ), // Instruction memory recieve response.
+.mem_ack         (i_axi_ack        ), // Response acknowledge
+.mem_error       (i_axi_error      ), // Error
+.mem_rdata       (i_axi_rdata      )  // Read data
 );
 
 frv_axi_adapter #(
@@ -349,16 +421,137 @@ frv_axi_adapter #(
 .mem_axi_rready  (dmem_rready  ),
 .mem_axi_rdata   (dmem_rdata   ),
 .mem_axi_rresp   (dmem_rresp   ),
-.mem_req         (d_req        ), // Start memory request
-.mem_wen         (d_wen        ), // Write enable
-.mem_strb        (d_strb       ), // Write strobe
-.mem_wdata       (d_wdata      ), // Write data
-.mem_addr        (d_addr       ), // Read/Write address
-.mem_gnt         (d_gnt        ), // request accepted
-.mem_recv        (d_recv       ), // Instruction memory recieve response.
-.mem_ack         (d_ack        ), // Response acknowledge
-.mem_error       (d_error      ), // Error
-.mem_rdata       (d_rdata      )  // Read data
+.mem_req         (d_axi_req        ), // Start memory request
+.mem_wen         (d_axi_wen        ), // Write enable
+.mem_strb        (d_axi_strb       ), // Write strobe
+.mem_wdata       (d_axi_wdata      ), // Write data
+.mem_addr        (d_axi_addr       ), // Read/Write address
+.mem_gnt         (d_axi_gnt        ), // request accepted
+.mem_recv        (d_axi_recv       ), // Instruction memory recieve response.
+.mem_ack         (d_axi_ack        ), // Response acknowledge
+.mem_error       (d_axi_error      ), // Error
+.mem_rdata       (d_axi_rdata      )  // Read data
+);
+
+
+frv_bus_splitter #(
+.M0_ADDR_MASK (BRAM_ADDR_MASK ),
+.M0_ADDR_MATCH(BRAM_ADDR_MATCH)
+) i_imem_bus_splitter(
+.g_clk    (g_clk    ), // global clock
+.g_resetn (g_resetn ), // synchronous reset
+.s0_req   (i_req   ), // Start memory request
+.s0_gnt   (i_gnt   ), // request accepted
+.s0_wen   (i_wen   ), // Write enable
+.s0_strb  (i_strb  ), // Write strobe
+.s0_wdata (i_wdata ), // Write data
+.s0_addr  (i_addr  ), // Read/Write address
+.s0_recv  (i_recv  ), // Instruction memory recieve response.
+.s0_ack   (i_ack   ), // Instruction memory ack response.
+.s0_error (i_error ), // Error
+.s0_rdata (i_rdata ), // Read data
+.m0_req   (i_ram_req   ), // Start memory request
+.m0_gnt   (i_ram_gnt   ), // request accepted
+.m0_wen   (i_ram_wen   ), // Write enable
+.m0_strb  (i_ram_strb  ), // Write strobe
+.m0_wdata (i_ram_wdata ), // Write data
+.m0_addr  (i_ram_addr  ), // Read/Write address
+.m0_recv  (i_ram_recv  ), // Instruction memory recieve response.
+.m0_ack   (i_ram_ack   ), // Instruction memory ack response.
+.m0_error (i_ram_error ), // Error
+.m0_rdata (i_ram_rdata ), // Read data
+.m1_req   (i_axi_req   ), // Start memory request
+.m1_gnt   (i_axi_gnt   ), // request accepted
+.m1_wen   (i_axi_wen   ), // Write enable
+.m1_strb  (i_axi_strb  ), // Write strobe
+.m1_wdata (i_axi_wdata ), // Write data
+.m1_addr  (i_axi_addr  ), // Read/Write address
+.m1_recv  (i_axi_recv  ), // Instruction memory recieve response.
+.m1_ack   (i_axi_ack   ), // Instruction memory ack response.
+.m1_error (i_axi_error ), // Error
+.m1_rdata (i_axi_rdata )  // Read data
+);
+
+frv_bus_splitter #(
+.M0_ADDR_MASK (BRAM_ADDR_MASK ),
+.M0_ADDR_MATCH(BRAM_ADDR_MATCH)
+) i_dmem_bus_splitter(
+.g_clk    (g_clk    ), // global clock
+.g_resetn (g_resetn ), // synchronous reset
+.s0_req   (d_req   ), // Start memory request
+.s0_gnt   (d_gnt   ), // request accepted
+.s0_wen   (d_wen   ), // Write enable
+.s0_strb  (d_strb  ), // Write strobe
+.s0_wdata (d_wdata ), // Write data
+.s0_addr  (d_addr  ), // Read/Write address
+.s0_recv  (d_recv  ), // Instruction memory recieve response.
+.s0_ack   (d_ack   ), // Instruction memory ack response.
+.s0_error (d_error ), // Error
+.s0_rdata (d_rdata ), // Read data
+.m0_req   (d_ram_req   ), // Start memory request
+.m0_gnt   (d_ram_gnt   ), // request accepted
+.m0_wen   (d_ram_wen   ), // Write enable
+.m0_strb  (d_ram_strb  ), // Write strobe
+.m0_wdata (d_ram_wdata ), // Write data
+.m0_addr  (d_ram_addr  ), // Read/Write address
+.m0_recv  (d_ram_recv  ), // Instruction memory recieve response.
+.m0_ack   (d_ram_ack   ), // Instruction memory ack response.
+.m0_error (d_ram_error ), // Error
+.m0_rdata (d_ram_rdata ), // Read data
+.m1_req   (d_axi_req   ), // Start memory request
+.m1_gnt   (d_axi_gnt   ), // request accepted
+.m1_wen   (d_axi_wen   ), // Write enable
+.m1_strb  (d_axi_strb  ), // Write strobe
+.m1_wdata (d_axi_wdata ), // Write data
+.m1_addr  (d_axi_addr  ), // Read/Write address
+.m1_recv  (d_axi_recv  ), // Instruction memory recieve response.
+.m1_ack   (d_axi_ack   ), // Instruction memory ack response.
+.m1_error (d_axi_error ), // Error
+.m1_rdata (d_axi_rdata )  // Read data
+);
+
+frv_bram_adapter i_bram_adapter_instr (
+.g_clk     (g_clk     ),
+.g_resetn  (g_resetn  ),
+.bram_cen  (bram_i_cen  ),
+.bram_addr (bram_i_addr ),
+.bram_wdata(bram_i_wdata),
+.bram_wstrb(bram_i_wstrb),
+.bram_stall(bram_i_stall),
+.bram_rdata(bram_i_rdata),
+.enable    (1'b1), // Enable requests / does addr map?
+.mem_req   (i_ram_req   ), // Start memory request
+.mem_gnt   (i_ram_gnt   ), // request accepted
+.mem_wen   (i_ram_wen   ), // Write enable
+.mem_strb  (i_ram_strb  ), // Write strobe
+.mem_wdata (i_ram_wdata ), // Write data
+.mem_addr  (i_ram_addr  ), // Read/Write address
+.mem_recv  (i_ram_recv  ), // Instruction memory recieve response.
+.mem_ack   (i_ram_ack   ), // Instruction memory ack response.
+.mem_error (i_ram_error ), // Error
+.mem_rdata (i_ram_rdata )  // Read data
+);
+
+frv_bram_adapter i_bram_adapter_data(
+.g_clk     (g_clk     ),
+.g_resetn  (g_resetn  ),
+.bram_cen  (bram_d_cen  ),
+.bram_addr (bram_d_addr ),
+.bram_wdata(bram_d_wdata),
+.bram_wstrb(bram_d_wstrb),
+.bram_stall(bram_d_stall),
+.bram_rdata(bram_d_rdata),
+.enable    (1'b1), // Enable requests / does addr map?
+.mem_req   (d_ram_req   ), // Start memory request
+.mem_gnt   (d_ram_gnt   ), // request accepted
+.mem_wen   (d_ram_wen   ), // Write enable
+.mem_strb  (d_ram_strb  ), // Write strobe
+.mem_wdata (d_ram_wdata ), // Write data
+.mem_addr  (d_ram_addr  ), // Read/Write address
+.mem_recv  (d_ram_recv  ), // Instruction memory recieve response.
+.mem_ack   (d_ram_ack   ), // Instruction memory ack response.
+.mem_error (d_ram_error ), // Error
+.mem_rdata (d_ram_rdata )  // Read data
 );
 
 endmodule

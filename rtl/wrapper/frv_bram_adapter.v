@@ -37,9 +37,9 @@ assign mem_error    = 1'b0;
 assign mem_gnt      = (!mem_recv || (mem_recv && mem_ack)) && !bram_stall;
 assign mem_error    = 1'b0;
 
-assign bram_addr    = enable ? mem_addr : 32'b0;
+assign bram_addr    = enable  ? mem_addr : 32'b0    ;
 assign bram_wdata   = mem_wdata;
-assign bram_wstrb   = mem_strb;
+assign bram_wstrb   = mem_wen ? mem_strb : 4'b0000  ;
 assign bram_cen     = mem_req && enable;
 
 wire   n_mem_recv   = (bram_cen && !bram_stall) || (mem_recv && !mem_ack);
