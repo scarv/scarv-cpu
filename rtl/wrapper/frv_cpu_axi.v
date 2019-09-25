@@ -187,6 +187,7 @@ parameter BITMANIP_BASELINE   = 1'b1;
 // Address mapping to BRAMs
 parameter BRAM_ADDR_MASK = 32'hFFFF8000;
 parameter BRAM_ADDR_MATCH= 32'hC0000000;
+parameter BRAM_ADDR_RANGE= 32'h00003FFF;
 
 //
 // Instruction Memory interface
@@ -436,7 +437,8 @@ frv_axi_adapter #(
 
 frv_bus_splitter #(
 .M0_ADDR_MASK (BRAM_ADDR_MASK ),
-.M0_ADDR_MATCH(BRAM_ADDR_MATCH)
+.M0_ADDR_MATCH(BRAM_ADDR_MATCH),
+.M0_ADDR_RANGE(BRAM_ADDR_RANGE)
 ) i_imem_bus_splitter(
 .g_clk    (g_clk    ), // global clock
 .g_resetn (g_resetn ), // synchronous reset
@@ -474,7 +476,8 @@ frv_bus_splitter #(
 
 frv_bus_splitter #(
 .M0_ADDR_MASK (BRAM_ADDR_MASK ),
-.M0_ADDR_MATCH(BRAM_ADDR_MATCH)
+.M0_ADDR_MATCH(BRAM_ADDR_MATCH),
+.M0_ADDR_RANGE(BRAM_ADDR_RANGE)
 ) i_dmem_bus_splitter(
 .g_clk    (g_clk    ), // global clock
 .g_resetn (g_resetn ), // synchronous reset

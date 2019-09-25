@@ -57,6 +57,7 @@ input  wire [31:0]  m1_rdata   // Read data
 
 parameter M0_ADDR_MASK = 32'hFFFF8000;
 parameter M0_ADDR_MATCH= 32'hC0000000;
+parameter M0_ADDR_RANGE= 32'h00003FFF;
 
 //
 // Outstanding request tracking.
@@ -86,7 +87,8 @@ end
 //
 // Request destination decoding
 
-wire    addr_to_m0 = (m0_addr & M0_ADDR_MASK) == M0_ADDR_MATCH;
+wire    addr_to_m0 = (m0_addr &  M0_ADDR_MASK) == M0_ADDR_MATCH &&
+                     (m0_addr & ~M0_ADDR_MASK) == (m0_addr & M0_ADDR_RANGE);
 wire    addr_to_m1 = !addr_to_m0;
 
 wire    m0_req_en  = addr_to_m0 && m1_reqs_out == 0;
