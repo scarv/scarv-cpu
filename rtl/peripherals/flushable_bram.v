@@ -34,13 +34,23 @@ wire [31:0] read_data = {darry_3[idx_a],
                          darry_1[idx_a],
                          darry_0[idx_a]};
 
+reg  p_ena;
+
+always @(posedge clka) begin
+    if(rsta) begin
+        p_ena <= 1'b0;
+    end else begin
+        p_ena <= ena;
+    end
+end
+
 wire is_write = |wea;
 
 // Port a reads / flushes
 always @(posedge clka) begin
     if(rsta) begin
         douta <= 0;
-    end else if(flush_rand && !ena) begin
+    end else if(flush_rand && !ena && !p_ena) begin
         douta <= flush_data;
     end else if(ena && !is_write) begin
         douta <= read_data;
