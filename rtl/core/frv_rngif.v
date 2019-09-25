@@ -66,7 +66,7 @@ end
 // ------------------------------------------------------------
 
 // Only accept response transactions when the pipeline is ready to progress.
-assign ready            = valid && rng_rsp_valid;
+assign ready            = (valid && rng_rsp_valid) || req_done;
 
 assign rng_rsp_ready    = pipeline_progress;
 
