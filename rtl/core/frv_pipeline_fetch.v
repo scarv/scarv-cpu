@@ -50,7 +50,7 @@ parameter FRV_MAX_REQS_OUTSTANDING = 0;
 assign s1_valid = buf_valid;
 
 // TODO: track when to ignore requests more inteligently.
-assign cf_ack   = (!imem_req || imem_req && imem_gnt);
+assign cf_ack   = (!imem_req);
 
 //
 // Request buffer interface signals.
