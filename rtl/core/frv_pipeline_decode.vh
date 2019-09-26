@@ -74,7 +74,7 @@ wire dec_c_and      = d_data[1:0] == 2'd1 && d_data[15:13] == 3'd4 && d_data[12:
 wire dec_c_j        = d_data[1:0] == 2'd1 && d_data[15:13] == 3'd5;
 wire dec_c_beqz     = d_data[1:0] == 2'd1 && d_data[15:13] == 3'd6;
 wire dec_c_bnez     = d_data[1:0] == 2'd1 && d_data[15:13] == 3'd7;
-wire dec_c_slli     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd0 && d_data[12:0] == 0;
+wire dec_c_slli     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd0 && d_data[12] == 0;
 wire dec_c_lwsp     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd2 && d_data[11:7] != 0;
 wire dec_c_jr       = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:12] == 1'd0 && d_data[6:2] == 5'd0 && d_data[11:7] != 0;
 wire dec_c_mv       = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:12] == 1'd0 && d_data[6:2] != 0;
