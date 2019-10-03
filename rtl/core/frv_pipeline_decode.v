@@ -942,7 +942,7 @@ wire [RL-1:0] p_in = {
  s1_bubble ?  bubble_fu : n_s2_fu   , // Functional Unit (alu/mem/jump/mul/csr)
  s1_bubble ?  {1+PW{1'b0}}: n_s2_pw , // IALU pack width specifier.
  s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
- s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
+leak_stall || s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
  s1_bubble ? 32'b0      : n_s2_instr  // The instruction word
 };
 
