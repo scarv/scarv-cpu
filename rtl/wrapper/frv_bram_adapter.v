@@ -34,7 +34,7 @@ output wire [31:0]  mem_rdata         // Read data
 assign mem_rdata    = bram_rdata;
 
 assign mem_error    = 1'b0;
-assign mem_gnt      = (!mem_recv || (mem_recv && mem_ack)) && !bram_stall;
+assign mem_gnt      = !bram_stall;
 assign mem_error    = 1'b0;
 
 assign bram_addr    = enable  ? mem_addr : 32'b0    ;

@@ -50,7 +50,7 @@ parameter FRV_MAX_REQS_OUTSTANDING = 0;
 assign s1_valid = buf_valid;
 
 // TODO: track when to ignore requests more inteligently.
-assign cf_ack   = (!imem_req);
+assign cf_ack   = (!imem_req) || (imem_req && imem_gnt);
 
 //
 // Request buffer interface signals.
@@ -104,7 +104,7 @@ wire incomplete_instr = buf_32 && buf_depth == 1;
 // outstanding, unrecieved responses.
 wire        n_imem_req  =
     ((f_ready || cf_change) && reqs_outstanding<=FRV_MAX_REQS_OUTSTANDING &&
-     (buf_depth <= 1 || incomplete_instr)) ||
+     (buf_depth <= 2 || incomplete_instr)) ||
     (imem_req && !imem_gnt);
 
 //
