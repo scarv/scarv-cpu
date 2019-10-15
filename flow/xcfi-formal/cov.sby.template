@@ -3,8 +3,8 @@ mode cover
 expect pass,fail
 append 0
 tbtop i_wrapper.uut
-depth 16
-skip 15
+depth 20
+skip 19
 timeout 7200
 
 [engines]
