@@ -13,11 +13,8 @@ instruction set extensions.*
 
 - [Overview](#Overview)
 - [Documentation](#Documentation)
-- [Getting Started](#Getting-Started)
-- [Design & Verification Flows](#Flows)
-  - [RISC-V Compliance](#RISC-V-Compliance-Flow)
-  - [Unit Tests](#Unit-Tests-Flow)
-  - [RISC-V Formal](#RISC-V-Formal-Verfication-Flow)
+- [Quickstart](#Quickstart)
+- [Acknowledgements](#Acknowledgements)
 
 ## Overview
 
@@ -77,6 +74,12 @@ the pipeline structure.
 
     ```sh
     $> source bin/conf.sh
+    ```
+
+- Build the verilator simulation model:
+
+    ```sh
+    $> make verilator_build
     ```
 
 - Run the basic RISC-V compliance tests:

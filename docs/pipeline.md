@@ -57,7 +57,7 @@ into Decode.
 
 ## Pipeline Registers.
 
-There will be 4 pipeline registers:
+There are 4 pipeline registers:
 - `p0` - Fetch -> Decode
 - `p1` - Decode -> Execute 
 - `p2` - Execute -> Memory
