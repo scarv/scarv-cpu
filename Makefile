@@ -41,7 +41,6 @@ include $(FRV_HOME)/flow/verilator/Makefile.in
 include $(FRV_HOME)/flow/compliance/Makefile.in
 include $(FRV_HOME)/flow/riscv-formal/Makefile.in
 include $(FRV_HOME)/flow/xcfi-formal/Makefile.in
-include $(FRV_HOME)/flow/formal/Makefile.in
 include $(FRV_HOME)/flow/yosys/Makefile.in
 include $(FRV_HOME)/flow/embench/Makefile.in
 include $(FRV_HOME)/src/fsbl/Makefile.in
