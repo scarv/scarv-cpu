@@ -130,7 +130,7 @@ Stages which can *cause* a pipeline stall:
   - Waiting for data memory accesses to complete.
   - Waiting for slow multiply/divide operations to complete.
 
-Stages which forward values to dispatch and why:
+Stages which forward values to decode and why:
 - Execute - to prevent RAW hazards.
 - Writeback - to feed CSR and memory load values back into the pipe.
 
@@ -147,7 +147,7 @@ This can be due to one of:
 - An `mret` instruction.
 
 The destination addresses for conditional branch instructions
-are computed in the dispatch stage.
+are computed in the decode stage.
 
 The destination addresses for jump instructions are computed in
 the execute stage.
