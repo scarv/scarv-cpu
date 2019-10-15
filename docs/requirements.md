@@ -11,6 +11,8 @@
   - `Zicsr` Extension
   - `Zifencei` Extension
   - System instructions: `ecall`, `ebreak`, `mret`.
+- Extended Architecture: `XCrypto`
+  - Support the full set of XCrypto instruction extensions.
 - Priviledged ISA:
   - M mode only.
   - Memory mapped `mtime` and `mtimecmp`
@@ -38,18 +40,3 @@
   - Timer interrupt
   - Software interrupt
   - External interrupt
-
-## Micro-architecture
-
-- PPA Targets:
-  - When implemented on Xilinx Artix-7 FPGA
-  - Frequency: 150MHz
-  - LUTs: ~~2000~~ 2422
-  - FFs: ~~2000~~ 869 + 1024 for GPRs.
-- 5 Stage pipeline
-  - Fetch
-  - Decode
-  - Operand Gather
-  - Execute
-  - Writeback
-- Slow multiply / divide

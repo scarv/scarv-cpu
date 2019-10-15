@@ -18,7 +18,6 @@ instruction set extensions.*
   - [RISC-V Compliance](#RISC-V-Compliance-Flow)
   - [Unit Tests](#Unit-Tests-Flow)
   - [RISC-V Formal](#RISC-V-Formal-Verfication-Flow)
-- [Notes & Queries](#Notes-and-Queries)
 
 ## Overview
 
@@ -28,111 +27,70 @@ and **M**ultiply extensions.
 It's a micro-controller, with no cache, branch prediction or
 virtual memory.
 
+![Pipeline Diagram](docs/scarv-cpu-uarch.png)
+
 ## Documentation
 
 See the `docs/` folder for information on the design requirements and
 the pipeline structure.
 
-## Getting Started
+- [Design Requirements](docs/requirements.md)
+- [Functional Verification](docs/verification.md)
+- Implementation Documentation:
+  - [Instruction Table](docs/instr-table.md)
+  - [Pipeline Structure](docs/pipeline.md)
+  - [Leakage Fence Instruction Implementation](docs/leakage-fence.md)
+  - [Random Number Generator Interface](docs/rng-interface.md)
 
-You will need the following tools installed to use all parts of the
-design flow:
-- [Verilator](https://www.veripool.org/projects/verilator/)
-- [Yosys](http://www.clifford.at/yosys/)
-- [SymbiYosys](https://symbiyosys.readthedocs.io/en/latest/index.html)
-- [A RISC-V Toolchain](https://github.com/riscv/riscv-gnu-toolchain)
+## Quickstart
 
-These commands will checkout the repository and it's submodules, and
-setup the project environment:
+- Install the following tools installed to use all parts of the
+  design flow:
 
-```sh
-git clone git@github.com:scarv-cpu/scarv-cpu.git
-cd mediocre-riscv/
-git submodule update --init --remote
-source bin/conf.sh
-```
+  - [Verilator](https://www.veripool.org/projects/verilator/)
 
-## Flows
+  - [Yosys](http://www.clifford.at/yosys/)
 
-There are several simulation and verification flows within the repository.
+  - [SymbiYosys](https://symbiyosys.readthedocs.io/en/latest/index.html)
 
-### RISC-V Compliance Flow
+  - [A Toolchain](https://github.com/scarv/riscv-gnu-toolchain) which
+    supports the
+    [XCrypto](https://github.com/scarv/xcrypto)
+    instruction set extension.
 
-Runs the relevent 
-[RISC-V compliance suite](https://github.com/riscv/riscv-compliance)
-tests for the core.
+- Checkout the repository and required submodules.
 
-**Building the tests:**
+    ```sh
+    $> git clone git@github.com:scarv-cpu/scarv-cpu.git
+    $> cd scarv-cpu/
+    $> git submodule update --init --remote
+    ```
 
-```sh
-make riscv-compliance-build
-```
+- Setup tool environment variables.
 
-This will compile all of the relevent `RV32IMC` tests for the core, create
-simulation memory images (srec format) for them, and collect things
-like objdump and signature files for debugging.
+    ```sh
+    $> export YOSYS_ROOT=<path to yosys installation>
+    $> export RISCV=<path to toolchain installation>
+    ```
 
-**Running the tests:**
+- Configure the project environment.
 
-```sh
-make riscv-compliance-run
-```
+    ```sh
+    $> source bin/conf.sh
+    ```
 
-This will run all of the compliance tests for the core.
-Results from the run, including waveforms and output signatures are
-placed in `work/riscv-compliance/*`.
+- Run the basic RISC-V compliance tests:
 
-Currently, all tests pass except for the misaligned load/store test and
-the misaligned jump test.
-- Misaligned load/store fails because the core itself does not support
-  this feature. This is valid behaviour for a RISC-V core, but the
-  compliance suite test (at the time of writing) does not support it.
-- The misaligned jump test fails because of how it depends on the `C`
-  extension, which cannot be turned off in this core.
+    ```sh
+    $> make riscv-compliance-build
+    $> make riscv-compliance-run
+    ```
 
-### Unit Tests Flow
+- Run the standard Yosys Synthesis flow:
 
-These are simple directed tests which provide basic checks for
-functionality not otherwise hit by the compliance suite.
-
-Sources for the tests are found in `verif/unit/`
-
-**Building:**
-```sh
-make unit-tests-build
-```
-
-**Running:**
-```sh
-make unit-tests-run
-```
-
-Results from the tests are placed in `work/unit/<test name>`.
-
-### RISC-V Formal Verification Flow
-
-The [riscv-formal](https://github.com/SymbioticEDA/riscv-formal/) framework
-is used as the primary means of verifying correct instruction behaviour.
-
-**Building:**
-```sh
-make riscv-formal-clean riscv-formal-prepare
-```
-
-**Running:**
-```sh
-make riscv-formal-run
-```
-
-This will run all checks against the core, running `NJOBS` in parallel.
-One can control which checks are run, and how wide using the `NJOBS` and
-`CHECKS` variables:
-
-```sh
-make riscv-formal-run NJOBS=2 CHECKS=insn_add_ch0\ insn_sw_ch0
-```
-
-Results are put in `work/riscv-formal/<check name>`
+    ```sh
+    $> make synthesise
+    ```
 
 ---
 

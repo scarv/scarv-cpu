@@ -29,6 +29,8 @@
   - Writeback: Commits results to architectural state, sends control
     flow changes to the fetch stage, interracts with CSR registers.
 
+![Pipeline Diagram](scarv-cpu-uarch.png)
+
 ## Signal Naming
 
 Signals originating in a stage are prefixed depending on the stage,
