@@ -810,7 +810,7 @@ wire[1:0]  n_lf_count = lf_count + 1;
 
 wire         leak_stall     = leak_fence    && 
                               lf_count < 3  &&
-                              XC_CLASS_LEAK_BUBBLE;;
+                              XC_CLASS_LEAK_BUBBLE;
 wire         lf_count_ld    = leak_fence && !p_s2_busy && XC_CLASS_LEAK_BUBBLE;
 
 always @(posedge g_clk) begin
