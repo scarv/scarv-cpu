@@ -23,7 +23,7 @@ assume property (reset == $initstate);
 reg [7:0] cycle_reg = 0;
 
 always @(posedge clock) begin
-	cycle_reg <= reset ? 1 : cycle_reg + (cycle_reg != 255);
+    cycle_reg <= reset ? 1 : cycle_reg + (cycle_reg != 255);
 end
 
 wire    check = cycle_reg == XCFI_CHECK_CYCLE;
