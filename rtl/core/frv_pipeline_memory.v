@@ -174,8 +174,14 @@ wire[4:0] n_s4_rd     =     s3_trap  ? s3_rd         :
 // Next pipestage value progression.
 // -------------------------------------------------------------------------
 
-wire        imul_gpr_wide   = imul_madd || imul_msub || imul_madd || imul_mmul;
-wire         bitw_gpr_wide    = bitw_mror;
+wire        imul_gpr_wide   = fu_mul && (
+    s3_uop == MUL_MADD ||
+    s3_uop == MUL_MSUB ||
+    s3_uop == MUL_MACC ||
+    s3_uop == MUL_MMUL
+);
+
+wire        bitw_gpr_wide   = fu_bit && (s3_uop == BIT_RORW);
 
 wire opra_ld_en = p_valid && (
     fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_asi || fu_bit ||
@@ -198,20 +204,11 @@ wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 // Forwaring / bubbling signals.
 // -------------------------------------------------------------------------
 
-wire        imul_madd       = s3_uop == MUL_MADD        ;
-wire        imul_msub       = s3_uop == MUL_MSUB        ;
-wire        imul_macc       = s3_uop == MUL_MACC        ;
-wire        imul_mmul       = s3_uop == MUL_MMUL        ;
-
-wire        bitw_mror       = s3_uop == BIT_RORW        ;
-
 assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
 assign fwd_s3_wdata = s3_opr_a          ;
 assign fwd_s3_wdata_hi = s3_opr_b       ;
-assign fwd_s3_wide  = fu_mul && (
-        imul_madd || imul_msub || imul_madd || imul_mmul
-    ) ||
-    fu_bit && (bitw_mror);
+assign fwd_s3_wide  = imul_gpr_wide ||
+                      bitw_gpr_wide ;
 assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
 

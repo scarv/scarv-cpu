@@ -209,7 +209,7 @@ wire        imul_result_hi  = imul_mulhu || imul_mulhsu ||
 wire [31:0] imul_result     = imul_result_hi ? imul_result_wide[63:32]  :
                                                imul_result_wide[31: 0]  ;
 
-wire        imul_gpr_wide   = imul_madd || imul_msub || imul_madd || imul_mmul;
+wire        imul_gpr_wide   = imul_madd || imul_msub || imul_macc || imul_mmul;
 
 wire [XL:0] n_s3_opr_a_mul  = imul_clmul_r ? {1'b0,imul_result_wide[63:33]} :
                                              imul_result                    ;
