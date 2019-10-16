@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Wed Oct 16 08:16:22 2019
+[*] Wed Oct 16 09:18:45 2019
 [*]
-[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/xcfi/xc_aesmix_enc_cov/engine_0/trace1.vcd"
-[dumpfile_mtime] "Tue Oct 15 16:33:41 2019"
-[dumpfile_size] 1046216
+[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/xcfi/reg_check_bmc/engine_0/trace.vcd"
+[dumpfile_mtime] "Wed Oct 16 09:16:37 2019"
+[dumpfile_size] 1272243
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/xcfi-formal.gtkw"
-[timestart] 0
+[timestart] 85
 [size] 1920 1025
 [pos] -1 -1
-*-5.636464 37 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.242094 180 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] xcfi_testbench.
 [treeopen] xcfi_testbench.i_insn_checker.
 [treeopen] xcfi_testbench.i_insn_checker.i_insn_spec.
@@ -19,7 +19,7 @@
 [treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.
 [treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.
 [sst_width] 338
-[signals_width] 357
+[signals_width] 305
 [sst_expanded] 1
 [sst_vpaned_height] 312
 @420
@@ -68,12 +68,44 @@ xcfi_testbench.i_insn_checker.spec_trap
 xcfi_testbench.i_insn_checker.spec_valid
 @200
 -
+@28
+xcfi_testbench.i_insn_checker.i_insn_spec.reg_write_en
+@22
+xcfi_testbench.i_insn_checker.i_insn_spec.reg_write_value[31:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rd_wdata[31:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rd_wdatahi[31:0]
+@28
+xcfi_testbench.i_insn_checker.i_insn_spec.reg_write_wide
+@24
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rd_addr[4:0]
+@200
+-
+@24
+xcfi_testbench.i_insn_checker.i_insn_spec.reg_num[4:0]
+@22
+xcfi_testbench.i_insn_checker.i_insn_spec.reg_value[31:0]
+@28
+xcfi_testbench.i_insn_checker.i_insn_spec.reg_written
+@200
+-
+@24
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs1_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs1_rdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs2_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs2_rdata[31:0]
+@24
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs3_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs3_rdata[31:0]
+@800200
+-Writeback
 @24
 xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs1_addr[4:0]
 xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs2_addr[4:0]
 @22
-xcfi_testbench.i_insn_checker.i_insn_spec.i_xc_aesmix_checker.rs1[31:0]
-xcfi_testbench.i_insn_checker.i_insn_spec.i_xc_aesmix_checker.rs2[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_rs1[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_rs2[31:0]
 @200
@@ -94,17 +126,9 @@ xcfi_testbench.i_insn_checker.spec_rd_wdata[31:0]
 xcfi_testbench.i_insn_checker.spec_rd_wdatahi[31:0]
 @28
 xcfi_testbench.i_insn_checker.spec_rd_wide
-@200
--
-@28
-xcfi_testbench.i_insn_checker.rvfi_rd_wide
-xcfi_testbench.i_insn_checker.spec_rd_wide
-@22
-xcfi_testbench.i_insn_checker.rd_wdatahi[31:0]
-xcfi_testbench.i_insn_checker.spec_rd_wdatahi[31:0]
-@200
--
-@800200
+@1000200
+-Writeback
+@c00200
 -ASI
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_valid
@@ -141,10 +165,8 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_aes
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_aessub[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha2[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha3[31:0]
-@1000200
+@1401200
 -ASI
-@200
--
 @22
 xcfi_testbench.i_insn_checker.rvfi_insn[31:0]
 @24
@@ -191,8 +213,10 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.trs_instr[31:0]
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_rd[4:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wdata_hi[31:0]
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wen
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wide
 @200
 -
 @c00200
@@ -352,7 +376,7 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha
 @1401200
 -group_end
 -ASI
-@800200
+@c00200
 -BITW
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_bop
@@ -374,7 +398,7 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs2[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs3[31:0]
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_valid
-@1000200
+@1401200
 -BITW
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.n_s3_rd[4:0]
@@ -456,5 +480,154 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_ror
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s1_decode.dec_b_rori
 @1401200
 -Bitmanip Decode
+@28
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_add
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_addi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_and
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_andi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_auipc
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_bdep
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_bext
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_clmul
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_clmulh
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_clmulr
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_cmov
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_fsl
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_fsr
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_fsri
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_grev
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_grevi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_ror
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_b_rori
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_beq
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_bge
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_bgeu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_blt
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_bltu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_bne
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_add
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_addi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_addi4spn
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_addi16sp
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_and
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_andi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_beqz
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_bnez
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_ebreak
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_j
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_jal
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_jalr
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_jr
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_li
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_lui
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_lw
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_lwsp
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_mv
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_nop
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_or
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_slli
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_srai
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_srli
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_sub
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_sw
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_swsp
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_c_xor
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_csrrc
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_csrrci
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_csrrs
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_csrrsi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_csrrw
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_csrrwi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_div
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_divu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_ebreak
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_ecall
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_fence
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_fence_i
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_jal
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_jalr
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_lb
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_lbu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_lh
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_lhu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_lui
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_lw
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_mret
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_mul
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_mulh
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_mulhsu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_mulhu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_or
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_ori
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_rem
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_remu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sb
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sh
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sll
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_slli
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_slt
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_slti
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sltiu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sltu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sra
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_srai
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_srl
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_srli
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sub
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_sw
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_wfi
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_aesmix_dec
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_aesmix_enc
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_aessub_dec
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_aessub_decrot
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_aessub_enc
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_aessub_encrot
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_bop
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_gather_b
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_gather_h
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_ldr_b
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_ldr_bu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_ldr_h
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_ldr_hu
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_ldr_w
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_lkgconf
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_lkgfence
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_lut
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_macc_1
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_madd_3
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_mmul_3
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_mror
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_msub_3
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_padd
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_pclmul_h
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_pclmul_l
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_pmul_h
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_pmul_l
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_pror
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_pror_i
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_psll
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_psll_i
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_psrl
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_psrl_i
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_psub
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_rngsamp
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_rngseed
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_rngtest
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_scatter_b
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_scatter_h
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha3_x1
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha3_x2
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha3_x4
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha3_xy
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha3_yx
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha256_s0
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha256_s1
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha256_s2
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_sha256_s3
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_str_b
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_str_h
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xc_str_w
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xor
+xcfi_testbench.i_insn_checker.i_insn_spec.dec_xori
 [pattern_trace] 1
 [pattern_trace] 0
