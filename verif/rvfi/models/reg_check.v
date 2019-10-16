@@ -21,10 +21,11 @@ reg         reg_written ;
 reg  [XL:0] reg_value   ;
 
 wire        reg_write_wide  = rvfi_rd_addr[4:1] == reg_num[4:1] &&
-                              reg_num[0]                        &&
+                              rvfi_rd_addr[0] == 1'b0           &&
+                              reg_num[0] == 1'b1                &&
                               rvfi_rd_wide                      ;
 
-wire        reg_write_en    = rvfi_valid && (
+wire        reg_write_en    = rvfi_valid && !rvfi_trap && (
     rvfi_rd_addr == reg_num || reg_write_wide
 );
 
