@@ -1,24 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu Aug 29 12:01:45 2019
+[*] Wed Oct 16 08:16:22 2019
 [*]
-[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/xcfi/cmov_bmc/engine_0/trace.vcd"
-[dumpfile_mtime] "Thu Aug 29 11:59:56 2019"
-[dumpfile_size] 1085329
+[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/xcfi/xc_aesmix_enc_cov/engine_0/trace1.vcd"
+[dumpfile_mtime] "Tue Oct 15 16:33:41 2019"
+[dumpfile_size] 1046216
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/xcfi-formal.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-5.363748 150 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.636464 37 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] xcfi_testbench.
 [treeopen] xcfi_testbench.i_insn_checker.
+[treeopen] xcfi_testbench.i_insn_checker.i_insn_spec.
 [treeopen] xcfi_testbench.i_wrapper.
 [treeopen] xcfi_testbench.i_wrapper.i_dut.
 [treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.
-[sst_width] 268
+[treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.
+[treeopen] xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.
+[sst_width] 338
 [signals_width] 357
 [sst_expanded] 1
-[sst_vpaned_height] 302
+[sst_vpaned_height] 312
 @420
 smt_step
 @28
@@ -65,12 +68,81 @@ xcfi_testbench.i_insn_checker.spec_trap
 xcfi_testbench.i_insn_checker.spec_valid
 @200
 -
+@24
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs1_addr[4:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.rvfi_rs2_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.i_insn_spec.i_xc_aesmix_checker.rs1[31:0]
+xcfi_testbench.i_insn_checker.i_insn_spec.i_xc_aesmix_checker.rs2[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_rs1[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_rs2[31:0]
+@200
+-
+@24
+xcfi_testbench.i_insn_checker.rd_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.rd_wdata[31:0]
+xcfi_testbench.i_insn_checker.rd_wdatahi[31:0]
+@28
+xcfi_testbench.i_insn_checker.rd_wide
+@200
+-
+@24
+xcfi_testbench.i_insn_checker.spec_rd_addr[4:0]
+@22
+xcfi_testbench.i_insn_checker.spec_rd_wdata[31:0]
+xcfi_testbench.i_insn_checker.spec_rd_wdatahi[31:0]
+@28
+xcfi_testbench.i_insn_checker.spec_rd_wide
+@200
+-
 @28
 xcfi_testbench.i_insn_checker.rvfi_rd_wide
 xcfi_testbench.i_insn_checker.spec_rd_wide
 @22
 xcfi_testbench.i_insn_checker.rd_wdatahi[31:0]
 xcfi_testbench.i_insn_checker.spec_rd_wdatahi[31:0]
+@200
+-
+@800200
+-ASI
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_valid
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_ready
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_result[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.insn_aes
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.insn_aes_mix
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_mix_enc
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_mix_ready
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_mix_rs1[15:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_mix_rs2[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_sub_enc
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_sub_ready
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_sub_rot
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_sub_rs1[23:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_sub_rs2[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_flush_aesmix
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_flush_aessub
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_flush_data[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_rs1[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_rs2[31:0]
+@28
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_shamt[1:0]
+@22
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_uop[4:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_aesmix[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_aessub[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha2[31:0]
+xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha3[31:0]
+@1000200
+-ASI
 @200
 -
 @22
@@ -205,7 +277,6 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s3_memory.lsu_word
 @28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_mix_ready
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.aes_sub_ready
-xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_flush
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_ready
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.asi_result[31:0]
@@ -281,13 +352,13 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_asi.result_sha
 @1401200
 -group_end
 -ASI
-@800201
+@800200
 -BITW
-@29
+@28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_bop
-@23
+@22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_bop_lut[7:0]
-@29
+@28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_cmov
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_flush
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_fsl
@@ -296,14 +367,14 @@ xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_gpr_wide
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_lut
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_mror
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_ready
-@23
+@22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_result_wide[63:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs1[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs2[31:0]
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_rs3[31:0]
-@29
+@28
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.bitw_valid
-@1000201
+@1000200
 -BITW
 @22
 xcfi_testbench.i_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.n_s3_rd[4:0]

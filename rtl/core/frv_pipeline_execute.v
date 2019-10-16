@@ -292,6 +292,18 @@ wire        asi_valid  = fu_asi;
 wire        asi_ready  ;
 wire [XL:0] asi_result ;
 
+reg         asi_done   ;
+
+wire        asi_finished = (asi_valid && asi_ready) || asi_done;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        asi_done <= 1'b0;
+    end else begin
+        asi_done <= (asi_done || (asi_valid && asi_ready)) && !pipe_progress;
+    end
+end
+
 wire        asi_flush_aessub = leak_fence && leak_lkgcfg[LEAK_CFG_FU_AESSUB];
 wire        asi_flush_aesmix = leak_fence && leak_lkgcfg[LEAK_CFG_FU_AESMIX];
 wire [31:0] asi_flush_data   = leak_prng;
@@ -354,6 +366,7 @@ wire   p_valid   = s2_valid && !s2_busy;
 
 // Is this stage currently busy?
 assign s2_busy = p_busy                    ||
+                 asi_valid  && !asi_finished||
                  lsu_valid  && !lsu_ready  ||
                  rng_valid  && !rng_ready  ||
                  imul_valid && !imul_ready ||
