@@ -5,8 +5,6 @@
 // Responsible for checking that all register reads/writes are
 // consistent, including double width writebacks and RS3 reads.
 //
-// WIP
-//
 module xcfi_insn_spec (
 
     `XCFI_TRACE_INPUTS,

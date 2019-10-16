@@ -72,6 +72,11 @@ wire mem_access_fault = 1'b0;
 
 reg integer i;
 
+// Turn off checking of instructions for some checks which
+// dont use the isntruction interface. Controlled by the
+// Makefile flow for XCFI.
+`ifdef XCFI_CHECK_INSTRS
+
 always @* begin
     if (!reset) begin
         cover(spec_valid);
@@ -134,6 +139,8 @@ always @* begin
         end
     end
 end
+
+`endif
 
 xcfi_insn_spec i_insn_spec(
     .clock(clock),

@@ -14,39 +14,78 @@ XCFI_COMMON     = $(XCFI_SRC_DIR)/fi_fairness.sv \
 
 
 XCFI_MODELS     = $(notdir $(basename $(shell find $(XCFI_SRC_DIR)/models -name '*.v')))
+XCFI_INSNS      = $(filter insn_%,$(XCFI_MODELS))
+XCFI_PROPS      = $(filter-out insn_%,$(XCFI_MODELS))
 
-XCFI_SBY_TGTS   = $(addsuffix _bmc.sby,$(addprefix $(XCFI_WORK)/,$(XCFI_MODELS))) \
-                  $(addsuffix _cov.sby,$(addprefix $(XCFI_WORK)/,$(XCFI_MODELS)))
+XCFI_INSN_DEFS  = -DXCFI_CHECK_INSTRS=1
+XCFI_PROP_DEFS  = 
 
-XCFI_SBY_LOGS   = $(addsuffix _bmc/logfile.txt,$(addprefix $(XCFI_WORK)/,$(XCFI_MODELS))) \
-                  $(addsuffix _cov/logfile.txt,$(addprefix $(XCFI_WORK)/,$(XCFI_MODELS)))
+XCFI_SBY_TGTS   = 
 
+XCFI_SBY_LOGS   = 
 
 XCFI_SBY_BMC_SRC= $(FRV_HOME)/flow/xcfi-formal/bmc.sby.template
 XCFI_SBY_COV_SRC= $(FRV_HOME)/flow/xcfi-formal/cov.sby.template
 
-$(XCFI_WORK)/%_bmc.sby : $(XCFI_SRC_DIR)/models/%.v $(XCFI_COMMON)
-	@mkdir -p $(dir $@)
-	@cp $(XCFI_SBY_BMC_SRC) $@
-	@echo "read_verilog -sv $^" >> $@
-	@echo "read_verilog -DRVFI -sv $(CPU_RTL_SRCS)" >> $@
-	@echo "prep -flatten -nordff -top xcfi_testbench" >> $@
-	@echo "chformal -early" >> $@
+define map_sby_cov
+    $(addsuffix _cov.sby,$(addprefix $(XCFI_WORK)/,${1}))
+endef
 
-$(XCFI_WORK)/%_cov.sby : $(XCFI_SRC_DIR)/models/%.v $(XCFI_COMMON)
-	@mkdir -p $(dir $@)
-	@cp $(XCFI_SBY_COV_SRC) $@
-	@echo "read_verilog -sv $^" >> $@
-	@echo "read_verilog -DRVFI -sv $(CPU_RTL_SRCS)" >> $@
-	@echo "prep -flatten -nordff -top xcfi_testbench" >> $@
-	@echo "chformal -early" >> $@
+define map_sby_bmc
+    $(addsuffix _bmc.sby,$(addprefix $(XCFI_WORK)/,${1}))
+endef
 
-$(XCFI_WORK)/%_bmc/logfile.txt : $(XCFI_WORK)/%_cov/logfile.txt
-$(XCFI_WORK)/%_bmc/logfile.txt : $(XCFI_WORK)/%_bmc.sby
-	sby -f $<
+define map_log_cov
+    $(addsuffix _cov/logfile.txt,$(addprefix $(XCFI_WORK)/,${1}))
+endef
 
-$(XCFI_WORK)/%_cov/logfile.txt : $(XCFI_WORK)/%_cov.sby
-	sby -f $<
+define map_log_bmc
+    $(addsuffix _bmc/logfile.txt,$(addprefix $(XCFI_WORK)/,${1}))
+endef
+
+#
+# 1 - Name of the proof.
+# 2 - Extra defines for the target.
+#
+define add_xcfi_target
+
+$(call map_sby_bmc,${1}) : $(XCFI_SRC_DIR)/models/${1}.v $(XCFI_COMMON)
+	@mkdir -p $(dir $${@})
+	@cp $(XCFI_SBY_BMC_SRC) $${@}
+	@echo "read_verilog  ${2} -sv $${^}" >> $${@}
+	@echo "read_verilog -DRVFI -sv $(CPU_RTL_SRCS)" >> $${@}
+	@echo "prep -flatten -nordff -top xcfi_testbench" >> $${@}
+	@echo "chformal -early" >> $${@}
+
+
+$(call map_sby_cov,${1}): $(XCFI_SRC_DIR)/models/${1}.v $(XCFI_COMMON)
+	@mkdir -p $(dir $${@})
+	@cp $(XCFI_SBY_COV_SRC) $${@}
+	@echo "read_verilog ${2} -sv $${^}" >> $${@}
+	@echo "read_verilog -DRVFI -sv $(CPU_RTL_SRCS)" >> $${@}
+	@echo "prep -flatten -nordff -top xcfi_testbench" >> $${@}
+	@echo "chformal -early" >> $${@}
+
+$(call map_log_bmc,${1}) : $(call map_sby_bmc,${1}) $(call map_log_cov,${1})
+	sby -f $${<}
+
+$(call map_log_cov,${1}) : $(call map_sby_cov,${1})
+	sby -f $${<}
+
+XCFI_SBY_TGTS += $(call map_sby_cov,${1}) $(call map_sby_bmc,${1})
+XCFI_SBY_LOGS += $(call map_log_cov,${1}) $(call map_log_bmc,${1})
+
+endef
+
+#
+# Add all instruction checks.
+$(foreach PROOF,$(XCFI_INSNS),\
+    $(eval $(call add_xcfi_target,${PROOF},$(XCFI_INSN_DEFS))))
+
+#
+# Add generic consistency checks.
+$(foreach PROOF,$(XCFI_PROPS),\
+    $(eval $(call add_xcfi_target,${PROOF},$(XCFI_PROP_DEFS))))
 
 xcfi-prepare: $(XCFI_SBY_TGTS)
 
