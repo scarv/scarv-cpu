@@ -49,12 +49,6 @@ always @(posedge clock) begin
         if(rvfi_rs1_addr == reg_num) begin
             assert(rvfi_rs1_rdata == reg_value);
         end
-        if(rvfi_rs2_addr == reg_num) begin
-            assert(rvfi_rs2_rdata == reg_value);
-        end
-        if(rvfi_rs3_addr == reg_num) begin
-            assert(rvfi_rs3_rdata == reg_value);
-        end
     end
 end
 
