@@ -62,7 +62,7 @@ wire f_2byte;   // Buffer should store 2 bytes of input.
 
 wire       buf_16;
 wire       buf_32;
-wire [1:0] buf_depth; // Current buffer depth.
+wire [2:0] buf_depth; // Current buffer depth.
 
 wire buf_out_2 ; // Buffer has entire valid 2 byte instruction.
 wire buf_out_4 ; // Buffer has entire valid 4 byte instruction.
@@ -103,8 +103,8 @@ wire incomplete_instr = buf_32 && buf_depth == 1;
 // Don't start a memory fetch request if there are already a bunch of
 // outstanding, unrecieved responses.
 wire        n_imem_req  =
-    ((f_ready || cf_change) && reqs_outstanding<=FRV_MAX_REQS_OUTSTANDING &&
-     (buf_depth <= 2 || incomplete_instr)) ||
+    ((f_ready || cf_change) && n_reqs_outstanding<=FRV_MAX_REQS_OUTSTANDING ||
+    incomplete_instr) ||
     (imem_req && !imem_gnt);
 
 //
