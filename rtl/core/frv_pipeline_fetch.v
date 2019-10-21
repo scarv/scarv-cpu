@@ -105,10 +105,12 @@ wire incomplete_instr = buf_32 && buf_depth == 1;
 
 // Don't start a memory fetch request if there are already a bunch of
 // outstanding, unrecieved responses.
-wire allow_new_mem_req  =   reqs_outstanding <  FRV_MAX_REQS_OUTSTANDING ;
+wire allow_new_mem_req  =   reqs_outstanding <  FRV_MAX_REQS_OUTSTANDING ||
+                          n_reqs_outstanding == 0                        ;
+wire new_mem_req        = f_ready || cf_change;
 
 wire        n_imem_req  =
-    ((f_ready || cf_change) && allow_new_mem_req || incomplete_instr) ||
+    (new_mem_req && allow_new_mem_req || incomplete_instr) ||
     (imem_req && !imem_gnt);
 
 //

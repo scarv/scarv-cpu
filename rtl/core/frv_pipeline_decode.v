@@ -487,13 +487,22 @@ wire [4:0] dec_rd_16 =
     {5{dec_c_sub     }} & {2'b01, s1_data[9:7]} |
     {5{dec_c_xor     }} & {2'b01, s1_data[9:7]} ;
 
+wire   no_rs1      = !(opra_src_rs1);
+wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
+wire   no_rs3      = !(oprc_src_rs3);
 
-assign s1_rs1_addr = instr_16bit ? dec_rs1_16 : dec_rs1_32;
-assign s1_rs2_addr = instr_16bit ? dec_rs2_16 : dec_rs2_32;
+assign s1_rs1_addr =  no_rs1       ? 5'b0       :
+                      instr_16bit  ? dec_rs1_16 :
+                                     dec_rs1_32 ;
+assign s1_rs2_addr =  no_rs2       ? 5'b0       :
+                      instr_16bit  ? dec_rs2_16 :
+                                     dec_rs2_32 ;
 
 wire   rd_as_rs3   = dec_xc_bop;
 
-assign s1_rs3_addr = rd_as_rs3 ? dec_rd_32 :    dec_rs3_32;
+assign s1_rs3_addr = no_rs3        ? 5'b0       :
+                     rd_as_rs3     ? dec_rd_32  :
+                                     dec_rs3_32 ;
 
 wire lsu_no_rd = uop_lsu[LSU_STORE] && n_s2_fu[P_FU_LSU];
 wire cfu_no_rd = (uop_cfu!=CFU_JALI && uop_cfu!=CFU_JALR) &&

@@ -365,11 +365,15 @@ wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 // - There is a data hazard due to a CSR read or a data load.
 // - There is a leakage fence in decode and subsequent stages still have
 //   an instruction in them.
+wire   s1_bubble_no_instr = !s1_valid && !s2_busy ;
+wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4));
+wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3));
+wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2));
 wire   s1_bubble   =
-    !s1_valid && !s2_busy                                                   ||
-    (fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4))) ||
-    (fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3))) ||
-    (fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2)))  ;
+     s1_bubble_no_instr     ||
+     s1_bubble_from_s4      ||
+     s1_bubble_from_s3      ||
+     s1_bubble_from_s2      ;
 
 
 wire [XL:0] fwd_rs1_rdata =
