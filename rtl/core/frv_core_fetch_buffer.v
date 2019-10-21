@@ -79,7 +79,8 @@ wire [ 2:0] insert_at  = bdepth - bdepth_sub;
 assign      n_bdepth   = bdepth + bdepth_add - bdepth_sub;
 
 wire [31:0] n_buffer_d      = f_2byte ? {16'b0, f_in[31:16]} :
-                                                f_in         ;
+                              f_4byte ?         f_in         :
+                                                32'b0        ;
 
 wire [63:0] n_buffer_or_in  = {32'b0,n_buffer_d} << (16*insert_at );
 wire [63:0] n_buffer_shf_out= buffer             >> (16*bdepth_sub);
