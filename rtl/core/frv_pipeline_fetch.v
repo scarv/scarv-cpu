@@ -37,7 +37,7 @@ output wire         s1_error
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
 // Maximum outstanding memory requests
-parameter FRV_MAX_REQS_OUTSTANDING = 0;
+parameter FRV_MAX_REQS_OUTSTANDING = 1;
 
 // Common core parameters and constants
 `include "frv_common.vh"
@@ -87,9 +87,12 @@ wire        drop_response   = |ignore_rsps;
 // recieved a response. This counter is updated whether or not the
 // response is dropped or not.
 reg  [2:0]   reqs_outstanding;
-wire [2:0] n_reqs_outstanding = reqs_outstanding +
-                                {2'b0,(imem_req && imem_gnt)} -
-                                {2'b0,rsp_recv};
+wire [2:0]   reqs_outstanding_add = {2'b0,(imem_req && imem_gnt)};
+wire [2:0]   reqs_outstanding_sub = {2'b0,(rsp_recv            )};
+
+wire [2:0] n_reqs_outstanding = reqs_outstanding     +
+                                reqs_outstanding_add -
+                                reqs_outstanding_sub ;
 
 wire cf_change          = cf_req && cf_ack;
 
@@ -102,9 +105,10 @@ wire incomplete_instr = buf_32 && buf_depth == 1;
 
 // Don't start a memory fetch request if there are already a bunch of
 // outstanding, unrecieved responses.
+wire allow_new_mem_req  =   reqs_outstanding <  FRV_MAX_REQS_OUTSTANDING ;
+
 wire        n_imem_req  =
-    ((f_ready || cf_change) && n_reqs_outstanding<=FRV_MAX_REQS_OUTSTANDING ||
-    incomplete_instr) ||
+    ((f_ready || cf_change) && allow_new_mem_req || incomplete_instr) ||
     (imem_req && !imem_gnt);
 
 //
