@@ -783,7 +783,7 @@ assign n_s2_trap         = s1_valid && (s1_error || invalid_instr);
 // -------------------------------------------------------------------------
 
 wire [31:0] csr_addr = {20'b0, n_s2_imm[31:20]};
-wire [31:0] csr_imm  = {27'b0, s1_rs1_addr    };
+wire [31:0] csr_imm  = {27'b0, dec_rs1_32     };
 
 //
 // PC computation
