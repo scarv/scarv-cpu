@@ -87,10 +87,14 @@ wire [63:0] n_buffer_shf_out= buffer             >> (16*bdepth_sub);
 
 assign      n_buffer        = n_buffer_or_in | n_buffer_shf_out;
 
-wire [ 3:0] n_err_or_in     = {2'b0, {2{f_err}}} << insert_at;
-wire [ 3:0] n_err_shf_out   = buffer_err         >> insert_at;
+wire        n_err_in        = f_err && (f_2byte || f_4byte);
+wire [ 3:0] n_err_or_in     = {2'b0, {2{n_err_in}}} << insert_at;
+wire [ 3:0] n_err_shf_out   = buffer_err            >> insert_at;
 
 assign      n_buffer_err    = n_err_or_in    | n_err_shf_out;
+
+wire        update_buffer   = f_4byte || f_2byte || buf_ready;
+
 
 //
 // Register updates.
@@ -99,7 +103,7 @@ always @(posedge g_clk) begin
         buffer      <= 64'b0;
         buffer_err  <=  4'b0;
         bdepth      <=  3'd0;
-    end else begin
+    end else if(update_buffer) begin
         buffer      <= n_buffer    ;
         buffer_err  <= n_buffer_err;
         bdepth      <= n_bdepth    ;
