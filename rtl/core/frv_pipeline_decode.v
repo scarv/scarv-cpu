@@ -510,8 +510,8 @@ wire cfu_no_rd = (uop_cfu!=CFU_JALI && uop_cfu!=CFU_JALR) &&
 
 // Destination register address carries trap cause if need be.
 assign n_s2_rd    = 
-                 lsu_no_rd || cfu_no_rd ? 0  :
                     n_s2_trap           ? trap_cause[4:0]   :
+                 lsu_no_rd || cfu_no_rd ? 0  :
                  {5{instr_16bit && |n_s2_fu}} & dec_rd_16 | 
                  {5{instr_32bit && |n_s2_fu}} & dec_rd_32 ;
 
@@ -772,8 +772,8 @@ assign n_s2_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
 // -------------------------------------------------------------------------
 
 wire [5:0] trap_cause =
+    s1_error        ? TRAP_IACCESS  :
     invalid_instr   ? TRAP_IOPCODE  :
-    s1_error         ? TRAP_IACCESS  :
                       0             ;
 
 assign n_s2_trap         = s1_valid && (s1_error || invalid_instr);

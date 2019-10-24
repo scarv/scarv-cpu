@@ -492,7 +492,7 @@ assign trap_cause = // Cause of the trap.
     cfu_ebreak                  ? TRAP_BREAKPT  :
     cfu_ecall                   ?   TRAP_ECALLM :
     trap_int                    ? int_trap_cause:
-                                  s4_opr_a[5:0] ;
+                                  {1'b0,s4_rd}  ;
 
 // TODO: Make this useful.
 assign trap_mtval = 32'b0   ; // Value associated with the trap.
