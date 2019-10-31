@@ -191,6 +191,7 @@ localparam TRAP_ECALLM  = 6'd11;
 localparam TRAP_INT_MSI = 6'd3 ;
 localparam TRAP_INT_MTI = 6'd7 ;
 localparam TRAP_INT_MEI = 6'd11;
+localparam TRAP_INT_NMI = 6'd16;
 
 //
 // Formal verification macros

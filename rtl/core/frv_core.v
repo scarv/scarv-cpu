@@ -60,7 +60,9 @@ input  wire [ 2:0]  rng_rsp_status  , // RNG status
 input  wire [31:0]  rng_rsp_data    , // RNG response / sample data.
 output wire         rng_rsp_ready   , // CPU accepts response.
 
+input  wire         int_nmi         , // Non-maskable interrupt.
 input  wire         int_external    , // External interrupt trigger line.
+input  wire [ 3:0]  int_extern_cause, // External interrupt cause code.
 input  wire         int_software    , // Software interrupt trigger line.
 
 output wire         imem_req        , // Start memory request
@@ -301,21 +303,23 @@ frv_pipeline #(
 //  Handles internal and external interrupts.
 //
 frv_interrupt i_interrupts (
-.g_clk         (g_clk         ), //
-.g_resetn      (g_resetn      ), //
-.mstatus_mie   (mstatus_mie   ), // Global interrupt enable.
-.mie_meie      (mie_meie      ), // External interrupt enable.
-.mie_mtie      (mie_mtie      ), // Timer interrupt enable.
-.mie_msie      (mie_msie      ), // Software interrupt enable.
-.ex_pending    (int_external  ), // External interrupt pending?
-.ti_pending    (ti_pending    ), // From mrv_counters is mtime pending?
-.sw_pending    (int_software  ), // Software interrupt pending?
-.mip_meip      (mip_meip      ), // External interrupt pending
-.mip_mtip      (mip_mtip      ), // Timer interrupt pending
-.mip_msip      (mip_msip      ), // Software interrupt pending
-.int_trap_req  (int_trap_req  ), // Request WB stage trap an interrupt
-.int_trap_cause(int_trap_cause), // Cause of interrupt
-.int_trap_ack  (int_trap_ack  )  // WB stage acknowledges the taken trap.
+.g_clk         (g_clk           ), //
+.g_resetn      (g_resetn        ), //
+.mstatus_mie   (mstatus_mie     ), // Global interrupt enable.
+.mie_meie      (mie_meie        ), // External interrupt enable.
+.mie_mtie      (mie_mtie        ), // Timer interrupt enable.
+.mie_msie      (mie_msie        ), // Software interrupt enable.
+.nmi_pending   (int_nmi         ),
+.ex_pending    (int_external    ), // External interrupt pending?
+.ex_cause      (int_extern_cause),// External interrupt cause code.
+.ti_pending    (ti_pending      ), // From mrv_counters is mtime pending?
+.sw_pending    (int_software    ), // Software interrupt pending?
+.mip_meip      (mip_meip        ), // External interrupt pending
+.mip_mtip      (mip_mtip        ), // Timer interrupt pending
+.mip_msip      (mip_msip        ), // Software interrupt pending
+.int_trap_req  (int_trap_req    ), // Request WB stage trap an interrupt
+.int_trap_cause(int_trap_cause  ), // Cause of interrupt
+.int_trap_ack  (int_trap_ack    )  // WB stage acknowledges the taken trap.
 );
 
 
