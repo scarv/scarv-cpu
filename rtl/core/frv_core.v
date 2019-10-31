@@ -128,6 +128,14 @@ parameter AES_MIX_FAST        = 1'b0;
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
 
+//
+// Value of the M-mode implementation id register
+`ifdef SCARV_CPU_MIMPID
+parameter  CSR_MIMPID         = `SCARV_CPU_MIMPID;
+`else
+parameter  CSR_MIMPID         = 32'b0;
+`endif
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -192,7 +200,8 @@ frv_pipeline #(
 .XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
 .AES_SUB_FAST       (AES_SUB_FAST       ),
 .AES_MIX_FAST       (AES_MIX_FAST       ),
-.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ), 
+.CSR_MIMPID         (CSR_MIMPID         )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset

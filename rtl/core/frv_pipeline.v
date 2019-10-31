@@ -155,6 +155,10 @@ parameter AES_MIX_FAST = 1'b1;
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
 
+//
+// Value of the M-mode implementation id register
+parameter  CSR_MIMPID           = 32'b0;
+
 // Common core parameters and constants
 `include "frv_common.vh"
 
@@ -778,7 +782,8 @@ frv_csrs #(
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
-.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ),
+.CSR_MIMPID         (CSR_MIMPID         )
 ) i_csrs (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
