@@ -346,9 +346,9 @@ wire [OP:0] uop_mul =
     {5{dec_rem          }} & MUL_REM    |
     {5{dec_remu         }} & MUL_REMU   |
     {5{dec_mul          }} & MUL_MUL    |
-    {5{dec_xc_pmul_l    }} & MUL_MUL    |
+    {5{dec_xc_pmul_l    }} & MUL_PMUL_L |
     {5{dec_mulh         }} & MUL_MULH   |
-    {5{dec_xc_pmul_h    }} & MUL_MULH   |
+    {5{dec_xc_pmul_h    }} & MUL_PMUL_H |
     {5{dec_mulhsu       }} & MUL_MULHSU |
     {5{dec_mulhu        }} & MUL_MULHU  |
     {5{dec_xc_mmul_3    }} & MUL_MMUL   |
