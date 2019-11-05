@@ -328,8 +328,8 @@ wire         bitw_fsl         = fu_bit && s2_uop == BIT_FSL ;
 wire         bitw_fsr         = fu_bit && s2_uop == BIT_FSR ;
 wire         bitw_mror        = fu_bit && s2_uop == BIT_RORW;
 wire         bitw_cmov        = fu_bit && s2_uop == BIT_CMOV;
-wire         bitw_lut         = fu_bit && s2_uop == BIT_LUT ;
-wire         bitw_bop         = fu_bit && s2_uop == BIT_BOP ;
+wire         bitw_lut         = XC_CLASS_BIT && fu_bit && s2_uop == BIT_LUT ;
+wire         bitw_bop         = XC_CLASS_BIT && fu_bit && s2_uop == BIT_BOP ;
 wire [63:0]  bitw_result_wide ; // 64-bit result
 wire         bitw_ready       ; // Outputs ready.
 
@@ -477,7 +477,9 @@ xc_malu i_xc_malu (
 //  This module is responsible for many of the bitwise operations the
 //  core performs, both from XCrypto and Bitmanip
 //
-frv_bitwise i_frv_bitwise (
+frv_bitwise #(
+.XC_CLASS_BIT(XC_CLASS_BIT)
+) i_frv_bitwise (
 .rs1     (bitw_rs1        ), //
 .rs2     (bitw_rs2        ), //
 .rs3     (bitw_rs3        ), //

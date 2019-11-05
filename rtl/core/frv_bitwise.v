@@ -30,6 +30,10 @@ output wire         ready             // Outputs ready.
 
 
 //
+// XCrypto feature class config bits.
+parameter XC_CLASS_BIT        = 1'b1;
+
+//
 // CMOV
 // ------------------------------------------------------------
 
@@ -73,6 +77,8 @@ end endgenerate
 
 wire [31:0] result_lut;
 
+generate if(XC_CLASS_BIT) begin
+
 // Lut function instance from external/xcrypto-rtl
 b_lut i_b_lut (
 .crs1  (rs1         ), // Source register 1 (LUT input)
@@ -81,11 +87,19 @@ b_lut i_b_lut (
 .result(result_lut  )  //
 );
 
+end else begin
+
+    assign result_lut = 0;
+
+end endgenerate
+
 //
 // BOP
 // ------------------------------------------------------------
 
 wire [31:0] result_bop  ;
+
+generate if(XC_CLASS_BIT) begin
 
 b_bop i_b_bop(
 .rs1   (rs1         ),
@@ -94,6 +108,12 @@ b_bop i_b_bop(
 .lut   (bop_lut     ),
 .result(result_bop  ) 
 );
+
+end else begin
+
+    assign result_bop = 0;
+
+end endgenerate
 
 
 //
