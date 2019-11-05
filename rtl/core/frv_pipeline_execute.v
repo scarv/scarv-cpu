@@ -380,8 +380,11 @@ wire   p_busy    ;
 // -------------------------------------------------------------------------
 
 frv_asi #(
-.AES_SUB_FAST(AES_SUB_FAST),
-.AES_MIX_FAST(AES_MIX_FAST)
+.AES_SUB_FAST (AES_SUB_FAST ),
+.AES_MIX_FAST (AES_MIX_FAST ),
+.XC_CLASS_AES (XC_CLASS_AES ),
+.XC_CLASS_SHA2(XC_CLASS_SHA2),
+.XC_CLASS_SHA3(XC_CLASS_SHA3),
 ) i_asi(
 .g_clk     (g_clk           ), // global clock
 .g_resetn  (g_resetn        ), // synchronous reset

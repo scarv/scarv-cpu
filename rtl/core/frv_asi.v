@@ -30,6 +30,12 @@ output wire [XL:0]  asi_result        // Instruction result.
 
 `include "frv_common.vh"
 
+//
+// XCrypto feature class config bits.
+parameter XC_CLASS_AES        = 1'b1;
+parameter XC_CLASS_SHA2       = 1'b1;
+parameter XC_CLASS_SHA3       = 1'b1;
+
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
 parameter AES_MIX_FAST = 1'b1;
@@ -39,10 +45,10 @@ parameter AES_MIX_FAST = 1'b1;
 // -------------------------------------------------------------
 
 wire insn_aes           = asi_valid && asi_uop[OP:OP-1] == ASI_AES ;
-wire insn_aes_sub       = insn_aes  && !asi_uop[2];
-wire insn_aes_mix       = insn_aes  &&  asi_uop[2];
-wire insn_sha2          = asi_valid && asi_uop[OP:OP-1] == ASI_SHA2;
-wire insn_sha3          = asi_valid && asi_uop[OP:OP-1] == ASI_SHA3;
+wire insn_aes_sub       = XC_CLASS_AES && insn_aes  && !asi_uop[2];
+wire insn_aes_mix       = XC_CLASS_AES && insn_aes  &&  asi_uop[2];
+wire insn_sha2          = XC_CLASS_SHA2 && asi_valid && asi_uop[OP:OP-1] == ASI_SHA2;
+wire insn_sha3          = XC_CLASS_SHA3 && asi_valid && asi_uop[OP:OP-1] == ASI_SHA3;
 
 wire insn_aessub_enc    = asi_valid && asi_uop == ASI_AESSUB_ENC   ;
 wire insn_aessub_encrot = asi_valid && asi_uop == ASI_AESSUB_ENCROT;
