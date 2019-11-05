@@ -177,10 +177,10 @@ wire        imul_clmul_r    = s2_uop == MUL_CLMUL_R     ;
 wire        imul_clmul      = s2_uop == MUL_CLMUL_L     || 
                               s2_uop == MUL_CLMUL_H     ||
                               imul_clmul_r              ;
-wire        imul_madd       = s2_uop == MUL_MADD        ;
-wire        imul_msub       = s2_uop == MUL_MSUB        ;
-wire        imul_macc       = s2_uop == MUL_MACC        ;
-wire        imul_mmul       = s2_uop == MUL_MMUL        ;
+wire        imul_madd       = XC_CLASS_MULTIARITH && s2_uop == MUL_MADD;
+wire        imul_msub       = XC_CLASS_MULTIARITH && s2_uop == MUL_MSUB;
+wire        imul_macc       = XC_CLASS_MULTIARITH && s2_uop == MUL_MACC;
+wire        imul_mmul       = XC_CLASS_MULTIARITH && s2_uop == MUL_MMUL;
 
 wire [31:0] imul_rs1        = s2_opr_a;
 wire [31:0] imul_rs2        = s2_opr_b;
@@ -343,11 +343,11 @@ wire         bitw_gpr_wide    = bitw_mror;
 // -------------------------------------------------------------------------
 
 wire [XL:0]  rng_rs1          = s2_opr_a;
-wire         rng_valid        = fu_rng && s2_uop != RNG_ALFENCE;
+wire         rng_valid        = XC_CLASS_RANDOMNESS && fu_rng && s2_uop != RNG_ALFENCE;
 
-wire         rng_uop_test     = fu_rng && s2_uop == RNG_RNGTEST;
-wire         rng_uop_seed     = fu_rng && s2_uop == RNG_RNGSEED;
-wire         rng_uop_samp     = fu_rng && s2_uop == RNG_RNGSAMP;
+wire         rng_uop_test     = XC_CLASS_RANDOMNESS && fu_rng && s2_uop == RNG_RNGTEST;
+wire         rng_uop_seed     = XC_CLASS_RANDOMNESS && fu_rng && s2_uop == RNG_RNGSEED;
+wire         rng_uop_samp     = XC_CLASS_RANDOMNESS && fu_rng && s2_uop == RNG_RNGSAMP;
 wire         rng_uop_alsetcfg = fu_rng && s2_uop == RNG_ALSETCFG;
 
 wire         rng_if_ready     ;

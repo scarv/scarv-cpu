@@ -489,7 +489,11 @@ wire [4:0] dec_rd_16 =
 
 wire   no_rs1      = !(opra_src_rs1);
 wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
-wire   no_rs3      = !(oprc_src_rs3);
+wire   no_rs3      = !(oprc_src_rs3) || 
+                     !(XC_CLASS_MULTIARITH ||
+                       XC_CLASS_BIT || 
+                       XC_CLASS_MEMORY ||
+                       XC_CLASS_BASELINE);
 
 assign s1_rs1_addr =  no_rs1       ? 5'b0       :
                       instr_16bit  ? dec_rs1_16 :
