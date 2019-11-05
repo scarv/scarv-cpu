@@ -107,7 +107,7 @@ parameter TRACE_INSTR_WORD = 1'b1;
 // XCrypto feature class config bits.
 parameter XC_CLASS_BASELINE   = 1'b1;
 parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_MEMORY     = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MEMORY     = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
