@@ -149,6 +149,8 @@ wire        alu_lt                      ; // Is LHS < RHS?
 wire        alu_eq                      ; // Is LHS = RHS?
 wire [XL:0] alu_add_result              ; // Result of adding LHS,RHS.
 
+wire [PW:0] alu_pw          = XC_CLASS_PACKED ? s2_pw : PW_32 ;
+
 wire [XL:0] alu_lhs         = s2_opr_a  ; // left hand operand
 wire [XL:0] alu_rhs         = s2_opr_b  ; // right hand operand
 wire [XL:0] alu_result                  ; // result of the ALU operation
@@ -169,10 +171,13 @@ wire        imul_mulhsu     = s2_uop == MUL_MULHSU      ;
 wire        imul_mulhu      = s2_uop == MUL_MULHU       ;
 wire        imul_rem        = s2_uop == MUL_REM         ;
 wire        imul_remu       = s2_uop == MUL_REMU        ;
-wire        imul_pmul       = s2_uop == MUL_PMUL_L      ||
-                              s2_uop == MUL_PMUL_H      ;
-wire        imul_pclmul     = s2_uop == MUL_PCLMUL_L    ||
-                              s2_uop == MUL_PCLMUL_H    ;
+
+wire        imul_pmul       = 
+    (s2_uop == MUL_PMUL_L   || s2_uop == MUL_PMUL_H)   && XC_CLASS_PACKED;
+
+wire        imul_pclmul     =
+    (s2_uop == MUL_PCLMUL_L || s2_uop == MUL_PCLMUL_H) && XC_CLASS_PACKED;
+
 wire        imul_clmul_r    = s2_uop == MUL_CLMUL_R     ;
 wire        imul_clmul      = s2_uop == MUL_CLMUL_L     || 
                               s2_uop == MUL_CLMUL_H     ||
@@ -189,10 +194,10 @@ wire [31:0] imul_rs3        = s2_opr_c;
 wire        imul_flush      = pipe_progress || flush ||
                               leak_fence && leak_lkgcfg[LEAK_CFG_FU_MULT];
 
-wire        imul_pw_2       = s2_pw == PW_2 ;
-wire        imul_pw_4       = s2_pw == PW_4 ;
-wire        imul_pw_8       = s2_pw == PW_8 ;
-wire        imul_pw_16      = s2_pw == PW_16;
+wire        imul_pw_2       = XC_CLASS_PACKED && s2_pw == PW_2 ;
+wire        imul_pw_4       = XC_CLASS_PACKED && s2_pw == PW_4 ;
+wire        imul_pw_8       = XC_CLASS_PACKED && s2_pw == PW_8 ;
+wire        imul_pw_16      = XC_CLASS_PACKED && s2_pw == PW_16;
 wire        imul_pw_32      = s2_pw == PW_32;
 
 wire        imul_ready      ;
@@ -406,7 +411,7 @@ frv_alu i_alu (
 .alu_valid       (alu_valid       ), // Stall this stage
 .alu_flush       (alu_flush       ), // flush the stage
 .alu_ready       (alu_ready       ), // stage ready to progress
-.alu_pw          (s2_pw           ), // Pack width specifier.
+.alu_pw          (alu_pw          ), // Pack width specifier.
 .alu_op_add      (alu_op_add      ), // 
 .alu_op_sub      (alu_op_sub      ), // 
 .alu_op_xor      (alu_op_xor      ), // 
