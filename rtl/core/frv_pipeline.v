@@ -181,8 +181,6 @@ wire        cf_ack     ; // Control flow change acknolwedge
 
 //
 // Leakage barrier instruction wiring.
-wire        leak_cfg_load ; // Load a new configuration word.
-wire [XL:0] leak_cfg_wdata; // The new configuration word to load.
 wire [12:0] leak_lkgcfg   ; // Current lkgcfg register value.
 wire        s1_leak_fence ; // Currently a lkgfence in decode.
 
@@ -470,8 +468,6 @@ frv_pipeline_decode #(
 .s1_rs1_rdata       (fwd_rs1_rdata      ),
 .s1_rs2_rdata       (fwd_rs2_rdata      ),
 .s1_rs3_rdata       (fwd_rs3_rdata      ),
-.leak_cfg_load      (leak_cfg_load      ), // load a new configuration word.
-.leak_cfg_wdata     (leak_cfg_wdata     ), // new configuration word to load.
 .leak_prng          (leak_prng          ), // current prng value.
 .leak_lkgcfg        (leak_lkgcfg        ), // current lkgcfg register value.
 .s1_leak_fence      (s1_leak_fence      ),
@@ -726,8 +722,6 @@ frv_pipeline_writeback #(
 .fwd_s4_wdata     (fwd_s4_wdata     ), // Write data for writeback stage.
 .fwd_s4_load      (fwd_s4_load      ), // Writeback stage has load in it.
 .fwd_s4_csr       (fwd_s4_csr       ), // Writeback stage has CSR op in it.
-.leak_cfg_load    (leak_cfg_load    ), // Load a new configuration word.
-.leak_cfg_wdata   (leak_cfg_wdata   ), // The new configuration word to load.
 .gpr_wen          (gpr_wen          ), // GPR write enable.
 .gpr_wide         (gpr_wide         ), // GPR wide writeback.
 .gpr_rd           (gpr_rd           ), // GPR destination register.
@@ -813,6 +807,7 @@ frv_csrs #(
 .uxcrypto_ct      (uxcrypto_ct      ), // UXCrypto constant time bit.
 .uxcrypto_b0      (uxcrypto_b0      ), // UXCrypto lookup table 0.
 .uxcrypto_b1      (uxcrypto_b1      ), // UXCrypto lookup table 1.
+.leak_lkgcfg      (leak_lkgcfg      ), // FENL Leakage config register.
 .trap_cpu         (trap_cpu         ), // A trap occured due to CPU
 .trap_int         (trap_int         ), // A trap occured due to interrupt
 .trap_cause       (trap_cause       ), // Cause of a trap.

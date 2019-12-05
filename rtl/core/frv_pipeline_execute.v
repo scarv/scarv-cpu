@@ -353,14 +353,12 @@ wire         rng_valid        = XC_CLASS_RANDOMNESS && fu_rng && s2_uop != RNG_A
 wire         rng_uop_test     = XC_CLASS_RANDOMNESS && fu_rng && s2_uop == RNG_RNGTEST;
 wire         rng_uop_seed     = XC_CLASS_RANDOMNESS && fu_rng && s2_uop == RNG_RNGSEED;
 wire         rng_uop_samp     = XC_CLASS_RANDOMNESS && fu_rng && s2_uop == RNG_RNGSAMP;
-wire         rng_uop_alsetcfg = fu_rng && s2_uop == RNG_ALSETCFG;
 
 wire         rng_if_ready     ;
-wire         rng_ready = rng_if_ready || rng_uop_alsetcfg || leak_fence;
+wire         rng_ready = rng_if_ready || leak_fence;
 wire [XL:0]  rng_result       ;
 
-wire [XL:0]  n_s3_opr_a_rng   = rng_uop_alsetcfg ? s2_opr_a   :
-                                                   rng_result ;
+wire [XL:0]  n_s3_opr_a_rng   = rng_result ;
 
 //
 // Stalling / Pipeline Progression

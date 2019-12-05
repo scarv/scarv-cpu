@@ -25,10 +25,8 @@ input  wire [XL:0] s1_rs1_rdata  ,
 input  wire [XL:0] s1_rs2_rdata  ,
 input  wire [XL:0] s1_rs3_rdata  ,
 
-input  wire        leak_cfg_load , // Load a new configuration word.
-input  wire [XL:0] leak_cfg_wdata, // The new configuration word to load.
 output wire [XL:0] leak_prng     , // Current PRNG value.
-output wire [12:0] leak_lkgcfg   , // Current lkgcfg register value.
+input  wire [12:0] leak_lkgcfg   , // Current lkgcfg register value.
 output wire        s1_leak_fence , // Leakage fence currently in decode.
 
 input  wire        cf_req        , // Control flow change request
@@ -183,7 +181,7 @@ assign n_s2_fu[P_FU_ASI] =
 
 assign n_s2_fu[P_FU_RNG] = 
     dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ||
-    dec_xc_lkgconf  || dec_xc_lkgfence ;
+    dec_xc_lkgfence ;
 
 
 //
@@ -195,7 +193,7 @@ wire [4:0] dec_rs2_32 = s1_data[24:20];
 wire [4:0] dec_rs3_32 = s1_data[31:27];
 
 wire       clr_rd_lsb = dec_xc_mror   || dec_xc_madd_3 || dec_xc_msub_3 ||
-                        dec_xc_mmul_3 || dec_xc_macc_1 || dec_xc_lkgconf;
+                        dec_xc_mmul_3 || dec_xc_macc_1 ;
 
 wire [4:0] dec_rd_32  = {s1_data[11: 8], clr_rd_lsb ? 1'b0 : s1_data[7]};
 
@@ -412,7 +410,6 @@ wire [OP:0] uop_rng =
     {1+OP{dec_xc_rngtest      }} & RNG_RNGTEST      |
     {1+OP{dec_xc_rngseed      }} & RNG_RNGSEED      |
     {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      |
-    {1+OP{dec_xc_lkgconf      }} & RNG_ALSETCFG     |
     {1+OP{dec_xc_lkgfence     }} & RNG_ALFENCE      ;
 
 assign n_s2_uop =
@@ -691,7 +688,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     || dec_xc_lkgconf ;
+    dec_xc_scatter_h     ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -846,10 +843,7 @@ frv_leak #(
 ) i_frv_leak(
 .g_clk         (g_clk         ),
 .g_resetn      (g_resetn      ),
-.leak_cfg_load (leak_cfg_load ), // load a new configuration word.
-.leak_cfg_wdata(leak_cfg_wdata), // the new configuration word to load.
 .leak_prng     (leak_prng     ), // current prng value.
-.leak_lkgcfg   (leak_lkgcfg   ), // current lkgcfg register value.
 .leak_fence    (leak_fence    )  // Fence instruction flying past.
 );
 

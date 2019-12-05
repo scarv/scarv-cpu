@@ -72,9 +72,6 @@ output wire [XL:0] fwd_s4_wdata    , // Write data for writeback stage.
 output wire        fwd_s4_load     , // Writeback stage has load in it.
 output wire        fwd_s4_csr      , // Writeback stage has CSR op in it.
 
-output wire        leak_cfg_load   , // Load a new configuration word.
-output wire [XL:0] leak_cfg_wdata  , // The new configuration word to load.
-
 output wire        gpr_wen         , // GPR write enable.
 output wire        gpr_wide        , // GPR wide writeback enable.
 output wire [ 4:0] gpr_rd          , // GPR destination register.
@@ -208,10 +205,6 @@ wire        rng_gpr_wen     = fu_rng && (
     s4_uop == RNG_RNGTEST
 );
 wire [XL:0] rng_gpr_wdata   = s4_opr_a;
-
-// Load a new configuration word for the leakage barrier instructions.
-assign leak_cfg_load        = fu_rng && s4_uop == RNG_ALSETCFG;
-assign leak_cfg_wdata       = s4_opr_a;
 
 //
 // Functional Unit: CSR

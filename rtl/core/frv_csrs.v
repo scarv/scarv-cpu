@@ -43,6 +43,8 @@ output reg         uxcrypto_ct      , // UXCrypto constant time bit.
 output reg  [ 7:0] uxcrypto_b0      , // UXCrypto lookup table 0.
 output reg  [ 7:0] uxcrypto_b1      , // UXCrypto lookup table 1.
 
+output wire [12:0] leak_lkgcfg      , // FENL Leakage configuration register.
+
 input  wire        trap_cpu         , // A trap occured due to CPU
 input  wire        trap_int         , // A trap occured due to interrupt
 input  wire [ 5:0] trap_cause       , // A trap occured due to interrupt
@@ -99,6 +101,7 @@ localparam CSR_ADDR_MIMPID      = 12'hF13;
 localparam CSR_ADDR_MHARTID     = 12'hF14;
 
 localparam CSR_ADDR_UXCRYPTO    = 12'h800;
+localparam CSR_ADDR_LKGCFG      = 12'h801;
 
 //
 // XCrypto feature class config bits.
@@ -555,6 +558,37 @@ always @(posedge g_clk) begin
     end
 end
 
+
+//
+// LKGCFG
+//
+//  FENL - Leakage Fence configuration register.
+//
+// -------------------------------------------------------------------------
+
+reg  [12:0]   reg_lkgcfg ;
+
+assign        leak_lkgcfg= reg_lkgcfg;
+
+wire [12:0] n_reg_lkgcfg =
+    csr_wr_set ? reg_lkgcfg |  csr_wdata[12: 0] :
+    csr_wr_clr ? reg_lkgcfg & ~csr_wdata[12: 0] :
+                               csr_wdata[12: 0] ;
+
+wire          wen_lkgcfg = csr_wr && csr_addr == CSR_ADDR_LKGCFG;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        
+        reg_lkgcfg <= 13'b0;
+
+    end else if(wen_lkgcfg) begin
+        
+        reg_lkgcfg <= n_reg_lkgcfg;
+
+    end
+end
+
 //
 // CSR read responses.
 // -------------------------------------------------------------------------
@@ -586,6 +620,7 @@ wire   read_mcycleh   = csr_en && csr_addr == CSR_ADDR_MCYCLEH  ;
 wire   read_minstreth = csr_en && csr_addr == CSR_ADDR_MINSTRETH;
 wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
 wire   read_uxcrypto  = csr_en && csr_addr == CSR_ADDR_UXCRYPTO ;
+wire   read_lkgcfg    = csr_en && csr_addr == CSR_ADDR_LKGCFG   ;
 
 wire   valid_addr     = 
     read_mstatus   ||
@@ -614,7 +649,8 @@ wire   valid_addr     =
     read_mcycleh   ||
     read_minstreth ||
     read_mcountin  ||
-    read_uxcrypto  ;
+    read_uxcrypto  ||
+    read_lkgcfg    ;
 
 wire invalid_addr = !valid_addr;
 
@@ -645,7 +681,8 @@ assign csr_rdata =
     {32{read_mcycleh  }} & ctr_cycle    [63:32] |
     {32{read_minstreth}} & ctr_instret  [63:32] |
     {32{read_mcountin }} & reg_mcountin         |
-    {32{read_uxcrypto }} & reg_uxcrypto         ;
+    {32{read_uxcrypto }} & reg_uxcrypto         |
+    {32{read_lkgcfg   }} & {19'b0,reg_lkgcfg}   ;
 
 endmodule
 

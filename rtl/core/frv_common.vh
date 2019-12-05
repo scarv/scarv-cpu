@@ -132,7 +132,6 @@ localparam ASI_SHA256_S3     = {ASI_SHA2, 3'b011};
 localparam RNG_RNGSEED       = {2'b00, 3'b001};
 localparam RNG_RNGSAMP       = {2'b00, 3'b010};
 localparam RNG_RNGTEST       = {2'b00, 3'b100};
-localparam RNG_ALSETCFG      = {2'b11, 3'b001};
 localparam RNG_ALFENCE       = {2'b11, 3'b010};
 
 localparam RNG_IF_SEED       = 3'b001;
