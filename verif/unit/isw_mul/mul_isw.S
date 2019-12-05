@@ -8,7 +8,7 @@ mul_isw:
     // a3 - uint32_t * c
     
     li t0, -1
-    xc.lkgconf  t0                          // Set leakage barrier to "all"
+    csrw 0x801, t0                          // Set leakage barrier to "all"
 
     li t0, 0                                // i    = t0 = 0
     .L0:
