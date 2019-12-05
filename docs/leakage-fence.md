@@ -10,13 +10,15 @@ instructions.*
 
 The leakage barrier functionality consists of two instructions:
 
-- `xc.lkgconf` - Writes a configuration register (`lkgcfg`) with a single
+- `xc.lkgconf` - Writes a CSR (`lkgcfg`) with a single
   source register word.
 
-- `xc.lkgfence` - Clears / resets the micro-architectural state as
+  - The CSR address is `0x801`: User level, readable/writable.
+
+- `xc.lkgfence` - Flushes the micro-architectural state as
   specified in the `lkgcfg` register.
 
-**Note:** Hereafter, the stating that a register is "cleared" should be
+**Note:** Hereafter, the stating that a register is "flushed" should be
 read as meaning either "set to zero" or "randomised".
 
 The exact set of micro-architectural state controllable via the
@@ -55,7 +57,7 @@ The execute stage pipeline result registers are controlled individually:
 - `s3_opr_a`
 - `s3_opr_b`
 
-Other execute stage resources which can be cleared:
+Other execute stage resources which can be flushed:
 
 - The multiplier functional unit accumulator registers.
 - The AES `mix` and `sub` functional units.
@@ -70,7 +72,7 @@ The memory stage pipeline result registers are controlled individually:
 ### Uncore Resources
 
 Three external pins will be provided to signal that un-core resources
-should be cleared.
+should be flushed.
 These can be used to control:
 
 - Buffers in the memory hierarchy.
@@ -123,11 +125,11 @@ Some notes on the RTL implementation of these instructions:
   - Hence, the instruction to set it's value must reach the writeback stage
     before writing the control register.
 
-- Uncore resources are signalled to be cleared from the *memory* stage,
+- Uncore resources are signalled to be flushed from the *memory* stage,
   since this is the only stage where the CPU can normally access
   uncore resources.
 
-- The "clearing" or "randomising" of a resource is controlled by
+- The "zeroing" or "randomising" of a resource is controlled by
   a synthesis time parameter.
 
   - The randomness source is a simple 32-bit LFSR.
