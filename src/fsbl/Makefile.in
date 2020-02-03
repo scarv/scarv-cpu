@@ -8,7 +8,7 @@ FSBL_HEX    = $(FRV_WORK)/fsbl/fsbl.mem
 
 FSBL_CFLAGS = -nostartfiles -Os -O2 -Wall -fpic -fPIC \
               -T$(FRV_HOME)/src/fsbl/link.ld
-FSBL_CFLAGS += -march=rv32imc -mabi=ilp32
+FSBL_CFLAGS += -march=rv32imc_xcrypto -mabi=ilp32
 
 $(FSBL_OBJ) : $(FSBL_SRC)
 	@mkdir -p $(dir $@)
