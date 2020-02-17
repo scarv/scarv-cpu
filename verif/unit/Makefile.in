@@ -12,7 +12,7 @@ UNIT_FAIL       = 0x80000084
 UNIT_PASS       = 0x8000008e
 
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
-UNIT_CFLAGS    += -march=rv32imc -mabi=ilp32
+UNIT_CFLAGS    += -march=rv32imcb_xcrypto -mabi=ilp32
 UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
 
 UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
