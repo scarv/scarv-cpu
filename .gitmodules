@@ -10,6 +10,3 @@
 [submodule "external/riscv-opcodes"]
 	path = external/riscv-opcodes
 	url = https://github.com/scarv/riscv-opcodes.git
-[submodule "external/xcrypto-rtl"]
-	path = external/xcrypto-rtl
-	url = https://github.com/scarv/xcrypto-rtl.git
