@@ -11,7 +11,7 @@ if [[ -z "$VERILATOR_ROOT" ]]; then
 fi
 
 if [[ -z "$XCRYPTO_RTL" ]]; then
-    export XCRYPTO_RTL=$FRV_HOME/../../rtl
+    export XCRYPTO_RTL=$FRV_HOME/external/xcrypto/rtl
 fi
 
 export PATH=$RISCV:$PATH

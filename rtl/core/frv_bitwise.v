@@ -79,7 +79,7 @@ wire [31:0] result_lut;
 
 generate if(XC_CLASS_BIT) begin
 
-// Lut function instance from external/xcrypto-rtl
+// Lut function instance from external/xcrypto/rtl
 b_lut i_b_lut (
 .crs1  (rs1         ), // Source register 1 (LUT input)
 .crs2  (rs2         ), // Source register 2 (LUT bottom half)
