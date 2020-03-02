@@ -5,8 +5,9 @@ endif
 ifndef RISCV
     $(error "Please set the RISCV environment variable")
 endif
-
-export XCRYPTO_RTL  = $(FRV_HOME)/external/xcrypto-rtl/rtl
+ifndef XCRYPTO_RTL
+    $(error "Please set the XCRYPTO_RTL environment variable")
+endif
 
 export CPU_RTL_DIR  = $(FRV_HOME)/rtl/core
 export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \

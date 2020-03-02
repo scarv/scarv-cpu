@@ -1,15 +1,15 @@
 [submodule "external/riscv-compliance"]
 	path = external/riscv-compliance
-	url = git@github.com:riscv/riscv-compliance.git
+	url = https://github.com/riscv/riscv-compliance.git
 [submodule "external/embench-iot"]
 	path = external/embench-iot
-	url = git@github.com:embench/embench-iot.git
+	url = https://github.com/embench/embench-iot.git
 [submodule "external/riscv-formal"]
 	path = external/riscv-formal
-	url = git@github.com:symbioticeda/riscv-formal.git
+	url = https://github.com/symbioticeda/riscv-formal.git
 [submodule "external/riscv-opcodes"]
 	path = external/riscv-opcodes
 	url = https://github.com/scarv/riscv-opcodes.git
-[submodule "external/xcrypto-rtl"]
-	path = external/xcrypto-rtl
-	url = https://github.com/scarv/xcrypto-rtl.git
+[submodule "external/xcrypto"]
+	path = external/xcrypto
+	url = https://github.com/scarv/xcrypto.git
