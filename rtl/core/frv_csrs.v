@@ -80,8 +80,6 @@ localparam CSR_ADDR_MINSTRETH   = 12'hB82;
 
 localparam CSR_ADDR_MCOUNTIN    = 12'h320;
 
-localparam CSR_ADDR_SATP        = 12'h180;
-
 localparam CSR_ADDR_MSTATUS     = 12'h300;
 localparam CSR_ADDR_MISA        = 12'h301;
 localparam CSR_ADDR_MEDELEG     = 12'h302;
