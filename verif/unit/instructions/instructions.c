@@ -24,7 +24,7 @@ int test_main() {
 
     
     rs1 = 0x1FFF;
-    __asm__ volatile ("csrw 0x801, %0" : :"r"(rs1) );
+    __asm__ volatile ("csrw uxcrypto, %0" : :"r"(rs1) );
 
     volatile int arry[10];
 
