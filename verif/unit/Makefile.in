@@ -96,7 +96,6 @@ include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
 include $(FRV_HOME)/verif/unit/counters/Makefile.in
 include $(FRV_HOME)/verif/unit/instructions/Makefile.in
 include $(FRV_HOME)/verif/unit/interrupts/Makefile.in
-include $(FRV_HOME)/verif/unit/bitmanip/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)
