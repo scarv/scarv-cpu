@@ -14,6 +14,16 @@
 #define MIE_MTIE     (0x00000001 <<  7)
 #define MIE_MSIE     (0x00000001 <<  3)
 
+#define MTVEC_DIRECT    0x0
+#define MTVEC_VECTORED  0x1
+
+volatile uint32_t mtvec(void *func, uint32_t mode) {
+    uint32_t rd;
+    uint32_t base = (uint32_t)func;
+    uint32_t wr = (base & 0xFFFFFFC) | mode;
+    asm volatile("csrrw %0, mtvec, %1" : "=r"(rd) : "r"(wr));
+    return rd;
+}
 
 //! Setup the interrupt handler.
 void setup_timer_interrupt_handler(

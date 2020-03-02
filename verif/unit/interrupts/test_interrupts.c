@@ -1,4 +1,5 @@
 
+
 #include "unit_test.h"
 
 #include "test_interrupts.h"
@@ -128,6 +129,9 @@ int test_timer_interupt() {
             break;
         }
     }
+
+    // Disable timer interrupts.
+    __clr_mie(MIE_MTIE);
     
     // Globally Disable interrupts again.
     __clr_mstatus(MSTATUS_MIE);
@@ -139,9 +143,61 @@ int test_timer_interupt() {
     }
 }
 
-//! Check that when a trap occurs, mpp, mpie and mie are set correctly.
 
-//! Check that we can schedule a timer interrupt and it is raised correctly.
+//! Used to communicate status codes between mtvec trap handler and test code.
+volatile uint32_t mtvec_test_code = 0;
+
+
+//! Handler for mtvec related exceptions - aligned to 64b boundary.
+void mtvec_trap_handler_unaligned() {
+    mtvec_test_code = 1;
+    return ;
+}
+
+
+//! Handler for mtvec related exceptions - aligned to 64b boundary.
+__attribute__((aligned(64)))
+void mtvec_trap_handler_aligned() {
+    mtvec_test_code = 2;
+    return ;
+}
+
+
+//! Check that mtvec can be set correctly wrt. vectored/direct interrupts.
+int test_mtvec_fields() {
+
+    uint32_t toset  = 0;
+    uint32_t save   = 0;
+    mtvec_test_code = 0; // No traps taken.
+
+    //
+    // Set to direct interrupt mode, handler = mtvec_trap_handler.
+    save = mtvec(&mtvec_trap_handler_unaligned, 0);
+    if(mtvec_test_code != 0){return 1;} // Expect not to have trapped.
+    
+    //
+    // Set to vectored interrupt mode, handler = mtvec_trap_handler.
+    mtvec(&mtvec_trap_handler_aligned, 1);
+    if(mtvec_test_code != 0){return 2;} // Expect not to have trapped.
+    
+    //
+    // Set to invalid interrupt mode, handler = mtvec_trap_handler.
+    mtvec_test_code = 0;
+    mtvec(&mtvec_trap_handler_unaligned, 2);
+    if(mtvec_test_code != 1){return 3;} // Expect to have trapped.
+
+    //
+    // Set to invalid interrupt mode, handler = mtvec_trap_handler.
+    mtvec_test_code = 0;
+    mtvec(&mtvec_trap_handler_unaligned, 3);
+    if(mtvec_test_code != 1){return 4;} // Expect to have trapped.
+    
+    // Restore the original trap handler before returning.
+    mtvec((void*)save,0);
+    
+    return 0;
+}
+
 
 /*!
 @brief Test for interrupt control.
@@ -159,6 +215,9 @@ int test_main() {
 
 
     fail = test_timer_interupt();
+    if(fail){return fail;}
+    
+    fail = test_mtvec_fields();
     if(fail){return fail;}
 
 
