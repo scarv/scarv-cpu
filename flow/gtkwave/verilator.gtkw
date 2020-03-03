@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Sep 10 14:35:44 2019
+[*] Tue Mar  3 09:14:33 2020
 [*]
-[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/unit/isw_mul/isw_mul.vcd"
-[dumpfile_mtime] "Tue Sep 10 14:34:52 2019"
-[dumpfile_size] 32333439
+[dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/riscv-compliance/rv32imc/C-ADD.vcd"
+[dumpfile_mtime] "Tue Mar  3 09:12:54 2020"
+[dumpfile_size] 1750636
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 6500
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-10.964172 -1 2626 23906 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-9.968252 586 2626 23906 3830 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -18,9 +18,9 @@
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [sst_width] 270
-[signals_width] 431
+[signals_width] 454
 [sst_expanded] 1
-[sst_vpaned_height] 326
+[sst_vpaned_height] 314
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -243,10 +243,6 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.flush
 @800200
 -Leakage Instructions
 @28
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_cfg_load
-@22
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_cfg_wdata[31:0]
-@28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_fence
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_prng[31:0]
@@ -466,7 +462,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_valid
 @1401200
 -Pipe - S4 - Writeback
-@c00200
+@800200
 -CSR Bus
 @22
 TOP.frv_core.i_pipeline.csr_addr[11:0]
@@ -476,12 +472,15 @@ TOP.frv_core.i_pipeline.csr_en
 TOP.frv_core.i_pipeline.csr_mepc[31:0]
 TOP.frv_core.i_pipeline.csr_mtvec[31:0]
 TOP.frv_core.i_pipeline.csr_rdata[31:0]
+@29
+TOP.frv_core.i_pipeline.csr_error
+@22
 TOP.frv_core.i_pipeline.csr_wdata[31:0]
 @28
 TOP.frv_core.i_pipeline.csr_wr
 TOP.frv_core.i_pipeline.csr_wr_clr
 TOP.frv_core.i_pipeline.csr_wr_set
-@1401200
+@1000200
 -CSR Bus
 @22
 TOP.frv_core.i_pipeline.i_csrs.reg_mcause_cause[30:0]
@@ -551,9 +550,9 @@ TOP.frv_core.i_counters.inhibit_tm
 TOP.frv_core.i_counters.instr_ret
 @1401200
 -Counters
-@800201
+@800200
 -GPRs
-@23
+@22
 TOP.frv_core.i_pipeline.i_gprs.gprs(0)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(1)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(2)[31:0]
@@ -586,7 +585,7 @@ TOP.frv_core.i_pipeline.i_gprs.gprs(28)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(29)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(30)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(31)[31:0]
-@1000201
+@1000200
 -GPRs
 [pattern_trace] 1
 [pattern_trace] 0
