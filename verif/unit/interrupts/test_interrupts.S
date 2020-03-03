@@ -24,7 +24,7 @@ setup_timer_interrupt_handler:
 .endfunc
 
 
-.align 2
+.align 4
 .func timer_interrupt_handler
 .global timer_interrupt_handler
 timer_interrupt_handler:

@@ -205,18 +205,23 @@ int test_mtvec_fields() {
 int test_main() {
 
     int fail;
-    
+
+    __putstr("Test Global Interrupt Enable...\n");
     fail = test_global_interrupt_enable();
     if(fail){return fail;}
 
 
+    __putstr("Test Individual Interrupt Enable...\n");
     fail = test_individual_interrupt_enable();
     if(fail){return fail;}
 
 
+    __putstr("Test Timer Interrupt...\n");
     fail = test_timer_interupt();
     if(fail){return fail;}
     
+    
+    __putstr("Test MTVEC Fields...\n");
     fail = test_mtvec_fields();
     if(fail){return fail;}
 

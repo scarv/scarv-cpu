@@ -20,7 +20,7 @@
 volatile uint32_t mtvec(void *func, uint32_t mode) {
     uint32_t rd;
     uint32_t base = (uint32_t)func;
-    uint32_t wr = (base & 0xFFFFFFC) | mode;
+    uint32_t wr = (base & 0xFFFFFFFC) | mode;
     asm volatile("csrrw %0, mtvec, %1" : "=r"(rd) : "r"(wr));
     return rd;
 }
