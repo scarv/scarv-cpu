@@ -282,9 +282,15 @@ wire [31:0] cf_target_noint =
     {XLEN{cfu_cf_taken}}  & s4_opr_a  |
     {XLEN{cfu_mret    }}  & csr_mepc  ;
 
+
+wire [ 7:0] trap_vector_offset  = 
+    (vector_intrs && trap_int) ? ({2'b00,int_trap_cause} << 2) : 8'b0;
+
+wire [XL:0] trap_target_addr    = {24'b0, trap_vector_offset} | csr_mtvec;
+
 // Given a control flow change, this is where we are going.
 assign cf_target    = 
-          cfu_tgt_trap    ? csr_mtvec : cf_target_noint;
+          cfu_tgt_trap    ? trap_target_addr : cf_target_noint;
 
 // CFU operation finished, but pipeline still stalled.
 reg     cfu_done;
