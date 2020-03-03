@@ -104,6 +104,7 @@ output wire        csr_wr_clr      , // CSR Write - Clear
 output wire [11:0] csr_addr        , // Address of the CSR to access.
 output wire [XL:0] csr_wdata       , // Data to be written to a CSR
 input  wire [XL:0] csr_rdata       , // CSR read data
+input  wire        csr_error        , // Raise invalid opcode exception.
 
 output wire        cf_req          , // Control flow change request
 output wire [XL:0] cf_target       , // Control flow change target
@@ -231,6 +232,8 @@ assign      csr_wdata       = s4_opr_a;
 
 wire        csr_read        = fu_csr && s4_uop[CSR_READ];
 
+wire        csr_trap        = csr_error;
+
 wire        csr_gpr_wen     = csr_read && !csr_done;
 wire [XL:0] csr_gpr_wdata   = csr_rdata;
 
@@ -258,7 +261,7 @@ wire cfu_mret       = fu_cfu &&  s4_uop == CFU_MRET;
 assign exec_mret    = cfu_mret && pipe_progress;
 
 // Control flow change target should go to the trap handler.
-wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap || trap_int;
+wire cfu_tgt_trap   = cfu_trap || s4_trap || lsu_trap || trap_int || csr_trap;
 
 // We need to write the next natural PC to a register.
 wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
@@ -266,7 +269,7 @@ wire cfu_link       = fu_cfu && (s4_uop == CFU_JALI || s4_uop == CFU_JALR);
 // Control flow change occuring due to anything except an interrupt.
 // Separate out interrupts for easier RVFI tracking of events.
 wire   cf_req_noint = cfu_cf_taken || cfu_trap || cfu_mret || s4_trap ||
-                      lsu_trap     ;
+                      lsu_trap     || csr_trap ;
 
 // Any sort of control flow change is occuring.
 assign cf_req       = cf_req_noint || trap_int  ;

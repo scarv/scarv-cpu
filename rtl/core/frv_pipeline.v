@@ -193,6 +193,7 @@ wire        csr_wr_clr ; // CSR Write - Clear
 wire [11:0] csr_addr   ; // Address of the CSR to access.
 wire [XL:0] csr_wdata  ; // Data to be written to a CSR
 wire [XL:0] csr_rdata  ; // CSR read data
+wire        csr_error  ; // Raise invalid opcode trap due to bad csr access.
 
 wire [XL:0] csr_mepc   ; // Current MEPC.
 wire [XL:0] csr_mtvec  ; // Current MTVEC.
@@ -748,6 +749,7 @@ frv_pipeline_writeback #(
 .csr_addr         (csr_addr         ), // Address of the CSR to access.
 .csr_wdata        (csr_wdata        ), // Data to be written to a CSR
 .csr_rdata        (csr_rdata        ), // CSR read data
+.csr_error        (csr_error        ), // Raise invalid opcode trap - bad CSR
 .cf_req           (cf_req           ), // Control flow change request
 .cf_target        (cf_target        ), // Control flow change target
 .cf_ack           (cf_ack           ), // Control flow change acknowledge.
@@ -788,6 +790,7 @@ frv_csrs #(
 .csr_addr         (csr_addr         ), // Address of the CSR to access.
 .csr_wdata        (csr_wdata        ), // Data to be written to a CSR
 .csr_rdata        (csr_rdata        ), // CSR read data
+.csr_error        (csr_error        ), // Raise invalid opcode trap - bad CSR
 .csr_mepc         (csr_mepc         ), // Current MEPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
 .exec_mret        (exec_mret        ), // MRET instruction executed.

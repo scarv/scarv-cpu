@@ -16,6 +16,7 @@ input              csr_wr_clr       , // CSR Write - Clear
 input       [11:0] csr_addr         , // Address of the CSR to access.
 input       [XL:0] csr_wdata        , // Data to be written to a CSR
 output wire [XL:0] csr_rdata        , // CSR read data
+output wire        csr_error        , // Raise invalid opcode exception.
 
 output wire [XL:0] csr_mepc         , // Current EPC.
 output wire [XL:0] csr_mtvec        , // Current MTVEC.
@@ -314,7 +315,7 @@ end
 // -------------------------------------------------------------------------
 
 reg  [29:0] reg_mtvec_base  ;
-reg  [ 1:0] reg_mtvec_mode  = 2'b00; // Only direct exceptions supported.
+reg  [ 1:0] reg_mtvec_mode  ; // Only direct exceptions supported.
 
 wire [31:0] reg_mtvec       = {
     reg_mtvec_base,
@@ -330,11 +331,23 @@ wire [29:0] n_mtvec_base =
     csr_wr_clr ? csr_mtvec[31:2] & ~csr_wdata[31:2] :
                  csr_wdata[31:2]                    ;
 
+wire [1:0] n_mtvec_mode = 
+    csr_wr_set ? csr_mtvec[ 1:0] |  csr_wdata[ 1:0] :
+    csr_wr_clr ? csr_mtvec[ 1:0] & ~csr_wdata[ 1:0] :
+                 csr_wdata[ 1:0]                    ;
+
+wire        mtvec_bad_write = wen_mtvec && (
+    n_mtvec_mode[1] ||
+    n_mtvec_mode[0] && |n_mtvec_base[3:0]
+);
+
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         reg_mtvec_base <= CSR_MTVEC_RESET_VALUE[31:2];
-    end else if(wen_mtvec) begin
+        reg_mtvec_mode <= 2'b00;;
+    end else if(wen_mtvec && !mtvec_bad_write) begin
         reg_mtvec_base <= n_mtvec_base;
+        reg_mtvec_mode <= n_mtvec_mode;
     end
 end
 
@@ -651,6 +664,12 @@ wire   valid_addr     =
     read_lkgcfg    ;
 
 wire invalid_addr = !valid_addr;
+
+assign csr_error = csr_en && (
+    (csr_wr && invalid_addr ) ||
+    (mtvec_bad_write        )
+);
+                    
 
 assign csr_rdata =
     {32{read_mstatus  }} & reg_mstatus          |
