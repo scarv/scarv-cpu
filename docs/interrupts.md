@@ -116,3 +116,51 @@ An NMI is triggered by asserting the top level `int_nmi` pin.
 - An NMI is identified by the `mcause` code `16`, with the interrupt
   field set.
 
+## Template ASM interrupt handler code
+
+The following code can be coppied into an assembler file, and edited
+as appropriate to provied exception and interrupt handling functionality.
+
+```
+.global setup_vectored_interrupt_handler
+.func setup_vectored_interrupt_handler
+setup_vectored_interrupt_handler:
+    csrr    a1, mstatus                     // Stash mstatus.
+    csrci   mstatus, 0x1                    // Disable interrupts.
+    la      a0, vectored_interrupt_handler  // Handler address.
+    ori     a0, a0, 0x1                     // Set to vectored mode.
+    csrw    mtvec, a0                       // Setup mtvec.
+    csrw    mstatus, a1                     // Restore mstatus.
+    ret
+.endfunc
+
+exception_handler:
+    j   exception_handler
+
+interrupt_handler:
+    j   interrupt_handler
+
+nmi_handler:
+    j   nmi_handler
+
+.balign 128
+vectored_interrupt_handler:
+.balign 4; j exception_handler // 00 - User SW interrupt / exception
+.balign 4; j interrupt_handler // 01 - Supervisor SW interrupt
+.balign 4; j interrupt_handler // 02 - Reserved
+.balign 4; j interrupt_handler // 03 - Machine SW interrupt
+.balign 4; j interrupt_handler // 04 - User Timer Interrupt
+.balign 4; j interrupt_handler // 05 - Supervisor Timer Interrupt
+.balign 4; j interrupt_handler // 06 - Reserved
+.balign 4; j interrupt_handler // 07 - Machine Timer Interrupt
+.balign 4; j interrupt_handler // 08 - User External Interrupt
+.balign 4; j interrupt_handler // 09 - Supervisor External Interrupt
+.balign 4; j interrupt_handler // 10 - Reserved
+.balign 4; j interrupt_handler // 11 - Machine External Interrupt
+.balign 4; j interrupt_handler // 12 - Reserved
+.balign 4; j interrupt_handler // 13 - Reserved
+.balign 4; j interrupt_handler // 14 - Reserved
+.balign 4; j interrupt_handler // 15 - Reserved
+.balign 4; j nmi_handler       // 16 - NMI
+
+```
