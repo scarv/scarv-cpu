@@ -145,7 +145,7 @@ mtvec_trap_handler_aligned:
 .extern test_fail
 .extern test_pass
 
-.balign 64
+.balign 128
 .global vector_interrupt_table
 vector_interrupt_table:
 .balign 4; j test_fail                  // 00 - User SW interrupt / exception
@@ -164,5 +164,6 @@ vector_interrupt_table:
 .balign 4; j test_fail                  // 13 - Reserved
 .balign 4; j test_fail                  // 14 - Reserved
 .balign 4; j test_fail                  // 15 - Reserved
+.balign 4; j test_fail                  // 16 - NMI
 
 

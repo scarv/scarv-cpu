@@ -340,7 +340,7 @@ wire [1:0] n_mtvec_mode =
 
 wire        mtvec_bad_write = wen_mtvec && (
     n_mtvec_mode[1] ||
-    n_mtvec_mode[0] && |n_mtvec_base[3:0]
+    n_mtvec_mode[0] && |n_mtvec_base[4:0]
 );
 
 always @(posedge g_clk) begin

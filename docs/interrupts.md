@@ -19,7 +19,15 @@ The SCARV-CPU supports four classes of interrupts.
 - Non-maskable Interrupts (NMIs), which act like external interrupts,
   but cannot be selectivley disabled.
 
-- Vectored interrupt / trap handlers are not supported.
+- Vectored interrupts are supported.
+
+  - When in direct interrupt mode (`mtvec.mode=0`), the `mtvec.base`
+    handler address must be 4-byte aligned.
+
+  - When in vectored interrupt mode (`mtvec.mode=1`), the `mtvec.base`
+    handler address must be 128-byte aligned.
+
+- On reset, the core is in direct interrupt mode.
 
 ## Timer Interrupts
 
@@ -34,7 +42,7 @@ These occur as described in the RISC-V PRA.
   flow is transfered to the trap vector handler at `mtvec.`
 
 - A machine timer interrupt is identified through the `mcause` register
-  value `7`, with the interrupt field set to `1`.
+  value `7`, with the `mcause.interrupt` field set to `1`.
 
 All aspects of timer interrupt implementation are handled inside the
 core RTL module.
