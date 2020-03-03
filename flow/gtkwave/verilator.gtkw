@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Mar  3 12:38:19 2020
+[*] Tue Mar  3 14:41:06 2020
 [*]
 [dumpfile] "/home/ben/scarv/repos/scarv-cpu/work/unit/interrupts/interrupts.vcd"
-[dumpfile_mtime] "Tue Mar  3 12:34:10 2020"
-[dumpfile_size] 38243752
+[dumpfile_mtime] "Tue Mar  3 14:39:29 2020"
+[dumpfile_size] 5862676
 [savefile] "/home/ben/scarv/repos/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 91400
+[timestart] 27720
 [size] 1920 1025
 [pos] -1 -1
-*-9.297943 93495 2626 23906 3830 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.497602 28306 2626 23906 3830 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -106,7 +106,7 @@ TOP.frv_core.trs_pc[31:0]
 TOP.frv_core.trs_valid
 TOP.frv_core.i_pipeline.cf_req
 TOP.frv_core.i_pipeline.cf_ack
-@23
+@22
 TOP.frv_core.i_pipeline.cf_target[31:0]
 @1000200
 -Trace
@@ -354,7 +354,7 @@ TOP.frv_core.i_pipeline.s3_trap
 TOP.frv_core.i_pipeline.s3_uop[4:0]
 @28
 TOP.frv_core.i_pipeline.s3_valid
-@800200
+@c00200
 -LSU
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_req
@@ -403,9 +403,8 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_word
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.n_lsu_finished
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
-@1000200
--LSU
 @1401200
+-LSU
 -Pipe - S3 Memory
 @c00200
 -Pipe - S4 - Writeback
@@ -575,6 +574,13 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.cfu_trap
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.csr_trap
 @200
 -
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.vector_intrs
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_target_addr[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_vector_offset[7:0]
+@23
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.int_trap_cause[5:0]
 @24
 TOP.frv_core.i_pipeline.i_csrs.trap_cause[5:0]
 @28
