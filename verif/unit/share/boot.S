@@ -57,6 +57,7 @@ _boot:
     j       test_fail           // Nonzero -> fail.
 
 
+.align 2
 _trap_handler:                  // Main trap handler function.
     j test_fail
     nop
