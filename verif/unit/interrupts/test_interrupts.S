@@ -66,3 +66,27 @@ timer_interrupt_handler:
     mret
 .endfunc
 
+.extern test_fail
+.extern test_pass
+
+.balign 64
+.global vector_interrupt_table
+vector_interrupt_table:
+.balign 16;  j   test_fail               // 00 - User SW interrupt / exception
+.balign 16;  j   test_fail               // 01 - Supervisor SW interrupt
+.balign 16;  j   test_fail               // 02 - Reserved
+.balign 16;  j   test_fail               // 03 - Machine SW interrupt
+.balign 16;  j   test_fail               // 04 - User Timer Interrupt
+.balign 16;  j   test_fail               // 05 - Supervisor Timer Interrupt
+.balign 16;  j   test_fail               // 06 - Reserved
+.balign 16;  j   timer_interrupt_handler // 07 - Machine Timer Interrupt
+.balign 16;  j   test_fail               // 08 - User External Interrupt
+.balign 16;  j   test_fail               // 09 - Supervisor External Interrupt
+.balign 16;  j   test_fail               // 10 - Reserved
+.balign 16;  j   test_fail               // 11 - Machine External Interrupt
+.balign 16;  j   test_fail               // 12 - Reserved
+.balign 16;  j   test_fail               // 13 - Reserved
+.balign 16;  j   test_fail               // 14 - Reserved
+.balign 16;  j   test_fail               // 15 - Reserved
+
+

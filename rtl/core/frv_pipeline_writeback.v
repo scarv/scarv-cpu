@@ -92,6 +92,7 @@ output wire        exec_mret       , // MRET instruction executed.
 
 input  wire [XL:0] csr_mepc        ,
 input  wire [XL:0] csr_mtvec       ,
+input  wire        vector_intrs    , // Vector interrupt mode (if set)
 
 output wire [XL:0] trs_pc          , // Trace program counter.
 output wire [31:0] trs_instr       , // Trace instruction.
@@ -476,7 +477,7 @@ end
 assign int_trap_ack = 1'b0;
 
 // Trap occured due to CPU exception or instruction.
-assign trap_cpu   = cfu_trap || lsu_trap || s4_trap;
+assign trap_cpu   = cfu_trap || lsu_trap || s4_trap || csr_trap;
 
  // A trap occured due to interrupt. trap_cpu takes priority.
 assign trap_int   = (int_trap_req || trap_int_pending) &&
@@ -487,6 +488,7 @@ assign trap_cause = // Cause of the trap.
     lsu_b_error && lsu_store    ? TRAP_STACCESS :
     cfu_ebreak                  ? TRAP_BREAKPT  :
     cfu_ecall                   ?   TRAP_ECALLM :
+    csr_error                   ? TRAP_IOPCODE  :
     trap_int                    ? int_trap_cause:
                                   {1'b0,s4_rd}  ;
 

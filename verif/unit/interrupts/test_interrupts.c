@@ -97,6 +97,33 @@ int test_individual_interrupt_enable() {
     return 0;
 
 }
+    
+int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
+
+    // Add a big value to mtime and set mtimecmp to this.
+    __mtimecmp[0] = __mtime[0] + delay;
+
+    // Re-enable interrupts.
+    __set_mstatus(MSTATUS_MIE);
+
+    int spins = 0;
+
+    for(int i = 0; i < 200; i ++) {
+        // Spin round doing nothing, waiting to see the interrupt.
+        if(*interrupt_seen) {
+            break;
+        }
+        spins ++;
+    }
+
+    // Disable timer interrupts.
+    __clr_mie(MIE_MTIE);
+    
+    // Globally Disable interrupts again.
+    __clr_mstatus(MSTATUS_MIE);
+
+    return spins;
+}
 
 //! Check that we can cause a timer interrupt.
 int test_timer_interupt() {
@@ -117,24 +144,10 @@ int test_timer_interupt() {
         &interrupt_seen
     );
 
-    // Add a big value to mtime and set mtimecmp to this.
-    __mtimecmp[0] = __mtime[0] + 400;
+    int spins = trigger_timer_interrupt(&interrupt_seen, 400);
 
-    // Re-enable interrupts.
-    __set_mstatus(MSTATUS_MIE);
+    __putstr("- Spins: "); __puthex32(spins); __putchar('\n');
 
-    for(int i = 0; i < 200; i ++) {
-        // Spin round doing nothing, waiting to see the interrupt.
-        if(interrupt_seen) {
-            break;
-        }
-    }
-
-    // Disable timer interrupts.
-    __clr_mie(MIE_MTIE);
-    
-    // Globally Disable interrupts again.
-    __clr_mstatus(MSTATUS_MIE);
     
     if(interrupt_seen) {
         return 0;
@@ -145,28 +158,29 @@ int test_timer_interupt() {
 
 
 //! Used to communicate status codes between mtvec trap handler and test code.
-volatile uint32_t mtvec_test_code = 0;
+volatile char mtvec_test_code = 0;
 
 
 //! Handler for mtvec related exceptions - aligned to 64b boundary.
 void mtvec_trap_handler_unaligned() {
     mtvec_test_code = 1;
-    return ;
+    asm("mret");
 }
 
+//! Vectored interrupt table.
+extern void vector_interrupt_table();
 
 //! Handler for mtvec related exceptions - aligned to 64b boundary.
 __attribute__((aligned(64)))
 void mtvec_trap_handler_aligned() {
     mtvec_test_code = 2;
-    return ;
+    asm("mret");
 }
 
 
 //! Check that mtvec can be set correctly wrt. vectored/direct interrupts.
 int test_mtvec_fields() {
 
-    uint32_t toset  = 0;
     uint32_t save   = 0;
     mtvec_test_code = 0; // No traps taken.
 
@@ -199,6 +213,41 @@ int test_mtvec_fields() {
 }
 
 
+int test_vectored_timer_interrupt() {
+    uint32_t save   = 0;
+    mtvec_test_code = 0; // No traps taken.
+
+    volatile int interrupt_seen;
+    
+    //
+    // Set to vectored interrupt mode, handler = vector_interrupt_table.
+    save = mtvec(&vector_interrupt_table, 1);
+
+    // Restore the original trap handler before returning.
+    mtvec((void*)save,0);
+    
+    // Globally Disable interrupts
+    __clr_mstatus(MSTATUS_MIE);
+
+    // Disable all other interrupt sources.
+    __clr_mie(MIE_MEIE | MIE_MSIE);
+
+    // Enable timer interrupts.
+    __set_mie(MIE_MTIE);
+
+    // Enable timer interrupts.
+    __set_mie(MIE_MTIE);
+
+    trigger_timer_interrupt(&interrupt_seen, 400);
+
+    if(interrupt_seen) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+
 /*!
 @brief Test for interrupt control.
 */
@@ -219,12 +268,16 @@ int test_main() {
     __putstr("Test Timer Interrupt...\n");
     fail = test_timer_interupt();
     if(fail){return fail;}
-    
-    
-    __putstr("Test MTVEC Fields...\n");
-    fail = test_mtvec_fields();
-    if(fail){return fail;}
 
+
+    //__putstr("Test MTVEC Fields...\n");
+    //fail = test_mtvec_fields();
+    //if(fail){return fail;}
+
+
+    //__putstr("Test Vectored Timer Interrupt...\n");
+    //fail = test_vectored_timer_interrupt();
+    //if(fail){return fail;}
 
     return 0;
 }

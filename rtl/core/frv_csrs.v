@@ -19,7 +19,8 @@ output wire [XL:0] csr_rdata        , // CSR read data
 output wire        csr_error        , // Raise invalid opcode exception.
 
 output wire [XL:0] csr_mepc         , // Current EPC.
-output wire [XL:0] csr_mtvec        , // Current MTVEC.
+output wire [XL:0] csr_mtvec        , // Current MTVEC address.
+output wire        vector_intrs     , // Vector interrupt mode (if set)
 
 input  wire        exec_mret        , // MRET instruction executed.
 
@@ -323,6 +324,7 @@ wire [31:0] reg_mtvec       = {
 };
 
 assign      csr_mtvec    = {reg_mtvec_base, 2'b00};
+assign      vector_intrs = reg_mtvec_mode[0];
 
 wire        wen_mtvec    = csr_wr && csr_addr == CSR_ADDR_MTVEC;
 

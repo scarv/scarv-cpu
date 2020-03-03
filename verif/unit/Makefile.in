@@ -8,8 +8,8 @@ UNIT_TESTS_RUN  =
 UNIT_TESTS_CLEAN=
 
 UNIT_TIMEOUT    = 20000
-UNIT_FAIL       = 0x80000084
-UNIT_PASS       = 0x8000008e
+UNIT_FAIL       = 0x80000086
+UNIT_PASS       = 0x80000090
 
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
 UNIT_CFLAGS    += -march=rv32imcb_xcrypto -mabi=ilp32

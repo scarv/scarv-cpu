@@ -197,6 +197,7 @@ wire        csr_error  ; // Raise invalid opcode trap due to bad csr access.
 
 wire [XL:0] csr_mepc   ; // Current MEPC.
 wire [XL:0] csr_mtvec  ; // Current MTVEC.
+wire        vector_intrs;// In vectored interrupt mode.
 
 wire        exec_mret  ; // MRET instruction executed.
 
@@ -739,6 +740,7 @@ frv_pipeline_writeback #(
 .exec_mret        (exec_mret        ), // MRET instruction executed.
 .csr_mepc         (csr_mepc         ),
 .csr_mtvec        (csr_mtvec        ),
+.vector_intrs     (vector_intrs     ),
 .trs_pc           (trs_pc           ), // Trace program counter.
 .trs_instr        (trs_instr        ), // Trace instruction.
 .trs_valid        (trs_valid        ), // Trace output valid.
@@ -793,6 +795,7 @@ frv_csrs #(
 .csr_error        (csr_error        ), // Raise invalid opcode trap - bad CSR
 .csr_mepc         (csr_mepc         ), // Current MEPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
+.vector_intrs     (vector_intrs     ), // Vectored interrupt mode?
 .exec_mret        (exec_mret        ), // MRET instruction executed.
 .mstatus_mie      (mstatus_mie      ), // Global interrupt enable.
 .mie_meie         (mie_meie         ), // External interrupt enable.
