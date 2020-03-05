@@ -122,6 +122,7 @@ wire fu_csr = s3_fu[P_FU_CSR];
 wire fu_asi = s3_fu[P_FU_ASI];
 wire fu_bit = s3_fu[P_FU_BIT];
 wire fu_rng = s3_fu[P_FU_RNG];
+wire fu_msk = s3_fu[P_FU_MSK];
 
 
 //
@@ -183,12 +184,19 @@ wire        imul_gpr_wide   = fu_mul && (
 
 wire        bitw_gpr_wide   = fu_bit && (s3_uop == BIT_RORW);
 
+wire        msk_op_b_unmask = s3_uop == MSK_B_UNMASK ;
+wire        msk_op_a_unmask = s3_uop == MSK_A_UNMASK ;
+
+wire        msk_gpr_wide    =
+    fu_msk && !(msk_op_b_unmask || msk_op_a_unmask);
+
 wire opra_ld_en = p_valid && (
     fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_asi || fu_bit ||
-    fu_rng ); 
+    fu_rng || fu_msk); 
 
 wire oprb_ld_en = p_valid && (
     (fu_lsu                 )  ||
+     fu_msk                    ||
      fu_csr                    ||
     (fwd_s3_wide            )  ); 
 
@@ -208,6 +216,7 @@ assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
 assign fwd_s3_wdata = s3_opr_a          ;
 assign fwd_s3_wdata_hi = s3_opr_b       ;
 assign fwd_s3_wide  = imul_gpr_wide ||
+                      msk_gpr_wide  ||
                       bitw_gpr_wide ;
 assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.

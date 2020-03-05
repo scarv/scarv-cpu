@@ -169,6 +169,7 @@ wire fu_csr = s4_fu[P_FU_CSR];
 wire fu_asi = s4_fu[P_FU_ASI];
 wire fu_bit = s4_fu[P_FU_BIT];
 wire fu_rng = s4_fu[P_FU_RNG];
+wire fu_msk = s4_fu[P_FU_MSK];
 
 //
 // Functional Unit: ALU
@@ -176,6 +177,13 @@ wire fu_rng = s4_fu[P_FU_RNG];
 
 wire        alu_gpr_wen     = fu_alu;
 wire [XL:0] alu_gpr_wdata   = s4_opr_a;
+
+//
+// Functional Unit: MASK
+// -------------------------------------------------------------------------
+
+wire        msk_gpr_wen     = fu_msk;
+wire [XL:0] msk_gpr_wdata   = s4_opr_a;
 
 //
 // Functional Unit: MUL
@@ -431,6 +439,12 @@ end
 
 assign gpr_rd   = s4_rd;
 
+wire   msk_op_b_unmask = fu_msk && s4_uop == MSK_B_UNMASK;
+wire   msk_op_a_unmask = fu_msk && s4_uop == MSK_A_UNMASK;
+
+wire   msk_gpr_wide    =
+    fu_msk && !(msk_op_b_unmask || msk_op_a_unmask);
+
 assign gpr_wide = 
     fu_mul && (
         s4_uop == MUL_MMUL ||
@@ -438,16 +452,18 @@ assign gpr_wide =
         s4_uop == MUL_MSUB ||
         s4_uop == MUL_MACC 
     )    ||
-    fu_bit && (s4_uop == BIT_RORW) ;
+    fu_bit && (s4_uop == BIT_RORW) ||
+    msk_gpr_wide;
 
 
 assign gpr_wen  = !s4_trap &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
      cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen ||
-     bit_gpr_wen || rng_gpr_wen                );
+     bit_gpr_wen || rng_gpr_wen || msk_gpr_wen );
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
+                  {32{msk_gpr_wen}} & msk_gpr_wdata |
                   {32{bit_gpr_wen}} & bit_gpr_wdata |
                   {32{rng_gpr_wen}} & rng_gpr_wdata |
                   {32{lsu_gpr_wen}} & lsu_gpr_wdata |

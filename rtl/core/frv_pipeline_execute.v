@@ -117,6 +117,7 @@ wire fu_csr = s2_fu[P_FU_CSR];
 wire fu_asi = s2_fu[P_FU_ASI];
 wire fu_bit = s2_fu[P_FU_BIT];
 wire fu_rng = s2_fu[P_FU_RNG];
+wire fu_msk = s2_fu[P_FU_MSK];
 
 //
 // Functional Unit Interfacing: ALU
@@ -238,6 +239,60 @@ wire        lsu_store  = fu_lsu && s2_uop[LSU_STORE];
 
 wire [XL:0] n_s3_opr_a_lsu = alu_add_result ;
 wire [XL:0] n_s3_opr_b_lsu = s2_opr_c       ;
+
+//
+// Functional Unit Interfacing: Masking ISE
+// -------------------------------------------------------------------------
+
+
+// Bit to stop a very heavily delayed masked ALU instruction re-starting
+// accidentally.
+reg         msk_valid_en_r  ;
+wire        msk_valid_en    = 
+    msk_valid_en_r ? !(fu_msk && msk_ready && !pipe_progress) :
+                                               pipe_progress  ;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        msk_valid_en_r <= 1'b1;
+    end else begin
+        msk_valid_en_r <= msk_valid_en;
+    end
+end
+
+// Mask ALU input valid.
+wire        msk_valid       = fu_msk && msk_valid_en_r ;
+wire        msk_ready       ; // Mask ALU operation complete.
+    
+wire        msk_op_b2a      = msk_valid && s2_uop == MSK_B2A     ;
+wire        msk_op_a2b      = msk_valid && s2_uop == MSK_A2B     ;
+wire        msk_op_b_mask   = msk_valid && s2_uop == MSK_B_MASK  ;
+wire        msk_op_b_unmask = msk_valid && s2_uop == MSK_B_UNMASK;
+wire        msk_op_b_remask = msk_valid && s2_uop == MSK_B_REMASK;
+wire        msk_op_a_mask   = msk_valid && s2_uop == MSK_A_MASK  ;
+wire        msk_op_a_unmask = msk_valid && s2_uop == MSK_A_UNMASK;
+wire        msk_op_a_remask = msk_valid && s2_uop == MSK_A_REMASK;
+wire        msk_op_b_not    = msk_valid && s2_uop == MSK_B_NOT   ;
+wire        msk_op_b_and    = msk_valid && s2_uop == MSK_B_AND   ;
+wire        msk_op_b_ior    = msk_valid && s2_uop == MSK_B_IOR   ;
+wire        msk_op_b_xor    = msk_valid && s2_uop == MSK_B_XOR   ;
+wire        msk_op_b_add    = msk_valid && s2_uop == MSK_B_ADD   ;
+wire        msk_op_b_sub    = msk_valid && s2_uop == MSK_B_SUB   ;
+
+wire [XL:0] msk_rs1_s0      = s2_opr_a;
+wire [XL:0] msk_rs1_s1      = s2_opr_c;
+wire [XL:0] msk_rs2_s0      = s2_opr_b;
+wire [XL:0] msk_rs2_s1      = s2_opr_d;
+
+wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
+wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
+
+wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
+wire [XL:0] n_s3_opr_b_msk  = msk_rd_s1;
+
+wire        msk_gpr_wide    =
+    fu_msk && !(msk_op_b_unmask || msk_op_a_unmask);
+
 
 //
 // Functional Unit Interfacing: CFU
@@ -375,7 +430,8 @@ assign s2_busy = p_busy                    ||
                  lsu_valid  && !lsu_ready  ||
                  rng_valid  && !rng_ready  ||
                  imul_valid && !imul_ready ||
-                 bitw_valid && !bitw_ready ;
+                 bitw_valid && !bitw_ready ||
+                 msk_valid  && !msk_ready  ;
 
 // Is the next stage currently busy?
 wire   p_busy    ;
@@ -429,6 +485,38 @@ frv_alu i_alu (
 .alu_lhs         (alu_lhs         ), // left hand operand
 .alu_rhs         (alu_rhs         ), // right hand operand
 .alu_result      (alu_result      )  // result of the ALU operation
+);
+
+//
+// instance: frv_masked_alu
+//
+//  Implements all of the masked ALU functionality.
+//
+frv_masked_alu i_frv_masked_alu (
+.g_clk       (g_clk           ), // Global clock
+.g_resetn    (g_resetn        ), // Synchronous, active low reset.
+.valid       (msk_valid       ), // Inputs valid
+.op_b2a      (msk_op_b2a      ), // Binary to arithmetic mask covert
+.op_a2b      (msk_op_a2b      ), // Arithmetic to binary mask convert
+.op_b_mask   (msk_op_b_mask   ), // Binary mask
+.op_b_unmask (msk_op_b_unmask ), // Binary unmask
+.op_b_remask (msk_op_b_remask ), // Binary remask
+.op_a_mask   (msk_op_a_mask   ), // Arithmetic mask
+.op_a_unmask (msk_op_a_unmask ), // Arithmetic unmask
+.op_a_remask (msk_op_a_remask ), // Arithmetic remask
+.op_b_not    (msk_op_b_not    ), // Binary masked not
+.op_b_and    (msk_op_b_and    ), // Binary masked and
+.op_b_ior    (msk_op_b_ior    ), // Binary masked or
+.op_b_xor    (msk_op_b_xor    ), // Binary masked xor
+.op_b_add    (msk_op_b_add    ), // Binary masked addition
+.op_b_sub    (msk_op_b_sub    ), // Binary masked subtraction
+.rs1_s0      (msk_rs1_s0      ), // RS1 Share 0
+.rs1_s1      (msk_rs1_s1      ), // RS1 Share 1
+.rs2_s0      (msk_rs2_s0      ), // RS2 Share 0
+.rs2_s1      (msk_rs2_s1      ), // RS2 Share 1
+.ready       (msk_ready       ), // Outputs ready
+.rd_s0       (msk_rd_s0       ), // Output share 0
+.rd_s1       (msk_rd_s1       )  // Output share 1
 );
 
 //
@@ -563,7 +651,8 @@ wire [XL:0] n_s3_opr_a =
     {XLEN{fu_mul}} & n_s3_opr_a_mul |
     {XLEN{fu_lsu}} & n_s3_opr_a_lsu |
     {XLEN{fu_cfu}} & n_s3_opr_a_cfu |
-    {XLEN{fu_csr}} & n_s3_opr_a_csr ;
+    {XLEN{fu_csr}} & n_s3_opr_a_csr |
+    {XLEN{fu_msk}} & n_s3_opr_a_msk ;
 
 wire [XL:0] n_s3_opr_b =
     n_s3_trap ? {26'b0,n_trap_cause} : (
@@ -572,7 +661,8 @@ wire [XL:0] n_s3_opr_b =
         {XLEN{fu_mul}} & n_s3_opr_b_mul |
         {XLEN{fu_lsu}} & n_s3_opr_b_lsu |
         {XLEN{fu_cfu}} & n_s3_opr_b_cfu |
-        {XLEN{fu_csr}} & n_s3_opr_b_csr 
+        {XLEN{fu_csr}} & n_s3_opr_b_csr |
+        {XLEN{fu_msk}} & n_s3_opr_b_msk 
     );
 
 wire opra_ld_en = p_valid && (
@@ -581,6 +671,7 @@ wire opra_ld_en = p_valid && (
 
 wire oprb_ld_en = p_valid && (
     (fu_mul && imul_gpr_wide)  || 
+    (fu_msk && msk_gpr_wide )  || 
     (fu_lsu && lsu_store    )  ||
      fu_csr                    ||
     (fu_bit && bitw_gpr_wide)  ); 
@@ -594,6 +685,7 @@ assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32]   :
                                   n_s3_opr_b_bit            ;
 assign fwd_s2_wide  =
     fu_mul && (imul_gpr_wide) ||
+    fu_msk && (msk_gpr_wide ) ||
     fu_bit && (bitw_gpr_wide  );
 
 assign fwd_s2_load  = fu_lsu && lsu_load; // Writeback stage has load in it.

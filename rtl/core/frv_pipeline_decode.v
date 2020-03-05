@@ -425,7 +425,6 @@ wire [OP:0] uop_rng =
 wire [OP:0] uop_msk =
     {1+OP{dec_mask_b2a        }} & MSK_B2A          |
     {1+OP{dec_mask_a2b        }} & MSK_A2B          |
-    {1+OP{dec_mask_b_unmask   }} & MSK_B_UNMASK     |
     {1+OP{dec_mask_b_mask     }} & MSK_B_MASK       |
     {1+OP{dec_mask_b_unmask   }} & MSK_B_UNMASK     |
     {1+OP{dec_mask_b_remask   }} & MSK_B_REMASK     |
