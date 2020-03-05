@@ -39,6 +39,8 @@ output wire        fwd_s3_csr      , // stage has CSR op in it.
 `ifdef RVFI
 input  wire [XL:0] rvfi_s3_rs1_rdata, // Source register data 1
 input  wire [XL:0] rvfi_s3_rs2_rdata, // Source register data 2
+input  wire [XL:0] rvfi_s3_rs1_rdata_hi, // Source register data 1
+input  wire [XL:0] rvfi_s3_rs2_rdata_hi, // Source register data 2
 input  wire [XL:0] rvfi_s3_rs3_rdata, // Source register data 3
 input  wire [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
@@ -49,6 +51,8 @@ input  wire [ 2:0] rvfi_s3_rng_stat , // RNG status
 output reg  [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 output reg  [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
 output reg  [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
+output reg  [XL:0] rvfi_s4_rs1_rdata_hi, // Source register data 1
+output reg  [XL:0] rvfi_s4_rs2_rdata_hi, // Source register data 2
 output reg  [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 output reg  [ 4:0] rvfi_s4_rs3_addr , // Source register address 3

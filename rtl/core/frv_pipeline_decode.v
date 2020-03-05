@@ -41,6 +41,8 @@ output reg  [ 4:0] rvfi_s2_rs2_addr,
 output reg  [ 4:0] rvfi_s2_rs3_addr,
 output reg  [XL:0] rvfi_s2_rs1_data,
 output reg  [XL:0] rvfi_s2_rs2_data,
+output reg  [XL:0] rvfi_s2_rs1_data_hi,
+output reg  [XL:0] rvfi_s2_rs2_data_hi,
 output reg  [XL:0] rvfi_s2_rs3_data,
 `endif
 
@@ -969,11 +971,13 @@ localparam RL = 40 + (1+OP) + (1+FU) + (1+PW);
 always @(posedge g_clk) begin
     if(!g_resetn || s1_flush) begin
         rvfi_s2_rs1_addr <= 0;
-        rvfi_s2_rs2_addr <= 0;
         rvfi_s2_rs1_data <= 0;
+        rvfi_s2_rs2_addr <= 0;
         rvfi_s2_rs2_data <= 0;
+        rvfi_s2_rs3_addr <= 0;
         rvfi_s2_rs3_data <= 0;
-        rvfi_s2_rs3_data <= 0;
+        rvfi_s2_rs1_data_hi <= 0;
+        rvfi_s2_rs2_data_hi <= 0;
     end else if (pipe_progress) begin
         rvfi_s2_rs1_addr <= s1_rs1_addr;
         rvfi_s2_rs1_data <= s1_rs1_rdata;
@@ -981,6 +985,8 @@ always @(posedge g_clk) begin
         rvfi_s2_rs2_data <= s1_rs2_rdata;
         rvfi_s2_rs3_addr <= s1_rs3_addr;
         rvfi_s2_rs3_data <= s1_rs3_rdata;
+        rvfi_s2_rs1_data_hi <= s1_rs1_rdatahi;
+        rvfi_s2_rs2_data_hi <= s1_rs2_rdatahi;
     end
 end
 `endif

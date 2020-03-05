@@ -47,6 +47,8 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 input  wire [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 input  wire [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
 input  wire [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
+input  wire [XL:0] rvfi_s4_rs1_rdata_hi, // Source register data 1
+input  wire [XL:0] rvfi_s4_rs2_rdata_hi, // Source register data 2
 input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 input  wire [ 4:0] rvfi_s4_rs3_addr , // Source register address 3

@@ -299,12 +299,16 @@ wire        hold_lsu_req  ; // Don't make LSU requests yet.
 `ifdef RVFI
 wire [XL:0] rvfi_s2_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s2_rs2_rdata; // Source register data 2
+wire [XL:0] rvfi_s2_rs1_rdata_hi; // Source register data 1
+wire [XL:0] rvfi_s2_rs2_rdata_hi; // Source register data 2
 wire [XL:0] rvfi_s2_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s2_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s2_rs2_addr ; // Source register address 2
 wire [ 4:0] rvfi_s2_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s3_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s3_rs2_rdata; // Source register data 2
+wire [XL:0] rvfi_s3_rs1_rdata_hi; // Source register data 1
+wire [XL:0] rvfi_s3_rs2_rdata_hi; // Source register data 2
 wire [XL:0] rvfi_s3_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s3_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s3_rs2_addr ; // Source register address 2
@@ -314,6 +318,8 @@ wire [31:0] rvfi_s3_rng_data ; // RNG read data
 wire [ 2:0] rvfi_s3_rng_stat ; // RNG status
 wire [XL:0] rvfi_s4_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s4_rs2_rdata; // Source register data 2
+wire [XL:0] rvfi_s4_rs1_rdata_hi; // Source register data 1
+wire [XL:0] rvfi_s4_rs2_rdata_hi; // Source register data 2
 wire [XL:0] rvfi_s4_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s4_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s4_rs2_addr ; // Source register address 2
@@ -491,6 +497,8 @@ frv_pipeline_decode #(
 .rvfi_s2_rs3_addr   (rvfi_s2_rs3_addr   ),
 .rvfi_s2_rs1_data   (rvfi_s2_rs1_rdata  ),
 .rvfi_s2_rs2_data   (rvfi_s2_rs2_rdata  ),
+.rvfi_s2_rs1_data_hi(rvfi_s2_rs1_rdata_hi),
+.rvfi_s2_rs2_data_hi(rvfi_s2_rs2_rdata_hi),
 .rvfi_s2_rs3_data   (rvfi_s2_rs3_rdata  ),
 `endif
 .s2_valid           (s2_valid           ), // Is the output data valid?
@@ -565,12 +573,16 @@ frv_pipeline_execute #(
 `ifdef RVFI
 .rvfi_s2_rs1_rdata(rvfi_s2_rs1_rdata), // Source register data 1
 .rvfi_s2_rs2_rdata(rvfi_s2_rs2_rdata), // Source register data 2
+.rvfi_s2_rs1_rdata_hi(rvfi_s2_rs1_rdata_hi),
+.rvfi_s2_rs2_rdata_hi(rvfi_s2_rs2_rdata_hi),
 .rvfi_s2_rs3_rdata(rvfi_s2_rs3_rdata), // Source register data 2
 .rvfi_s2_rs1_addr (rvfi_s2_rs1_addr ), // Source register address 1
 .rvfi_s2_rs2_addr (rvfi_s2_rs2_addr ), // Source register address 2
 .rvfi_s2_rs3_addr (rvfi_s2_rs3_addr ), // Source register address 2
 .rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
 .rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs1_rdata_hi(rvfi_s3_rs1_rdata_hi),
+.rvfi_s3_rs2_rdata_hi(rvfi_s3_rs2_rdata_hi),
 .rvfi_s3_rs3_rdata(rvfi_s3_rs3_rdata), // Source register data 2
 .rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
@@ -628,6 +640,8 @@ frv_pipeline_memory #(
 `ifdef RVFI
 .rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
 .rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
+.rvfi_s3_rs1_rdata_hi(rvfi_s3_rs1_rdata_hi),
+.rvfi_s3_rs2_rdata_hi(rvfi_s3_rs2_rdata_hi),
 .rvfi_s3_rs3_rdata(rvfi_s3_rs3_rdata), // Source register data 3
 .rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
@@ -637,6 +651,8 @@ frv_pipeline_memory #(
 .rvfi_s3_rng_stat (rvfi_s3_rng_stat ), 
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs1_rdata_hi(rvfi_s4_rs1_rdata_hi),
+.rvfi_s4_rs2_rdata_hi(rvfi_s4_rs2_rdata_hi),
 .rvfi_s4_rs3_rdata(rvfi_s4_rs3_rdata), // Source register data 3
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
@@ -713,6 +729,8 @@ frv_pipeline_writeback #(
 .rvfi_mem_wdata   (rvfi_mem_wdata   ),
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
+.rvfi_s4_rs1_rdata_hi(rvfi_s4_rs1_rdata_hi), // Source register data 1
+.rvfi_s4_rs2_rdata_hi(rvfi_s4_rs2_rdata_hi), // Source register data 2
 .rvfi_s4_rs3_rdata(rvfi_s4_rs3_rdata), // Source register data 3
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
