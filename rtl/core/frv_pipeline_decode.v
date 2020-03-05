@@ -22,7 +22,9 @@ output wire [ 4:0] s1_rs1_addr   ,
 output wire [ 4:0] s1_rs2_addr   ,
 output wire [ 4:0] s1_rs3_addr   ,
 input  wire [XL:0] s1_rs1_rdata  ,
+input  wire [XL:0] s1_rs1_rdatahi,
 input  wire [XL:0] s1_rs2_rdata  ,
+input  wire [XL:0] s1_rs2_rdatahi,
 input  wire [XL:0] s1_rs3_rdata  ,
 
 output wire [XL:0] leak_prng     , // Current PRNG value.
@@ -421,6 +423,9 @@ wire [OP:0] uop_rng =
     {1+OP{dec_xc_lkgfence     }} & RNG_ALFENCE      ;
 
 wire [OP:0] uop_msk =
+    {1+OP{dec_mask_b2a        }} & MSK_B2A          |
+    {1+OP{dec_mask_a2b        }} & MSK_A2B          |
+    {1+OP{dec_mask_b_unmask   }} & MSK_B_UNMASK     |
     {1+OP{dec_mask_b_mask     }} & MSK_B_MASK       |
     {1+OP{dec_mask_b_unmask   }} & MSK_B_UNMASK     |
     {1+OP{dec_mask_b_remask   }} & MSK_B_REMASK     |
@@ -711,7 +716,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ;
+    dec_xc_scatter_h     || n_s2_fu[P_FU_MSK]    ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -744,7 +749,9 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ;
+    dec_xc_scatter_h     ||
+    dec_mask_b_not || dec_mask_b_and || dec_mask_b_ior || dec_mask_b_xor ||
+    dec_mask_b_add || dec_mask_b_sub ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
@@ -774,6 +781,12 @@ assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
     dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ;
 
+wire oprc_src_rs1_hi =
+    dec_mask_b2a        || dec_mask_a2b        || dec_mask_b_unmask   ||
+    dec_mask_b_remask   || dec_mask_a_unmask   || dec_mask_a_remask   ||
+    dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
+    dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ;
+
 assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
     dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||
     dec_xc_madd_3  || dec_xc_msub_3  || dec_xc_macc_1  || dec_xc_mror    ||
@@ -790,6 +803,12 @@ assign n_s2_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
     dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
     dec_c_j        || dec_c_jal      || dec_jal         ;
+
+//
+// Operand D sources rs2 high half of double-width read
+wire oprd_src_rs2_hi = 
+    dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
+    dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ;
 
 //
 // Trap catching
@@ -923,10 +942,12 @@ wire oprc_src_csra = n_s2_opr_src[DIS_OPRC_CSRA];
 wire oprc_src_pcim = n_s2_opr_src[DIS_OPRC_PCIM];
 
 wire oprc_ld_en    = n_s2_valid && (
-    oprc_src_rs2  || oprc_src_rs3  || oprc_src_csra || oprc_src_pcim
+    oprc_src_rs2  || oprc_src_rs3  || oprc_src_csra || oprc_src_pcim  ||
+    oprc_src_rs1_hi
 );
 
 assign n_s2_opr_c = 
+    {XLEN{oprc_src_rs1_hi }} & s1_rs1_rdatahi |
     {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
     {XLEN{oprc_src_rs3    }} & s1_rs3_rdata   |
     {XLEN{oprc_src_csra   }} & csr_addr       |
@@ -935,9 +956,7 @@ assign n_s2_opr_c =
 //
 // Operand D sourcing: TODO
 
-wire oprd_src_rs2_hi = 1'b0;
-
-wire [XL:0] n_s2_opr_d     = 32'b0 ;
+wire [XL:0] n_s2_opr_d     = oprd_src_rs2_hi ? s1_rs2_rdatahi : {XLEN{1'b0}};
 
 wire        oprd_ld_en     = n_s2_valid && oprd_src_rs2_hi;
 

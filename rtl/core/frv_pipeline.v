@@ -228,7 +228,9 @@ wire [ 4:0] s1_rs1_addr   ;
 wire [ 4:0] s1_rs2_addr   ;
 wire [ 4:0] s1_rs3_addr   ;
 wire [XL:0] s1_rs1_rdata  ;
+wire [XL:0] s1_rs1_rdatahi;
 wire [XL:0] s1_rs2_rdata  ;
+wire [XL:0] s1_rs2_rdatahi;
 wire [XL:0] s1_rs3_rdata  ;
 
 wire        s2_valid      ; // Is the output data valid?
@@ -381,6 +383,8 @@ wire   s1_bubble   =
      s1_bubble_from_s3      ||
      s1_bubble_from_s2      ;
 
+wire [XL:0] fwd_rs1_rdatahi = s1_rs1_rdatahi;
+wire [XL:0] fwd_rs2_rdatahi = s1_rs2_rdatahi;
 
 wire [XL:0] fwd_rs1_rdata =
      hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
@@ -471,7 +475,9 @@ frv_pipeline_decode #(
 .s1_rs2_addr        (s1_rs2_addr        ),
 .s1_rs3_addr        (s1_rs3_addr        ),
 .s1_rs1_rdata       (fwd_rs1_rdata      ),
+.s1_rs1_rdatahi     (fwd_rs1_rdatahi    ),
 .s1_rs2_rdata       (fwd_rs2_rdata      ),
+.s1_rs2_rdatahi     (fwd_rs2_rdatahi    ),
 .s1_rs3_rdata       (fwd_rs3_rdata      ),
 .leak_prng          (leak_prng          ), // current prng value.
 .leak_lkgcfg        (leak_lkgcfg        ), // current lkgcfg register value.
@@ -841,8 +847,10 @@ frv_gprs #(
 .g_resetn   (g_resetn       ), //
 .rs1_addr   (s1_rs1_addr    ), // Source register 1 address
 .rs1_data   (s1_rs1_rdata   ), // Source register 1 read data
+.rs1_rdhi   (s1_rs1_rdatahi ), // Source register 1 read data (wide, high)
 .rs2_addr   (s1_rs2_addr    ), // Source register 2 address
 .rs2_data   (s1_rs2_rdata   ), // Source register 2 read data
+.rs2_rdhi   (s1_rs2_rdatahi ), // Source register 2 read data (wide, high)
 .rs3_addr   (s1_rs3_addr    ), // Source register 3 address
 .rs3_data   (s1_rs3_rdata   ), // Source register 3 read data
 .rd_wen     (gpr_wen        ), // Destination register write enable

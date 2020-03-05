@@ -93,6 +93,8 @@ localparam MUL_CLMUL_R  = {2'b00, 3'b100};
 localparam MUL_PCLMUL_L = {2'b00, 3'b101};
 localparam MUL_PCLMUL_H = {2'b00, 3'b111};
 
+localparam MSK_B2A      = {2'b11, 3'b001};
+localparam MSK_A2B      = {2'b11, 3'b010};
 localparam MSK_B_MASK   = {2'b10, 3'b001};
 localparam MSK_B_UNMASK = {2'b10, 3'b010};
 localparam MSK_B_REMASK = {2'b10, 3'b100};

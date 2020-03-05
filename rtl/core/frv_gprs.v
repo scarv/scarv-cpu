@@ -11,9 +11,11 @@ input  wire         g_resetn, //
 
 input  wire [ 4:0]  rs1_addr, // Source register 1 address
 output wire [31:0]  rs1_data, // Source register 1 read data
+output wire [31:0]  rs1_rdhi, // Source register 1 wide read high 32-bits
 
 input  wire [ 4:0]  rs2_addr, // Source register 2 address
 output wire [31:0]  rs2_data, // Source register 2 read data
+output wire [31:0]  rs2_rdhi, // Source register 2 wide read high 32-bits
 
 input  wire [ 4:0]  rs3_addr, // Source register 3 address
 output wire [31:0]  rs3_data, // Source register 3 read data
@@ -35,14 +37,25 @@ reg [31:0] gprs_odd  [15:0];
 // Used for debugging.
 wire [31:0] gprs      [31:0];
 
-assign rs1_data = gprs[rs1_addr];
-assign rs2_data = gprs[rs2_addr];
-assign rs3_data = gprs[rs3_addr];
+wire [31:0] rs1_even = gprs_even[rs1_addr[4:1]];
+wire [31:0] rs2_even = gprs_even[rs2_addr[4:1]];
+wire [31:0] rs3_even = gprs_even[rs3_addr[4:1]];
 
-wire        rd_odd       =  rd_addr[0];
-wire        rd_even      = !rd_addr[0];
+wire [31:0] rs1_odd  = gprs_odd [rs1_addr[4:1]];
+wire [31:0] rs2_odd  = gprs_odd [rs2_addr[4:1]];
+wire [31:0] rs3_odd  = gprs_odd [rs3_addr[4:1]];
 
-wire [ 3:0] rd_top       =  rd_addr[4:1];
+assign      rs1_data = rs1_addr[0] ? rs1_odd : rs1_even;
+assign      rs2_data = rs2_addr[0] ? rs2_odd : rs2_even;
+assign      rs3_data = rs3_addr[0] ? rs3_odd : rs3_even;
+
+assign      rs1_rdhi = rs1_odd;
+assign      rs2_rdhi = rs2_odd;
+
+wire        rd_odd   =  rd_addr[0];
+wire        rd_even  = !rd_addr[0];
+
+wire [ 3:0] rd_top   =  rd_addr[4:1];
 
 wire        rd_wen_even  = rd_even && rd_wen;
 wire        rd_wen_odd   = (rd_odd || rd_wide) && rd_wen;
