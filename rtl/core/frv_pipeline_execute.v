@@ -94,6 +94,7 @@ parameter XC_CLASS_MULTIARITH = 1'b1;
 parameter XC_CLASS_AES        = 1'b1;
 parameter XC_CLASS_SHA2       = 1'b1;
 parameter XC_CLASS_SHA3       = 1'b1;
+parameter XC_CLASS_MASK       = 1'b1;
 
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;

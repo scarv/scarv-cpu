@@ -79,6 +79,7 @@ parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MASK       = 1'b1 && XC_CLASS_BASELINE;
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;

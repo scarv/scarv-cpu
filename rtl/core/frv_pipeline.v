@@ -140,6 +140,7 @@ parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
+parameter XC_CLASS_MASK       = 1'b1 && XC_CLASS_BASELINE;
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
@@ -452,6 +453,7 @@ frv_pipeline_decode #(
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
+.XC_CLASS_MASK      (XC_CLASS_MASK      ),
 .XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
 .XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
@@ -512,6 +514,7 @@ frv_pipeline_execute #(
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
+.XC_CLASS_MASK      (XC_CLASS_MASK      ),
 .AES_SUB_FAST       (AES_SUB_FAST       ),
 .AES_MIX_FAST       (AES_MIX_FAST       ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
@@ -780,6 +783,7 @@ frv_csrs #(
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
+.XC_CLASS_MASK      (XC_CLASS_MASK      ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ),
 .CSR_MIMPID         (CSR_MIMPID         )
 ) i_csrs (
