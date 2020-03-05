@@ -27,8 +27,9 @@ localparam P_FU_CSR     = 4;    // CSR accesses
 localparam P_FU_BIT     = 5;    // Bitwise
 localparam P_FU_ASI     = 6;    // Algorithm specific (AES/SHA2/SHA3)
 localparam P_FU_RNG     = 7;    // Algorithm specific (AES/SHA2/SHA3)
+localparam P_FU_MSK     = 8;    // Masking Instructions.
 
-localparam FU           = 7;    // Width of functional unit specifier field
+localparam FU           = 8;    // Width of functional unit specifier field
 localparam OP           = 4;    // Width of micro-op specifier field.
 localparam PW           = 2;    // Width of IALU pack width field.
 
@@ -91,6 +92,19 @@ localparam MUL_CLMUL_H  = {2'b00, 3'b010};
 localparam MUL_CLMUL_R  = {2'b00, 3'b100};
 localparam MUL_PCLMUL_L = {2'b00, 3'b101};
 localparam MUL_PCLMUL_H = {2'b00, 3'b111};
+
+localparam MSK_B_MASK   = {2'b10, 3'b001};
+localparam MSK_B_UNMASK = {2'b10, 3'b010};
+localparam MSK_B_REMASK = {2'b10, 3'b100};
+localparam MSK_A_MASK   = {2'b11, 3'b001};
+localparam MSK_A_UNMASK = {2'b11, 3'b010};
+localparam MSK_A_REMASK = {2'b11, 3'b100};
+localparam MSK_B_NOT    = {2'b00, 3'b001};
+localparam MSK_B_AND    = {2'b00, 3'b010};
+localparam MSK_B_IOR    = {2'b00, 3'b011};
+localparam MSK_B_XOR    = {2'b00, 3'b100};
+localparam MSK_B_ADD    = {2'b00, 3'b101};
+localparam MSK_B_SUB    = {2'b00, 3'b110};
 
 localparam CSR_READ     = 4;
 localparam CSR_WRITE    = 3;

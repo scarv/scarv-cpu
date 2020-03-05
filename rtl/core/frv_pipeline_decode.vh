@@ -146,6 +146,20 @@ wire dec_b_bdep        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h800
 wire dec_b_bext        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h8006033;
 wire dec_b_grev        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h40001033;
 wire dec_b_grevi       = BITMANIP_BASELINE && (d_data & 32'hfc00707f) == 32'h40001013;
+wire dec_mask_b2a       = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h5b;
+wire dec_mask_a2b       = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h805b;
+wire dec_mask_b_mask    = XC_CLASS_MASK && (d_data & 32'hfff070ff) == 32'h20005b;
+wire dec_mask_b_unmask  = XC_CLASS_MASK && (d_data & 32'hfff0f07f) == 32'h30005b;
+wire dec_mask_b_remask  = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h30805b;
+wire dec_mask_a_mask    = XC_CLASS_MASK && (d_data & 32'hfff070ff) == 32'h40005b;
+wire dec_mask_a_unmask  = XC_CLASS_MASK && (d_data & 32'hfff0f07f) == 32'h50005b;
+wire dec_mask_a_remask  = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h50805b;
+wire dec_mask_b_not     = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h200205b;
+wire dec_mask_b_and     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h200705b;
+wire dec_mask_b_ior     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h200605b;
+wire dec_mask_b_xor     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h200405b;
+wire dec_mask_b_add     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h200005b;
+wire dec_mask_b_sub     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h200105b;
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge
@@ -182,4 +196,10 @@ dec_xc_sha256_s1   || dec_xc_sha256_s2   || dec_xc_sha256_s3   ||
 dec_xc_sha3_x1   || dec_xc_sha3_x2   || dec_xc_sha3_x4 || dec_xc_sha3_xy  ||
 dec_xc_sha3_yx || dec_xc_str_b
 || dec_xc_str_h   || dec_xc_str_w   ||
-dec_xc_lkgfence );
+dec_xc_lkgfence    ||
+dec_mask_b2a       || dec_mask_a2b       || dec_mask_b_mask    ||
+dec_mask_b_unmask  || dec_mask_b_remask  || dec_mask_a_mask    ||
+dec_mask_a_unmask  || dec_mask_a_remask  || dec_mask_b_not     ||
+dec_mask_b_and     || dec_mask_b_ior     || dec_mask_b_xor     ||
+dec_mask_b_add     || dec_mask_b_sub
+);

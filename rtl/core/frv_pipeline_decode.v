@@ -184,6 +184,12 @@ assign n_s2_fu[P_FU_RNG] =
     dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ||
     dec_xc_lkgfence ;
 
+assign n_s2_fu[P_FU_MSK] =
+    dec_mask_b2a       || dec_mask_a2b      || dec_mask_b_mask    ||
+    dec_mask_b_unmask  || dec_mask_b_remask || dec_mask_a_mask    ||
+    dec_mask_a_unmask  || dec_mask_a_remask || dec_mask_b_not     ||
+    dec_mask_b_and     || dec_mask_b_ior    || dec_mask_b_xor     ||
+    dec_mask_b_add     || dec_mask_b_sub    ;
 
 //
 // Encoding field extraction
@@ -413,6 +419,20 @@ wire [OP:0] uop_rng =
     {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      |
     {1+OP{dec_xc_lkgfence     }} & RNG_ALFENCE      ;
 
+wire [OP:0] uop_msk =
+    {1+OP{dec_mask_b_mask     }} & MSK_B_MASK       |
+    {1+OP{dec_mask_b_unmask   }} & MSK_B_UNMASK     |
+    {1+OP{dec_mask_b_remask   }} & MSK_B_REMASK     |
+    {1+OP{dec_mask_a_mask     }} & MSK_A_MASK       |
+    {1+OP{dec_mask_a_unmask   }} & MSK_A_UNMASK     |
+    {1+OP{dec_mask_a_remask   }} & MSK_A_REMASK     |
+    {1+OP{dec_mask_b_not      }} & MSK_B_NOT        |
+    {1+OP{dec_mask_b_and      }} & MSK_B_AND        |
+    {1+OP{dec_mask_b_ior      }} & MSK_B_IOR        |
+    {1+OP{dec_mask_b_xor      }} & MSK_B_XOR        |
+    {1+OP{dec_mask_b_add      }} & MSK_B_ADD        |
+    {1+OP{dec_mask_b_sub      }} & MSK_B_SUB        ;
+
 assign n_s2_uop =
     uop_alu |
     uop_cfu |
@@ -421,7 +441,8 @@ assign n_s2_uop =
     uop_csr |
     uop_bit |
     uop_asi |
-    uop_rng ;
+    uop_rng |
+    uop_msk ;
 
 //
 // Register Address Decoding
@@ -942,7 +963,7 @@ wire [RL-1:0] p_mr;
 // operations into the pipeline which will randomise the registers,
 // but not increment the PC since the s*_valid signal won't be asserted.
 wire [OP:0] bubble_uop = leak_fence ? RNG_ALFENCE   : {1+OP{1'b0}};
-wire [FU:0] bubble_fu  = leak_fence ? 8'b1<<P_FU_RNG: {1+FU{1'b0}};
+wire [FU:0] bubble_fu  = leak_fence ? 9'b1<<P_FU_RNG: {1+FU{1'b0}};
 
 wire [RL-1:0] p_in = {
  s1_bubble ?  5'b0      : n_s2_rd   , // Destination register address
