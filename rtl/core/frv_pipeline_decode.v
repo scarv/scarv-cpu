@@ -48,6 +48,7 @@ output wire [ 4:0] s2_rd         , // Destination register address
 output wire [XL:0] s2_opr_a      , // Operand A
 output wire [XL:0] s2_opr_b      , // Operand B
 output wire [XL:0] s2_opr_c      , // Operand C
+output wire [XL:0] s2_opr_d      , // Operand D
 output wire [OP:0] s2_uop        , // Micro-op code
 output wire [FU:0] s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
 output wire [PW:0] s2_pw         , // Pack width specifier for IALU.
@@ -932,6 +933,15 @@ assign n_s2_opr_c =
     {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
 
 //
+// Operand D sourcing: TODO
+
+wire oprd_src_rs2_hi = 1'b0;
+
+wire [XL:0] n_s2_opr_d     = 32'b0 ;
+
+wire        oprd_ld_en     = n_s2_valid && oprd_src_rs2_hi;
+
+//
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
@@ -1052,6 +1062,23 @@ frv_pipeline_register #(
 .flush    (oprc_flush   ), // Flush the contents of the pipeline
 .flush_dat(leak_prng    ), // Data flushed into the pipeline.
 .o_data   (s2_opr_c     ), // Output data for stage N+1
+.o_valid  (             ), // Input data from stage N valid?
+.i_busy   (s2_busy      )  // Stage N+1 ready to continue?
+);
+
+frv_pipeline_register #(
+.BUFFER_HANDSHAKE(1'b0),
+.RLEN(32)
+) i_decode_pipereg_opr_d (
+.g_clk    (g_clk        ), // global clock
+.g_resetn (g_resetn     ), // synchronous reset
+.i_data   (n_s2_opr_d   ), // Input data from stage N
+.i_valid  (oprd_ld_en   ), // Input data valid?
+.o_busy   (             ), // Stage N+1 ready to continue?
+.mr_data  (             ), // Most recent data into the stage.
+.flush    (oprc_flush   ), // Flush the contents of the pipeline
+.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.o_data   (s2_opr_d     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?
 .i_busy   (s2_busy      )  // Stage N+1 ready to continue?
 );

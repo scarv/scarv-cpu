@@ -13,6 +13,7 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [XL:0] s2_opr_a        , // Operand A
 input  wire [XL:0] s2_opr_b        , // Operand B
 input  wire [XL:0] s2_opr_c        , // Operand C
+input  wire [XL:0] s2_opr_d        , // Operand D
 input  wire [OP:0] s2_uop          , // Micro-op code
 input  wire [FU:0] s2_fu           , // Functional Unit
 input  wire [PW:0] s2_pw           , // IALU pack width specifer.
