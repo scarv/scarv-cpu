@@ -95,33 +95,7 @@ frv_core #(
 ) i_dut(
 .g_clk          (clock          ), // global clock
 .g_resetn       (g_resetn       ), // synchronous reset
-.rvfi_valid     (rvfi_valid     ),
-.rvfi_order     (rvfi_order     ),
-.rvfi_insn      (rvfi_insn      ),
-.rvfi_trap      (rvfi_trap      ),
-.rvfi_halt      (rvfi_halt      ),
-.rvfi_intr      (rvfi_intr      ),
-.rvfi_mode      (rvfi_mode      ),
-.rvfi_rs1_addr  (rvfi_rs1_addr  ),
-.rvfi_rs2_addr  (rvfi_rs2_addr  ),
-.rvfi_rs3_addr  (rvfi_rs3_addr  ),
-.rvfi_rs1_rdata (rvfi_rs1_rdata ),
-.rvfi_rs2_rdata (rvfi_rs2_rdata ),
-.rvfi_rs3_rdata (rvfi_rs3_rdata ),
-.rvfi_aux       (rvfi_aux       ),
-.rvfi_rng_data  (rvfi_rng_data  ),
-.rvfi_rng_stat  (rvfi_rng_stat  ),
-.rvfi_rd_addr   (rvfi_rd_addr   ),
-.rvfi_rd_wide   (rvfi_rd_wide   ),
-.rvfi_rd_wdata  (rvfi_rd_wdata  ),
-.rvfi_rd_wdatahi(rvfi_rd_wdatahi),
-.rvfi_pc_rdata  (rvfi_pc_rdata  ),
-.rvfi_pc_wdata  (rvfi_pc_wdata  ),
-.rvfi_mem_addr  (rvfi_mem_addr  ),
-.rvfi_mem_rmask (rvfi_mem_rmask ),
-.rvfi_mem_wmask (rvfi_mem_wmask ),
-.rvfi_mem_rdata (rvfi_mem_rdata ),
-.rvfi_mem_wdata (rvfi_mem_wdata ),
+`XCFI_TRACE_CONNECT              ,
 .trs_pc         (trs_pc         ), // Trace program counter.
 .trs_instr      (trs_instr      ), // Trace instruction.
 .trs_valid      (trs_valid      ), // Trace output valid.

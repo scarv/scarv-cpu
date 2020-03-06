@@ -21,6 +21,8 @@
     input [NRET *  3     - 1 : 0] rvfi_rng_stat    , \
     input [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata   , \
     input [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   , \
+    input [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata_hi, \
+    input [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata_hi, \
     input [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   , \
     input [NRET *    5   - 1 : 0] rvfi_rd_addr     , \
     input [NRET          - 1 : 0] rvfi_rd_wide     , \
@@ -51,6 +53,8 @@
     output [NRET *  3     - 1 : 0] rvfi_rng_stat    , \
     output [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata   , \
     output [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   , \
+    output [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata_hi, \
+    output [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata_hi, \
     output [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   , \
     output [NRET *    5   - 1 : 0] rvfi_rd_addr     , \
     output [NRET          - 1 : 0] rvfi_rd_wide     , \
@@ -81,6 +85,8 @@
     wire [NRET *  3     - 1 : 0] rvfi_rng_stat    ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata   ; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata   ; \
+    wire [NRET * XLEN   - 1 : 0] rvfi_rs1_rdata_hi; \
+    wire [NRET * XLEN   - 1 : 0] rvfi_rs2_rdata_hi; \
     wire [NRET * XLEN   - 1 : 0] rvfi_rs3_rdata   ; \
     wire [NRET *    5   - 1 : 0] rvfi_rd_addr     ; \
     wire [NRET          - 1 : 0] rvfi_rd_wide     ; \
@@ -111,6 +117,8 @@
     .rvfi_rng_stat    (rvfi_rng_stat    ), \
     .rvfi_rs1_rdata   (rvfi_rs1_rdata   ), \
     .rvfi_rs2_rdata   (rvfi_rs2_rdata   ), \
+    .rvfi_rs1_rdata_hi(rvfi_rs1_rdata_hi), \
+    .rvfi_rs2_rdata_hi(rvfi_rs2_rdata_hi), \
     .rvfi_rs3_rdata   (rvfi_rs3_rdata   ), \
     .rvfi_rd_addr     (rvfi_rd_addr     ), \
     .rvfi_rd_wide     (rvfi_rd_wide     ), \
@@ -184,6 +192,8 @@ parameter BITMANIP_BASELINE   = 1'b1;
 
 `define RS1            rvfi_rs1_rdata
 `define RS2            rvfi_rs2_rdata
+`define RS1_HI         rvfi_rs1_rdata_hi
+`define RS2_HI         rvfi_rs2_rdata_hi
 `define RS3            rvfi_rs3_rdata
 `define RD             rvfi_rd_wdata 
 `define RD_HI          rvfi_rd_wdatahi
