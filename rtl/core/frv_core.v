@@ -17,6 +17,7 @@ output [NRET        - 1 : 0] rvfi_trap      ,
 output [NRET        - 1 : 0] rvfi_halt      ,
 output [NRET        - 1 : 0] rvfi_intr      ,
 output [NRET * 2    - 1 : 0] rvfi_mode      ,
+output [NRET * 2    - 1 : 0] rvfi_ixl       ,
 
 output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
@@ -179,6 +180,11 @@ wire [31:0] mmio_rdata       ; // MMIO read data
 wire        mmio_error       ; // MMIO error
 
 // -------------------------------------------------------------------------
+
+`ifdef RVFI
+// Indicates the value of MXL
+assign rvfi_ixl = 2'b01;
+`endif
 
 //
 // instance: frv_pipeline
