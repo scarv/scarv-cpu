@@ -40,8 +40,57 @@ output wire [XL:0] rd_s1              // Output share 1
 // Common core parameters and constants
 `include "frv_common.vh"
 
+//
+// Temporary constant mask
+localparam MASK = 32'hABCD_0123;
+
+//
+// Binary Mask
+// ------------------------------------------------------------
+wire [XL:0] result_b_mask_s0    = MASK ^ rs1_s0;
+wire [XL:0] result_b_mask_s1    = MASK         ;
+
+//
+// Binary Unmask
+// ------------------------------------------------------------
+
+//
+// All of these keep attributes are needed to stop the synthesiser
+// optimising them away. We *must* gate the inputs to the unmask operation,
+// otherwise we will implicitly unmask the rs1 input each time.
+
+(* keep *)
+wire [XL:0] b_unmask_s0_gated   = rs1_s0 & {XLEN{op_b_unmask}};
+(* keep *)
+wire [XL:0] b_unmask_s1_gated   = rs1_s1 & {XLEN{op_b_unmask}};
+
+(* keep *)
+wire [XL:0] result_b_unmask_s0  = b_unmask_s0_gated ^ b_unmask_s1_gated;
+(* keep *)
+
+
+//
+// Binary AND
+// ------------------------------------------------------------
+
+wire [XL:0] result_b_and_s1     = (rs1_s1 & rs2_s1) ^ (rs1_s1 | ~rs2_s0);
+wire [XL:0] result_b_and_s0     = (rs1_s0 & rs2_s1) ^ (rs1_s0 | ~rs2_s0);
+
+//
+// Nieve result multiplexing.
+// ------------------------------------------------------------
+
+assign rd_s0 =
+    {XLEN{op_b_mask     }} & result_b_mask_s0   |
+    {XLEN{op_b_unmask   }} & result_b_unmask_s0 |
+    {XLEN{op_b_and      }} & result_b_and_s0    ;
+
+assign rd_s1 =
+    {XLEN{op_b_mask     }} & result_b_mask_s1   |
+    {XLEN{op_b_and      }} & result_b_and_s1    ;
+
+//
+// Randomly report readiness for now to check we can handle delays.
 assign ready = ($random & 32'b11) == 32'b0 ? valid : 1'b0;
-assign rd_s0 = rs1_s0 ^ rs2_s0;
-assign rd_s1 = rs1_s1 ^ rs2_s1;
 
 endmodule
