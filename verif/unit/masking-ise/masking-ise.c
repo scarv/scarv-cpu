@@ -16,8 +16,8 @@ int test_main() {
     
     int fail = 0;
 
-    uint32_t lhs = __rdcycle();
-    uint32_t rhs = __rdcycle();
+    uint32_t lhs = 0xABCD0123;
+    uint32_t rhs = 0xDEADBEAD;
 
     __putstr("# Masking ISE Unit Test\n");
 
