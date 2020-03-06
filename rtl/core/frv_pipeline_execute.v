@@ -671,7 +671,7 @@ wire [XL:0] n_s3_opr_b =
 
 wire opra_ld_en = p_valid && (
     fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_asi || fu_bit ||
-    fu_rng ); 
+    fu_rng || fu_msk ); 
 
 wire oprb_ld_en = p_valid && (
     (fu_mul && imul_gpr_wide)  || 
@@ -686,7 +686,8 @@ assign fwd_s2_rd    = s2_rd             ; // Writeback stage destination reg.
 assign fwd_s2_wdata = n_s3_opr_a;
 
 assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32]   :
-                                  n_s3_opr_b_bit            ;
+                         fu_bit ? n_s3_opr_b_bit            :
+                                  n_s3_opr_b_msk            ;
 assign fwd_s2_wide  =
     fu_mul && (imul_gpr_wide) ||
     fu_msk && (msk_gpr_wide ) ||
