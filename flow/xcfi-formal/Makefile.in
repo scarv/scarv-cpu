@@ -17,8 +17,8 @@ XCFI_MODELS     = $(notdir $(basename $(shell find $(XCFI_SRC_DIR)/models -name 
 XCFI_INSNS      = $(filter insn_%,$(XCFI_MODELS))
 XCFI_PROPS      = $(filter-out insn_%,$(XCFI_MODELS))
 
-XCFI_INSN_DEFS  = -DXCFI_CHECK_INSTRS=1
-XCFI_PROP_DEFS  = 
+XCFI_INSN_DEFS  = -DRVFI -DXCFI_CHECK_INSTRS=1
+XCFI_PROP_DEFS  = -DRVFI 
 
 XCFI_SBY_TGTS   = 
 
