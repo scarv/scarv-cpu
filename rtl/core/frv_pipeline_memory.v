@@ -358,6 +358,8 @@ always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         rvfi_s4_rs1_rdata <= 0; // Source register data 1
         rvfi_s4_rs2_rdata <= 0; // Source register data 2
+        rvfi_s4_rs1_rdata_hi <= 0; // Source register data 1
+        rvfi_s4_rs2_rdata_hi <= 0; // Source register data 2
         rvfi_s4_rs3_rdata <= 0; // Source register data 3
         rvfi_s4_rs1_addr  <= 0; // Source register address 1
         rvfi_s4_rs2_addr  <= 0; // Source register address 2
@@ -368,6 +370,8 @@ always @(posedge g_clk) begin
     end else if(pipe_progress) begin
         rvfi_s4_rs1_rdata <= rvfi_s3_rs1_rdata;
         rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
+        rvfi_s4_rs1_rdata_hi <= rvfi_s3_rs1_rdata_hi;
+        rvfi_s4_rs2_rdata_hi <= rvfi_s3_rs2_rdata_hi;
         rvfi_s4_rs3_rdata <= rvfi_s3_rs3_rdata;
         rvfi_s4_rs1_addr  <= rvfi_s3_rs1_addr ;
         rvfi_s4_rs2_addr  <= rvfi_s3_rs2_addr ;

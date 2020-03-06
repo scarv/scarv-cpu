@@ -26,6 +26,8 @@ output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
+output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata_hi,
+output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_aux       ,
 output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
@@ -653,6 +655,8 @@ assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
 assign rvfi_rs3_addr = rvfi_s4_rs3_addr ;
 assign rvfi_rs1_rdata= rvfi_s4_rs1_rdata;
 assign rvfi_rs2_rdata= rvfi_s4_rs2_rdata;
+assign rvfi_rs1_rdata_hi= rvfi_s4_rs1_rdata_hi;
+assign rvfi_rs2_rdata_hi= rvfi_s4_rs2_rdata_hi;
 assign rvfi_rs3_rdata= rvfi_s4_rs3_rdata;
 
 assign rvfi_rd_addr  = use_saved_gpr_wdata ? saved_gpr_waddr :
