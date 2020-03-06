@@ -389,8 +389,6 @@ wire   s1_bubble   =
      s1_bubble_from_s3      ||
      s1_bubble_from_s2      ;
 
-wire [XL:0] fwd_rs1_rdatahi = s1_rs1_rdatahi;
-wire [XL:0] fwd_rs2_rdatahi = s1_rs2_rdatahi;
 
 wire [XL:0] fwd_rs1_rdata =
      hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
@@ -398,11 +396,23 @@ wire [XL:0] fwd_rs1_rdata =
      hzd_rs1_s4 ? (fwd_s4_rs1_hi ? gpr_wdata_hi    : gpr_wdata   )  :
                   s1_rs1_rdata   ;
 
+wire [XL:0] fwd_rs1_rdatahi =
+     hzd_rs1_s2 ? fwd_s2_wdata_hi   :
+     hzd_rs1_s3 ? fwd_s3_wdata_hi   :
+     hzd_rs1_s4 ? gpr_wdata_hi      :
+                  s1_rs1_rdatahi    ;
+
 wire [XL:0] fwd_rs2_rdata =
      hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
      hzd_rs2_s3 ? (fwd_s3_rs2_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
      hzd_rs2_s4 ? (fwd_s4_rs2_hi ? gpr_wdata_hi    : gpr_wdata   )  :
                   s1_rs2_rdata   ;
+
+wire [XL:0] fwd_rs2_rdatahi =
+     hzd_rs2_s2 ? fwd_s2_wdata_hi   :
+     hzd_rs2_s3 ? fwd_s3_wdata_hi   :
+     hzd_rs2_s4 ? gpr_wdata_hi      :
+                  s1_rs2_rdatahi    ;
 
 wire [XL:0] fwd_rs3_rdata =
      hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
