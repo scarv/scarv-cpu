@@ -28,6 +28,7 @@ output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN -1  : 0] rvfi_aux       ,
+output [NRET * 32   - 1 : 0] rvfi_mask_data , // For the masking ISE verif.
 output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
 output [NRET *  3   - 1 : 0] rvfi_rng_stat  , // RNG status
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
@@ -234,6 +235,7 @@ frv_pipeline #(
 .rvfi_rs2_rdata_hi(rvfi_rs2_rdata_hi),
 .rvfi_rs3_rdata(rvfi_rs3_rdata),
 .rvfi_aux      (rvfi_aux      ),
+.rvfi_mask_data(rvfi_mask_data), 
 .rvfi_rng_data (rvfi_rng_data ), 
 .rvfi_rng_stat (rvfi_rng_stat ), 
 .rvfi_rd_addr  (rvfi_rd_addr  ),

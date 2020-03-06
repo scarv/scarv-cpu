@@ -66,6 +66,7 @@ output reg  [ 4:0] rvfi_s3_rs1_addr , // Source register address 1
 output reg  [ 4:0] rvfi_s3_rs2_addr , // Source register address 2
 output reg  [ 4:0] rvfi_s3_rs3_addr , // Source register address 3
 output reg  [XL:0] rvfi_s3_aux      , // Auxiliary needed information.
+output wire [XL:0] rvfi_s3_mask_data, // Mask output data
 output reg  [31:0] rvfi_s3_rng_data , // RNG read data
 output reg  [ 2:0] rvfi_s3_rng_stat , // RNG status
 `endif
@@ -290,6 +291,8 @@ wire [XL:0] msk_rs2_s1      = s2_opr_d;
 
 wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
 wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
+
+wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
 wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
 wire [XL:0] n_s3_opr_b_msk  = msk_rd_s1;
@@ -519,6 +522,7 @@ frv_masked_alu i_frv_masked_alu (
 .rs2_s0      (msk_rs2_s0      ), // RS2 Share 0
 .rs2_s1      (msk_rs2_s1      ), // RS2 Share 1
 .ready       (msk_ready       ), // Outputs ready
+.mask        (msk_mask        ), // Mask used to en-mask. For Verification.
 .rd_s0       (msk_rd_s0       ), // Output share 0
 .rd_s1       (msk_rd_s1       )  // Output share 1
 );
@@ -802,6 +806,8 @@ always @(posedge g_clk) begin
         use_saved_rng <= rng_rsp_valid && rng_rsp_ready && !pipe_progress;
     end
 end
+
+assign rvfi_s3_mask_data = msk_mask;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin

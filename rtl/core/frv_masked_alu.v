@@ -32,6 +32,7 @@ input  wire [XL:0] rs2_s0           , // RS2 Share 0
 input  wire [XL:0] rs2_s1           , // RS2 Share 1
 
 output wire        ready            , // Outputs ready
+output wire [XL:0] mask             , // The mask, used for verification only.
 output wire [XL:0] rd_s0            , // Output share 0
 output wire [XL:0] rd_s1              // Output share 1
 
@@ -92,5 +93,7 @@ assign rd_s1 =
 //
 // Randomly report readiness for now to check we can handle delays.
 assign ready = ($random & 32'b11) == 32'b0 ? valid : 1'b0;
+
+assign mask = MASK;
 
 endmodule

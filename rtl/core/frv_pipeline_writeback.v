@@ -30,6 +30,7 @@ output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_aux       ,
+output [NRET * 32   - 1 : 0] rvfi_mask_data , // Masking ISE mask for verif.
 output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
 output [NRET *  3   - 1 : 0] rvfi_rng_stat  , // RNG status
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
@@ -55,6 +56,7 @@ input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
 input  wire [ 4:0] rvfi_s4_rs3_addr , // Source register address 3
 input  wire [XL:0] rvfi_s4_aux      , // Auxiliary needed information.
+input  wire [XL:0] rvfi_s4_mask_data, // Masking ISE mask for verification.
 input  wire [31:0] rvfi_s4_rng_data , // RNG read data
 input  wire [ 2:0] rvfi_s4_rng_stat , // RNG status
 input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
@@ -682,6 +684,8 @@ assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata :
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 assign rvfi_aux      = rvfi_s4_aux;
+
+assign rvfi_mask_data= rvfi_s4_mask_data;
 
 assign rvfi_rng_data = rvfi_s4_rng_data;
 assign rvfi_rng_stat = rvfi_s4_rng_stat;

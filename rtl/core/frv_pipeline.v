@@ -27,6 +27,7 @@ output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata_hi,
 output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_aux       ,
+output [NRET * 32   - 1 : 0] rvfi_mask_data , // For the masking ISE verif.
 output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
 output [NRET *  3   - 1 : 0] rvfi_rng_stat  , // RNG status
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
@@ -316,6 +317,7 @@ wire [ 4:0] rvfi_s3_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s3_rs2_addr ; // Source register address 2
 wire [ 4:0] rvfi_s3_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s3_aux      ; // Auxiliary needed information.
+wire [XL:0] rvfi_s3_mask_data; // Mask data for masking ISE verification.
 wire [31:0] rvfi_s3_rng_data ; // RNG read data
 wire [ 2:0] rvfi_s3_rng_stat ; // RNG status
 wire [XL:0] rvfi_s4_rs1_rdata; // Source register data 1
@@ -327,6 +329,7 @@ wire [ 4:0] rvfi_s4_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s4_rs2_addr ; // Source register address 2
 wire [ 4:0] rvfi_s4_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s4_aux      ; // Auxiliary needed information.
+wire [XL:0] rvfi_s4_mask_data; // Mask data for masking ISE verification.
 wire [31:0] rvfi_s4_rng_data ; // RNG read data
 wire [ 2:0] rvfi_s4_rng_stat ; // RNG status
 wire [XL:0] rvfi_s4_mem_wdata; // Memory write data.
@@ -600,6 +603,7 @@ frv_pipeline_execute #(
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
 .rvfi_s3_rs3_addr (rvfi_s3_rs3_addr ), // Source register address 2
 .rvfi_s3_aux      (rvfi_s3_aux      ), // Auxiliary data
+.rvfi_s3_mask_data(rvfi_s3_mask_data), 
 .rvfi_s3_rng_data (rvfi_s3_rng_data ), 
 .rvfi_s3_rng_stat (rvfi_s3_rng_stat ), 
 `endif // RVFI
@@ -659,6 +663,7 @@ frv_pipeline_memory #(
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
 .rvfi_s3_rs3_addr (rvfi_s3_rs3_addr ), // Source register address 3
 .rvfi_s3_aux      (rvfi_s3_aux      ), // Auxiliary data
+.rvfi_s3_mask_data(rvfi_s3_mask_data), 
 .rvfi_s3_rng_data (rvfi_s3_rng_data ), 
 .rvfi_s3_rng_stat (rvfi_s3_rng_stat ), 
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
@@ -670,6 +675,7 @@ frv_pipeline_memory #(
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
 .rvfi_s4_rs3_addr (rvfi_s4_rs3_addr ), // Source register address 3
 .rvfi_s4_aux      (rvfi_s4_aux      ), // Auxiliary data
+.rvfi_s4_mask_data(rvfi_s4_mask_data), 
 .rvfi_s4_rng_data (rvfi_s4_rng_data ), 
 .rvfi_s4_rng_stat (rvfi_s4_rng_stat ), 
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
@@ -728,6 +734,7 @@ frv_pipeline_writeback #(
 .rvfi_rs2_rdata_hi(rvfi_rs2_rdata_hi),
 .rvfi_rs3_rdata   (rvfi_rs3_rdata   ),
 .rvfi_aux         (rvfi_aux         ), // Auxiliary data
+.rvfi_mask_data   (rvfi_mask_data   ), // For the masking ISE verif.
 .rvfi_rng_data    (rvfi_rng_data    ), 
 .rvfi_rng_stat    (rvfi_rng_stat    ), 
 .rvfi_rd_addr     (rvfi_rd_addr     ),
@@ -750,6 +757,7 @@ frv_pipeline_writeback #(
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
 .rvfi_s4_rs3_addr (rvfi_s4_rs3_addr ), // Source register address 2
 .rvfi_s4_aux      (rvfi_s4_aux      ), // Auxiliary trace data.
+.rvfi_s4_mask_data(rvfi_s4_mask_data), 
 .rvfi_s4_rng_data (rvfi_s4_rng_data ), 
 .rvfi_s4_rng_stat (rvfi_s4_rng_stat ), 
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
