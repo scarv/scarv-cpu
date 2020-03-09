@@ -269,20 +269,20 @@ end
 wire        msk_valid       = fu_msk && msk_valid_en_r ;
 wire        msk_ready       ; // Mask ALU operation complete.
     
-wire        msk_op_b2a      = msk_valid && s2_uop == MSK_B2A     ;
-wire        msk_op_a2b      = msk_valid && s2_uop == MSK_A2B     ;
-wire        msk_op_b_mask   = msk_valid && s2_uop == MSK_B_MASK  ;
-wire        msk_op_b_unmask = msk_valid && s2_uop == MSK_B_UNMASK;
-wire        msk_op_b_remask = msk_valid && s2_uop == MSK_B_REMASK;
-wire        msk_op_a_mask   = msk_valid && s2_uop == MSK_A_MASK  ;
-wire        msk_op_a_unmask = msk_valid && s2_uop == MSK_A_UNMASK;
-wire        msk_op_a_remask = msk_valid && s2_uop == MSK_A_REMASK;
-wire        msk_op_b_not    = msk_valid && s2_uop == MSK_B_NOT   ;
-wire        msk_op_b_and    = msk_valid && s2_uop == MSK_B_AND   ;
-wire        msk_op_b_ior    = msk_valid && s2_uop == MSK_B_IOR   ;
-wire        msk_op_b_xor    = msk_valid && s2_uop == MSK_B_XOR   ;
-wire        msk_op_b_add    = msk_valid && s2_uop == MSK_B_ADD   ;
-wire        msk_op_b_sub    = msk_valid && s2_uop == MSK_B_SUB   ;
+wire        msk_op_b2a      = s2_uop == MSK_B2A     ;
+wire        msk_op_a2b      = s2_uop == MSK_A2B     ;
+wire        msk_op_b_mask   = s2_uop == MSK_B_MASK  ;
+wire        msk_op_b_unmask = s2_uop == MSK_B_UNMASK;
+wire        msk_op_b_remask = s2_uop == MSK_B_REMASK;
+wire        msk_op_a_mask   = s2_uop == MSK_A_MASK  ;
+wire        msk_op_a_unmask = s2_uop == MSK_A_UNMASK;
+wire        msk_op_a_remask = s2_uop == MSK_A_REMASK;
+wire        msk_op_b_not    = s2_uop == MSK_B_NOT   ;
+wire        msk_op_b_and    = s2_uop == MSK_B_AND   ;
+wire        msk_op_b_ior    = s2_uop == MSK_B_IOR   ;
+wire        msk_op_b_xor    = s2_uop == MSK_B_XOR   ;
+wire        msk_op_b_add    = s2_uop == MSK_B_ADD   ;
+wire        msk_op_b_sub    = s2_uop == MSK_B_SUB   ;
 
 wire [XL:0] msk_rs1_s0      = s2_opr_a;
 wire [XL:0] msk_rs1_s1      = s2_opr_c;
