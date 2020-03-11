@@ -143,6 +143,12 @@ The following commands can be used to run the unit tests:
     $> make unit-tests-run
     ```
 
+  Or a single unit test:
+
+    ```sh
+    $> make run-unit-[TEST NAME]
+    ```
+
   Results will be put into `work/unit/<test name>/`.
 
 

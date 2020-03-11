@@ -51,6 +51,10 @@ the pipeline structure.
   - [Leakage Fence Instruction Implementation](docs/leakage-fence.md)
   - [Random Number Generator Interface](docs/rng-interface.md)
 
+Note: The [Functional Verification](docs/verification.md) document
+describes how to run all of the different test and verification flows,
+including running unit tests and the model checkers.
+
 ## Quickstart
 
 - Install the following tools installed to use all parts of the
