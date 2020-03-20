@@ -31,6 +31,9 @@ volatile uint64_t __rd_mtime();
 //! Read the memory mapped mtimecmp register
 volatile uint64_t __rd_mtimecmp();
 
+//! Read the memory mapped mtimecmp register
+volatile void     __wr_mtimecmp(uint64_t mtc);
+
 //! Intrisic for the `rdcycle` assembly instruction
 volatile uint64_t __rdcycle();
 

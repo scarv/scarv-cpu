@@ -28,6 +28,17 @@ __rd_mtimecmp:
     ret
 .endfunc
 
+.func   __wr_mtimecmp
+.global __wr_mtimecmp
+__wr_mtimecmp:
+    li a3, 0x00001000       // Base address of MMIO region
+    li a2, -1
+    sw a2,  8(a3)           // a1 = high word of mtime cmp
+    sw a1, 12(a3)           // a1 = high word of mtime cmp
+    sw a0,  8(a3)           // a0 = low word of mtime
+    ret
+.endfunc
+
 .func   __rdcycle
 .global __rdcycle
 __rdcycle:
