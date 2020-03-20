@@ -64,6 +64,7 @@ input  wire         int_nmi         , // Non-maskable interrupt.
 input  wire         int_external    , // External interrupt trigger line.
 input  wire [ 3:0]  int_extern_cause, // External interrupt cause code.
 input  wire         int_software    , // Software interrupt trigger line.
+output wire         int_mtime       , // Machine timer interrupt triggered.
 
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
@@ -159,6 +160,8 @@ wire        ti_pending       ; // Raise a timer interrupt. From frv_counters.
 wire        mip_meip         ; // External interrupt pending
 wire        mip_mtip         ; // Timer interrupt pending
 wire        mip_msip         ; // Software interrupt pending
+
+assign      int_mtime = mip_mtip;
 
 wire        int_trap_req     ; // Request WB stage trap an interrupt
 wire [ 5:0] int_trap_cause   ; // Cause of interrupt

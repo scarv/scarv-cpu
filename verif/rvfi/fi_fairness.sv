@@ -15,6 +15,11 @@ input wire          rng_req_ready   , // RNG accepts request
 input wire          rng_rsp_valid   , // RNG response data valid
 input wire          rng_rsp_ready   , // CPU accepts response.
 
+input wire          int_nmi         ,
+input wire          int_mtime       ,
+input wire          int_external    ,
+input wire          int_software    ,
+
 input wire          imem_req        ,
 input wire          imem_gnt        ,
 input wire          imem_recv       ,
@@ -213,6 +218,16 @@ always @(posedge clock) begin
     // If num responses >= num requests, *mem_recv is clear. Else True.
     restrict(dmem_rsps >= dmem_reqs ? dmem_recv == 1'b0 : 1'b1);
     restrict(imem_rsps >= imem_reqs ? imem_recv == 1'b0 : 1'b1);
+end
+
+//
+// Assume we never get non-maskable interrutps.
+// TODO: Proper interrupt checking for RVFI
+always @(posedge clock) begin
+    assume(int_nmi      == 1'b0);
+    assume(int_mtime    == 1'b0);
+    assume(int_external == 1'b0);
+    assume(int_software == 1'b0);
 end
 
 //

@@ -20,6 +20,8 @@ wire         trs_valid       ; // Trace output valid.
 wire [31:0]  trs_pc          ; // Trace program counter object.
 wire [31:0]  trs_instr       ; // Instruction traced out.
 
+wire         
+
 wire         g_resetn = !reset;
 
 parameter ILEN = 32      ;
@@ -27,6 +29,7 @@ parameter NRET = 1       ;
 parameter XLEN = 32      ;
 parameter XL   = XLEN - 1;
 
+(*keep*) reg         int_nmi      = $anyseq; // External interrupt
 (*keep*) reg         int_external = $anyseq; // External interrupt
 (*keep*) reg         int_software = $anyseq; // Software interrupt
 
@@ -73,6 +76,7 @@ fi_fairness i_fairness (
 .rng_req_ready(rng_req_ready), // RNG accepts request
 .rng_rsp_valid(rng_rsp_valid), // RNG response data valid
 .rng_rsp_ready(rng_rsp_ready), // CPU accepts response.
+.int_nmi     (int_nmi     ), // Non-maskable interrupt trigger line.
 .imem_req    (imem_req    ),
 .imem_gnt    (imem_gnt    ),
 .imem_recv   (imem_recv   ),
@@ -133,6 +137,7 @@ frv_core #(
 .rng_rsp_status (rng_rsp_status ), // RNG status
 .rng_rsp_data   (rng_rsp_data   ), // RNG response / sample data.
 .rng_rsp_ready  (rng_rsp_ready  ), // CPU accepts response.
+.int_nmi        (int_nmi        ), // Non-maskable interrupt trigger line.
 .int_external   (int_external   ), // External interrupt trigger line.
 .int_software   (int_software   ), // Software interrupt trigger line.
 .imem_req       (imem_req       ), // Start memory request

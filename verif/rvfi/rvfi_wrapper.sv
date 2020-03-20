@@ -21,6 +21,8 @@ parameter NRET = 1       ;
 parameter XLEN = 32      ;
 parameter XL   = XLEN - 1;
 
+(*keep*) `rvformal_rand_reg         int_nmi     ; // Non-maskable interrupt
+(*keep*) wire                       int_mtime   ; // Machine timer interrupt
 (*keep*) `rvformal_rand_reg         int_external; // External interrupt
 (*keep*) `rvformal_rand_reg         int_software; // Software interrupt
 
@@ -80,6 +82,10 @@ fi_fairness i_fairness (
 .rng_req_ready(rng_req_ready), // RNG accepts request
 .rng_rsp_valid(rng_rsp_valid), // RNG response data valid
 .rng_rsp_ready(rng_rsp_ready), // CPU accepts response.
+.int_nmi     (int_nmi     ), // Non-maskable interrupt trigger line.
+.int_mtime   (int_mtime   ), // Non-maskable interrupt trigger line.
+.int_external(int_external), // External interrupt trigger line.
+.int_software(int_software), // Software interrupt trigger line.
 .imem_req    (imem_req    ),
 .imem_gnt    (imem_gnt    ),
 .imem_recv   (imem_recv   ),
@@ -137,6 +143,8 @@ frv_core #(
 .rng_rsp_status (rng_rsp_status ), // RNG status
 .rng_rsp_data   (rng_rsp_data   ), // RNG response / sample data.
 .rng_rsp_ready  (rng_rsp_ready  ), // CPU accepts response.
+.int_nmi        (int_nmi        ), // Non-maskable interrupt trigger line.
+.int_mtime      (int_mtime      ), // Non-maskable interrupt trigger line.
 .int_external   (int_external   ), // External interrupt trigger line.
 .int_software   (int_software   ), // Software interrupt trigger line.
 .imem_req       (imem_req       ), // Start memory request
