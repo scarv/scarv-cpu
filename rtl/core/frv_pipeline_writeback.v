@@ -441,7 +441,7 @@ assign gpr_wide =
     fu_bit && (s4_uop == BIT_RORW) ;
 
 
-assign gpr_wen  = !s4_trap &&
+assign gpr_wen  = !s4_trap && !trap_int &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
      cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen ||
      bit_gpr_wen || rng_gpr_wen                );
