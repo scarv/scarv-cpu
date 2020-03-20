@@ -121,6 +121,18 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 parameter BITMANIP_BASELINE   = 1'b1;
 
 //
+// Make sure that the trap_int signal acts as a single cycle pulse.
+// -------------------------------------------------------------------------
+
+reg p_trap_int;
+
+always @(posedge g_clk) begin
+    p_trap_int <= g_resetn ? trap_int : 1'b0;
+end
+
+wire int_pulse = !p_trap_int && trap_int;
+
+//
 // CSR: MISA
 // -------------------------------------------------------------------------
 
@@ -255,11 +267,11 @@ wire [31:0] reg_mstatus         = {
 };
 
 wire        wen_mstatus     = csr_wr && csr_addr == CSR_ADDR_MSTATUS;
-wire        wen_mstatus_mie = wen_mstatus || trap_cpu || trap_int || exec_mret;
-wire        wen_mstatus_mpie= wen_mstatus || trap_cpu || trap_int || exec_mret;
+wire        wen_mstatus_mie = wen_mstatus || trap_cpu || int_pulse || exec_mret;
+wire        wen_mstatus_mpie= wen_mstatus || trap_cpu || int_pulse || exec_mret;
 
 wire        n_mstatus_mie       =
-    trap_int      ? 1'b0                                :
+    int_pulse     ? 1'b0                                :
     trap_cpu      ? 1'b0                                :
     exec_mret     ? reg_mstatus_mpie                    :
     csr_wr_set    ? reg_mstatus_mie |  csr_wdata[3] :
@@ -267,7 +279,7 @@ wire        n_mstatus_mie       =
                     csr_wdata[3]                ;
 
 wire        n_mstatus_mpie      = 
-    trap_int      ? reg_mstatus_mie                 :
+    int_pulse     ? reg_mstatus_mie                 :
     trap_cpu      ? reg_mstatus_mie                 :
     exec_mret     ? 0                               :
     csr_wr_set    ? reg_mstatus_mie |  csr_wdata[7] :
@@ -414,10 +426,10 @@ assign      csr_mepc = {reg_mepc_mepc, 1'b0};
 
 wire        wen_mepc = csr_wr  && csr_addr == CSR_ADDR_MEPC ||
                        trap_cpu                             ||
-                       trap_int                             ;
+                       int_pulse                            ;
 
 wire [30:0] n_mepc   =
-    trap_int || trap_cpu? trap_pc[31:1]                     :
+    int_pulse|| trap_cpu? trap_pc[31:1]                     :
     csr_wr_set          ? reg_mepc_mepc |  csr_wdata[31:1]  :
     csr_wr_clr          ? reg_mepc_mepc & ~csr_wdata[31:1]  :
                           csr_wdata[31:1]                   ;
@@ -445,10 +457,10 @@ wire [31:0] reg_mcause = {
 
 wire        wen_mcause = csr_wr  && csr_addr == CSR_ADDR_MCAUSE ||
                          trap_cpu                               ||
-                         trap_int                               ;
+                         int_pulse                              ;
 
 wire [30:0] n_mcause_cause =
-    trap_int || trap_cpu ? {25'b0, trap_cause   }                :
+    int_pulse|| trap_cpu ? {25'b0, trap_cause   }                :
     csr_wr_set           ? reg_mcause_cause |  csr_wdata[30:0]   :
     csr_wr_clr           ? reg_mcause_cause & ~csr_wdata[30:0]   :
                            csr_wdata[30:0]                       ;
@@ -471,7 +483,7 @@ always @(posedge g_clk) begin
         reg_mcause_interrupt <= 0;
     end else if(wen_mcause && wen_valid_mcause) begin
         reg_mcause_cause     <= n_mcause_cause;
-        reg_mcause_interrupt <= trap_int;
+        reg_mcause_interrupt <= int_pulse;
     end
 end
 
