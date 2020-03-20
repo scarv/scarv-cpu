@@ -26,7 +26,7 @@ output reg          mip_mtip        , // Timer interrupt pending
 output reg          mip_msip        , // Software interrupt pending
 
 output wire         int_trap_req    , // Request WB stage trap an interrupt
-output wire [ 5:0]  int_trap_cause  , // Cause of interrupt
+output reg  [ 5:0]  int_trap_cause  , // Cause of interrupt
 input  wire         int_trap_ack      // WB stage acknowledges the taken trap.
 
 );
@@ -35,20 +35,6 @@ input  wire         int_trap_ack      // WB stage acknowledges the taken trap.
 
 // NMI pending bit,
 reg mip_nmi;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        mip_meip <= 1'b0        ;
-        mip_mtip <= 1'b0        ;
-        mip_msip <= 1'b0        ;
-        mip_nmi  <= 1'b0        ;
-    end else begin
-        mip_meip <= ex_pending  ;
-        mip_mtip <= ti_pending  ;
-        mip_msip <= sw_pending  ;
-        mip_nmi  <= nmi_pending ;
-    end
-end
 
 wire   raise_mei    = mstatus_mie && mie_meie && mip_meip;
 wire   raise_mti    = mstatus_mie && mie_mtie && mip_mtip;
@@ -63,10 +49,28 @@ wire [5:0]  extern_cause     = raise_nmi        ? TRAP_INT_NMI      :
                                use_extern_cause ? {2'b1, ex_cause}  :
                                                   TRAP_INT_MEI      ;
 
-assign int_trap_cause = 
-    raise_mei   ? extern_cause  :
-    raise_mti   ? TRAP_INT_MTI  :
-    raise_msi   ? TRAP_INT_MSI  :
+wire [5:0] n_int_trap_cause = 
+    nmi_pending ? extern_cause  :
+    ex_pending  ? extern_cause  :
+    ti_pending  ? TRAP_INT_MTI  :
+    sw_pending  ? TRAP_INT_MSI  :
                              0  ;
+
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        mip_meip        <= 1'b0         ;
+        mip_mtip        <= 1'b0         ;
+        mip_msip        <= 1'b0         ;
+        mip_nmi         <= 1'b0         ;
+        int_trap_cause  <= 6'b0         ;
+    end else begin
+        mip_meip        <= ex_pending   ;
+        mip_mtip        <= ti_pending   ;
+        mip_msip        <= sw_pending   ;
+        mip_nmi         <= nmi_pending  ;
+        int_trap_cause  <= n_int_trap_cause;
+    end
+end
 
 endmodule
