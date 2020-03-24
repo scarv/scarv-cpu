@@ -112,10 +112,20 @@ parameter XC_CLASS_MEMORY     = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_BIT        = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_PACKED     = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_MULTIARITH = 1'b0 && XC_CLASS_BASELINE;
-parameter XC_CLASS_AES        = 1'b0 && XC_CLASS_BASELINE;
+parameter XC_CLASS_AES        = 1'b1                     ;
 parameter XC_CLASS_SHA2       = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_LEAK       = 1'b0 && XC_CLASS_BASELINE;
+
+//
+// Which AES variant should we use:
+//
+// 1. Simple 4-wide SBox and MixColumns instruction
+// 2. Tillich/Großschädl
+// 3. TTable based / riscv-crypto proposal.
+// 4. Tiled
+//
+parameter XC_AES_VARIANT      = 1;
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b0 && XC_CLASS_LEAK;
@@ -198,6 +208,7 @@ frv_pipeline #(
 .XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
 .XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
 .XC_CLASS_AES       (XC_CLASS_AES       ),
+.XC_AES_VARIANT     (XC_AES_VARIANT     ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),

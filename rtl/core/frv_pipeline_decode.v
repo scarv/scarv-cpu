@@ -80,6 +80,16 @@ parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
 parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 
+//
+// Which AES variant should we use:
+//
+// 1. Simple 4-wide SBox and MixColumns instruction
+// 2. Tillich/Großschädl
+// 3. TTable based / riscv-crypto proposal.
+// 4. Tiled
+//
+parameter XC_AES_VARIANT      = 1;
+
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 

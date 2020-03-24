@@ -95,6 +95,16 @@ parameter XC_CLASS_AES        = 1'b1;
 parameter XC_CLASS_SHA2       = 1'b1;
 parameter XC_CLASS_SHA3       = 1'b1;
 
+//
+// Which AES variant should we use:
+//
+// 1. Simple 4-wide SBox and MixColumns instruction
+// 2. Tillich/Großschädl
+// 3. TTable based / riscv-crypto proposal.
+// 4. Tiled
+//
+parameter XC_AES_VARIANT      = 1;
+
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
 parameter AES_MIX_FAST = 1'b1;
