@@ -1,5 +1,9 @@
 # [SCARV](https://github.com/scarv/scarv): processor core implementation 
 
+- **AES N Ways Paper Development Branch**
+
+- Do not merge back into `master`.
+
 <!--- -------------------------------------------------------------------- --->
 
 *Acting as a component part of the wider
@@ -23,10 +27,21 @@ implementation.*
 
 <!--- -------------------------------------------------------------------- --->
 
+- [Foreword on Branches](#Foreword)
 - [Overview](#Overview)
 - [Documentation](#Documentation)
 - [Quickstart](#Quickstart)
 - [Acknowledgements](#Acknowledgements)
+
+## Foreword
+
+**Note:** This branch (`dev/paper/aes-n-ways`) is used exclusively
+for developing different ways to accelerate AES in a scalar CPU pipeline.
+
+- It should *never* be merged back into the master branch.
+
+- It represents a version of the scarv-cpu gutted of XCrypto features,
+  and with a selectable scalar AES accelerator implemented.
 
 ## Overview
 

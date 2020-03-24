@@ -2,7 +2,7 @@
 
 VARIANTS="rv32i rv32im rv32imc"
 
-OBJCOPY=$RISCV/bin/riscv32-unknown-elf-objcopy
+OBJCOPY=$RISCV/bin/riscv64-unknown-elf-objcopy
 DEST=$FRV_HOME/work/riscv-compliance
 
 mkdir -p $DEST

@@ -94,12 +94,14 @@ UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
 
 endef
 
-include $(FRV_HOME)/verif/unit/isw_mul/Makefile.in
+# isw_mul test disabled on this branch as it uses XCrypto features.
+#include $(FRV_HOME)/verif/unit/isw_mul/Makefile.in
 include $(FRV_HOME)/verif/unit/example/Makefile.in
 include $(FRV_HOME)/verif/unit/mtime-read/Makefile.in
 include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
 include $(FRV_HOME)/verif/unit/counters/Makefile.in
-include $(FRV_HOME)/verif/unit/instructions/Makefile.in
+# instructions test disabled on this branch as it uses XCrypto features.
+#include $(FRV_HOME)/verif/unit/instructions/Makefile.in
 include $(FRV_HOME)/verif/unit/interrupts/Makefile.in
 include $(FRV_HOME)/verif/unit/timer/Makefile.in
 

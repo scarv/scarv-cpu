@@ -4,7 +4,7 @@ riscv-compliance-build:
 	$(MAKE) -C $(FRV_HOME)/external/riscv-compliance \
         RISCV_TARGET=spike \
         RISCV_DEVICE=rv32imc \
-        RISCV_PREFIX=$(RISCV)/bin/riscv32-unknown-elf-
+        RISCV_PREFIX=$(RISCV)/bin/riscv64-unknown-elf-
 	$(FRV_HOME)/bin/riscv-compliance-srecs.sh
 
 riscv-compliance-run: $(VL_OUT)
