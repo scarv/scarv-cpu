@@ -43,6 +43,9 @@ for developing different ways to accelerate AES in a scalar CPU pipeline.
 - It represents a version of the scarv-cpu gutted of XCrypto features,
   and with a selectable scalar AES accelerator implemented.
 
+- This branch expects to appear as a submodule of
+  [scarv/aes-risc-pipeline](https://github.com/scarv/aes-risc-pipeline).
+
 ## Overview
 
 This is a 5-stage single issue in order CPU core, implementing the

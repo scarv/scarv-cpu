@@ -3,7 +3,7 @@ export FRV_HOME=`pwd`
 export FRV_WORK=$FRV_HOME/work
 
 if [[ -z "$RISCV" ]]; then
-    export RISCV=/opt/riscv32
+    export RISCV=$FRV_HOME/../../build/toolchain/install
 fi
 
 if [[ -z "$VERILATOR_ROOT" ]]; then
