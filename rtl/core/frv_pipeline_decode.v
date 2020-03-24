@@ -90,6 +90,10 @@ parameter XC_CLASS_LEAK_BUBBLE= 1'b1 && XC_CLASS_LEAK;
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
 
+//
+// Enable register read port 3?
+parameter ENABLE_RS3          = 1'b1;
+
 // From (buffered) pipeline register of next stage.
 wire   p_s2_busy;
 
@@ -190,7 +194,7 @@ assign n_s2_fu[P_FU_RNG] =
 
 wire [4:0] dec_rs1_32 = s1_data[19:15];
 wire [4:0] dec_rs2_32 = s1_data[24:20];
-wire [4:0] dec_rs3_32 = s1_data[31:27];
+wire [4:0] dec_rs3_32 = ENABLE_RS3 ? s1_data[31:27] : 5'b0;
 
 wire       clr_rd_lsb = dec_xc_mror   || dec_xc_madd_3 || dec_xc_msub_3 ||
                         dec_xc_mmul_3 || dec_xc_macc_1 ;
@@ -895,7 +899,7 @@ assign n_s2_opr_b =
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
-wire oprc_src_rs3  = n_s2_opr_src[DIS_OPRC_RS3 ];
+wire oprc_src_rs3  = n_s2_opr_src[DIS_OPRC_RS3 ] && ENABLE_RS3;
 wire oprc_src_csra = n_s2_opr_src[DIS_OPRC_CSRA];
 wire oprc_src_pcim = n_s2_opr_src[DIS_OPRC_PCIM];
 

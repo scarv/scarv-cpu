@@ -130,6 +130,10 @@ input  wire [XL:0] dmem_rdata        // Read data
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
+//
+// Should we enable support for wide register writebacks?
+parameter ENABLE_WIDE_RD = 1'b1;
+
 wire  pipe_progress = s4_valid && !s4_busy;
 
 assign s4_busy = fu_cfu && cfu_busy ||
@@ -431,14 +435,15 @@ end
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wide = 
+assign gpr_wide = ENABLE_WIDE_RD && (
     fu_mul && (
         s4_uop == MUL_MMUL ||
         s4_uop == MUL_MADD ||
         s4_uop == MUL_MSUB ||
         s4_uop == MUL_MACC 
     )    ||
-    fu_bit && (s4_uop == BIT_RORW) ;
+    fu_bit && (s4_uop == BIT_RORW)
+);
 
 
 assign gpr_wen  = !s4_trap && !trap_int &&

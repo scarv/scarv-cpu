@@ -156,6 +156,17 @@ parameter AES_MIX_FAST = 1'b1;
 parameter BITMANIP_BASELINE   = 1'b1;
 
 //
+// Should we enable support for register read port 3?
+localparam REGFILE_ENABLE_RS3  = XC_CLASS_BASELINE   ||
+                                 XC_CLASS_MULTIARITH ||
+                                 XC_CLASS_BIT        ||
+                                 BITMANIP_BASELINE   ;
+
+//
+// Should we enable support for wide register writebacks?
+localparam REGFILE_ENABLE_WIDE_RD = XC_CLASS_MULTIARITH ;
+
+//
 // Value of the M-mode implementation id register
 parameter  CSR_MIMPID           = 32'b0;
 
@@ -454,7 +465,8 @@ frv_pipeline_decode #(
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
 .XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
 .XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
-.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) ,
+.ENABLE_RS3 (REGFILE_ENABLE_RS3 ),
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
 .g_resetn           (g_resetn           ), // synchronous reset
@@ -586,6 +598,7 @@ frv_pipeline_execute #(
 //  Memory stage of the pipeline, responsible making memory requests.
 //
 frv_pipeline_memory #(
+.ENABLE_WIDE_RD(REGFILE_ENABLE_WIDE_RD),
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
 .MMIO_BASE_MASK(MMIO_BASE_MASK)
 ) i_pipeline_s3_memory(
@@ -667,6 +680,7 @@ frv_pipeline_memory #(
 //  - GPR writeback.
 //
 frv_pipeline_writeback #(
+.ENABLE_WIDE_RD(REGFILE_ENABLE_WIDE_RD),
 .FRV_PC_RESET_VALUE(FRV_PC_RESET_VALUE)
 ) i_pipeline_s4_writeback(
 .g_clk            (g_clk            ), // global clock
@@ -828,7 +842,9 @@ frv_csrs #(
 //  The general purpose register file.
 //
 frv_gprs #(
-.BRAM_REGFILE(BRAM_REGFILE)
+.BRAM_REGFILE(BRAM_REGFILE),
+.ENABLE_RS3 (REGFILE_ENABLE_RS3 ),
+.ENABLE_WIDE_RD(REGFILE_ENABLE_WIDE_RD)
 ) i_gprs (
 .g_clk      (g_clk          ), //
 .g_resetn   (g_resetn       ), //

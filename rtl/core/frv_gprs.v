@@ -29,6 +29,14 @@ input  wire [31:0] rd_wdata_hi  // Destination write data [63:32]
 // Use an FPGA BRAM style register file.
 parameter BRAM_REGFILE = 0;
 
+// Enable the 3rd register read port.
+parameter ENABLE_RS3   = 1;
+
+// Enable wide writeback
+parameter ENABLE_WIDE_RD = 1;
+
+// ------------------------------------------------------------
+
 reg [31:0] gprs_even [15:0];
 reg [31:0] gprs_odd  [15:0];
 
@@ -37,7 +45,12 @@ wire [31:0] gprs      [31:0];
 
 assign rs1_data = gprs[rs1_addr];
 assign rs2_data = gprs[rs2_addr];
-assign rs3_data = gprs[rs3_addr];
+
+generate if(ENABLE_RS3) begin
+    assign rs3_data = gprs[rs3_addr];
+end else begin
+    assign rs3_data = 32'b0;
+end endgenerate
 
 wire        rd_odd       =  rd_addr[0];
 wire        rd_even      = !rd_addr[0];
@@ -45,9 +58,10 @@ wire        rd_even      = !rd_addr[0];
 wire [ 3:0] rd_top       =  rd_addr[4:1];
 
 wire        rd_wen_even  = rd_even && rd_wen;
-wire        rd_wen_odd   = (rd_odd || rd_wide) && rd_wen;
+wire        rd_wen_odd   = (rd_odd || (rd_wide && ENABLE_WIDE_RD)) && rd_wen;
 
-wire [31:0] rd_wdata_odd = rd_wide ? rd_wdata_hi : rd_wdata;
+wire [31:0] rd_wdata_odd = (rd_wide && ENABLE_WIDE_RD) ? rd_wdata_hi :
+                                                         rd_wdata    ;
 
 genvar i ;
 generate for(i = 0; i < 16; i = i+1) begin

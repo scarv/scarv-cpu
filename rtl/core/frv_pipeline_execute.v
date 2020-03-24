@@ -178,10 +178,11 @@ wire        imul_pmul       =
 wire        imul_pclmul     =
     (s2_uop == MUL_PCLMUL_L || s2_uop == MUL_PCLMUL_H) && XC_CLASS_PACKED;
 
-wire        imul_clmul_r    = s2_uop == MUL_CLMUL_R     ;
-wire        imul_clmul      = s2_uop == MUL_CLMUL_L     || 
-                              s2_uop == MUL_CLMUL_H     ||
-                              imul_clmul_r              ;
+wire        imul_clmul_r    = BITMANIP_BASELINE && s2_uop == MUL_CLMUL_R     ;
+wire        imul_clmul      = BITMANIP_BASELINE && (
+                                s2_uop == MUL_CLMUL_L     || 
+                                s2_uop == MUL_CLMUL_H     ||
+                                imul_clmul_r              );
 wire        imul_madd       = XC_CLASS_MULTIARITH && s2_uop == MUL_MADD;
 wire        imul_msub       = XC_CLASS_MULTIARITH && s2_uop == MUL_MSUB;
 wire        imul_macc       = XC_CLASS_MULTIARITH && s2_uop == MUL_MACC;
@@ -329,10 +330,10 @@ wire [ 7:0]  bitw_bop_lut     = s2_pw[0] ? uxcrypto_b1 : uxcrypto_b0 ;
 wire         bitw_flush       = flush || pipe_progress;
 wire         bitw_valid       = fu_bit;
 
-wire         bitw_fsl         = fu_bit && s2_uop == BIT_FSL ;
-wire         bitw_fsr         = fu_bit && s2_uop == BIT_FSR ;
-wire         bitw_mror        = fu_bit && s2_uop == BIT_RORW;
-wire         bitw_cmov        = fu_bit && s2_uop == BIT_CMOV;
+wire         bitw_fsl         = BITMANIP_BASELINE &&fu_bit && s2_uop == BIT_FSL ;
+wire         bitw_fsr         = BITMANIP_BASELINE &&fu_bit && s2_uop == BIT_FSR ;
+wire         bitw_mror        = BITMANIP_BASELINE &&fu_bit && s2_uop == BIT_RORW;
+wire         bitw_cmov        = BITMANIP_BASELINE &&fu_bit && s2_uop == BIT_CMOV;
 wire         bitw_lut         = XC_CLASS_BIT && fu_bit && s2_uop == BIT_LUT ;
 wire         bitw_bop         = XC_CLASS_BIT && fu_bit && s2_uop == BIT_BOP ;
 wire [63:0]  bitw_result_wide ; // 64-bit result

@@ -93,6 +93,10 @@ parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
 // Common core parameters and constants
 `include "frv_common.vh"
 
+//
+// Should we enable support for wide register writebacks?
+parameter ENABLE_WIDE_RD = 1'b1;
+
 
 //
 // Stalling / Pipeline Progression
@@ -207,8 +211,7 @@ wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
 assign fwd_s3_wdata = s3_opr_a          ;
 assign fwd_s3_wdata_hi = s3_opr_b       ;
-assign fwd_s3_wide  = imul_gpr_wide ||
-                      bitw_gpr_wide ;
+assign fwd_s3_wide  = ENABLE_WIDE_RD && (imul_gpr_wide || bitw_gpr_wide);
 assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
 
