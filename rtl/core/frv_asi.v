@@ -46,6 +46,11 @@ parameter XC_CLASS_SHA3       = 1'b1;
 //
 parameter XC_AES_VARIANT      = 1;
 
+localparam XC_AES_VARIANT_V1  = XC_AES_VARIANT == 1;
+localparam XC_AES_VARIANT_TG  = XC_AES_VARIANT == 2;
+localparam XC_AES_VARIANT_TT  = XC_AES_VARIANT == 3;
+localparam XC_AES_VARIANT_TI  = XC_AES_VARIANT == 4;
+
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
 parameter AES_MIX_FAST = 1'b1;
