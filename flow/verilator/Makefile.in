@@ -2,11 +2,13 @@
 VERILATOR       = $(VERILATOR_ROOT)/bin/verilator
 
 VL_DIR   = $(FRV_WORK)/verilator
-VL_OUT   = $(FRV_WORK)/verilator/verilated
+VL_OUT   = $(VL_DIR)/verilated
 
 VL_WAVES    = $(VL_DIR)/waves.vcd
 VL_TIMEOUT  = 1000
 VL_ARGS     = +IMEM=$(FRV_WORK)/riscv-compliance/rv32imc/C-ADD.elf.srec
+
+VL_VERILOG_PARAMETERS ?=
 
 VL_CSRC_DIR=$(FRV_HOME)/flow/verilator
 VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
@@ -23,6 +25,7 @@ VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
 VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
             -I$(CPU_RTL_DIR) -DRVFI \
             --exe --trace \
+            $(VL_VERILOG_PARAMETERS) \
             --top-module frv_core $(VL_BUILD_FLAGS)
 
 .PHONY: $(VL_CSRC)
