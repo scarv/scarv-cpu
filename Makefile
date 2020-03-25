@@ -9,6 +9,8 @@ ifndef XCRYPTO_RTL
     $(error "Please set the XCRYPTO_RTL environment variable")
 endif
 
+AES_VAR_RTL_DIR     = $(FRV_HOME)/../../rtl/aes
+
 export CPU_RTL_DIR  = $(FRV_HOME)/rtl/core
 export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
                       $(XCRYPTO_RTL)/p_addsub/p_addsub.v \
@@ -25,7 +27,9 @@ export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu_pmul.v \
                       $(XCRYPTO_RTL)/xc_malu/xc_malu_muldivrem.v \
                       $(XCRYPTO_RTL)/b_bop/b_bop.v \
-                      $(XCRYPTO_RTL)/b_lut/b_lut.v
+                      $(XCRYPTO_RTL)/b_lut/b_lut.v \
+                      $(AES_VAR_RTL_DIR)/share/aes_sbox_shared.v \
+                      $(AES_VAR_RTL_DIR)/v2/aes_v2_latency.v
 
 export PATH:=$(RISCV)/bin:$(YOSYS_ROOT)/:$(PATH)
 

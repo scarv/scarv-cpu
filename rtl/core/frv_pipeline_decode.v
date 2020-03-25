@@ -772,13 +772,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ||
-    // AES Variant instructions.
-    dec_saes_v2_sub_enc  || dec_saes_v2_sub_dec  ||
-    dec_saes_v2_mix_enc  || dec_saes_v2_mix_dec  || dec_saes_v3_encs     ||
-    dec_saes_v3_encsm    || dec_saes_v3_decs     || dec_saes_v3_decsm    ||
-    dec_saes_v5_esrsub_lo|| dec_saes_v5_esrsub_hi|| dec_saes_v5_dsrsub_lo||
-    dec_saes_v5_dsrsub_hi|| dec_saes_v5_emix     || dec_saes_v5_dmix      ;
+    dec_xc_scatter_h     ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
@@ -799,6 +793,10 @@ wire   oprb_src_zero =  // Operand B sources zero
     dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||
     dec_jal        ;
 
+wire   oprb_src_imm_bs = // Operand B sources 2-bit BS immediate    
+    dec_saes_v3_encs     || dec_saes_v3_encsm    || dec_saes_v3_decs     ||
+    dec_saes_v3_decsm    ;
+
 assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
     dec_sw         ||
@@ -806,7 +804,13 @@ assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
     dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
     dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
-    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ;
+    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ||
+    // AES Variant instructions.
+    dec_saes_v2_sub_enc  || dec_saes_v2_sub_dec  ||
+    dec_saes_v2_mix_enc  || dec_saes_v2_mix_dec  || dec_saes_v3_encs     ||
+    dec_saes_v3_encsm    || dec_saes_v3_decs     || dec_saes_v3_decsm    ||
+    dec_saes_v5_esrsub_lo|| dec_saes_v5_esrsub_hi|| dec_saes_v5_dsrsub_lo||
+    dec_saes_v5_dsrsub_hi|| dec_saes_v5_emix     || dec_saes_v5_dmix      ;
 
 assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
     dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||
@@ -825,10 +829,6 @@ assign n_s2_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
     dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
     dec_c_j        || dec_c_jal      || dec_jal         ;
 
-
-wire   oprc_src_imm_bs = // Operand C sources 2-bit BS immediate    
-    dec_saes_v3_encs     || dec_saes_v3_encsm    || dec_saes_v3_decs     ||
-    dec_saes_v3_decsm    ;
 
 //
 // Trap catching
@@ -950,10 +950,13 @@ wire oprb_ld_en    = n_s2_valid && (
     oprb_src_rs2 || oprb_src_imm || oprb_src_zero
 );
 
+wire [31:0] aesvar_imm_bs = {30'b0,d_data[31:30]};
+
 assign n_s2_opr_b =
     {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
     {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
-    {XLEN{oprb_src_imm    }} & n_s2_imm       ;
+    {XLEN{oprb_src_imm    }} & n_s2_imm       |
+    {XLEN{oprb_src_imm_bs }} & aesvar_imm_bs  ;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
@@ -965,14 +968,11 @@ wire oprc_ld_en    = n_s2_valid && (
     oprc_src_rs2  || oprc_src_rs3  || oprc_src_csra || oprc_src_pcim
 );
 
-wire [31:0] aesvar_imm_bs = {30'b0,d_data[31:30]};
-
 assign n_s2_opr_c = 
     {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
     {XLEN{oprc_src_rs3    }} & s1_rs3_rdata   |
     {XLEN{oprc_src_csra   }} & csr_addr       |
-    {XLEN{oprc_src_pcim   }} & pc_plus_imm    |
-    {XLEN{oprc_src_imm_bs }} & aesvar_imm_bs  ;
+    {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
 
 //
 // Pipeline Register.

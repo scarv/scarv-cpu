@@ -383,24 +383,24 @@ Instruction        |`opr_a`      | `opr_b`       | `opr_c`
 
 Instruction        |`opr_a`      | `opr_b`       | `opr_c`    
 -------------------|-------------|---------------|------------
-`saes.v1.encs     `| rs1         |               | 
-`saes.v1.encm     `| rs1         |               | 
-`saes.v1.decs     `| rs1         |               | 
-`saes.v1.decm     `| rs1         |               | 
-`saes.v2.sub.enc  `| rs1         | rs2           | bs
-`saes.v2.sub.dec  `| rs1         | rs2           | bs
-`saes.v2.mix.enc  `| rs1         | rs2           | bs
-`saes.v2.mix.dec  `| rs1         | rs2           | bs
-`saes.v3.encs     `| rs1         | rs2           | 
-`saes.v3.encsm    `| rs1         | rs2           | 
-`saes.v3.decs     `| rs1         | rs2           | 
-`saes.v3.decsm    `| rs1         | rs2           | 
-`saes.v5.esrsub.lo`| rs1         | rs2           | 
-`saes.v5.esrsub.hi`| rs1         | rs2           | 
-`saes.v5.dsrsub.lo`| rs1         | rs2           | 
-`saes.v5.dsrsub.hi`| rs1         | rs2           | 
-`saes.v5.emix     `| rs1         | rs2           | 
-`saes.v5.dmix     `| rs1         | rs2           | 
+`saes.v1.encs     `| rs1         |               |    
+`saes.v1.encm     `| rs1         |               |    
+`saes.v1.decs     `| rs1         |               |    
+`saes.v1.decm     `| rs1         |               |    
+`saes.v2.sub.enc  `| rs1         | bs            | rs2
+`saes.v2.sub.dec  `| rs1         | bs            | rs2
+`saes.v2.mix.enc  `| rs1         | bs            | rs2
+`saes.v2.mix.dec  `| rs1         | bs            | rs2
+`saes.v3.encs     `| rs1         |               | rs2
+`saes.v3.encsm    `| rs1         |               | rs2
+`saes.v3.decs     `| rs1         |               | rs2
+`saes.v3.decsm    `| rs1         |               | rs2
+`saes.v5.esrsub.lo`| rs1         |               | rs2
+`saes.v5.esrsub.hi`| rs1         |               | rs2
+`saes.v5.dsrsub.lo`| rs1         |               | rs2
+`saes.v5.dsrsub.hi`| rs1         |               | rs2
+`saes.v5.emix     `| rs1         |               | rs2
+`saes.v5.dmix     `| rs1         |               | rs2
 
 
 **RNG Instructions:**
