@@ -25,3 +25,10 @@ TEST_V3_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v3/aes_dec.c
 
 $(eval $(call add_unit_test,$(TEST_V3_NAME),$(TEST_V3_SRC),$(TEST_FLAGS)))
+
+TEST_V5_NAME = aes-v5
+TEST_V5_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
+               $(AES_SRC_DIR)/tiled/aes_enc.c \
+               $(AES_SRC_DIR)/tiled/aes_dec.c
+
+$(eval $(call add_unit_test,$(TEST_V5_NAME),$(TEST_V5_SRC),$(TEST_FLAGS)))
