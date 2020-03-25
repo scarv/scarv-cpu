@@ -136,8 +136,24 @@ xc_sha256 i_xc_sha256 (
 
 generate if(XC_AES_VARIANT_V1) begin // Simple Sub/Mix
 
-assign aes_ready    =  1'b1;
-assign result_aes   = 32'b0;
+wire   insn_sub_enc = asi_valid && asi_uop == ASI_SAES_V1_ENCS;
+wire   insn_sub_dec = asi_valid && asi_uop == ASI_SAES_V1_DECS;
+wire   insn_mix_enc = asi_valid && asi_uop == ASI_SAES_V1_ENCM;
+wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V1_DECM;
+
+wire   aes_dec      = insn_sub_dec || insn_mix_dec;
+wire   aes_mix      = insn_mix_dec || insn_mix_enc;
+
+aes_v1 i_aes_v1 (
+.g_clk      (g_clk      ),
+.g_resetn   (g_resetn   ),
+.valid      (insn_aes   ), // Input data valid
+.dec        (aes_dec    ), // Encrypt (0) or decrypt (1)
+.mix        (aes_mix    ), // Do MixColumns (1) or SubBytes (0)
+.rs1        (asi_rs1    ), // Input source register
+.ready      (aes_ready  ), // Finished computing?
+.rd         (result_aes )  // Output destination register value.
+);
 
 end else if(XC_AES_VARIANT_TG) begin // Tillich/Grochadl
 
