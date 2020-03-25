@@ -203,4 +203,24 @@ dec_xc_sha256_s1   || dec_xc_sha256_s2   || dec_xc_sha256_s3   ||
 dec_xc_sha3_x1   || dec_xc_sha3_x2   || dec_xc_sha3_x4 || dec_xc_sha3_xy  ||
 dec_xc_sha3_yx || dec_xc_str_b
 || dec_xc_str_h   || dec_xc_str_w   ||
-dec_xc_lkgfence );
+dec_xc_lkgfence       ||
+dec_saes_v1_encs      ||
+dec_saes_v1_encm      ||
+dec_saes_v1_decs      ||
+dec_saes_v1_decm      ||
+dec_saes_v2_sub_enc   ||
+dec_saes_v2_sub_dec   ||
+dec_saes_v2_mix_enc   ||
+dec_saes_v2_mix_dec   ||
+dec_saes_v3_encs      ||
+dec_saes_v3_encsm     ||
+dec_saes_v3_decs      ||
+dec_saes_v3_decsm     ||
+dec_saes_v5_esrsub_lo ||
+dec_saes_v5_esrsub_hi ||
+dec_saes_v5_dsrsub_lo ||
+dec_saes_v5_dsrsub_hi ||
+dec_saes_v5_emix      ||
+dec_saes_v5_dmix      
+
+);
