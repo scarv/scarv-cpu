@@ -150,6 +150,7 @@ localparam ASI_SAES_V5_DSRSUB_LO = {ASI_AES, 3'b001};
 localparam ASI_SAES_V5_DSRSUB_HI = {ASI_AES, 3'b011};
 localparam ASI_SAES_V5_EMIX      = {ASI_AES, 3'b100};
 localparam ASI_SAES_V5_DMIX      = {ASI_AES, 3'b101};
+localparam ASI_SAES_V5_SUB       = {ASI_AES, 3'b111};
 
 localparam RNG_RNGSEED       = {2'b00, 3'b001};
 localparam RNG_RNGSAMP       = {2'b00, 3'b010};

@@ -166,7 +166,7 @@ wire dec_saes_v5_dsrsub_lo  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'
 wire dec_saes_v5_dsrsub_hi  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1200502b;
 wire dec_saes_v5_emix       = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1400502b;
 wire dec_saes_v5_dmix       = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1600502b;
-
+wire dec_saes_v5_sub        = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h1800502b;
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge
@@ -221,6 +221,6 @@ dec_saes_v5_esrsub_hi ||
 dec_saes_v5_dsrsub_lo ||
 dec_saes_v5_dsrsub_hi ||
 dec_saes_v5_emix      ||
-dec_saes_v5_dmix      
-
+dec_saes_v5_dmix      ||
+dec_saes_v5_sub
 );

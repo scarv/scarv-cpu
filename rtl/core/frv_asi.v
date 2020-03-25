@@ -200,8 +200,35 @@ aes_v3_1 i_aes_v3_1 (
 
 end else if(XC_AES_VARIANT_TI) begin // Tiles
 
-assign aes_ready    =  1'b1;
-assign result_aes   = 32'b0;
+wire    insn_esrsub_lo = asi_valid && asi_uop == ASI_SAES_V5_ESRSUB_LO ;
+wire    insn_esrsub_hi = asi_valid && asi_uop == ASI_SAES_V5_ESRSUB_HI ;
+wire    insn_dsrsub_lo = asi_valid && asi_uop == ASI_SAES_V5_DSRSUB_LO ;
+wire    insn_dsrsub_hi = asi_valid && asi_uop == ASI_SAES_V5_DSRSUB_HI ;
+wire    insn_emix      = asi_valid && asi_uop == ASI_SAES_V5_EMIX      ;
+wire    insn_dmix      = asi_valid && asi_uop == ASI_SAES_V5_DMIX      ;
+wire    insn_sub       = asi_valid && asi_uop == ASI_SAES_V5_SUB       ;
+
+wire    op_hi          = insn_esrsub_hi || insn_dsrsub_hi   ;
+wire    op_sbsr        = insn_esrsub_hi || insn_dsrsub_hi  ||
+                         insn_esrsub_lo || insn_dsrsub_lo   ;
+wire    op_mix         = insn_emix      || insn_dmix        ;
+wire    op_dec         = insn_dsrsub_lo || insn_dsrsub_hi  ||
+                         insn_dmix                          ;
+
+aes_tiled i_aes_tiled(
+.g_clk      (g_clk      ),
+.g_resetn   (g_resetn   ),
+.valid      (insn_aes   ), // Input data valid
+.dec        (op_dec     ), // Encrypt (0) or decrypt (1)
+.op_sb      (insn_sub   ), // Sub-bytes only
+.op_sbsr    (op_sbsr    ), // Subbytes and shift-rows
+.op_mix     (op_mix     ), // Mix-Columns
+.hi         (op_hi      ), // High or low shiftrows?
+.rs1        (asi_rs1    ), // Input source register
+.rs2        (asi_rs2    ), // Input source register
+.ready      (aes_ready  ), // Finished computing?
+.rd         (result_aes )  // Output destination register value.
+);
 
 end endgenerate
 

@@ -32,7 +32,8 @@ export CPU_RTL_SRCS = $(shell find $(CPU_RTL_DIR) -name *.v) \
                       $(AES_VAR_RTL_DIR)/share/aes_mixcolumn.v \
                       $(AES_VAR_RTL_DIR)/v1/aes_v1_latency.v \
                       $(AES_VAR_RTL_DIR)/v2/aes_v2_latency.v \
-                      $(AES_VAR_RTL_DIR)/v3/aes_v3_1.v
+                      $(AES_VAR_RTL_DIR)/v3/aes_v3_1.v \
+                      $(AES_VAR_RTL_DIR)/tiled/aes_tiled.v
 
 export PATH:=$(RISCV)/bin:$(YOSYS_ROOT)/:$(PATH)
 

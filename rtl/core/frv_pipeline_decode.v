@@ -203,7 +203,8 @@ assign n_s2_fu[P_FU_ASI] =
     dec_saes_v2_mix_enc  || dec_saes_v2_mix_dec  || dec_saes_v3_encs     ||
     dec_saes_v3_encsm    || dec_saes_v3_decs     || dec_saes_v3_decsm    ||
     dec_saes_v5_esrsub_lo|| dec_saes_v5_esrsub_hi|| dec_saes_v5_dsrsub_lo||
-    dec_saes_v5_dsrsub_hi|| dec_saes_v5_emix     || dec_saes_v5_dmix      ;
+    dec_saes_v5_dsrsub_hi|| dec_saes_v5_emix     || dec_saes_v5_dmix     ||
+    dec_saes_v5_sub      ;
 
 assign n_s2_fu[P_FU_RNG] = 
     dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ||
@@ -448,7 +449,8 @@ wire [OP:0] uop_asi =
     {1+OP{dec_saes_v5_dsrsub_lo}} & ASI_SAES_V5_DSRSUB_LO |
     {1+OP{dec_saes_v5_dsrsub_hi}} & ASI_SAES_V5_DSRSUB_HI |
     {1+OP{dec_saes_v5_emix     }} & ASI_SAES_V5_EMIX      |
-    {1+OP{dec_saes_v5_dmix     }} & ASI_SAES_V5_DMIX      ;
+    {1+OP{dec_saes_v5_dmix     }} & ASI_SAES_V5_DMIX      |
+    {1+OP{dec_saes_v5_sub      }} & ASI_SAES_V5_SUB       ;
 
 wire [OP:0] uop_rng =
     {1+OP{dec_xc_rngtest      }} & RNG_RNGTEST      |
@@ -739,8 +741,8 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_saes_v2_mix_enc  || dec_saes_v2_mix_dec  || dec_saes_v3_encs     ||
     dec_saes_v3_encsm    || dec_saes_v3_decs     || dec_saes_v3_decsm    ||
     dec_saes_v5_esrsub_lo|| dec_saes_v5_esrsub_hi|| dec_saes_v5_dsrsub_lo||
-    dec_saes_v5_dsrsub_hi|| dec_saes_v5_emix     || dec_saes_v5_dmix      ;
-
+    dec_saes_v5_dsrsub_hi|| dec_saes_v5_emix     || dec_saes_v5_dmix     ||
+    dec_saes_v5_sub      ;
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
     dec_auipc       ;
