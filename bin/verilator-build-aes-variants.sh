@@ -21,3 +21,8 @@ build_variant   v2  2
 build_variant   v3  3
 build_variant   v5  4
 
+grep -Irn "\?>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
+    > $FRV_WORK/aes-variants-cycles.csv
+
+grep -Irn "\!>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
+    > $FRV_WORK/aes-variants-insret.csv

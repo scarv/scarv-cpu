@@ -69,7 +69,8 @@ run-unit-${1} : $(call unit_test_srec,${1}) $(VL_OUT) ;
 	$(VL_OUT) +IMEM=$(call unit_test_srec,${1}) \
 	          +WAVES=$(call unit_test_waves,${1}) \
 	          +TIMEOUT=$(UNIT_TIMEOUT) \
-	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL) 
+	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL) \
+        | tee $(call unit_test_log,${1})
 
 $(call unit_test_waves,${1}) : run-unit-${1}
 $(call unit_test_log,${1}) : run-unit-${1}
