@@ -129,6 +129,28 @@ localparam ASI_SHA256_S1     = {ASI_SHA2, 3'b001};
 localparam ASI_SHA256_S2     = {ASI_SHA2, 3'b010};
 localparam ASI_SHA256_S3     = {ASI_SHA2, 3'b011};
 
+localparam ASI_SAES_V1_ENCS      = {ASI_AES, 3'b000};
+localparam ASI_SAES_V1_ENCM      = {ASI_AES, 3'b001};
+localparam ASI_SAES_V1_DECS      = {ASI_AES, 3'b100};
+localparam ASI_SAES_V1_DECM      = {ASI_AES, 3'b101};
+
+localparam ASI_SAES_V2_SUB_ENC   = {ASI_AES, 3'b000};
+localparam ASI_SAES_V2_SUB_DEC   = {ASI_AES, 3'b001};
+localparam ASI_SAES_V2_MIX_ENC   = {ASI_AES, 3'b100};
+localparam ASI_SAES_V2_MIX_DEC   = {ASI_AES, 3'b101};
+
+localparam ASI_SAES_V3_ENCS      = {ASI_AES, 3'b000};
+localparam ASI_SAES_V3_ENCSM     = {ASI_AES, 3'b001};
+localparam ASI_SAES_V3_DECS      = {ASI_AES, 3'b100};
+localparam ASI_SAES_V3_DECSM     = {ASI_AES, 3'b101};
+
+localparam ASI_SAES_V5_ESRSUB_LO = {ASI_AES, 3'b000};
+localparam ASI_SAES_V5_ESRSUB_HI = {ASI_AES, 3'b010};
+localparam ASI_SAES_V5_DSRSUB_LO = {ASI_AES, 3'b001};
+localparam ASI_SAES_V5_DSRSUB_HI = {ASI_AES, 3'b011};
+localparam ASI_SAES_V5_EMIX      = {ASI_AES, 3'b100};
+localparam ASI_SAES_V5_DMIX      = {ASI_AES, 3'b101};
+
 localparam RNG_RNGSEED       = {2'b00, 3'b001};
 localparam RNG_RNGSAMP       = {2'b00, 3'b010};
 localparam RNG_RNGTEST       = {2'b00, 3'b100};
