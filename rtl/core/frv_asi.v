@@ -179,8 +179,24 @@ aes_v2 i_aes_v2 (
 
 end else if(XC_AES_VARIANT_TT) begin // TTable
 
-assign aes_ready    =  1'b1;
-assign result_aes   = 32'b0;
+wire   insn_encs  = asi_valid && asi_uop == ASI_SAES_V3_ENCS ;
+wire   insn_decs  = asi_valid && asi_uop == ASI_SAES_V3_DECS ;
+wire   insn_encsm = asi_valid && asi_uop == ASI_SAES_V3_ENCSM;
+wire   insn_decsm = asi_valid && asi_uop == ASI_SAES_V3_DECSM;
+
+wire   aes_dec    = insn_decs   || insn_decsm;
+wire   aes_mix    = insn_encsm  || insn_decsm;
+
+aes_v3_1 i_aes_v3_1 (
+.valid  (insn_aes   ), // Are the inputs valid? Used for logic gating.
+.dec    (aes_dec    ), // Encrypt (clear) or decrypt (set)
+.mix    (aes_mix    ), // Perform MixColumn transformation (if set)
+.rs1    (asi_rs1    ), // Source register 1
+.rs2    (asi_rs2    ), // Source register 2
+.bs     (asi_shamt  ), // Byte select immediate
+.rd     (result_aes ), // output destination register value.
+.ready  (aes_ready  )  // Compute finished?
+);
 
 end else if(XC_AES_VARIANT_TI) begin // Tiles
 

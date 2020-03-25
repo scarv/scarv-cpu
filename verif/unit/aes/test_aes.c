@@ -43,11 +43,6 @@ int test_main() {
 
     __putstr("--- Test AES 128 ---\n");
 
-    uint32_t in  = 0x4c260628;
-    uint32_t out = _saes_v1_decm(in);
-    __puthex32(in ); __putchar('\n');
-    __puthex32(out); __putchar('\n');
-
     int result_aes_128 = test_aes_128();
 
     return result_aes_128;

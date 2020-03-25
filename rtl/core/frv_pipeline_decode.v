@@ -947,7 +947,7 @@ wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
 wire oprb_ld_en    = n_s2_valid && (
-    oprb_src_rs2 || oprb_src_imm || oprb_src_zero
+    oprb_src_rs2 || oprb_src_imm || oprb_src_zero || oprb_src_imm_bs
 );
 
 wire [31:0] aesvar_imm_bs = {30'b0,d_data[31:30]};
