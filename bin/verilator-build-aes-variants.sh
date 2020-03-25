@@ -13,7 +13,8 @@ function build_variant {
     make build-unit-aes-${1} run-unit-aes-${1} \
         VL_DIR=$FRV_HOME/work/verilator-aes-${1} \
         VL_VERILOG_PARAMETERS=-GXC_AES_VARIANT=$2 \
-        UNIT_TIMEOUT=200000
+        UNIT_TIMEOUT=200000 \
+        UNIT_IMEM_MAX_STALL=0 UNIT_DMEM_MAX_STALL=0
 }
 
 build_variant   v1  1

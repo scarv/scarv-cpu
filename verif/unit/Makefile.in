@@ -10,6 +10,8 @@ UNIT_TESTS_CLEAN=
 UNIT_TIMEOUT    = 20000
 UNIT_FAIL       = 0x80000086
 UNIT_PASS       = 0x80000090
+UNIT_IMEM_MAX_STALL=5
+UNIT_DMEM_MAX_STALL=5
 
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
 UNIT_CFLAGS    += -march=rv32imcb_xcrypto -mabi=ilp32
@@ -70,6 +72,8 @@ run-unit-${1} : $(call unit_test_srec,${1}) $(VL_OUT) ;
 	          +WAVES=$(call unit_test_waves,${1}) \
 	          +TIMEOUT=$(UNIT_TIMEOUT) \
 	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL) \
+	          +IMEM_MAX_STALL=$(UNIT_IMEM_MAX_STALL) \
+	          +DMEM_MAX_STALL=$(UNIT_DMEM_MAX_STALL) \
         | tee $(call unit_test_log,${1})
 
 $(call unit_test_waves,${1}) : run-unit-${1}

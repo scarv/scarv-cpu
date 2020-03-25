@@ -62,15 +62,15 @@ int test_aes_128() {
     __putstr("erk: "); __puthexstr((uint8_t*)erk, AES_128_RK_BYTES); __putchar('\n');
     __putstr("drk: "); __puthexstr((uint8_t*)drk, AES_128_RK_BYTES); __putchar('\n');
 
-    __putstr("!> ");
-    __puthex64(cycles_eks); __putchar(',');
-    __puthex64(cycles_enc); __putchar(',');
-    __puthex64(cycles_dks); __putchar(',');
+    __putstr("!> 0x");
+    __puthex64(cycles_eks); __putstr(",0x");
+    __puthex64(cycles_enc); __putstr(",0x");
+    __puthex64(cycles_dks); __putstr(",0x");
     __puthex64(cycles_dec); __putchar('\n');
-    __putstr("?> ");
-    __puthex64(insret_eks); __putchar(',');
-    __puthex64(insret_enc); __putchar(',');
-    __puthex64(insret_dks); __putchar(',');
+    __putstr("?> 0x");
+    __puthex64(insret_eks); __putstr(",0x");
+    __puthex64(insret_enc); __putstr(",0x");
+    __puthex64(insret_dks); __putstr(",0x");
     __puthex64(insret_dec); __putchar('\n');
 
     return tr;
