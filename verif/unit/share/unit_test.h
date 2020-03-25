@@ -91,5 +91,8 @@ void __puthex32(uint32_t w);
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w);
 
+//! Print a string of 8-bit numbers as hex.
+void __puthexstr(uint8_t * str, int len);
+
 #endif
 

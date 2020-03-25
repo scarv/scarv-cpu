@@ -1,0 +1,14 @@
+
+AES_SRC_DIR =$(FRV_HOME)/../../src/aes
+
+TEST_NAME = aes-v2
+TEST_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
+            $(AES_SRC_DIR)/v2/aes_enc.c \
+            $(AES_SRC_DIR)/v2/aes_dec.c
+            
+# Include the AES Source code directory from the aes-risc-pipeline
+# parent repository
+TEST_FLAGS= -I$(AES_SRC_DIR)
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC),$(TEST_FLAGS)))
+

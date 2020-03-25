@@ -43,10 +43,14 @@ define unit_test_log
 $(UNIT_TEST_BUILD)/${1}/${1}.log
 endef
 
+#
+# 1. Unit Test Name
+# 2. Unit Test Source Files
+# 3. GCC FLags
 define add_unit_test
 $(call unit_test_elf,${1}) : ${2} $(UNIT_SRCS) ;
 	@mkdir -p $(dir $(call unit_test_elf,${1}))
-	$(CC) -Wall $(UNIT_CFLAGS) -o $(call unit_test_elf,${1}) $(UNIT_SRCS) ${2}
+	$(CC) -Wall $(UNIT_CFLAGS) ${3} -o $(call unit_test_elf,${1}) $(UNIT_SRCS) ${2}
 
 $(call unit_test_objdump,${1}) : $(call unit_test_elf,${1}) ;
 	$(OBJDUMP) -D $(call unit_test_elf,${1}) > $(call unit_test_objdump,${1})
@@ -104,6 +108,7 @@ include $(FRV_HOME)/verif/unit/counters/Makefile.in
 #include $(FRV_HOME)/verif/unit/instructions/Makefile.in
 include $(FRV_HOME)/verif/unit/interrupts/Makefile.in
 include $(FRV_HOME)/verif/unit/timer/Makefile.in
+include $(FRV_HOME)/verif/unit/aes/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)

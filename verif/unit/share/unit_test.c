@@ -77,3 +77,13 @@ void __puthex8(uint8_t w) {
     __putchar(lut[b_1]);
     __putchar(lut[b_0]);
 }
+
+//! Print a string of 8-bit numbers as hex.
+void __puthexstr(uint8_t * str, int len) {
+    for (int i = 0; i < len ; i ++) {
+        uint8_t b_0 = (str[i] >> ( 0)) & 0xF;
+        uint8_t b_1 = (str[i] >> ( 4)) & 0xF;
+        __putchar(lut[b_1]);
+        __putchar(lut[b_0]);
+    }
+}
