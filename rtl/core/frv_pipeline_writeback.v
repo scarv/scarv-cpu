@@ -353,7 +353,7 @@ wire        lsu_gpr_wen     = (lsu_txn_recv && !dmem_error ||
                                lsu_mmio     && !mmio_error  ) &&
                               !lsu_rsp_seen &&  lsu_load       ;
 
-wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
+wire [XL:0] lsu_gpr_wdata;
 
 wire        lsu_load    = fu_lsu && s4_uop[LSU_LOAD];
 wire        lsu_store   = fu_lsu && s4_uop[LSU_STORE]   ;
@@ -397,7 +397,7 @@ wire [15: 0] rdata_h1 =
     {16{lsu_word                         }} &  mem_rdata[31:16] ;
 
 //                         31....16,15.....8,7......0
-wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
+assign lsu_gpr_wdata = {rdata_h1,rdata_b1,rdata_b0};
 
 reg  dmem_error_seen;
 

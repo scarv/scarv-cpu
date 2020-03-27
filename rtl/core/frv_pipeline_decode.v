@@ -88,7 +88,7 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 // 3. TTable based / riscv-crypto proposal.
 // 4. Tiled
 //
-parameter  XC_AES_VARIANT      = 1;
+parameter  XC_AES_VARIANT      = 2;
 
 localparam XC_AES_VARIANT_V1   = XC_AES_VARIANT == 1;
 localparam XC_AES_VARIANT_TG   = XC_AES_VARIANT == 2;

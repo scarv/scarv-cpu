@@ -149,7 +149,7 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 // 3. TTable based / riscv-crypto proposal.
 // 4. Tiled
 //
-parameter XC_AES_VARIANT      = 1;
+parameter XC_AES_VARIANT      = 2;
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;

@@ -230,6 +230,11 @@ aes_tiled i_aes_tiled(
 .rd         (result_aes )  // Output destination register value.
 );
 
+end else begin
+
+assign result_aes = 32'b0;
+assign aes_ready  =  1'b1;
+
 end endgenerate
 
 endmodule

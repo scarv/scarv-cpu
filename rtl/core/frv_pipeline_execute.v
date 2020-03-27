@@ -103,7 +103,7 @@ parameter XC_CLASS_SHA3       = 1'b1;
 // 3. TTable based / riscv-crypto proposal.
 // 4. Tiled
 //
-parameter XC_AES_VARIANT      = 1;
+parameter XC_AES_VARIANT      = 2;
 
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
