@@ -7,7 +7,8 @@ set -x
 # 1. Variant name
 # 2. XC_AES_VARIANT parameter number = {1,2,3,4}
 function build_variant {
-    make build-unit-aes-${1} run-unit-aes-${1} \
+    make -B build-unit-aes-${1}
+    make run-unit-aes-${1} \
         VL_DIR=$FRV_HOME/work/verilator-aes-${1} \
         VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=$2 -GXC_CLASS_AES=1\'b1" \
         UNIT_TIMEOUT=200000 \
@@ -19,8 +20,8 @@ build_variant   v2  2
 build_variant   v3  3
 build_variant   v5  4
 
-grep -Irn "\?>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
-    > $FRV_WORK/aes-variants-cycles.csv
-
 grep -Irn "\!>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
-    > $FRV_WORK/aes-variants-insret.csv
+    | sort > $FRV_WORK/aes-variants-cycles.csv
+
+grep -Irn "\?>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
+    | sort > $FRV_WORK/aes-variants-insret.csv
