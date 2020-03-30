@@ -6,6 +6,9 @@ SYNTH_CELLS_RPT     = $(FRV_WORK)/synth/synth-cells.rpt
 SYNTH_LOOPS_RPT     = $(FRV_WORK)/synth/logic-loops.rpt
 SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-gates.v
 
+export XC_CLASS_AES       ?= 1
+export XC_AES_VARIANT     ?= 3
+
 $(SYNTH_VERILOG_OUT) : $(SYNTH_SCRIPT) $(CPU_RTL_SRCS)
 	@mkdir -p $(dir $(SYNTH_VERILOG_OUT))
 	yosys -QT \

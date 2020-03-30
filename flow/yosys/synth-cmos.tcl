@@ -1,7 +1,13 @@
 
 yosys -import
 
+echo on
+
+verilog_defines -DD_XC_CLASS_AES=$::env(XC_CLASS_AES)
+verilog_defines -DD_XC_AES_VARIANT=$::env(XC_AES_VARIANT)
+
 # Read in the design
+read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_core_fetch_buffer.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_core.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_counters.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_pipeline.v
@@ -15,7 +21,6 @@ read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_alu.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_asi.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_bitwise.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_common.vh
-read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_core_fetch_buffer.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_csrs.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_gprs.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_interrupts.v

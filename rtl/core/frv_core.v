@@ -112,7 +112,11 @@ parameter XC_CLASS_MEMORY     = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_BIT        = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_PACKED     = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_MULTIARITH = 1'b0 && XC_CLASS_BASELINE;
+`ifndef D_XC_CLASS_AES
 parameter XC_CLASS_AES        = 1'b1                     ;
+`else
+parameter XC_CLASS_AES        = `D_XC_CLASS_AES          ;
+`endif
 parameter XC_CLASS_SHA2       = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_SHA3       = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_LEAK       = 1'b0 && XC_CLASS_BASELINE;
@@ -126,7 +130,11 @@ parameter XC_CLASS_LEAK       = 1'b0 && XC_CLASS_BASELINE;
 // 3. TTable based / riscv-crypto proposal.
 // 4. Tiled
 //
+`ifndef D_XC_AES_VARIANT
 parameter XC_AES_VARIANT      = 3;
+`else
+parameter XC_AES_VARIANT      = `D_XC_AES_VARIANT;
+`endif
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b0 && XC_CLASS_LEAK;

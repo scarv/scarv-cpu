@@ -3,32 +3,36 @@ AES_SRC_DIR =$(FRV_HOME)/../../src/aes
 
 # Include the AES Source code directory from the aes-risc-pipeline
 # parent repository
-TEST_FLAGS= -I$(AES_SRC_DIR)
+TEST_FLAGS= -I$(AES_SRC_DIR) -I$(AES_SRC_DIR)/share
 
 TEST_V1_NAME = aes-v1
 TEST_V1_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v1/aes_enc.c \
-               $(AES_SRC_DIR)/v1/aes_dec.c
+               $(AES_SRC_DIR)/v1/aes_dec.c \
+               $(AES_SRC_DIR)/v1/aes.S
 
 $(eval $(call add_unit_test,$(TEST_V1_NAME),$(TEST_V1_SRC),$(TEST_FLAGS)))
 
 TEST_V2_NAME = aes-v2
 TEST_V2_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v2/aes_enc.c \
-               $(AES_SRC_DIR)/v2/aes_dec.c
+               $(AES_SRC_DIR)/v2/aes_dec.c \
+               $(AES_SRC_DIR)/v2/aes.S
 
 $(eval $(call add_unit_test,$(TEST_V2_NAME),$(TEST_V2_SRC),$(TEST_FLAGS)))
 
 TEST_V3_NAME = aes-v3
 TEST_V3_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v3/aes_enc.c \
-               $(AES_SRC_DIR)/v3/aes_dec.c
+               $(AES_SRC_DIR)/v3/aes_dec.c \
+               $(AES_SRC_DIR)/v3/aes.S
 
 $(eval $(call add_unit_test,$(TEST_V3_NAME),$(TEST_V3_SRC),$(TEST_FLAGS)))
 
 TEST_V5_NAME = aes-v5
 TEST_V5_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/tiled/aes_enc.c \
-               $(AES_SRC_DIR)/tiled/aes_dec.c
+               $(AES_SRC_DIR)/tiled/aes_dec.c \
+               $(AES_SRC_DIR)/tiled/aes.S
 
 $(eval $(call add_unit_test,$(TEST_V5_NAME),$(TEST_V5_SRC),$(TEST_FLAGS)))

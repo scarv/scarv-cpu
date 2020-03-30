@@ -7,8 +7,8 @@
 parameter  XLEN = 32        ; // Register word width (bits)
 parameter  ILEN = 32        ; // Maximum instruction length (bits)
 
-localparam XL   = XLEN-1    ; // Register signal high bit
-localparam IL   = ILEN-1    ; // Instruction signal high bit
+localparam XL   = 31        ; // Register signal high bit
+localparam IL   = 31        ; // Instruction signal high bit
 
 localparam REG_ZERO = 5'd0;
 localparam REG_RA   = 5'd1;
@@ -113,44 +113,44 @@ localparam ASI_AES  = 2'b01;
 localparam ASI_SHA2 = 2'b10;
 localparam ASI_SHA3 = 2'b11;
 
-localparam ASI_AESSUB_ENC    = {ASI_AES , 3'b000};
-localparam ASI_AESSUB_ENCROT = {ASI_AES , 3'b010};
-localparam ASI_AESSUB_DEC    = {ASI_AES , 3'b001};
-localparam ASI_AESSUB_DECROT = {ASI_AES , 3'b011};
-localparam ASI_AESMIX_ENC    = {ASI_AES , 3'b100};
-localparam ASI_AESMIX_DEC    = {ASI_AES , 3'b101};
-localparam ASI_SHA3_XY       = {ASI_SHA3, 3'b000};
-localparam ASI_SHA3_X1       = {ASI_SHA3, 3'b001};
-localparam ASI_SHA3_X2       = {ASI_SHA3, 3'b010};
-localparam ASI_SHA3_X4       = {ASI_SHA3, 3'b011};
-localparam ASI_SHA3_YX       = {ASI_SHA3, 3'b100};
-localparam ASI_SHA256_S0     = {ASI_SHA2, 3'b000};
-localparam ASI_SHA256_S1     = {ASI_SHA2, 3'b001};
-localparam ASI_SHA256_S2     = {ASI_SHA2, 3'b010};
-localparam ASI_SHA256_S3     = {ASI_SHA2, 3'b011};
+localparam ASI_AESSUB_ENC    = {2'b01, 3'b000};
+localparam ASI_AESSUB_ENCROT = {2'b01, 3'b010};
+localparam ASI_AESSUB_DEC    = {2'b01, 3'b001};
+localparam ASI_AESSUB_DECROT = {2'b01, 3'b011};
+localparam ASI_AESMIX_ENC    = {2'b01, 3'b100};
+localparam ASI_AESMIX_DEC    = {2'b01, 3'b101};
+localparam ASI_SHA3_XY       = {2'b11, 3'b000};
+localparam ASI_SHA3_X1       = {2'b11, 3'b001};
+localparam ASI_SHA3_X2       = {2'b11, 3'b010};
+localparam ASI_SHA3_X4       = {2'b11, 3'b011};
+localparam ASI_SHA3_YX       = {2'b11, 3'b100};
+localparam ASI_SHA256_S0     = {2'b10, 3'b000};
+localparam ASI_SHA256_S1     = {2'b10, 3'b001};
+localparam ASI_SHA256_S2     = {2'b10, 3'b010};
+localparam ASI_SHA256_S3     = {2'b10, 3'b011};
 
-localparam ASI_SAES_V1_ENCS      = {ASI_AES, 3'b000};
-localparam ASI_SAES_V1_ENCM      = {ASI_AES, 3'b001};
-localparam ASI_SAES_V1_DECS      = {ASI_AES, 3'b100};
-localparam ASI_SAES_V1_DECM      = {ASI_AES, 3'b101};
+localparam ASI_SAES_V1_ENCS      = {2'b01, 3'b000};
+localparam ASI_SAES_V1_ENCM      = {2'b01, 3'b001};
+localparam ASI_SAES_V1_DECS      = {2'b01, 3'b100};
+localparam ASI_SAES_V1_DECM      = {2'b01, 3'b101};
 
-localparam ASI_SAES_V2_SUB_ENC   = {ASI_AES, 3'b000};
-localparam ASI_SAES_V2_SUB_DEC   = {ASI_AES, 3'b001};
-localparam ASI_SAES_V2_MIX_ENC   = {ASI_AES, 3'b100};
-localparam ASI_SAES_V2_MIX_DEC   = {ASI_AES, 3'b101};
+localparam ASI_SAES_V2_SUB_ENC   = {2'b01, 3'b000};
+localparam ASI_SAES_V2_SUB_DEC   = {2'b01, 3'b001};
+localparam ASI_SAES_V2_MIX_ENC   = {2'b01, 3'b100};
+localparam ASI_SAES_V2_MIX_DEC   = {2'b01, 3'b101};
 
-localparam ASI_SAES_V3_ENCS      = {ASI_AES, 3'b000};
-localparam ASI_SAES_V3_ENCSM     = {ASI_AES, 3'b001};
-localparam ASI_SAES_V3_DECS      = {ASI_AES, 3'b100};
-localparam ASI_SAES_V3_DECSM     = {ASI_AES, 3'b101};
+localparam ASI_SAES_V3_ENCS      = {2'b01, 3'b000};
+localparam ASI_SAES_V3_ENCSM     = {2'b01, 3'b001};
+localparam ASI_SAES_V3_DECS      = {2'b01, 3'b100};
+localparam ASI_SAES_V3_DECSM     = {2'b01, 3'b101};
 
-localparam ASI_SAES_V5_ESRSUB_LO = {ASI_AES, 3'b000};
-localparam ASI_SAES_V5_ESRSUB_HI = {ASI_AES, 3'b010};
-localparam ASI_SAES_V5_DSRSUB_LO = {ASI_AES, 3'b001};
-localparam ASI_SAES_V5_DSRSUB_HI = {ASI_AES, 3'b011};
-localparam ASI_SAES_V5_EMIX      = {ASI_AES, 3'b100};
-localparam ASI_SAES_V5_DMIX      = {ASI_AES, 3'b101};
-localparam ASI_SAES_V5_SUB       = {ASI_AES, 3'b111};
+localparam ASI_SAES_V5_ESRSUB_LO = {2'b01, 3'b000};
+localparam ASI_SAES_V5_ESRSUB_HI = {2'b01, 3'b010};
+localparam ASI_SAES_V5_DSRSUB_LO = {2'b01, 3'b001};
+localparam ASI_SAES_V5_DSRSUB_HI = {2'b01, 3'b011};
+localparam ASI_SAES_V5_EMIX      = {2'b01, 3'b100};
+localparam ASI_SAES_V5_DMIX      = {2'b01, 3'b101};
+localparam ASI_SAES_V5_SUB       = {2'b01, 3'b111};
 
 localparam RNG_RNGSEED       = {2'b00, 3'b001};
 localparam RNG_RNGSAMP       = {2'b00, 3'b010};
