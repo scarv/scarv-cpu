@@ -158,8 +158,7 @@ parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
 parameter XC_CLASS_LEAK_BUBBLE= 1'b1 && XC_CLASS_LEAK;
 
 // Single cycle implementations of AES instructions?
-parameter AES_SUB_FAST = 1'b1;
-parameter AES_MIX_FAST = 1'b1;
+parameter XC_AES_FAST  = 1'b1;
 
 //
 // Partial Bitmanip Extension Support
@@ -536,8 +535,7 @@ frv_pipeline_execute #(
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_AES_VARIANT     (XC_AES_VARIANT     ),
-.AES_SUB_FAST       (AES_SUB_FAST       ),
-.AES_MIX_FAST       (AES_MIX_FAST       ),
+.XC_AES_FAST        (XC_AES_FAST        ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline_s2_execute (
 .g_clk            (g_clk            ), // global clock

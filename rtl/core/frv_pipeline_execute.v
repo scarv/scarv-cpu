@@ -106,8 +106,7 @@ parameter XC_CLASS_SHA3       = 1'b1;
 parameter XC_AES_VARIANT      = 2;
 
 // Single cycle implementations of AES instructions?
-parameter AES_SUB_FAST = 1'b1;
-parameter AES_MIX_FAST = 1'b1;
+parameter XC_AES_FAST  = 1'b1;
 
 //
 // Partial Bitmanip Extension Support
@@ -394,8 +393,7 @@ wire   p_busy    ;
 // -------------------------------------------------------------------------
 
 frv_asi #(
-.AES_SUB_FAST (AES_SUB_FAST ),
-.AES_MIX_FAST (AES_MIX_FAST ),
+.XC_AES_FAST  (XC_AES_FAST  ),
 .XC_AES_VARIANT(XC_AES_VARIANT),
 .XC_CLASS_AES (XC_CLASS_AES ),
 .XC_CLASS_SHA2(XC_CLASS_SHA2),
