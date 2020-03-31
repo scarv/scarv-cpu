@@ -19,10 +19,11 @@ function build_variant {
     mv $FRV_WORK/synth $FRV_WORK/synth-aes-${1}
 }
 
-build_variant   v1  1
-build_variant   v2  2
-build_variant   v3  3
-build_variant   v5  4
+build_variant   ref-ttable  0
+build_variant   v1          1
+build_variant   v2          2
+build_variant   v3          3
+build_variant   v5          4
 
 make synthesise XC_CLASS_AES=0 XC_AES_VARIANT=0
 

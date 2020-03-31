@@ -36,3 +36,11 @@ TEST_V5_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/tiled/aes.S
 
 $(eval $(call add_unit_test,$(TEST_V5_NAME),$(TEST_V5_SRC),$(TEST_FLAGS)))
+
+TEST_REF_TT_NAME = aes-ref-ttable
+TEST_REF_TT_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
+                   $(AES_SRC_DIR)/ttable/aes_enc.c \
+                   $(AES_SRC_DIR)/ttable/aes_dec.c \
+                   $(AES_SRC_DIR)/ttable/aes.S
+
+$(eval $(call add_unit_test,$(TEST_REF_TT_NAME),$(TEST_REF_TT_SRC),$(TEST_FLAGS)))
