@@ -35,5 +35,11 @@ grep -Irn "\?>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
 grep -Irn "Estimated number of" work/synth* | grep "synth-cell" \
     | sort > $FRV_WORK/aes-variants-cells.rpt
 
-$FRV_HOME/bin/aes-variants-graphs.py $FRV_WORK/aes-variants-cycles.csv
-$FRV_HOME/bin/aes-variants-graphs.py $FRV_WORK/aes-variants-insret.csv
+echo "Var, KSE,Enc,KSD,Dec" > $FRV_WORK/aes-variants-cycles-dec.csv
+$FRV_HOME/bin/aes-variants-graphs.py $FRV_WORK/aes-variants-cycles.csv >> \
+    $FRV_WORK/aes-variants-cycles-dec.csv
+
+echo "Var, KSE,Enc,KSD,Dec" > $FRV_WORK/aes-variants-insret-dec.csv
+$FRV_HOME/bin/aes-variants-graphs.py $FRV_WORK/aes-variants-insret.csv >> \
+    $FRV_WORK/aes-variants-insret-dec.csv
+
