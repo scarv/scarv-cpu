@@ -13,9 +13,12 @@ UNIT_PASS       = 0x80000090
 UNIT_IMEM_MAX_STALL=5
 UNIT_DMEM_MAX_STALL=5
 
+AES_WORD_ALIGNED ?=0
+
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
 UNIT_CFLAGS    += -march=rv32imcb_xcrypto -mabi=ilp32
 UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
+UNIT_CFLAGS    += -DAES_WORD_ALIGNED=$(AES_WORD_ALIGNED)
 
 UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
                   $(UNIT_ROOT)/share/util.S \

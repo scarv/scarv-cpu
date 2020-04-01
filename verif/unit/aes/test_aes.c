@@ -17,43 +17,43 @@ int test_aes_128() {
     uint32_t    erk [AES_128_RK_WORDS];
     uint32_t    drk [AES_128_RK_WORDS];
 
-    uint64_t    cycles_eks = __rd_mtime();
-    uint64_t    insret_eks = __rdinstret();
+    uint64_t    cycles_0 = __rd_mtime();
+    uint64_t    insret_0 = __rdinstret();
 
     aes_128_enc_key_schedule(erk, ck);
     
-    cycles_eks = __rd_mtime () - cycles_eks;
-    insret_eks = __rdinstret() - insret_eks;
-
-    uint64_t    cycles_enc = __rd_mtime();
-    uint64_t    insret_enc = __rdinstret();
+    uint64_t    cycles_1 = __rd_mtime();
+    uint64_t    insret_1 = __rdinstret();
 
     aes_128_enc_block(ct, pt, erk);
     
-    cycles_enc = __rd_mtime () - cycles_enc;
-    insret_enc = __rdinstret() - insret_enc;
-    
-    uint64_t    cycles_dks = __rd_mtime();
-    uint64_t    insret_dks = __rdinstret();
+    uint64_t    cycles_2 = __rd_mtime();
+    uint64_t    insret_2 = __rdinstret();
     
     aes_128_dec_key_schedule(drk, ck);
     
-    cycles_dks = __rd_mtime () - cycles_dks;
-    insret_dks = __rdinstret() - insret_dks;
-    
-    uint64_t    cycles_dec = __rd_mtime();
-    uint64_t    insret_dec = __rdinstret();
+    uint64_t    cycles_3 = __rd_mtime();
+    uint64_t    insret_3 = __rdinstret();
 
     aes_128_dec_block(fi, ct, drk);
     
-    cycles_dec = __rd_mtime () - cycles_dec;
-    insret_dec = __rdinstret() - insret_dec;
+    uint64_t    cycles_4 = __rd_mtime();
+    uint64_t    insret_4 = __rdinstret();
 
     for(int i = 0; i < 16; i ++){
         if(pt[i] != fi[i]) {
             tr |= 1;
         }
     }
+
+    uint64_t cycles_eks = cycles_1 - cycles_0 ;
+    uint64_t cycles_enc = cycles_2 - cycles_1 ;
+    uint64_t cycles_dks = cycles_3 - cycles_2 ;
+    uint64_t cycles_dec = cycles_4 - cycles_3 ;
+    uint64_t insret_eks = insret_1 - insret_0 ;
+    uint64_t insret_enc = insret_2 - insret_1 ;
+    uint64_t insret_dks = insret_3 - insret_2 ;
+    uint64_t insret_dec = insret_4 - insret_3 ;
 
     __putstr("pt : "); __puthexstr(pt , 16); __putchar('\n');
     __putstr("ct : "); __puthexstr(ct , 16); __putchar('\n');
@@ -64,13 +64,13 @@ int test_aes_128() {
 
     __putstr("!> ");
     __puthex64_nlz(cycles_eks); __putchar(',');
-    __puthex64_nlz(cycles_enc); __putchar(',');
     __puthex64_nlz(cycles_dks); __putchar(',');
+    __puthex64_nlz(cycles_enc); __putchar(',');
     __puthex64_nlz(cycles_dec); __putchar('\n');
     __putstr("?> ");
     __puthex64_nlz(insret_eks); __putchar(',');
-    __puthex64_nlz(insret_enc); __putchar(',');
     __puthex64_nlz(insret_dks); __putchar(',');
+    __puthex64_nlz(insret_enc); __putchar(',');
     __puthex64_nlz(insret_dec); __putchar('\n');
 
     return tr;

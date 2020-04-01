@@ -7,7 +7,8 @@ set -x
 # 1. Variant name
 # 2. XC_AES_VARIANT parameter number = {1,2,3,4}
 function build_variant {
-    make -B build-unit-aes-${1}
+    make -B build-unit-aes-${1} \
+        AES_WORD_ALIGNED=1
     make run-unit-aes-${1} \
         VL_DIR=$FRV_WORK/verilator-aes-${1} \
         VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=$2 -GXC_CLASS_AES=1\'b1" \
@@ -36,11 +37,11 @@ grep -Irn "\?>" work/unit/ | sed 's/work.*\///' | sed 's/\.log.*> /,/' \
 grep -Irn "Estimated number of" work/synth* | grep "synth-cell" \
     | sort > $FRV_WORK/aes-variants-cells.rpt
 
-echo "Var, KSE,Enc,KSD,Dec" > $FRV_WORK/aes-variants-cycles-dec.csv
+echo "Var, KSE,KSD,Enc,Dec" > $FRV_WORK/aes-variants-cycles-dec.csv
 $FRV_HOME/bin/aes-variants-graphs.py $FRV_WORK/aes-variants-cycles.csv >> \
     $FRV_WORK/aes-variants-cycles-dec.csv
 
-echo "Var, KSE,Enc,KSD,Dec" > $FRV_WORK/aes-variants-insret-dec.csv
+echo "Var, KSE,KSD,Enc,Dec" > $FRV_WORK/aes-variants-insret-dec.csv
 $FRV_HOME/bin/aes-variants-graphs.py $FRV_WORK/aes-variants-insret.csv >> \
     $FRV_WORK/aes-variants-insret-dec.csv
 
