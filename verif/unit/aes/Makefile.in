@@ -44,3 +44,10 @@ TEST_REF_TT_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                    $(AES_SRC_DIR)/ttable/aes.S
 
 $(eval $(call add_unit_test,$(TEST_REF_TT_NAME),$(TEST_REF_TT_SRC),$(TEST_FLAGS)))
+
+TEST_REF_BY_NAME = aes-ref-bytewise
+TEST_REF_BY_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
+                   $(AES_SRC_DIR)/bytewise/aes_enc.c \
+                   $(AES_SRC_DIR)/bytewise/aes_dec.c \
+
+$(eval $(call add_unit_test,$(TEST_REF_BY_NAME),$(TEST_REF_BY_SRC),$(TEST_FLAGS)))

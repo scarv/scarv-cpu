@@ -15,16 +15,19 @@ function build_variant {
         UNIT_TIMEOUT=200000 \
         UNIT_IMEM_MAX_STALL=0 UNIT_DMEM_MAX_STALL=0
 
-    rm -rf $FRV_WORK/synth-aes-${1}
-    make synthesise XC_CLASS_AES=1 XC_AES_VARIANT=$2
-    mv $FRV_WORK/synth $FRV_WORK/synth-aes-${1}
+    if [ ${3} -eq 1 ] ; then
+        rm -rf $FRV_WORK/synth-aes-${1}
+        make synthesise XC_CLASS_AES=1 XC_AES_VARIANT=$2
+        mv $FRV_WORK/synth $FRV_WORK/synth-aes-${1}
+    fi
 }
 
-build_variant   ref-ttable  0
-build_variant   v1          1
-build_variant   v2          2
-build_variant   v3          3
-build_variant   v5          4
+build_variant   ref-bytewise    0   0
+build_variant   ref-ttable      0   0
+build_variant   v1              1   1
+build_variant   v2              2   1
+build_variant   v3              3   1
+build_variant   v5              4   1
 
 make synthesise XC_CLASS_AES=0 XC_AES_VARIANT=0
 
