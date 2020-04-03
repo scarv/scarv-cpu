@@ -72,6 +72,12 @@ int test_aes_128() {
     __puthex64_nlz(insret_dks); __putchar(',');
     __puthex64_nlz(insret_enc); __putchar(',');
     __puthex64_nlz(insret_dec); __putchar('\n');
+    
+    __putstr("@> ");
+    __puthex64_nlz(insret_eks); __putchar(','); __puthex64_nlz(cycles_eks); __putchar(',');
+    __puthex64_nlz(insret_dks); __putchar(','); __puthex64_nlz(cycles_dks); __putchar(',');
+    __puthex64_nlz(insret_enc); __putchar(','); __puthex64_nlz(cycles_enc); __putchar(',');
+    __puthex64_nlz(insret_dec); __putchar(','); __puthex64_nlz(cycles_dec); __putchar('\n');;
 
     return tr;
 }
