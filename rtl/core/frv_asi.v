@@ -14,6 +14,7 @@ input               g_resetn        , // synchronous reset
 
 input               asi_valid       , // Stall this stage
 output              asi_ready       , // stage ready to progress
+input  wire         asi_flush       , // Flush ASI module
 
 input  wire         asi_flush_aessub, // Flush any state in AES sub submodule
 input  wire         asi_flush_aesmix, // Flush any state in AES mix submodule

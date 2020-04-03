@@ -303,7 +303,7 @@ wire [XL:0] n_s3_opr_b_csr = s2_opr_c;
 // Functional Unit Interfacing: Algorithm Specific Instructions
 // -------------------------------------------------------------------------
 
-wire        asi_valid  = fu_asi;
+wire        asi_valid  = fu_asi && !flush;
 wire        asi_ready  ;
 wire [XL:0] asi_result ;
 
@@ -403,6 +403,7 @@ frv_asi #(
 .g_resetn  (g_resetn        ), // synchronous reset
 .asi_valid (asi_valid       ), // Stall this stage
 .asi_ready (asi_ready       ), // stage ready to progress
+.asi_flush (flush           ), 
 .asi_flush_aessub(asi_flush_aessub), // Flush any state in AES sub submodule
 .asi_flush_aesmix(asi_flush_aesmix), // Flush any state in AES mix submodule
 .asi_flush_data  (asi_flush_data  ), // Data to flush into the submodules.
