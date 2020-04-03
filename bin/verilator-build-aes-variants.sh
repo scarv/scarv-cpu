@@ -6,9 +6,11 @@ set -x
 #
 # 1. Variant name
 # 2. XC_AES_VARIANT parameter number = {1,2,3,4}
+# 3. Build synthesised core.
+# 4. Use word aligned aes variant
 function build_variant {
     make -B build-unit-aes-${1} \
-        AES_WORD_ALIGNED=0
+        AES_WORD_ALIGNED=${4}
 
     make run-unit-aes-${1} \
         VL_DIR=$FRV_WORK/verilator-aes-${1} \
@@ -23,12 +25,12 @@ function build_variant {
     fi
 }
 
-build_variant   ref-bytewise    0   0
-build_variant   ref-ttable      0   0
-build_variant   v1              1   1
-build_variant   v2              2   1
-build_variant   v3              3   1
-build_variant   v5              4   1
+build_variant   ref-bytewise    0   0   1
+build_variant   ref-ttable      0   0   1
+build_variant   v1              1   1   1
+build_variant   v2              2   1   1
+build_variant   v3              3   1   1
+build_variant   v5              4   1   1
 
 make synthesise XC_CLASS_AES=0 XC_AES_VARIANT=0
 
