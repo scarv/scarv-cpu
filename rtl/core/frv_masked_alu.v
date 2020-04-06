@@ -32,7 +32,12 @@ output wire [XL:0] rd_s1              // Output share 1
 
 );
 
+// Common core parameters and constants
 `include "frv_common.vh"
+
+//
+// Masking ISE - Use a TRNG (1) or a PRNG (0)
+parameter MASKING_ISE_TRNG    = 1'b0;
 
 wire [XL:0] i_a0, i_a1;
 wire [XL:0] i_b0, i_b1;

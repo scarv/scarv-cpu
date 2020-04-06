@@ -136,6 +136,10 @@ parameter AES_MIX_FAST        = 1'b0;
 parameter BITMANIP_BASELINE   = 1'b1;
 
 //
+// Masking ISE - Use a TRNG (1) or a PRNG (0)
+parameter MASKING_ISE_TRNG    = 1'b0;
+
+//
 // Value of the M-mode implementation id register
 `ifdef SCARV_CPU_MIMPID
 parameter  CSR_MIMPID         = `SCARV_CPU_MIMPID;
@@ -214,7 +218,8 @@ frv_pipeline #(
 .AES_SUB_FAST       (AES_SUB_FAST       ),
 .AES_MIX_FAST       (AES_MIX_FAST       ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ), 
-.CSR_MIMPID         (CSR_MIMPID         )
+.CSR_MIMPID         (CSR_MIMPID         ),
+.MASKING_ISE_TRNG   (MASKING_ISE_TRNG   )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset
