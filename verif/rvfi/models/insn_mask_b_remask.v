@@ -14,7 +14,7 @@ module xcfi_insn_spec (
 wire [XL:0] result_s1 = `RS1 ^ `RS1_HI ^ rvfi_mask_data;
 wire [XL:0] result_s0 =                  rvfi_mask_data;
 
-assign spec_valid       = rvfi_valid && dec_mask_b_not;
+assign spec_valid       = rvfi_valid && dec_mask_b_remask;
 assign spec_trap        = 1'b0   ;
 assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = 0;
@@ -30,6 +30,4 @@ assign spec_mem_wmask   = 0;
 assign spec_mem_wdata   = 0;
 
 endmodule
-
-
 
