@@ -2,9 +2,7 @@
 export FRV_HOME=`pwd`
 export FRV_WORK=$FRV_HOME/work
 
-if [[ -z "$RISCV" ]]; then
-    export RISCV=/opt/riscv32
-fi
+export RISCV=$FRV_HOME/external/xcrypto/build/toolchain/install
 
 if [[ -z "$VERILATOR_ROOT" ]]; then
     export VERILATOR_ROOT=/home/ben/tools/verilator
