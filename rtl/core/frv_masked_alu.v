@@ -4,6 +4,7 @@ input  wire        g_clk            , // Global clock
 input  wire        g_resetn         , // Synchronous, active low reset.
 
 input  wire        valid            , // Inputs valid
+input  wire        flush            , // Flush the masked ALU.
 
 input  wire        op_b2a           , // Binary to arithmetic mask covert
 input  wire        op_a2b           , // Arithmetic to binary mask convert

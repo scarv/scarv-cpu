@@ -270,7 +270,8 @@ always @(posedge g_clk) begin
 end
 
 // Mask ALU input valid.
-wire        msk_valid       = fu_msk && msk_valid_en_r ;
+wire        msk_valid       = fu_msk && msk_valid_en_r  ;
+wire        msk_flush       = flush                     ;
 wire        msk_ready       ; // Mask ALU operation complete.
     
 wire        msk_op_b2a      = s2_uop == MSK_B2A     ;
@@ -509,6 +510,7 @@ frv_masked_alu #(
 .g_clk       (g_clk           ), // Global clock
 .g_resetn    (g_resetn        ), // Synchronous, active low reset.
 .valid       (msk_valid       ), // Inputs valid
+.flush       (msk_flush       ), // Flush state
 .op_b2a      (msk_op_b2a      ), // Binary to arithmetic mask covert
 .op_a2b      (msk_op_a2b      ), // Arithmetic to binary mask convert
 .op_b_mask   (msk_op_b_mask   ), // Binary mask
