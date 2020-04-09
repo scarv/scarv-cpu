@@ -127,6 +127,7 @@ wire        madd_rdy;
 mskaddsub   mskaddsub_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),    
+    .flush(     flush),
     .ena(       addsub_ena), 
     .ini(       addsub_ini), 
     .sub(       dosub|doa2b),
@@ -140,11 +141,12 @@ mskaddsub   mskaddsub_ins(
     .rdy(       madd_rdy));
 
 //Control unit for boolean masking calculations
-wire        dologic  = valid & (donot | doxor | doand | doior | doadd | dosub | dob2a | doa2b);
-wire        doaddsub = valid & (doadd | dosub | dob2a | doa2b);
+wire        dologic  = (~flush) & valid & (donot | doxor | doand | doior | doadd | dosub | dob2a | doa2b);
+wire        doaddsub = (~flush) & valid & (doadd | dosub | dob2a | doa2b);
 mskalu_ctl  mskaluctl_ins(
     .g_resetn(  g_resetn),
-    .g_clk(     g_clk), 
+    .g_clk(     g_clk),
+    .flush(     flush),
     .dologic(   dologic), 
     .doaddsub(  doaddsub), 
     .madd_rdy(  madd_rdy),
@@ -160,9 +162,9 @@ always @(posedge g_clk)
     else                               {cal_rdy} <= 1'd0;
 
 // boolean mask, umask, remask
-wire opmask = valid & (op_b_mask   | op_a_mask);   //masking operand
-wire unmask = valid & (op_b_unmask | op_a_unmask);
-wire remask = valid & (op_b_remask | op_a_remask);
+wire opmask = (~flush) & valid & (op_b_mask   | op_a_mask);   //masking operand
+wire unmask = (~flush) & valid & (op_b_unmask | op_a_unmask);
+wire remask = (~flush) & valid & (op_b_remask | op_a_remask);
 
 wire b_mask = (op_b_mask | op_b_unmask | op_b_remask);
 
@@ -184,7 +186,7 @@ wire [XL:0] rmask0, rmask1;
 assign      rmask0 = (opmask)? m_a0_reg: (b_mask)? brm_a0 : arm_a0; 
 assign      rmask1 = (opmask | remask)? prng : {XLEN{1'b0}};
 
-wire domask = opmask | unmask | remask;
+wire domask = opmask | remask;
 reg  msk_rdy;
 always @(posedge g_clk) 
     if (!g_resetn)              {msk_rdy} <= 1'd0;
@@ -200,7 +202,8 @@ assign rd_s0 = {XLEN{donot }} &  mxor0 |
                {XLEN{dosub }} &  madd0 |
                {XLEN{doa2b }} &  madd0 |
                {XLEN{dob2a }} & (madd0^madd1) |
-               {XLEN{domask}} &  rmask0;
+	       {XLEN{domask}} &  rmask0|
+               {XLEN{unmask}} &  rmask0;
 
 assign rd_s1 = {XLEN{donot }} & ~mxor1 |
                {XLEN{doxor }} &  mxor1 |
@@ -210,16 +213,18 @@ assign rd_s1 = {XLEN{donot }} & ~mxor1 |
                {XLEN{dosub }} &  madd1 |
                {XLEN{doa2b }} &  madd1 |
                {XLEN{dob2a }} &  prng  |
-               {XLEN{domask}} &  rmask1;
+	       {XLEN{domask}} &  rmask1|
+               {XLEN{unmask}} &  rmask1;
 
-assign ready = cal_rdy | msk_rdy;
+assign ready = unmask | cal_rdy | msk_rdy;
 assign mask  = prng;
 
 endmodule
 
 
 module mskalu_ctl(
-input  wire      g_resetn, g_clk, dologic, doaddsub, madd_rdy, 
+input  wire      g_resetn, g_clk, flush,
+input  wire      dologic, doaddsub, madd_rdy, 
 output wire      mlogic_ena, addsub_ini,
 output reg       addsub_ena
 );
@@ -234,8 +239,10 @@ always @(posedge g_clk) begin
   if (!g_resetn) begin
     ctl_state	<= S_IDL;
     addsub_ena  <= 1'b0;
-  end
-  else begin
+  end else if (flush) begin
+    ctl_state	<= S_IDL;
+    addsub_ena  <= 1'b0;
+  end else begin
     case (ctl_state)
       S_IDL : begin
                ctl_state    <= (dologic == 1'b1)? S_LOG  : S_IDL; 
@@ -292,7 +299,7 @@ endgenerate
 
 endmodule
 module mskaddsub(
-    input wire         g_resetn, g_clk, ena, ini,
+    input wire         g_resetn, g_clk, flush, ena, ini,
     input wire         sub,  // active to perform a-b
     input wire  [31:0] i_gs,
     input wire  [31:0] mxor0, mxor1,
@@ -312,6 +319,7 @@ wire [31:0] g0_i, g1_i;
 reg  [ 2:0] seq_cnt;
 always @(posedge g_clk)
   if (!g_resetn)    seq_cnt <=3'd1;
+  else if (flush)   seq_cnt <=3'b1;
   else if (ena)     seq_cnt <=seq_cnt + 1'b1;
   else              seq_cnt <=3'd1;
 
@@ -349,6 +357,7 @@ postprocess posproc_ins(
 assign rdy = (seq_cnt==3'd5);
 endmodule
 
+/*
 module ksa_ctl(
 input wire       g_resetn, g_clk, ena,
 output wire      pre_ena, seq_sel,
@@ -396,7 +405,7 @@ always @(posedge g_clk)
 assign    pre_ena = (ctl_state == IDL) && (ena);
 assign    seq_sel = (ctl_state == PRE);
 endmodule
-
+*/
 
 module seq_process(
   input wire         g_resetn, g_clk, ena,
