@@ -40,13 +40,16 @@ output wire [XL:0] rd_s1              // Output share 1
 // Masking ISE - Use a TRNG (1) or a PRNG (0)
 parameter MASKING_ISE_TRNG    = 1'b0;
 
+// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
+parameter MASKING_ISE_TI      = 1'b1;
+
 wire [XL:0] gs_0;
 wire [XL:0] mxor0, mxor1;
 wire [XL:0] mand0, mand1;
 wire [XL:0] madd0, madd1;
 
 wire [ 2:0] seq_cnt;
-wire        addsub_ena, addsub_ini;
+wire        addsub_ena;
 wire 	    mlogic_ena;
 
 // decode 
@@ -107,7 +110,10 @@ assign op_a1 = (dob2a)? rs1_s1 : (doa2b)? {XLEN{1'b0}}: s_a1;
 assign op_b0 = (dob2a)? b2a_b0 : (doa2b)? a2b_b0      : n_b0;  
 assign op_b1 = (dob2a | doa2b)?           {XLEN{1'b0}}: n_b1; 
 
-msklogic   msklogic_ins(
+wire mlogic_rdy;
+msklogic   
+#(  .MASKING_ISE_TI(MASKING_ISE_TI))
+msklogic_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk), 
     .ena(       mlogic_ena), 
@@ -120,16 +126,18 @@ msklogic   msklogic_ins(
     .o_xor1(    mxor1), 
     .o_and0(    mand0),
     .o_and1(    mand1),  
-    .o_gs(      gs_0));
+    .o_gs(      gs_0),
+    .rdy(       mlogic_rdy));
 
 //boolean masking add/sub
 wire        madd_rdy;
-mskaddsub   mskaddsub_ins(
+mskaddsub   
+#(  .MASKING_ISE_TI(MASKING_ISE_TI))
+mskaddsub_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),    
     .flush(     flush),
     .ena(       addsub_ena), 
-    .ini(       addsub_ini), 
     .sub(       dosub|doa2b),
     .i_gs(      gs_0), 
     .mxor0(     mxor0),
@@ -141,82 +149,93 @@ mskaddsub   mskaddsub_ins(
     .rdy(       madd_rdy));
 
 //Control unit for boolean masking calculations
-wire        dologic  = (~flush) & valid & (donot | doxor | doand | doior | doadd | dosub | dob2a | doa2b);
+wire        dologic  = (~flush) & valid & (donot | doxor | doand | doior);
 wire        doaddsub = (~flush) & valid & (doadd | dosub | dob2a | doa2b);
 mskalu_ctl  mskaluctl_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),
     .flush(     flush),
-    .dologic(   dologic), 
+    .dologic(   dologic|doaddsub), 
     .doaddsub(  doaddsub), 
+    .mlogic_rdy(mlogic_rdy),
     .madd_rdy(  madd_rdy),
     .mlogic_ena(mlogic_ena), 
-    .addsub_ini(addsub_ini), 
     .addsub_ena(addsub_ena));
-
-reg         cal_rdy;
-always @(posedge g_clk) 
-    if (!g_resetn)                     {cal_rdy} <= 1'd0;
-    else if (mlogic_ena & ~doaddsub)   {cal_rdy} <= 1'b1;
-    else if (madd_rdy)                 {cal_rdy} <= 1'b1;
-    else                               {cal_rdy} <= 1'd0;
 
 // boolean mask, umask, remask
 wire opmask = (~flush) & valid & (op_b_mask   | op_a_mask);   //masking operand
 wire unmask = (~flush) & valid & (op_b_unmask | op_a_unmask);
 wire remask = (~flush) & valid & (op_b_remask | op_a_remask);
-
-wire b_mask = (op_b_mask | op_b_unmask | op_b_remask);
-
-wire [XL:0] am_a0 = rs1_s0 + prng;
-wire [XL:0] bm_a0 = rs1_s0 ^ prng; 
-
-reg  [XL:0] m_a0_reg;
-always @(posedge g_clk) 
-    if (!g_resetn)          m_a0_reg <= {XLEN{1'b0}};
-    else if (opmask|remask) m_a0_reg <= (b_mask)? bm_a0 : am_a0;
-
-wire [XL:0] xm_a0 = (unmask)? rs1_s0 : m_a0_reg;
-
-wire [XL:0] arm_a0 = xm_a0 - rs1_s1;
-wire [XL:0] brm_a0 = xm_a0 ^ rs1_s1;
+wire b_mask = (~flush) & valid & (op_b_mask   | op_b_unmask  | op_b_remask);
 
 wire [XL:0] rmask0, rmask1;
+wire        msk_rdy;
 
-assign      rmask0 = (opmask)? m_a0_reg: (b_mask)? brm_a0 : arm_a0; 
-assign      rmask1 = (opmask | remask)? prng : {XLEN{1'b0}};
+generate 
+    if (MASKING_ISE_TI == 1'b1) begin : masking_TI
 
-wire domask = opmask | remask;
-reg  msk_rdy;
-always @(posedge g_clk) 
-    if (!g_resetn)              {msk_rdy} <= 1'd0;
-    else if (domask & ~msk_rdy) {msk_rdy} <= 1'b1;
-    else                        {msk_rdy} <= 1'd0;
+        wire [XL:0] am_a0 = rs1_s0 + prng;
+        wire [XL:0] bm_a0 = rs1_s0 ^ prng; 
+
+        reg  [XL:0] m_a0_reg;
+        always @(posedge g_clk) 
+            if (!g_resetn)          m_a0_reg <= {XLEN{1'b0}};
+            else if (opmask|remask) m_a0_reg <= (b_mask)? bm_a0 : am_a0;
+    
+        wire [XL:0] xm_a0 = (unmask)? rs1_s0 : m_a0_reg;
+
+        wire [XL:0] arm_a0 = xm_a0 - rs1_s1;
+        wire [XL:0] brm_a0 = xm_a0 ^ rs1_s1;
+
+        assign      rmask0 = (opmask)? m_a0_reg: (b_mask)? brm_a0 : arm_a0; 
+        assign      rmask1 = (opmask | remask)? prng : {XLEN{1'b0}};
+
+        wire domask = opmask | remask;
+        reg  mask_done;
+        always @(posedge g_clk) 
+            if (!g_resetn)                {mask_done} <= 1'd0;
+            else if (domask & ~mask_done) {mask_done} <= 1'b1;
+            else                          {mask_done} <= 1'd0;
+        assign msk_rdy = unmask | mask_done;
+
+    end else begin                    : masking_non_TI
+
+        wire [XL:0] am_s0 =             rs1_s0 + prng;
+        wire [XL:0] am_s1 = (remask) ? (rs1_s1 + prng): prng;
+        wire [XL:0] bm_s0 =             rs1_s0 ^ prng;
+        wire [XL:0] bm_s1 = (remask) ? (rs1_s1 ^ prng): prng;
+
+        wire [XL:0] aum_s0 = rs1_s0 - rs1_s1;
+        wire [XL:0] bum_s0 = rs1_s0 ^ rs1_s1;
+
+        assign rmask0 = (unmask)?((b_mask)?bum_s0:aum_s0):((b_mask)?bm_s0:am_s0);
+        assign rmask1 = (unmask)?            {XLEN{1'b0}}:((b_mask)?bm_s1:am_s1);
+        assign msk_rdy = opmask | remask | unmask;
+    end
+endgenerate
 
 //gather and multiplexing results
-assign rd_s0 = {XLEN{donot }} &  mxor0 |
-               {XLEN{doxor }} &  mxor0 |
-               {XLEN{doand }} &  mand0 |
-               {XLEN{doior }} &  mand0 |
-               {XLEN{doadd }} &  madd0 |
-               {XLEN{dosub }} &  madd0 |
-               {XLEN{doa2b }} &  madd0 |
-               {XLEN{dob2a }} & (madd0^madd1) |
-	       {XLEN{domask}} &  rmask0|
-               {XLEN{unmask}} &  rmask0;
+assign rd_s0 = {XLEN{donot  }} &  mxor0 |
+               {XLEN{doxor  }} &  mxor0 |
+               {XLEN{doand  }} &  mand0 |
+               {XLEN{doior  }} &  mand0 |
+               {XLEN{doadd  }} &  madd0 |
+               {XLEN{dosub  }} &  madd0 |
+               {XLEN{doa2b  }} &  madd0 |
+               {XLEN{dob2a  }} & (madd0^madd1) |
+               {XLEN{msk_rdy}} &  rmask0;
 
-assign rd_s1 = {XLEN{donot }} & ~mxor1 |
-               {XLEN{doxor }} &  mxor1 |
-               {XLEN{doand }} &  mand1 |
-               {XLEN{doior }} & ~mand1 |
-               {XLEN{doadd }} &  madd1 |
-               {XLEN{dosub }} &  madd1 |
-               {XLEN{doa2b }} &  madd1 |
-               {XLEN{dob2a }} &  prng  |
-	       {XLEN{domask}} &  rmask1|
-               {XLEN{unmask}} &  rmask1;
+assign rd_s1 = {XLEN{donot  }} & ~mxor1 |
+               {XLEN{doxor  }} &  mxor1 |
+               {XLEN{doand  }} &  mand1 |
+               {XLEN{doior  }} & ~mand1 |
+               {XLEN{doadd  }} &  madd1 |
+               {XLEN{dosub  }} &  madd1 |
+               {XLEN{doa2b  }} &  madd1 |
+               {XLEN{dob2a  }} &  prng  |
+               {XLEN{msk_rdy}} &  rmask1;
 
-assign ready = unmask | cal_rdy | msk_rdy;
+assign ready = (dologic && mlogic_rdy) | madd_rdy | msk_rdy ;
 assign mask  = prng;
 
 endmodule
@@ -224,41 +243,35 @@ endmodule
 
 module mskalu_ctl(
 input  wire      g_resetn, g_clk, flush,
-input  wire      dologic, doaddsub, madd_rdy, 
-output wire      mlogic_ena, addsub_ini,
-output reg       addsub_ena
+input  wire      dologic, doaddsub, mlogic_rdy, madd_rdy, 
+output wire      mlogic_ena,
+output wire      addsub_ena
 );
 
 localparam S_IDL = 2'b00;
-localparam S_LOG = 2'b01;		//executing logical    instructions
-localparam S_ART = 2'b10;		//executing arithmetic instructions
-localparam S_FIN = 2'b11;
+localparam S_LOG = 2'b01;        //executing logical    instructions
+localparam S_ART = 2'b10;        //executing arithmetic instructions
 
 reg [1:0] ctl_state;
 always @(posedge g_clk) begin
-  if (!g_resetn) begin
-    ctl_state	<= S_IDL;
-    addsub_ena  <= 1'b0;
-  end else if (flush) begin
-    ctl_state	<= S_IDL;
-    addsub_ena  <= 1'b0;
-  end else begin
+  if (!g_resetn)    ctl_state <= S_IDL;
+  else if (flush)   ctl_state <= S_IDL;
+  else begin
     case (ctl_state)
-      S_IDL : begin
-               ctl_state    <= (dologic == 1'b1)? S_LOG  : S_IDL; 
-               addsub_ena   <= doaddsub; 
-            end
-      S_LOG :    ctl_state    <= (doaddsub)? S_ART: S_FIN;
-      S_ART :    ctl_state    <= (madd_rdy)? S_FIN: S_ART;
-      S_FIN : begin
-               ctl_state    <= S_IDL;			
-               addsub_ena   <= 1'b0;  
-            end
+        S_IDL :     ctl_state <= (dologic == 1'b1)? 
+                                 ((mlogic_rdy)? 
+                                 ((doaddsub)? S_ART : S_IDL)
+                                                    : S_LOG) 
+                                                    : S_IDL; 
+        S_LOG :     ctl_state <= (doaddsub)?  S_ART : S_IDL;
+        S_ART :     ctl_state <= (madd_rdy)?  S_IDL : S_ART;
+        default:    ctl_state <= S_IDL;
     endcase	
   end					
 end
-assign    mlogic_ena = dologic && (ctl_state == S_IDL);
-assign    addsub_ini = (ctl_state == S_LOG);
+assign    mlogic_ena =  dologic  && (ctl_state == S_IDL);
+assign    addsub_ena =  doaddsub && ((mlogic_rdy && (ctl_state == S_IDL)) | (ctl_state != S_IDL));
+
 endmodule
 
 
@@ -269,8 +282,12 @@ module msklogic(
   input wire  [31:0] i_b0,  i_b1,
   output wire [31:0] o_xor0, o_xor1,
   output wire [31:0] o_and0, o_and1,
-  output wire [31:0] o_gs
+  output wire [31:0] o_gs,
+  output wire        rdy
 );
+
+// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
+parameter MASKING_ISE_TI      = 1'b0;
 
 (* keep="true" *) 
 wire [31:0] gs;
@@ -279,9 +296,11 @@ assign    o_gs = i_a1;
 
 genvar i;
 generate 
-for (i=0;i<32;i=i+1) begin : gen_pg_s1
+    for (i=0;i<32;i=i+1) begin : gen_pg_s1
     (* keep_hierarchy="yes" *)
-    pg  pg_ins(
+    pg 
+    #(  .MASKING_ISE_TI(MASKING_ISE_TI)) 
+    pg_ins(
         .g_resetn(  g_resetn),
         .g_clk(     g_clk),
         .ena(       ena), 
@@ -297,9 +316,17 @@ for (i=0;i<32;i=i+1) begin : gen_pg_s1
 end
 endgenerate
 
+generate 
+    if (MASKING_ISE_TI == 1'b1) begin: masking_TI
+        FF_Nb  ff_msklogic_rdy(.g_resetn(g_resetn), .g_clk(g_clk), .ena(1'b1), .din(ena), .dout(rdy));
+    end else begin                   : masking_non_TI
+        assign rdy = ena;
+    end
+endgenerate
 endmodule
+
 module mskaddsub(
-    input wire         g_resetn, g_clk, flush, ena, ini,
+    input wire         g_resetn, g_clk, flush, ena,
     input wire         sub,  // active to perform a-b
     input wire  [31:0] i_gs,
     input wire  [31:0] mxor0, mxor1,
@@ -307,6 +334,9 @@ module mskaddsub(
     output wire [31:0] o_s0, o_s1,
     output wire        rdy
 );
+
+// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
+parameter MASKING_ISE_TI      = 1'b0;
 
 wire [31:0] gs;
 wire [31:0] p0, p1;
@@ -319,16 +349,20 @@ wire [31:0] g0_i, g1_i;
 reg  [ 2:0] seq_cnt;
 always @(posedge g_clk)
   if (!g_resetn)    seq_cnt <=3'd1;
-  else if (flush)   seq_cnt <=3'b1;
+  else if (flush)   seq_cnt <=3'd1;
+  else if (rdy)     seq_cnt <=3'd1;
   else if (ena)     seq_cnt <=seq_cnt + 1'b1;
-  else              seq_cnt <=3'd1;
+
+wire ini = ena && (seq_cnt == 3'd1);
 
 assign gs_i = (ini)?   i_gs : gs;
 assign p0_i = (ini)?   mxor0: p0;
 assign p1_i = (ini)?   mxor1: p1;
 assign g0_i = (ini)?   mand0: g0;
 assign g1_i = (ini)?   mand1: g1;
-seq_process seqproc_ins(
+seq_process 
+#(  .MASKING_ISE_TI(MASKING_ISE_TI))
+seqproc_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),
     .ena(       ena), 
@@ -354,58 +388,8 @@ postprocess posproc_ins(
     .o_s0(      o_s0),
     .o_s1(      o_s1));
 
-assign rdy = (seq_cnt==3'd5);
+assign rdy = (seq_cnt==3'd6);
 endmodule
-
-/*
-module ksa_ctl(
-input wire       g_resetn, g_clk, ena,
-output wire      pre_ena, seq_sel,
-output reg       seq_ena,
-output reg [2:0] cnt,
-output reg       val
-);
-
-localparam IDL = 2'b00;
-localparam PRE = 2'b01;
-localparam SEQ = 2'b10;
-localparam POS = 2'b11;
-
-reg [1:0] ctl_state = IDL;
-always @(posedge g_clk)
-  if (!g_resetn) begin
-    ctl_state <= IDL;
-    val       <= 1'b0;
-    seq_ena   <= 1'b0;
-    cnt       <= 3'd0;
-  end
-  else
-    case (ctl_state)
-      IDL : begin                
-                ctl_state <= (ena == 1'b1)? PRE  : IDL; 
-                seq_ena   <= (ena == 1'b1)? 1'b1 : 1'b0; 
-                val       <= 1'b0;
-                cnt       <= 3'd1;
-            end
-      PRE : begin
-                ctl_state <= SEQ;
-                cnt       <= cnt + 1'b1;
-            end
-      SEQ : begin
-                ctl_state <= (cnt == 3'd4)? POS: SEQ;
-                cnt       <= cnt + 1'b1;
-            end
-      POS : begin
-                ctl_state <= IDL;
-                seq_ena   <= 1'b0;
-                val       <= 1'b1;
-            end
-    endcase						
-
-assign    pre_ena = (ctl_state == IDL) && (ena);
-assign    seq_sel = (ctl_state == PRE);
-endmodule
-*/
 
 module seq_process(
   input wire         g_resetn, g_clk, ena,
@@ -421,6 +405,9 @@ module seq_process(
   output wire [31:0] o_gs
 );
 
+// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
+parameter MASKING_ISE_TI      = 1'b0;
+
 (* keep="true" *)  
 wire [31:0] gs;
 assign      gs = i_gs;
@@ -432,40 +419,40 @@ reg [31:0] pkj0, pkj1;
 always @(*) begin
   case (seq)
       3'b001: begin
-                  gkj0       = {i_gk0[30:0],1'd0};
-                  gkj1       = {i_gk1[30:0],sub};
-                  pkj0       = {i_pk0[30:0],1'd0};
-                  pkj1       = {i_pk1[30:0],1'd0};
+                  gkj0 = {i_gk0[30:0],1'd0};
+                  gkj1 = {i_gk1[30:0],sub};
+                  pkj0 = {i_pk0[30:0],1'd0};
+                  pkj1 = {i_pk1[30:0],1'd0};
                end
       3'b010 : begin
-                  gkj0       = {i_gk0[29:0],2'd0};
-                  gkj1       = {i_gk1[29:0],sub,1'd0};                  
-                  pkj0       = {i_pk0[29:0],2'd0};
-                  pkj1       = {i_pk1[29:0],2'd0};
+                  gkj0 = {i_gk0[29:0],2'd0};
+                  gkj1 = {i_gk1[29:0],sub,1'd0};                  
+                  pkj0 = {i_pk0[29:0],2'd0};
+                  pkj1 = {i_pk1[29:0],2'd0};
                end
       3'b011 : begin
-                  gkj0       = {i_gk0[27:0],4'd0};
-                  gkj1       = {i_gk1[27:0], sub, 3'd0};                  
-                  pkj0       = {i_pk0[27:0],4'd0};
-                  pkj1       = {i_pk1[27:0],4'd0};
+                  gkj0 = {i_gk0[27:0],4'd0};
+                  gkj1 = {i_gk1[27:0], sub, 3'd0};                  
+                  pkj0 = {i_pk0[27:0],4'd0};
+                  pkj1 = {i_pk1[27:0],4'd0};
                end
       3'b100 : begin
-                  gkj0       = {i_gk0[23:0],8'd0};
-                  gkj1       = {i_gk1[23:0],sub, 7'd0};                  
-                  pkj0       = {i_pk0[23:0],8'd0};
-                  pkj1       = {i_pk1[23:0],8'd0};
+                  gkj0 = {i_gk0[23:0],8'd0};
+                  gkj1 = {i_gk1[23:0],sub, 7'd0};                  
+                  pkj0 = {i_pk0[23:0],8'd0};
+                  pkj1 = {i_pk1[23:0],8'd0};
                end
       3'b101 : begin
-                  gkj0       = {i_gk0[15:0],16'd0};
-                  gkj1       = {i_gk1[15:0],sub,15'd0};                  
-                  pkj0       = {32'd0};
-                  pkj1       = {32'd0};
+                  gkj0 = {i_gk0[15:0],16'd0};
+                  gkj1 = {i_gk1[15:0],sub,15'd0};                  
+                  pkj0 = {32'd0};
+                  pkj1 = {32'd0};
                end
       default: begin
-                  gkj0       = {32'd0};
-                  gkj1       = {32'd0};                  
-                  pkj0       = {32'd0};
-                  pkj1       = {32'd0};
+                  gkj0 = {32'd0};
+                  gkj1 = {32'd0};                  
+                  pkj0 = {32'd0};
+                  pkj1 = {32'd0};
                end
    endcase
 end
@@ -473,7 +460,9 @@ end
 generate genvar i;
 for (i=0;i<32;i=i+1) begin : gen_black_s1
     (* keep_hierarchy="yes" *)	
-    pk_gk pkgk_ins(
+    pk_gk 
+    #(  .MASKING_ISE_TI(MASKING_ISE_TI)) 
+    pkgk_ins(
         .g_resetn(  g_resetn),
         .g_clk(     g_clk),
         .ena(       ena), 
@@ -491,10 +480,9 @@ for (i=0;i<32;i=i+1) begin : gen_black_s1
         .o_p0(      o_pk0[i]),
         .o_p1(      o_pk1[i]));
 end
-endgenerate
-
- 
+endgenerate 
 endmodule
+
 module postprocess(
   input wire         sub,
   input wire  [31:0] i_pk0, i_pk1,
@@ -514,28 +502,39 @@ module pg(
   output wire o_p0, o_p1,
   output wire o_g0, o_g1
 );
+// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
+parameter MASKING_ISE_TI      = 1'b0;
 
-wire p0 = i_a0 ^ i_b0;
-wire p1 = i_a1 ^ i_b1;
+generate 
+    if (MASKING_ISE_TI == 1'b1) begin : masking_TI
+        wire p0 = i_a0 ^ i_b0;
+        wire p1 = i_a1 ^ i_b1;
 
-FF_Nb  ff_p0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(p0), .dout(o_p0));
-FF_Nb  ff_p1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(p1), .dout(o_p1));
+        FF_Nb  ff_p0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(p0), .dout(o_p0));
+        FF_Nb  ff_p1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(p1), .dout(o_p1));
 
-wire i_t0 = i_gs ^ (i_a0 & i_b0);
-wire i_t1 = i_gs ^ (i_a0 & i_b1);
-wire i_t2 = (i_a1 & i_b0);
-wire i_t3 = (i_a1 & i_b1);
+        wire i_t0 = i_gs ^ (i_a0 & i_b0);
+        wire i_t1 = i_gs ^ (i_a0 & i_b1);
+        wire i_t2 = (i_a1 & i_b0);
+        wire i_t3 = (i_a1 & i_b1);
 
-wire t0,t1;
-wire t2,t3;
-FF_Nb  ff_t0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t0), .dout(t0));
-FF_Nb  ff_t1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t1), .dout(t1));
-FF_Nb  ff_t2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t2), .dout(t2));
-FF_Nb  ff_t3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t3), .dout(t3));
+        wire t0,t1;
+        wire t2,t3;
+        FF_Nb  ff_t0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t0), .dout(t0));
+        FF_Nb  ff_t1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t1), .dout(t1));
+        FF_Nb  ff_t2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t2), .dout(t2));
+        FF_Nb  ff_t3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t3), .dout(t3));
 
-assign o_g0 = t0 ^ t2;
-assign o_g1 = t1 ^ t3;
-
+        assign o_g0 = t0 ^ t2;
+        assign o_g1 = t1 ^ t3;
+    end else begin                    : masking_non_TI
+        assign o_p0 = i_a0 ^ i_b0;
+        assign o_p1 = i_a1 ^ i_b1;  
+    
+        assign o_g0 = i_gs ^ (i_a0 & i_b1) ^ (i_a0 | ~i_b0);
+        assign o_g1 = i_gs ^ (i_a1 & i_b1) ^ (i_a1 | ~i_b0);  
+    end
+endgenerate
 endmodule
 
 module pk_gk(
@@ -548,35 +547,51 @@ module pk_gk(
   output wire o_g0, o_g1,
   output wire o_p0, o_p1
 );
+// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
+parameter MASKING_ISE_TI      = 1'b0;
 
-wire i_tg0 = i_gk0 ^ (i_gj0 & i_pk0);
-wire i_tg1 = i_gk1 ^ (i_gj1 & i_pk0);
-wire i_tg2 =         (i_gj0 & i_pk1);
-wire i_tg3 =         (i_gj1 & i_pk1);
+generate 
+    if (MASKING_ISE_TI == 1'b1) begin : masking_TI
+        wire i_tg0 = i_gk0 ^ (i_gj0 & i_pk0);
+        wire i_tg1 = i_gk1 ^ (i_gj1 & i_pk0);
+        wire i_tg2 =         (i_gj0 & i_pk1);
+        wire i_tg3 =         (i_gj1 & i_pk1);
 
-wire tg0,tg1;
-wire tg2,tg3;
-FF_Nb  ff_tg0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg0), .dout(tg0));
-FF_Nb  ff_tg1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg1), .dout(tg1));
-FF_Nb  ff_tg2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg2), .dout(tg2));
-FF_Nb  ff_tg3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg3), .dout(tg3));
+        wire tg0,tg1;
+        wire tg2,tg3;
+        FF_Nb  ff_tg0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg0), .dout(tg0));
+        FF_Nb  ff_tg1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg1), .dout(tg1));
+        FF_Nb  ff_tg2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg2), .dout(tg2));
+        FF_Nb  ff_tg3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg3), .dout(tg3));
 
-assign o_g0 = tg0 ^ tg2;
-assign o_g1 = tg1 ^ tg3;
+        assign o_g0 = tg0 ^ tg2;
+        assign o_g1 = tg1 ^ tg3;
 
-wire i_tp0 = i_gs ^ (i_pk0 & i_pj0);
-wire i_tp1 = i_gs ^ (i_pk0 & i_pj1);
-wire i_tp2 =        (i_pk1 & i_pj0);
-wire i_tp3 =        (i_pk1 & i_pj1);
+        wire i_tp0 = i_gs ^ (i_pk0 & i_pj0);
+        wire i_tp1 = i_gs ^ (i_pk0 & i_pj1);
+        wire i_tp2 =        (i_pk1 & i_pj0);
+        wire i_tp3 =        (i_pk1 & i_pj1);
 
-wire tp0,tp1;
-wire tp2,tp3;
-FF_Nb  ff_tp0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp0), .dout(tp0));
-FF_Nb  ff_tp1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp1), .dout(tp1));
-FF_Nb  ff_tp2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp2), .dout(tp2));
-FF_Nb  ff_tp3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp3), .dout(tp3));
-assign o_p0 = tp0 ^ tp2;
-assign o_p1 = tp1 ^ tp3;
+        wire tp0,tp1;
+        wire tp2,tp3;
+        FF_Nb  ff_tp0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp0), .dout(tp0));
+        FF_Nb  ff_tp1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp1), .dout(tp1));
+        FF_Nb  ff_tp2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp2), .dout(tp2));
+        FF_Nb  ff_tp3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp3), .dout(tp3));
+        assign o_p0 = tp0 ^ tp2;
+        assign o_p1 = tp1 ^ tp3;
+    end else begin                    : masking_non_TI
+        wire pk0 = i_gs  ^ (i_pk0 & i_pj1) ^ (i_pk0 | ~i_pj0);
+        wire pk1 = i_gs  ^ (i_pk1 & i_pj1) ^ (i_pk1 | ~i_pj0);  
+        FF_Nb  ff_pk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk0), .dout(o_p0));
+        FF_Nb  ff_pk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk1), .dout(o_p1));
+
+        wire gk0 = i_gk0 ^ (i_gj0 & i_pk1) ^ (i_gj0 | ~i_pk0);
+        wire gk1 = i_gk1 ^ (i_gj1 & i_pk1) ^ (i_gj1 | ~i_pk0);
+        FF_Nb  ff_gk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(gk0), .dout(o_g0));
+        FF_Nb  ff_gk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(gk1), .dout(o_g1));    
+    end
+endgenerate
 endmodule
 
 module FF_Nb #(parameter Nb=1) (
@@ -588,9 +603,7 @@ module FF_Nb #(parameter Nb=1) (
 
 always @(posedge g_clk) begin
   if (!g_resetn)    dout <= {Nb{1'b0}};
-  else begin
-	if (ena)        dout <= din;
-  end
+  else if (ena)     dout <= din;
 end
 
 endmodule
