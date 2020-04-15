@@ -43,6 +43,9 @@ parameter MASKING_ISE_TRNG    = 1'b0;
 // Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
 parameter MASKING_ISE_TI      = 1'b1;
 
+// Use a fast implementaiton of the masking ISE instructions.
+parameter MASKING_ISE_FAST    = 1'b1;
+
 wire [XL:0] gs_0;
 wire [XL:0] mxor0, mxor1;
 wire [XL:0] mand0, mand1;
