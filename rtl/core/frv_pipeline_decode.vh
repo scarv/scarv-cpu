@@ -148,25 +148,25 @@ wire dec_xc_aessub_decrot   = 1'b0; //(d_data & 32'hfe00707f) == 32'h20007003;
 wire dec_xc_aesmix_enc      = 1'b0; //XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h22007003;
 wire dec_xc_aesmix_dec      = 1'b0; //XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h24007003;
 
-wire dec_saes_v1_encs       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h102b;
-wire dec_saes_v1_encm       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h10102b;
-wire dec_saes_v1_decs       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h20102b;
-wire dec_saes_v1_decm       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h30102b;
-wire dec_saes_v2_sub_enc    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1600202b;
-wire dec_saes_v2_sub_dec    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1200202b;
-wire dec_saes_v2_mix_enc    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'he00202b;
-wire dec_saes_v2_mix_dec    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'hc00202b;
-wire dec_saes_v3_encs       = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h800302b;
-wire dec_saes_v3_encsm      = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h600302b;
-wire dec_saes_v3_decs       = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h400302b;
-wire dec_saes_v3_decsm      = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h200302b;
-wire dec_saes_v5_esrsub_lo  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'hc00502b;
-wire dec_saes_v5_esrsub_hi  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'he00502b;
-wire dec_saes_v5_dsrsub_lo  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1000502b;
-wire dec_saes_v5_dsrsub_hi  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1200502b;
-wire dec_saes_v5_emix       = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1400502b;
-wire dec_saes_v5_dmix       = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1600502b;
-wire dec_saes_v5_sub        = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h1800502b;
+wire dec_saes_v1_encs       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h600b;
+wire dec_saes_v1_encm       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h10600b;
+wire dec_saes_v1_decs       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h20600b;
+wire dec_saes_v1_decm       = XC_AES_VARIANT_V1 && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h30600b;
+wire dec_saes_v2_sub_enc    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h1000700b;
+wire dec_saes_v2_sub_dec    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'he00700b;
+wire dec_saes_v2_mix_enc    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'hc00700b;
+wire dec_saes_v2_mix_dec    = XC_AES_VARIANT_TG && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'ha00700b;
+wire dec_saes_v3_encs       = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h800700b;
+wire dec_saes_v3_encsm      = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h600700b;
+wire dec_saes_v3_decs       = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h400700b;
+wire dec_saes_v3_decsm      = XC_AES_VARIANT_TT && XC_CLASS_AES && (d_data & 32'h3e00707f) == 32'h200700b;
+wire dec_saes_v5_esrsub_lo  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h2800700b;
+wire dec_saes_v5_esrsub_hi  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h2a00700b;
+wire dec_saes_v5_dsrsub_lo  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h2c00700b;
+wire dec_saes_v5_dsrsub_hi  = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h2e00700b;
+wire dec_saes_v5_emix       = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h3000700b;
+wire dec_saes_v5_dmix       = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfe00707f) == 32'h3200700b;
+wire dec_saes_v5_sub        = XC_AES_VARIANT_TI && XC_CLASS_AES && (d_data & 32'hfff0707f) == 32'h3400600b;
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge
