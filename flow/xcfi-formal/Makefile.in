@@ -94,3 +94,5 @@ xcfi-clean:
 
 xcfi-run: $(XCFI_SBY_LOGS)
 	
+xcfi-run-masking-ise: $(filter $(XCFI_WORK)/insn_mask% ,$(XCFI_SBY_LOGS))
+
