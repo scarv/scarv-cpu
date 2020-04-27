@@ -1,6 +1,8 @@
 
 export FRV_HOME=`pwd`
 export FRV_WORK=$FRV_HOME/work
+export SCARV_CPU=$FRV_HOME
+export AES_RTL_DIR=$FRV_HOME/../../rtl/aes
 
 if [[ -z "$RISCV" ]]; then
     export RISCV=/opt/riscv32
