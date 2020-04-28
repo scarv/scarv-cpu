@@ -184,7 +184,14 @@ generate
         always @(posedge g_clk) 
             if (!g_resetn)          m_a0_reg <= {XLEN{1'b0}};
             else if (opmask|remask) m_a0_reg <= (b_mask)? bm_a0 : am_a0;
-    
+
+        //
+        // FIXME - Possible unmasking of RS1
+        //
+        //  Do the assignments of xm_z0, arm_a0 and brm_a0
+        //  cause the rs1 shares to be combined combinatorially
+        //  every cycle?
+        //
         wire [XL:0] xm_a0 = (unmask)? rs1_s0 : m_a0_reg;
 
         wire [XL:0] arm_a0 = xm_a0 - rs1_s1;
@@ -203,11 +210,27 @@ generate
 
     end else begin                    : masking_non_TI
 
+        //
+        // FIXME
+        //
+        //  Adders used to mask or un-mask are never used in the same
+        //  cycle - can we share them? This could be part of the
+        //  solution to avoiding un-masking everything each cycle.
+        //
         wire [XL:0] am_s0 =             rs1_s0 + prng;
         wire [XL:0] am_s1 = (remask) ? (rs1_s1 + prng): prng;
         wire [XL:0] bm_s0 =             rs1_s0 ^ prng;
         wire [XL:0] bm_s1 = (remask) ? (rs1_s1 ^ prng): prng;
 
+        //
+        // FIXME - Always un-masking RS1 operand *every* cycle.
+        //
+        //  This is a security bug we need to find a way around.
+        //  Shares of RS1 or RS2 must *never* be combined combinatorially.
+        //  Need to find a way of stopping propagation of signals into the
+        //  un-masking logic unless we are actually doing an un-mask
+        //  operation.
+        //
         wire [XL:0] aum_s0 = rs1_s0 - rs1_s1;
         wire [XL:0] bum_s0 = rs1_s0 ^ rs1_s1;
 
