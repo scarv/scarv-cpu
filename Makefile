@@ -34,11 +34,11 @@ export PATH:=$(RISCV)/bin:$(YOSYS_ROOT)/:$(PATH)
 YOSYS       = $(YOSYS_ROOT)/yosys
 YOSYS_SMTBMC= $(YOSYS_ROOT)/yosys-smtbmc
 
-CC              = $(RISCV)/bin/riscv64-unknown-elf-gcc
-AS              = $(RISCV)/bin/riscv64-unknown-elf-as
-AR              = $(RISCV)/bin/riscv64-unknown-elf-ar
-OBJDUMP         = $(RISCV)/bin/riscv64-unknown-elf-objdump
-OBJCOPY         = $(RISCV)/bin/riscv64-unknown-elf-objcopy
+CC              = $(RISCV)/bin/riscv32-unknown-elf-gcc
+AS              = $(RISCV)/bin/riscv32-unknown-elf-as
+AR              = $(RISCV)/bin/riscv32-unknown-elf-ar
+OBJDUMP         = $(RISCV)/bin/riscv32-unknown-elf-objdump
+OBJCOPY         = $(RISCV)/bin/riscv32-unknown-elf-objcopy
 
 include $(FRV_HOME)/flow/verilator/Makefile.in
 include $(FRV_HOME)/flow/compliance/Makefile.in

@@ -24,6 +24,7 @@ $SCARV_CPU/rtl/core/frv_gprs.v
 $SCARV_CPU/rtl/core/frv_interrupts.v
 $SCARV_CPU/rtl/core/frv_leak.v
 $SCARV_CPU/rtl/core/frv_lsu.v
+$SCARV_CPU/rtl/core/frv_masked_alu.v
 $SCARV_CPU/rtl/core/frv_pipeline_decode.v
 $SCARV_CPU/rtl/core/frv_pipeline_execute.v
 $SCARV_CPU/rtl/core/frv_pipeline_fetch.v
