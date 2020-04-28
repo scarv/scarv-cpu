@@ -67,7 +67,12 @@ generate for(i = 0; i < 16; i = i+1) begin
 
     if(i == 0) begin
 
-        always @(*) gprs_even[i] = 0;
+        //
+        // Should be always@(*) but causes X-propagation issues
+        // in Vivado 2019.2. Rely on optimiser to remove.
+        always @(posedge g_clk) begin
+            gprs_even[i] <= 0;
+        end
         
         assign gprs[2*i+0] = 32'b0;
         assign gprs[2*i+1] = gprs_odd [i];
