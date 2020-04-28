@@ -136,7 +136,7 @@ parameter AES_MIX_FAST        = 1'b0;
 parameter BITMANIP_BASELINE   = 1'b1;
 
 parameter MASKING_ISE_TRNG    = 1'b0; // Use a TRNG (1) or a PRNG (0)
-parameter MASKING_ISE_TI      = 1'b1; // Threshold implementation (1) or (0)
+parameter MASKING_ISE_TI      = 1'b0; // Threshold implementation (1) or (0)
 parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
