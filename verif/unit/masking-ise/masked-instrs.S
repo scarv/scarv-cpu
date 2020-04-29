@@ -56,10 +56,10 @@ test_masked_xor:
 .func   test_masked_add
 test_masked_add:
 
-    mask.b.mask     (t2,t1), a0
-    mask.b.mask     (t4,t3), a1
-    mask.b.add      (a1,a0), (t2,t1), (t4,t3)
-    mask.b.unmask    a0    , (a1,a0)
+    mask.a.mask     (t2,t1), a0
+    mask.a.mask     (t4,t3), a1
+    mask.a.add      (a1,a0), (t2,t1), (t4,t3)
+    mask.a.unmask    a0    , (a1,a0)
 
 .test_masked_add_finish:
     ret
@@ -69,10 +69,10 @@ test_masked_add:
 .func   test_masked_sub
 test_masked_sub:
 
-    mask.b.mask     (t2,t1), a0
-    mask.b.mask     (t4,t3), a1
-    mask.b.sub      (a1,a0), (t2,t1), (t4,t3)
-    mask.b.unmask    a0    , (a1,a0)
+    mask.a.mask     (t2,t1), a0
+    mask.a.mask     (t4,t3), a1
+    mask.a.sub      (a1,a0), (t2,t1), (t4,t3)
+    mask.a.unmask    a0    , (a1,a0)
 
 .test_masked_sub_finish:
     ret
