@@ -111,10 +111,12 @@ always @* begin
                 if (spec_rs3_addr != 0)
                     assert(spec_rs3_addr == rs3_addr);
 
-                assert(spec_rd_addr == rd_addr);
-                assert(spec_rd_wide == rd_wide);
-                assert(spec_rd_wdata == rd_wdata);
-                assert(spec_rd_wdatahi == rd_wdatahi);
+                    assert(spec_rd_addr == rd_addr);
+                    assert(spec_rd_wide == rd_wide);
+                `ifndef XCFI_NO_RD_CHECKS
+                    assert(spec_rd_wdata == rd_wdata);
+                    assert(spec_rd_wdatahi == rd_wdatahi);
+                `endif
                 assert(spec_pc_wdata == pc_wdata);
 
                 if (spec_mem_wmask || spec_mem_rmask) begin

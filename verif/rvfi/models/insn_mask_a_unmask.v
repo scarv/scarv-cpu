@@ -1,4 +1,6 @@
 
+`define XCFI_NO_RD_CHECKS=1
+
 `include "xcfi_macros.sv"
 
 module xcfi_insn_spec (
@@ -11,16 +13,24 @@ module xcfi_insn_spec (
 
 `XCFI_INSN_CHECK_COMMON
 
-wire [XL:0] result_s1 = `RS1 - `RS1_HI  ;
-wire [XL:0] result_s0 = 0               ;
+wire [XL:0] u_rs1   = `XCFI_UNMASK_A(`RS1, `RS1_HI);
+wire [XL:0] u_result= `RD;
 
-assign spec_valid       = rvfi_valid && dec_mask_a_mask;
+`XCFI_SPEC_CHECK_BEGIN
+
+    assume(`FIELD_RD_ADDR != 0);
+
+    assert(u_rs1 == u_result);
+
+`XCFI_SPEC_CHECK_END
+
+assign spec_valid       = rvfi_valid && dec_mask_a_unmask;
 assign spec_trap        = 1'b0   ;
 assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = 0;
 assign spec_rs3_addr    = 0;
 assign spec_rd_addr     = `FIELD_RD_ADDR;
-assign spec_rd_wdata    = `FIELD_RD_ADDR ? result_s0 : 32'b0;
+assign spec_rd_wdata    = 0;
 assign spec_rd_wide     = 1'b0;
 assign spec_rd_wdatahi  = 32'b0;
 assign spec_pc_wdata    = rvfi_pc_rdata + 4;

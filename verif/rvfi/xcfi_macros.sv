@@ -196,6 +196,17 @@ parameter BITMANIP_BASELINE   = 1'b1;
     `include "frv_pipeline_decode.vh"        \
     `include "xcfi_shared.vh"        
 
+`define XCFI_SPEC_CHECK_BEGIN \
+    always @(*) begin if(!reset && spec_valid && rvfi_valid) \
+        begin
+
+`define XCFI_SPEC_CHECK_END \
+        end \
+    end
+
+`define XCFI_UNMASK_B(S0, S1) (S0 ^ S1)
+`define XCFI_UNMASK_A(S0, S1) (S0 - S1)
+
 `define RS1            rvfi_rs1_rdata
 `define RS2            rvfi_rs2_rdata
 `define RS1_HI         rvfi_rs1_rdata_hi
