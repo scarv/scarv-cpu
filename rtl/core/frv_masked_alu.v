@@ -152,12 +152,13 @@ mskaddsub_ins(
     .rdy(       madd_rdy));
 
 //Control unit for boolean masking calculations
-wire        dologic  = (~flush) & valid & (donot | doxor | doand | doior);
-wire        doaddsub = (~flush) & valid & (doadd | dosub | dob2a | doa2b);
+wire        dologic  = (~flush) & (donot | doxor | doand | doior);
+wire        doaddsub = (~flush) & (doadd | dosub | dob2a | doa2b);
 mskalu_ctl  mskaluctl_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),
     .flush(     flush),
+    .valid(valid),
     .dologic(   dologic|doaddsub), 
     .doaddsub(  doaddsub), 
     .mlogic_rdy(mlogic_rdy),
@@ -166,10 +167,10 @@ mskalu_ctl  mskaluctl_ins(
     .addsub_ena(addsub_ena));
 
 // boolean mask, umask, remask
-wire opmask = (~flush) & valid & (op_b_mask   | op_a_mask);   //masking operand
-wire unmask = (~flush) & valid & (op_b_unmask | op_a_unmask);
-wire remask = (~flush) & valid & (op_b_remask | op_a_remask);
-wire b_mask = (~flush) & valid & (op_b_mask   | op_b_unmask  | op_b_remask);
+wire opmask = (~flush) & (op_b_mask   | op_a_mask);   //masking operand
+wire unmask = (~flush) & (op_b_unmask | op_a_unmask);
+wire remask = (~flush) & (op_b_remask | op_a_remask);
+wire b_mask = (~flush) & (op_b_mask   | op_b_unmask  | op_b_remask);
 
 wire [XL:0] rmask0, rmask1;
 wire        msk_rdy;
@@ -269,6 +270,7 @@ endmodule
 
 module mskalu_ctl(
 input  wire      g_resetn, g_clk, flush,
+input  wire      valid,
 input  wire      dologic, doaddsub, mlogic_rdy, madd_rdy, 
 output wire      mlogic_ena,
 output wire      addsub_ena
@@ -278,25 +280,29 @@ localparam S_IDL = 2'b00;
 localparam S_LOG = 2'b01;        //executing logical    instructions
 localparam S_ART = 2'b10;        //executing arithmetic instructions
 
+wire dologic_valid  = dologic && valid;
+wire doaddsub_valid = doaddsub&& valid;
+
 reg [1:0] ctl_state;
 always @(posedge g_clk) begin
   if (!g_resetn)    ctl_state <= S_IDL;
   else if (flush)   ctl_state <= S_IDL;
   else begin
     case (ctl_state)
-        S_IDL :     ctl_state <= (dologic == 1'b1)? 
-                                 ((mlogic_rdy)? 
-                                 ((doaddsub)? S_ART : S_IDL)
+        S_IDL :     ctl_state <= 
+                            (dologic_valid) ? 
+                           ((mlogic_rdy)    ? 
+                           ((doaddsub_valid)? S_ART : S_IDL)
                                                     : S_LOG) 
                                                     : S_IDL; 
-        S_LOG :     ctl_state <= (doaddsub)?  S_ART : S_IDL;
+        S_LOG :     ctl_state <= (doaddsub_valid)?  S_ART : S_IDL;
         S_ART :     ctl_state <= (madd_rdy)?  S_IDL : S_ART;
         default:    ctl_state <= S_IDL;
     endcase	
   end					
 end
-assign    mlogic_ena =  dologic  && (ctl_state == S_IDL);
-assign    addsub_ena =  doaddsub && ((mlogic_rdy && (ctl_state == S_IDL)) | (ctl_state != S_IDL));
+assign    mlogic_ena =  dologic_valid  && (ctl_state == S_IDL);
+assign    addsub_ena =  doaddsub_valid && ((mlogic_rdy && (ctl_state == S_IDL)) | (ctl_state != S_IDL));
 
 endmodule
 
