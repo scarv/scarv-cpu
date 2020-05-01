@@ -144,7 +144,7 @@ assign n_s2_fu[P_FU_ALU] =
     dec_c_slli     ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
     dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
-    dec_b_ror      || dec_b_rori     ;
+    dec_b_ror      || dec_b_rori     || dec_mask_b_unmask || dec_mask_a_unmask;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
@@ -191,8 +191,8 @@ assign n_s2_fu[P_FU_RNG] =
 
 assign n_s2_fu[P_FU_MSK] =
     dec_mask_b2a       || dec_mask_a2b      || dec_mask_b_mask    ||
-    dec_mask_b_unmask  || dec_mask_b_remask || dec_mask_a_mask    ||
-    dec_mask_a_unmask  || dec_mask_a_remask || dec_mask_b_not     ||
+    dec_mask_b_remask || dec_mask_a_mask    ||
+    dec_mask_a_remask || dec_mask_b_not     ||
     dec_mask_b_and     || dec_mask_b_ior    || dec_mask_b_xor     ||
     dec_mask_b_add     || dec_mask_b_sub    ;
 
@@ -238,6 +238,7 @@ wire [OP:0] uop_alu =
     {5{dec_c_sub     }} & ALU_SUB   |
     {5{dec_sub       }} & ALU_SUB   |
     {5{dec_xc_psub   }} & ALU_SUB   |
+    {5{dec_mask_a_unmask}} & ALU_SUB|
     {5{dec_and       }} & ALU_AND   |
     {5{dec_andi      }} & ALU_AND   |
     {5{dec_c_and     }} & ALU_AND   |
@@ -252,6 +253,7 @@ wire [OP:0] uop_alu =
     {5{dec_c_xor     }} & ALU_XOR   |
     {5{dec_xor       }} & ALU_XOR   |
     {5{dec_xori      }} & ALU_XOR   |
+    {5{dec_mask_b_unmask}} & ALU_XOR|
     {5{dec_slt       }} & ALU_SLT   |
     {5{dec_slti      }} & ALU_SLT   |
     {5{dec_sltu      }} & ALU_SLTU  |
@@ -428,10 +430,8 @@ wire [OP:0] uop_msk =
     {1+OP{dec_mask_b2a        }} & MSK_B2A          |
     {1+OP{dec_mask_a2b        }} & MSK_A2B          |
     {1+OP{dec_mask_b_mask     }} & MSK_B_MASK       |
-    {1+OP{dec_mask_b_unmask   }} & MSK_B_UNMASK     |
     {1+OP{dec_mask_b_remask   }} & MSK_B_REMASK     |
     {1+OP{dec_mask_a_mask     }} & MSK_A_MASK       |
-    {1+OP{dec_mask_a_unmask   }} & MSK_A_UNMASK     |
     {1+OP{dec_mask_a_remask   }} & MSK_A_REMASK     |
     {1+OP{dec_mask_b_not      }} & MSK_B_NOT        |
     {1+OP{dec_mask_b_and      }} & MSK_B_AND        |
@@ -721,7 +721,8 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     || n_s2_fu[P_FU_MSK]    ;
+    dec_xc_scatter_h     || n_s2_fu[P_FU_MSK]    || 
+    dec_mask_a_unmask    || dec_mask_b_unmask    ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -773,6 +774,8 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_xc_psrl_i  || dec_xc_psll_i  || dec_xc_pror_i  || dec_b_grevi    ||
     dec_b_rori     || dec_b_fsri     ;
 
+wire oprb_src_rs1_hi = dec_mask_a_unmask || dec_mask_b_unmask;
+
 wire   oprb_src_zero =  // Operand B sources zero
     dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||
     dec_jal        ;
@@ -787,8 +790,8 @@ assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ;
 
 wire oprc_src_rs1_hi =
-    dec_mask_b2a        || dec_mask_a2b        || dec_mask_b_unmask   ||
-    dec_mask_b_remask   || dec_mask_a_unmask   || dec_mask_a_remask   ||
+    dec_mask_b2a        || dec_mask_a2b        || 
+    dec_mask_b_remask   || dec_mask_a_remask   ||
     dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
     dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ;
 
@@ -932,13 +935,14 @@ wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
 wire oprb_ld_en    = n_s2_valid && (
-    oprb_src_rs2 || oprb_src_imm || oprb_src_zero
+    oprb_src_rs2 || oprb_src_imm || oprb_src_zero || oprb_src_rs1_hi
 );
 
 assign n_s2_opr_b =
     {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
     {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
-    {XLEN{oprb_src_imm    }} & n_s2_imm       ;
+    {XLEN{oprb_src_imm    }} & n_s2_imm       |
+    {XLEN{oprb_src_rs1_hi }} & s1_rs1_rdatahi ;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
@@ -959,7 +963,7 @@ assign n_s2_opr_c =
     {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
 
 //
-// Operand D sourcing: TODO
+// Operand D sourcing:
 
 wire [XL:0] n_s2_opr_d     = oprd_src_rs2_hi ? s1_rs2_rdatahi : {XLEN{1'b0}};
 

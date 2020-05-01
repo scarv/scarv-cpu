@@ -269,6 +269,8 @@ always @(posedge g_clk) begin
     end
 end
 
+wire        msk_prng_update = pipe_progress;
+
 // Mask ALU input valid.
 wire        msk_valid       = fu_msk && msk_valid_en_r  ;
 wire        msk_flush       = flush                     ;
@@ -277,10 +279,8 @@ wire        msk_ready       ; // Mask ALU operation complete.
 wire        msk_op_b2a      = s2_uop == MSK_B2A     ;
 wire        msk_op_a2b      = s2_uop == MSK_A2B     ;
 wire        msk_op_b_mask   = s2_uop == MSK_B_MASK  ;
-wire        msk_op_b_unmask = s2_uop == MSK_B_UNMASK;
 wire        msk_op_b_remask = s2_uop == MSK_B_REMASK;
 wire        msk_op_a_mask   = s2_uop == MSK_A_MASK  ;
-wire        msk_op_a_unmask = s2_uop == MSK_A_UNMASK;
 wire        msk_op_a_remask = s2_uop == MSK_A_REMASK;
 wire        msk_op_b_not    = s2_uop == MSK_B_NOT   ;
 wire        msk_op_b_and    = s2_uop == MSK_B_AND   ;
@@ -302,8 +302,7 @@ wire [XL:0] msk_mask        ; // The mask. Used for verification.
 wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
 wire [XL:0] n_s3_opr_b_msk  = msk_rd_s1;
 
-wire        msk_gpr_wide    =
-    fu_msk && !(msk_op_b_unmask || msk_op_a_unmask);
+wire        msk_gpr_wide    = fu_msk;
 
 
 //
@@ -516,10 +515,8 @@ frv_masked_alu #(
 .op_b2a      (msk_op_b2a      ), // Binary to arithmetic mask covert
 .op_a2b      (msk_op_a2b      ), // Arithmetic to binary mask convert
 .op_b_mask   (msk_op_b_mask   ), // Binary mask
-.op_b_unmask (msk_op_b_unmask ), // Binary unmask
 .op_b_remask (msk_op_b_remask ), // Binary remask
 .op_a_mask   (msk_op_a_mask   ), // Arithmetic mask
-.op_a_unmask (msk_op_a_unmask ), // Arithmetic unmask
 .op_a_remask (msk_op_a_remask ), // Arithmetic remask
 .op_b_not    (msk_op_b_not    ), // Binary masked not
 .op_b_and    (msk_op_b_and    ), // Binary masked and
@@ -527,6 +524,7 @@ frv_masked_alu #(
 .op_b_xor    (msk_op_b_xor    ), // Binary masked xor
 .op_b_add    (msk_op_b_add    ), // Binary masked addition
 .op_b_sub    (msk_op_b_sub    ), // Binary masked subtraction
+.prng_update (msk_prng_update ), // Force the PRNG to update.
 .rs1_s0      (msk_rs1_s0      ), // RS1 Share 0
 .rs1_s1      (msk_rs1_s1      ), // RS1 Share 1
 .rs2_s0      (msk_rs2_s0      ), // RS2 Share 0

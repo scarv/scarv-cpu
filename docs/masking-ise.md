@@ -89,10 +89,10 @@ Instruction     | Operand A | Operand B | Operand C | Operand D
 `mask_b2a`      | `rs1.lo`  |           | `rs1.hi`  |
 `mask_a2b`      | `rs1.lo`  |           | `rs1.hi`  |
 `mask_b_mask`   | `rs1`     |           |           |
-`mask_b_unmask` | `rs1.lo`  |           | `rs1.hi`  |
+`mask_b_unmask` | `rs1.lo`  | `rs1.hi`  |           |
 `mask_b_remask` | `rs1.lo`  |           | `rs1.hi`  |
 `mask_a_mask`   | `rs1`     |           |           |
-`mask_a_unmask` | `rs1.lo`  |           | `rs1.hi`  |
+`mask_a_unmask` | `rs1.lo`  | `rs1.hi`  |           |
 `mask_a_remask` | `rs1.lo`  |           | `rs1.hi`  |
 `mask_b_not`    | `rs1.lo`  | `rs2.lo`  | `rs1.hi`  | `rs2.hi`
 `mask_b_and`    | `rs1.lo`  | `rs2.lo`  | `rs1.hi`  | `rs2.hi`

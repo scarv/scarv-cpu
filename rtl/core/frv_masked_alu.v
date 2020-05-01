@@ -9,10 +9,8 @@ input  wire        flush            , // Flush the masked ALU.
 input  wire        op_b2a           , // Binary to arithmetic mask covert
 input  wire        op_a2b           , // Arithmetic to binary mask convert
 input  wire        op_b_mask        , // Binary mask
-input  wire        op_b_unmask      , // Binary unmask
 input  wire        op_b_remask      , // Binary remask
 input  wire        op_a_mask        , // Arithmetic mask
-input  wire        op_a_unmask      , // Arithmetic unmask
 input  wire        op_a_remask      , // Arithmetic remask
 input  wire        op_b_not         , // Binary masked not
 input  wire        op_b_and         , // Binary masked and
@@ -20,6 +18,8 @@ input  wire        op_b_ior         , // Binary masked or
 input  wire        op_b_xor         , // Binary masked xor
 input  wire        op_b_add         , // Binary masked addition
 input  wire        op_b_sub         , // Binary masked subtraction
+
+input  wire        prng_update      , // Force the PRNG to update.
 
 input  wire [XL:0] rs1_s0           , // RS1 Share 0
 input  wire [XL:0] rs1_s1           , // RS1 Share 1
@@ -74,7 +74,7 @@ wire [31:0] n_prng     = {prng[31-1:0], n_prng_lsb};
 // Process for updating the LFSR.
 always @(posedge g_clk) begin
     if(!g_resetn)      prng <= 32'h6789ABCD;
-    else if(prng_req)  prng <= n_prng;
+    else if(prng_req || prng_update)  prng <= n_prng;
 end
 assign prng_req = ready;
 //boolean masking ior and subtract by controlling the complement of the operands.
@@ -167,10 +167,9 @@ mskalu_ctl  mskaluctl_ins(
     .addsub_ena(addsub_ena));
 
 // boolean mask, umask, remask
-wire opmask = (~flush) & (op_b_mask   | op_a_mask);   //masking operand
-wire unmask = (~flush) & (op_b_unmask | op_a_unmask);
+wire opmask = (~flush) & (op_b_mask   | op_a_mask  );   //masking operand
 wire remask = (~flush) & (op_b_remask | op_a_remask);
-wire b_mask = (~flush) & (op_b_mask   | op_b_unmask  | op_b_remask);
+wire b_mask = (~flush) & (op_b_mask   | op_b_remask);
 
 wire [XL:0] rmask0, rmask1;
 wire        msk_rdy;
@@ -186,14 +185,7 @@ generate
             if (!g_resetn)          m_a0_reg <= {XLEN{1'b0}};
             else if (opmask|remask) m_a0_reg <= (b_mask)? bm_a0 : am_a0;
 
-        //
-        // FIXME - Possible unmasking of RS1
-        //
-        //  Do the assignments of xm_z0, arm_a0 and brm_a0
-        //  cause the rs1 shares to be combined combinatorially
-        //  every cycle?
-        //
-        wire [XL:0] xm_a0 = (unmask)? rs1_s0 : m_a0_reg;
+        wire [XL:0] xm_a0 = m_a0_reg;
 
         wire [XL:0] arm_a0 = xm_a0 - rs1_s1;
         wire [XL:0] brm_a0 = xm_a0 ^ rs1_s1;
@@ -207,37 +199,18 @@ generate
             if (!g_resetn)                {mask_done} <= 1'd0;
             else if (domask & ~mask_done) {mask_done} <= 1'b1;
             else                          {mask_done} <= 1'd0;
-        assign msk_rdy = unmask | mask_done;
+        assign msk_rdy = mask_done;
 
     end else begin                    : masking_non_TI
 
-        //
-        // FIXME
-        //
-        //  Adders used to mask or un-mask are never used in the same
-        //  cycle - can we share them? This could be part of the
-        //  solution to avoiding un-masking everything each cycle.
-        //
         wire [XL:0] am_s0 =             rs1_s0 + prng;
         wire [XL:0] am_s1 = (remask) ? (rs1_s1 + prng): prng;
         wire [XL:0] bm_s0 =             rs1_s0 ^ prng;
         wire [XL:0] bm_s1 = (remask) ? (rs1_s1 ^ prng): prng;
 
-        //
-        // FIXME - Always un-masking RS1 operand *every* cycle.
-        //
-        //  This is a security bug we need to find a way around.
-        //  Shares of RS1 or RS2 must *never* be combined combinatorially.
-        //  Need to find a way of stopping propagation of signals into the
-        //  un-masking logic unless we are actually doing an un-mask
-        //  operation.
-        //
-        wire [XL:0] aum_s0 = rs1_s0 - rs1_s1;
-        wire [XL:0] bum_s0 = rs1_s0 ^ rs1_s1;
-
-        assign rmask0 = (unmask)?((b_mask)?bum_s0:aum_s0):((b_mask)?bm_s0:am_s0);
-        assign rmask1 = (unmask)?            {XLEN{1'b0}}:((b_mask)?bm_s1:am_s1);
-        assign msk_rdy = opmask | remask | unmask;
+        assign rmask0  = b_mask ? bm_s0 : am_s0 ;
+        assign rmask1  = b_mask ? bm_s1 : am_s1 ;
+        assign msk_rdy = opmask | remask ;
     end
 endgenerate
 
