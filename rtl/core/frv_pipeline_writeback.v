@@ -334,7 +334,7 @@ wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 
 //
 // Are we expecting an MMIO access?
-wire        lsu_mmio        = fu_lsu    && s4_opr_a[4];
+wire        lsu_mmio        = fu_lsu    && s4_opr_b[4];
 
 //
 // Are we recieving a data memory response which we expected?
@@ -371,11 +371,11 @@ wire        lsu_byte    = s4_uop[2:1] == LSU_BYTE;
 wire        lsu_half    = s4_uop[2:1] == LSU_HALF;
 wire        lsu_word    = s4_uop[2:1] == LSU_WORD;
 wire        lsu_signed  = s4_uop[LSU_SIGNED]  ;
-wire [XL:0] lsu_addr    = s4_opr_b;
+wire [XL:0] lsu_addr    = s4_opr_a;
 
 //
 // Strobe bits communicated from memory stage
-wire [ 3:0] lsu_strb    = s4_opr_a[3:0];
+wire [ 3:0] lsu_strb    = s4_opr_b[3:0];
 
 //
 // Are we still waiting for the memory response?

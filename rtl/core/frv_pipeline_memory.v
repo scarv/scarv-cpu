@@ -164,8 +164,8 @@ wire [5:0]  lsu_cause =
            (lsu_store  &&lsu_a_error)? TRAP_STALIGN  :
                                         0            ;
 
-wire [XL:0] n_s4_opr_a_lsu = {27'b0,lsu_mmio,dmem_strb};
-wire [XL:0] n_s4_opr_b_lsu = lsu_addr;
+wire [XL:0] n_s4_opr_a_lsu = lsu_addr;
+wire [XL:0] n_s4_opr_b_lsu = {27'b0,lsu_mmio,dmem_strb};
 
 //
 // Trapping

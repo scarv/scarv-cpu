@@ -451,6 +451,8 @@ wire   p_busy    ;
 // Submodule instances
 // -------------------------------------------------------------------------
 
+generate if(XC_CLASS_AES || XC_CLASS_SHA2 || XC_CLASS_SHA3) begin
+
 frv_asi #(
 .AES_SUB_FAST (AES_SUB_FAST ),
 .AES_MIX_FAST (AES_MIX_FAST ),
@@ -471,6 +473,13 @@ frv_asi #(
 .asi_shamt (s2_opr_b[1:0]   ), // Shift amount for SHA3 instructions.
 .asi_result(asi_result      )  // Instruction result.
 );
+
+end else begin
+
+assign asi_ready = 1'b1;
+assign asi_result= 32'b0;
+
+end endgenerate
 
 frv_alu i_alu (
 .g_clk           (g_clk           ), // global clock
@@ -586,6 +595,8 @@ xc_malu i_xc_malu (
 //  This module is responsible for many of the bitwise operations the
 //  core performs, both from XCrypto and Bitmanip
 //
+
+generate if(XC_CLASS_BIT) begin
 frv_bitwise #(
 .XC_CLASS_BIT(XC_CLASS_BIT)
 ) i_frv_bitwise (
@@ -604,6 +615,13 @@ frv_bitwise #(
 .result  (bitw_result_wide), // 64-bit result
 .ready   (bitw_ready      )  // Outputs ready.
 );
+
+end else begin
+
+assign bitw_result_wide = 64'b0;
+assign bitw_ready       = 1'b1;
+
+end endgenerate
 
 //
 // instance: frv_rng_if

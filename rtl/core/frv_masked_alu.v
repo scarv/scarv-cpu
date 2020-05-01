@@ -222,7 +222,7 @@ assign rd_s0 = {XLEN{donot  }} &  mxor0 |
                {XLEN{doadd  }} &  madd0 |
                {XLEN{dosub  }} &  madd0 |
                {XLEN{doa2b  }} &  madd0 |
-               {XLEN{dob2a  }} & (madd0^madd1) |
+               {XLEN{dob2a  }} &  32'b0 | // FIXME (madd0^madd1) |
                {XLEN{msk_rdy}} &  rmask0;
 
 assign rd_s1 = {XLEN{donot  }} & ~mxor1 |

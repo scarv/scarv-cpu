@@ -515,11 +515,6 @@ wire [4:0] dec_rd_16 =
 
 wire   no_rs1      = !(opra_src_rs1);
 wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
-wire   no_rs3      = !(oprc_src_rs3) || 
-                     !(XC_CLASS_MULTIARITH ||
-                       XC_CLASS_BIT || 
-                       XC_CLASS_MEMORY ||
-                       XC_CLASS_BASELINE);
 
 wire  [4:0] rs_mask = {4'hF, !(dec_mask_b_remask || dec_mask_a_remask ||
                                dec_mask_a2b                           )};
@@ -534,9 +529,15 @@ assign s1_rs2_addr =  no_rs2       ? 5'b0       :
 
 wire   rd_as_rs3   = dec_xc_bop;
 
-assign s1_rs3_addr = no_rs3        ? 5'b0       :
-                     rd_as_rs3     ? dec_rd_32  :
+generate if ( XC_CLASS_MULTIARITH || XC_CLASS_BIT ||
+              XC_CLASS_MEMORY || XC_CLASS_BASELINE) begin
+
+assign s1_rs3_addr = rd_as_rs3     ? dec_rd_32  :
                                      dec_rs3_32 ;
+end else begin
+assign s1_rs3_addr = 5'b0;
+
+end endgenerate
 
 wire lsu_no_rd = uop_lsu[LSU_STORE] && n_s2_fu[P_FU_LSU];
 wire cfu_no_rd = (uop_cfu!=CFU_JALI && uop_cfu!=CFU_JALR) &&
