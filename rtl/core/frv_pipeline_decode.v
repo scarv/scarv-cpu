@@ -513,7 +513,7 @@ wire [4:0] dec_rd_16 =
     {5{dec_c_sub     }} & {2'b01, s1_data[9:7]} |
     {5{dec_c_xor     }} & {2'b01, s1_data[9:7]} ;
 
-wire   no_rs1      = !(opra_src_rs1);
+wire   no_rs1      = !(opra_src_rs1 || opra_src_rs1_rev);
 wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
 
 wire  [4:0] rs_mask = {4'hF, !(dec_mask_b_remask || dec_mask_a_remask ||
@@ -722,8 +722,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
     dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     || n_s2_fu[P_FU_MSK]    || 
-    dec_mask_a_unmask    || dec_mask_b_unmask    ;
+    dec_xc_scatter_h     || n_s2_fu[P_FU_MSK]    ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -911,13 +910,24 @@ wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];
 wire opra_src_pcim = n_s2_opr_src[DIS_OPRA_PCIM];
 wire opra_src_csri = n_s2_opr_src[DIS_OPRA_CSRI];
 
+wire [XL:0] s1_rs1_rdata_rev;
+wire opra_src_rs1_rev = dec_mask_b_unmask || dec_mask_a_unmask;
+
+frv_masked_shuffle i_unshfl_rs1_s0(
+.i (s1_rs1_rdata    ),
+.en(1'b1            ),
+.o (s1_rs1_rdata_rev)
+);
+
 wire opra_ld_en    = n_s2_valid && (
-    opra_src_rs1 || opra_src_pcim || opra_src_csri || opra_src_zero
+    opra_src_rs1 || opra_src_pcim || opra_src_csri || opra_src_zero ||
+    opra_src_rs1_rev
 );
 
 assign n_s2_opr_a = 
     {XLEN{opra_src_zero   }} & 32'b0          |
     {XLEN{opra_src_rs1    }} & s1_rs1_rdata   |
+    {XLEN{opra_src_rs1_rev}} & s1_rs1_rdata_rev|
     {XLEN{opra_src_pcim   }} & pc_plus_imm    |
     {XLEN{opra_src_csri   }} & csr_imm        ;
 

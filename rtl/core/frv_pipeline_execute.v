@@ -289,17 +289,37 @@ wire        msk_op_b_xor    = s2_uop == MSK_B_XOR   ;
 wire        msk_op_b_add    = s2_uop == MSK_B_ADD   ;
 wire        msk_op_b_sub    = s2_uop == MSK_B_SUB   ;
 
-wire [XL:0] msk_rs1_s0      = s2_opr_a;
+wire [XL:0] msk_rs1_s0      ;
 wire [XL:0] msk_rs1_s1      = s2_opr_c;
-wire [XL:0] msk_rs2_s0      = s2_opr_b;
+wire [XL:0] msk_rs2_s0      ;
 wire [XL:0] msk_rs2_s1      = s2_opr_d;
+
+wire en_unshfl_s0 = !msk_op_b_mask && !msk_op_a_mask;
+
+frv_masked_shuffle i_unshfl_rs1_s0(
+.i (s2_opr_a        ),
+.en(en_unshfl_s0    ),
+.o (msk_rs1_s0      )
+);
+
+frv_masked_shuffle i_unshfl_rs2_s0(
+.i (s2_opr_b        ),
+.en(en_unshfl_s0    ),
+.o (msk_rs2_s0      )
+);
 
 wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
 wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
 
 wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
-wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
+frv_masked_shuffle i_shfl_rd_s0(
+.i (msk_rd_s0       ),
+.en(1'b1            ),
+.o (n_s3_opr_a_msk  )
+);
+
+wire [XL:0] n_s3_opr_a_msk  ;
 wire [XL:0] n_s3_opr_b_msk  = msk_rd_s1;
 
 wire        msk_gpr_wide    = fu_msk;

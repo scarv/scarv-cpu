@@ -1,3 +1,36 @@
+
+//
+// module: frv_masked_shuffle
+//
+//  Performs a permutation of a 32-bit word. Used to shuffle one
+//  share of each input/result of a masked operation.
+//  This mitigates accidental un-masking through muxing.
+//
+module frv_masked_shuffle #(
+parameter LEN=32
+)(
+input  wire [LEN-1:0] i ,
+input  wire           en,
+output wire [LEN-1:0] o
+);
+
+wire [LEN-1:0] shuffled;
+
+genvar J;
+generate for (J = 0; J < LEN; J = J+1) begin
+    assign shuffled[J] = i[(LEN-1)-J];
+end endgenerate
+
+assign o = en ? shuffled : i;
+
+endmodule
+
+
+//
+// module: frv_masked_alu
+//
+//  Responsible for performing masking operations.
+//
 module frv_masked_alu (
 
 input  wire        g_clk            , // Global clock
