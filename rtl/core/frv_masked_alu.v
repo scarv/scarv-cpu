@@ -51,6 +51,9 @@ input  wire        op_b_ior         , // Binary masked or
 input  wire        op_b_xor         , // Binary masked xor
 input  wire        op_b_add         , // Binary masked addition
 input  wire        op_b_sub         , // Binary masked subtraction
+input  wire        op_b_srli        , // Shift right, shamt in msk_rs2_s0
+input  wire        op_b_slli        , // Shift left, shamt in msk_rs2_s0
+input  wire        op_b_rori        , // Shift right, shamt in msk_rs2_s0
 
 input  wire        prng_update      , // Force the PRNG to update.
 

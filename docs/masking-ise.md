@@ -100,6 +100,9 @@ Instruction     | Operand A | Operand B | Operand C | Operand D
 `mask_b_xor`    | `rs1.lo`  | `rs2.lo`  | `rs1.hi`  | `rs2.hi`
 `mask_b_add`    | `rs1.lo`  | `rs2.lo`  | `rs1.hi`  | `rs2.hi`
 `mask_b_sub`    | `rs1.lo`  | `rs2.lo`  | `rs1.hi`  | `rs2.hi`
+`mask_b_slli`   | `rs1.lo`  | shamt     | `rs1.hi`  |         
+`mask_b_srli`   | `rs1.lo`  | shamt     | `rs1.hi`  |         
+`mask_b_rori`   | `rs1.lo`  | shamt     | `rs1.hi`  |         
 
 
 ## Example Masked ALU interface transactions

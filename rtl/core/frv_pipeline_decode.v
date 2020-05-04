@@ -194,7 +194,8 @@ assign n_s2_fu[P_FU_MSK] =
     dec_mask_b_remask || dec_mask_a_mask    ||
     dec_mask_a_remask || dec_mask_b_not     ||
     dec_mask_b_and     || dec_mask_b_ior    || dec_mask_b_xor     ||
-    dec_mask_b_add     || dec_mask_b_sub    ;
+    dec_mask_b_add     || dec_mask_b_sub    || dec_mask_b_slli    ||
+    dec_mask_b_srli    || dec_mask_b_rori;
 
 //
 // Encoding field extraction
@@ -438,7 +439,10 @@ wire [OP:0] uop_msk =
     {1+OP{dec_mask_b_ior      }} & MSK_B_IOR        |
     {1+OP{dec_mask_b_xor      }} & MSK_B_XOR        |
     {1+OP{dec_mask_b_add      }} & MSK_B_ADD        |
-    {1+OP{dec_mask_b_sub      }} & MSK_B_SUB        ;
+    {1+OP{dec_mask_b_sub      }} & MSK_B_SUB        |
+    {1+OP{dec_mask_b_srli     }} & MSK_B_SRLI       |
+    {1+OP{dec_mask_b_slli     }} & MSK_B_SLLI       |
+    {1+OP{dec_mask_b_rori     }} & MSK_B_RORI       ;
 
 assign n_s2_uop =
     uop_alu |
@@ -620,7 +624,8 @@ wire use_imm_csr = dec_csrrc || dec_csrrs || dec_csrrw;
 wire use_imm_csri= dec_csrrci || dec_csrrsi || dec_csrrwi;
 wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     || 
                    dec_xc_psll_i || dec_xc_psrl_i   || dec_xc_pror_i||
-                   dec_b_rori    ;
+                   dec_b_rori     ||
+                   dec_mask_b_slli || dec_mask_b_srli || dec_mask_b_rori;
 
 wire use_imm_wshf= dec_b_fsri; // Wide shift immediate
 
@@ -772,7 +777,8 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
     dec_xc_sha3_x4       || dec_xc_sha3_yx       ||
     dec_xc_psrl_i  || dec_xc_psll_i  || dec_xc_pror_i  || dec_b_grevi    ||
-    dec_b_rori     || dec_b_fsri     ;
+    dec_b_rori     || dec_b_fsri     ||
+    dec_mask_b_slli     || dec_mask_b_srli     || dec_mask_b_rori     ;
 
 wire oprb_src_rs1_hi = dec_mask_a_unmask || dec_mask_b_unmask;
 
@@ -793,7 +799,8 @@ wire oprc_src_rs1_hi =
     dec_mask_b2a        || dec_mask_a2b        || 
     dec_mask_b_remask   || dec_mask_a_remask   ||
     dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
-    dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ;
+    dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ||
+    dec_mask_b_slli     || dec_mask_b_srli     || dec_mask_b_rori     ;
 
 assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
     dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||

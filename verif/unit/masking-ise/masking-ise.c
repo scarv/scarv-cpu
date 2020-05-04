@@ -7,6 +7,9 @@ extern uint32_t test_masked_ior(uint32_t a, uint32_t b);
 extern uint32_t test_masked_xor(uint32_t a, uint32_t b);
 extern uint32_t test_masked_add(uint32_t a, uint32_t b);
 extern uint32_t test_masked_sub(uint32_t a, uint32_t b);
+extern uint32_t test_masked_srli(uint32_t a);
+extern uint32_t test_masked_slli(uint32_t a);
+extern uint32_t test_masked_rori(uint32_t a);
 extern uint32_t test_masked_brm(uint32_t a);   //boolean remask
 extern uint32_t test_masked_b2a(uint32_t a);
 extern uint32_t test_masked_arm(uint32_t a);   //arithmetic remask
@@ -83,6 +86,33 @@ int test_main() {
     if(result_sub != expect_sub) {
         __putstr("test_masked_sub [FAIL]\n");
         print_result_expectation(lhs,rhs,result_sub,expect_sub);
+        fail = 1;
+    }
+
+    uint32_t result_srli= test_masked_srli(lhs);
+    uint32_t expect_srli= (lhs >> 8);
+
+    if(result_srli!= expect_srli) {
+        __putstr("test_masked_srli [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_srli,expect_srli);
+        fail = 1;
+    }
+
+    uint32_t result_slli= test_masked_slli(lhs);
+    uint32_t expect_slli= (lhs << 8);
+
+    if(result_slli!= expect_slli) {
+        __putstr("test_masked_slli [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_slli,expect_slli);
+        fail = 1;
+    }
+
+    uint32_t result_rori= test_masked_rori(lhs);
+    uint32_t expect_rori= (lhs >> 8) | (lhs << (32-8));
+
+    if(result_rori!= expect_rori) {
+        __putstr("test_masked_rori [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_rori,expect_rori);
         fail = 1;
     }
 

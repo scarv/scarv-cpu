@@ -107,6 +107,9 @@ localparam MSK_B_IOR    = {2'b00, 3'b011};
 localparam MSK_B_XOR    = {2'b00, 3'b100};
 localparam MSK_B_ADD    = {2'b00, 3'b101};
 localparam MSK_B_SUB    = {2'b00, 3'b110};
+localparam MSK_B_SLLI   = {2'b01, 3'b001};
+localparam MSK_B_SRLI   = {2'b01, 3'b010};
+localparam MSK_B_RORI   = {2'b01, 3'b100};
 
 localparam CSR_READ     = 4;
 localparam CSR_WRITE    = 3;

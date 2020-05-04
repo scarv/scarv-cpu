@@ -288,6 +288,9 @@ wire        msk_op_b_ior    = s2_uop == MSK_B_IOR   ;
 wire        msk_op_b_xor    = s2_uop == MSK_B_XOR   ;
 wire        msk_op_b_add    = s2_uop == MSK_B_ADD   ;
 wire        msk_op_b_sub    = s2_uop == MSK_B_SUB   ;
+wire        msk_op_b_srli   = s2_uop == MSK_B_SRLI  ;
+wire        msk_op_b_slli   = s2_uop == MSK_B_SLLI  ;
+wire        msk_op_b_rori   = s2_uop == MSK_B_RORI  ;
 
 wire [XL:0] msk_rs1_s0      ;
 wire [XL:0] msk_rs1_s1      = s2_opr_c;
@@ -553,6 +556,9 @@ frv_masked_alu #(
 .op_b_xor    (msk_op_b_xor    ), // Binary masked xor
 .op_b_add    (msk_op_b_add    ), // Binary masked addition
 .op_b_sub    (msk_op_b_sub    ), // Binary masked subtraction
+.op_b_srli   (msk_op_b_srli   ), // Masked shift right, shamt in msk_rs2_s0
+.op_b_slli   (msk_op_b_slli   ), // Masked shift left, shamt in msk_rs2_s0
+.op_b_rori   (msk_op_b_rori   ), // Masked shift right, shamt in msk_rs2_s0
 .prng_update (msk_prng_update ), // Force the PRNG to update.
 .rs1_s0      (msk_rs1_s0      ), // RS1 Share 0
 .rs1_s1      (msk_rs1_s1      ), // RS1 Share 1

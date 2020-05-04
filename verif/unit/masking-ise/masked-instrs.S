@@ -79,6 +79,45 @@ test_masked_sub:
 .endfunc
 
 
+.global test_masked_srli
+.func   test_masked_srli
+test_masked_srli:
+
+    mask.b.mask     (t2,t1), a0
+    mask.b.srli     (a1,a0), (t2,t1), 8
+    mask.b.unmask    a0    , (a1,a0)
+
+.test_masked_srli_finish:
+    ret
+.endfunc
+
+
+.global test_masked_slli
+.func   test_masked_slli
+test_masked_slli:
+
+    mask.b.mask     (t2,t1), a0
+    mask.b.slli     (a1,a0), (t2,t1), 8
+    mask.b.unmask    a0    , (a1,a0)
+
+.test_masked_slli_finish:
+    ret
+.endfunc
+
+
+.global test_masked_rori
+.func   test_masked_rori
+test_masked_rori:
+
+    mask.b.mask     (t2,t1), a0
+    mask.b.rori     (a1,a0), (t2,t1), 8
+    mask.b.unmask    a0    , (a1,a0)
+
+.test_masked_rori_finish:
+    ret
+.endfunc
+
+
 .global test_masked_brm
 .func   test_masked_brm
 test_masked_brm:
