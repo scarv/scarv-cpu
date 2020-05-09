@@ -521,8 +521,7 @@ wire   no_rs1      = !(opra_src_rs1 || opra_src_rs1_rev);
 wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
 
 wire  [4:0] rs_mask = {4'hF, !(dec_mask_b_remask || dec_mask_a_remask ||
-                               dec_mask_a2b      || dec_mask_b_srli   ||
-                               dec_mask_b_slli   || dec_mask_b_rori   )};
+                               dec_mask_a2b      )};
 
 assign s1_rs1_addr =  no_rs1       ? 5'b0       :
                       instr_16bit  ? dec_rs1_16 :
