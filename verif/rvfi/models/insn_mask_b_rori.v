@@ -16,7 +16,7 @@ module xcfi_insn_spec (
 wire [ 4:0] shamt       = d_data[25:20];
 
 wire [XL:0] u_rs1   = `XCFI_UNMASK_B(`RS1, `RS1_HI);
-wire [XL:0] u_result= (u_rs1 >> shamt) | (u_rs1 >> (32-shamt));
+wire [XL:0] u_result= (u_rs1 >> shamt) | (u_rs1 << (32-shamt));
 wire [XL:0] u_rd    = `XCFI_UNMASK_B(`RD , `RD_HI );
 
 `XCFI_SPEC_CHECK_BEGIN

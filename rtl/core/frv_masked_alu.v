@@ -209,13 +209,16 @@ wire dosrl   = (~flush) & op_b_srli;
 wire dosll   = (~flush) & op_b_slli;
 wire doror   = (~flush) & op_b_rori;
 
+// Share 0 input gets reversed, so pick shamt from high 5 bits of rs2_s0
+wire [4:0] shamt = {rs2_s0[27],rs2_s0[28],rs2_s0[29],rs2_s0[30],rs2_s0[31]};
+
 wire doshr   = dosrl | dosll | doror;
 wire shr_rdy = doshr;
 
 wire [XL:0]  mshr0, mshr1;
 shfrot shfrpt_ins0(
     .s(      rs1_s0     ), 
-    .shamt(  rs2_s0[4:0]), // Shift amount 
+    .shamt(  shamt      ), // Shift amount 
     .rp (    prng       ), // random padding
     .srli(   dosrl      ), // Shift  right
     .slli(   dosll      ), // Shift  left
@@ -225,7 +228,7 @@ shfrot shfrpt_ins0(
 
 shfrot shfrpt_ins1(
     .s(      rs1_s1     ), 
-    .shamt(  rs2_s0[4:0]), // Shift amount 
+    .shamt(  shamt      ), // Shift amount 
     .rp (    prng       ), // random padding
     .srli(   dosrl      ), // Shift  right
     .slli(   dosll      ), // Shift  left
