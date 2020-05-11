@@ -523,9 +523,14 @@ wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
 wire  [4:0] rs_mask = {4'hF, !(dec_mask_b_remask || dec_mask_a_remask ||
                                dec_mask_a2b      )};
 
-assign s1_rs1_addr =  no_rs1       ? 5'b0       :
+wire  [4:0] rs1_adr=  no_rs1       ? 5'b0       :
                       instr_16bit  ? dec_rs1_16 :
                                      dec_rs1_32 &rs_mask;
+
+reg rs1_adr_0;
+always @(negedge g_clk) rs1_adr_0 <= rs1_adr[0];
+
+assign s1_rs1_addr =  {rs1_adr[4:1], rs1_adr_0};
 
 assign s1_rs2_addr =  no_rs2       ? 5'b0       :
                       instr_16bit  ? dec_rs2_16 :
