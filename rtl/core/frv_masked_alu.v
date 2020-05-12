@@ -106,8 +106,8 @@ wire 	    mlogic_ena;
 // Boolean masked IOR and SUB by controlling the complement of the operands.
 wire [XL:0] s_a1; // signed(rs2_s1)
 wire [XL:0] s_b1; // signed(rs1_s1)
-assign s_a1 = (op_b_ior      )? ~rs1_s1: rs1_s1;
-assign s_b1 = (op_b_ior|op_b_sub)? ~rs2_s1: rs2_s1;
+assign s_a1 = (op_b_ior          ) ? ~rs1_s1: rs1_s1;
+assign s_b1 = (op_b_ior||op_b_sub) ? ~rs2_s1: rs2_s1;
 
 // Boolean masked NOT by masking second operand of XOR
 wire [XL:0] n_b0, n_b1;
@@ -134,15 +134,23 @@ assign      a2b_b0 = ~rs1_s1;
 
 // Boolean masked logic 
 wire [XL:0] op_a0, op_a1, op_b0, op_b1;
+
 assign op_a0 = rs1_s0;
-assign op_a1 = (op_b2a)? rs1_s1 : (op_a2b)? {XLEN{1'b0}}: s_a1;
-assign op_b0 = (op_b2a)? b2a_b0 : (op_a2b)? a2b_b0      : n_b0;  
-assign op_b1 = (op_b2a | op_a2b)?           {XLEN{1'b0}}: n_b1; 
+
+assign op_a1 = op_b2a ? rs1_s1      :
+               op_a2b ? {XLEN{1'b0}}:
+                        s_a1        ;
+
+assign op_b0 = op_b2a ? b2a_b0      :
+               op_a2b ? a2b_b0      :
+                        n_b0        ;
+
+assign op_b1 = op_b2a || op_a2b ? {XLEN{1'b0}}: n_b1; 
 
 wire mlogic_rdy;
-msklogic   
-#(  .MASKING_ISE_TI(MASKING_ISE_TI))
-msklogic_ins(
+msklogic #(
+    .MASKING_ISE_TI(MASKING_ISE_TI)
+) msklogic_ins (
     .g_resetn(  g_resetn),
     .g_clk(     g_clk), 
     .ena(       mlogic_ena), 
@@ -156,7 +164,8 @@ msklogic_ins(
     .o_and0(    mand0),
     .o_and1(    mand1),  
     .o_gs(      gs_0),
-    .rdy(       mlogic_rdy));
+    .rdy(       mlogic_rdy)
+);
 
 // Boolean masked add/sub
 wire        madd_rdy;
@@ -178,31 +187,33 @@ mskaddsub_ins(
     .rdy(       madd_rdy));
 
 // Control unit for Boolean masked calculations
-wire        dologic  = (~flush) & (op_b_not | op_b_xor | op_b_and | op_b_ior);
-wire        op_b_addsub = (~flush) & (op_b_add | op_b_sub | op_b2a | op_a2b);
-mskalu_ctl  mskaluctl_ins(
-    .g_resetn(  g_resetn),
-    .g_clk(     g_clk),
-    .flush(     flush),
-    .valid(valid),
-    .dologic(   dologic|op_b_addsub), 
-    .doaddsub(  op_b_addsub), 
-    .mlogic_rdy(mlogic_rdy),
-    .madd_rdy(  madd_rdy),
-    .mlogic_ena(mlogic_ena), 
-    .addsub_ena(addsub_ena));
+wire dologic     = (!flush) && (op_b_not || op_b_xor || op_b_and || op_b_ior);
+wire op_b_addsub = (!flush) && (op_b_add || op_b_sub || op_b2a   || op_a2b  );
+
+mskalu_ctl mskaluctl_ins (
+    .g_resetn   (g_resetn               ),
+    .g_clk      (g_clk                  ),
+    .flush      (flush                  ),
+    .valid      (valid                  ),
+    .dologic    (dologic||op_b_addsub   ), 
+    .doaddsub   (op_b_addsub            ), 
+    .mlogic_rdy (mlogic_rdy             ),
+    .madd_rdy   (madd_rdy               ),
+    .mlogic_ena (mlogic_ena             ), 
+    .addsub_ena (addsub_ena             )
+);
 
 // Boolean masked shift/rotate
 
-wire dosrl   = (~flush) & op_b_srli;
-wire dosll   = (~flush) & op_b_slli;
-wire doror   = (~flush) & op_b_rori;
+wire dosrl   = op_b_srli;
+wire dosll   = op_b_slli;
+wire doror   = op_b_rori;
 
 // Share 0 input gets reversed, so pick shamt from high 5 bits of rs2_s0
 wire [4:0] shamt = 
     doshr ? {rs2_s0[27],rs2_s0[28],rs2_s0[29],rs2_s0[30],rs2_s0[31]} : 5'b0;
 
-wire doshr   = dosrl | dosll | doror;
+wire doshr   = op_b_srli || op_b_slli || op_b_rori;
 wire shr_rdy = doshr;
 
 wire [XL:0]  mshr0, mshr1;
@@ -210,9 +221,9 @@ shfrot shfrpt_ins0(
     .s(      rs1_s0     ), 
     .shamt(  shamt      ), // Shift amount 
     .rp (    prng       ), // random padding
-    .srli(   dosrl      ), // Shift  right
-    .slli(   dosll      ), // Shift  left
-    .rori(   doror      ), // Rotate right
+    .srli(op_b_srli     ), // Shift  right
+    .slli(op_b_slli     ), // Shift  left
+    .rori(op_b_rori     ), // Rotate right
     .r(      mshr0      )  
 );
 
@@ -220,16 +231,16 @@ shfrot shfrpt_ins1(
     .s(      rs1_s1     ), 
     .shamt(  shamt      ), // Shift amount 
     .rp (    prng       ), // random padding
-    .srli(   dosrl      ), // Shift  right
-    .slli(   dosll      ), // Shift  left
-    .rori(   doror      ), // Rotate right
+    .srli(op_b_srli     ), // Shift  right
+    .slli(op_b_slli     ), // Shift  left
+    .rori(op_b_rori     ), // Rotate right
     .r(      mshr1      )  
 );
 
 // Boolean masking and remasking
-wire opmask = (~flush) & (op_b_mask   | op_a_mask  );   //masking operation
-wire remask = (~flush) & (op_b_remask | op_a_remask);
-wire b_mask = (~flush) & (op_b_mask   | op_b_remask);
+wire opmask = (!flush) & (op_b_mask   || op_a_mask  );   //masking operation
+wire remask = (!flush) & (op_b_remask || op_a_remask);
+wire b_mask = (!flush) & (op_b_mask   || op_b_remask);
 
 wire [XL:0] rmask0, rmask1;
 wire        msk_rdy;
@@ -275,29 +286,29 @@ generate
 endgenerate
 
 //gather and multiplexing results
-assign rd_s0 = {XLEN{op_b_not  }} &  mxor0 |
-               {XLEN{op_b_xor  }} &  mxor0 |
-               {XLEN{op_b_and  }} &  mand0 |
-               {XLEN{op_b_ior  }} &  mand0 |
-               {XLEN{op_b_add  }} &  madd0 |
-               {XLEN{op_b_sub  }} &  madd0 |
+assign rd_s0 = {XLEN{op_b_not}} &  mxor0 |
+               {XLEN{op_b_xor}} &  mxor0 |
+               {XLEN{op_b_and}} &  mand0 |
+               {XLEN{op_b_ior}} &  mand0 |
+               {XLEN{op_b_add}} &  madd0 |
+               {XLEN{op_b_sub}} &  madd0 |
                {XLEN{op_a2b  }} &  madd0 |
                {XLEN{op_b2a  }} &  32'b0 | // FIXME (madd0^madd1) |
-               {XLEN{doshr  }} &  mshr0 |
-               {XLEN{msk_rdy}} &  rmask0;
+               {XLEN{doshr   }} &  mshr0 |
+               {XLEN{msk_rdy }} &  rmask0;
 
-assign rd_s1 = {XLEN{op_b_not  }} & ~mxor1 |
-               {XLEN{op_b_xor  }} &  mxor1 |
-               {XLEN{op_b_and  }} &  mand1 |
-               {XLEN{op_b_ior  }} & ~mand1 |
-               {XLEN{op_b_add  }} &  madd1 |
-               {XLEN{op_b_sub  }} &  madd1 |
+assign rd_s1 = {XLEN{op_b_not}} & ~mxor1 |
+               {XLEN{op_b_xor}} &  mxor1 |
+               {XLEN{op_b_and}} &  mand1 |
+               {XLEN{op_b_ior}} & ~mand1 |
+               {XLEN{op_b_add}} &  madd1 |
+               {XLEN{op_b_sub}} &  madd1 |
                {XLEN{op_a2b  }} &  madd1 |
                {XLEN{op_b2a  }} &  prng  |
-               {XLEN{doshr  }} &  mshr1 |
-               {XLEN{msk_rdy}} &  rmask1;
+               {XLEN{doshr   }} &  mshr1 |
+               {XLEN{msk_rdy }} &  rmask1;
 
-assign ready = (dologic && mlogic_rdy) | madd_rdy | msk_rdy | shr_rdy;
+assign ready = (dologic && mlogic_rdy) || madd_rdy || msk_rdy || shr_rdy;
 assign mask  = prng;
 
 endmodule
