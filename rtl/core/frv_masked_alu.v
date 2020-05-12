@@ -210,7 +210,8 @@ wire dosll   = (~flush) & op_b_slli;
 wire doror   = (~flush) & op_b_rori;
 
 // Share 0 input gets reversed, so pick shamt from high 5 bits of rs2_s0
-wire [4:0] shamt = {rs2_s0[27],rs2_s0[28],rs2_s0[29],rs2_s0[30],rs2_s0[31]};
+wire [4:0] shamt = 
+    doshr ? {rs2_s0[27],rs2_s0[28],rs2_s0[29],rs2_s0[30],rs2_s0[31]} : 5'b0;
 
 wire doshr   = dosrl | dosll | doror;
 wire shr_rdy = doshr;
