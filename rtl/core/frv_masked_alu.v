@@ -103,27 +103,16 @@ wire [ 2:0] seq_cnt;
 wire        addsub_ena;
 wire 	    mlogic_ena;
 
-// Decode 
-wire donot = op_b_not;
-wire doxor = op_b_xor;
-wire doand = op_b_and;
-wire doior = op_b_ior;
-wire doadd = op_b_add;
-wire dosub = op_b_sub;
-
-wire dob2a = op_b2a;
-wire doa2b = op_a2b;
-
 // Boolean masked IOR and SUB by controlling the complement of the operands.
 wire [XL:0] s_a1; // signed(rs2_s1)
 wire [XL:0] s_b1; // signed(rs1_s1)
-assign s_a1 = (doior      )? ~rs1_s1: rs1_s1;
-assign s_b1 = (doior|dosub)? ~rs2_s1: rs2_s1;
+assign s_a1 = (op_b_ior      )? ~rs1_s1: rs1_s1;
+assign s_b1 = (op_b_ior|op_b_sub)? ~rs2_s1: rs2_s1;
 
 // Boolean masked NOT by masking second operand of XOR
 wire [XL:0] n_b0, n_b1;
-assign n_b0 = (donot)? {XLEN{1'b0}}: rs2_s0;
-assign n_b1 = (donot)? {XLEN{1'b0}}: s_b1;
+assign n_b0 = (op_b_not)? {XLEN{1'b0}}: rs2_s0;
+assign n_b1 = (op_b_not)? {XLEN{1'b0}}: s_b1;
 
 // Boolean masking to arithmetic masking by reusing the boolean masked add/sub
 //a0^a1 = s0-s1
@@ -146,9 +135,9 @@ assign      a2b_b0 = ~rs1_s1;
 // Boolean masked logic 
 wire [XL:0] op_a0, op_a1, op_b0, op_b1;
 assign op_a0 = rs1_s0;
-assign op_a1 = (dob2a)? rs1_s1 : (doa2b)? {XLEN{1'b0}}: s_a1;
-assign op_b0 = (dob2a)? b2a_b0 : (doa2b)? a2b_b0      : n_b0;  
-assign op_b1 = (dob2a | doa2b)?           {XLEN{1'b0}}: n_b1; 
+assign op_a1 = (op_b2a)? rs1_s1 : (op_a2b)? {XLEN{1'b0}}: s_a1;
+assign op_b0 = (op_b2a)? b2a_b0 : (op_a2b)? a2b_b0      : n_b0;  
+assign op_b1 = (op_b2a | op_a2b)?           {XLEN{1'b0}}: n_b1; 
 
 wire mlogic_rdy;
 msklogic   
@@ -178,7 +167,7 @@ mskaddsub_ins(
     .g_clk(     g_clk),    
     .flush(     flush),
     .ena(       addsub_ena), 
-    .sub(       dosub|doa2b),
+    .sub(       op_b_sub|op_a2b),
     .i_gs(      gs_0), 
     .mxor0(     mxor0),
     .mxor1(     mxor1), 
@@ -189,15 +178,15 @@ mskaddsub_ins(
     .rdy(       madd_rdy));
 
 // Control unit for Boolean masked calculations
-wire        dologic  = (~flush) & (donot | doxor | doand | doior);
-wire        doaddsub = (~flush) & (doadd | dosub | dob2a | doa2b);
+wire        dologic  = (~flush) & (op_b_not | op_b_xor | op_b_and | op_b_ior);
+wire        op_b_addsub = (~flush) & (op_b_add | op_b_sub | op_b2a | op_a2b);
 mskalu_ctl  mskaluctl_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),
     .flush(     flush),
     .valid(valid),
-    .dologic(   dologic|doaddsub), 
-    .doaddsub(  doaddsub), 
+    .dologic(   dologic|op_b_addsub), 
+    .doaddsub(  op_b_addsub), 
     .mlogic_rdy(mlogic_rdy),
     .madd_rdy(  madd_rdy),
     .mlogic_ena(mlogic_ena), 
@@ -286,25 +275,25 @@ generate
 endgenerate
 
 //gather and multiplexing results
-assign rd_s0 = {XLEN{donot  }} &  mxor0 |
-               {XLEN{doxor  }} &  mxor0 |
-               {XLEN{doand  }} &  mand0 |
-               {XLEN{doior  }} &  mand0 |
-               {XLEN{doadd  }} &  madd0 |
-               {XLEN{dosub  }} &  madd0 |
-               {XLEN{doa2b  }} &  madd0 |
-               {XLEN{dob2a  }} &  32'b0 | // FIXME (madd0^madd1) |
+assign rd_s0 = {XLEN{op_b_not  }} &  mxor0 |
+               {XLEN{op_b_xor  }} &  mxor0 |
+               {XLEN{op_b_and  }} &  mand0 |
+               {XLEN{op_b_ior  }} &  mand0 |
+               {XLEN{op_b_add  }} &  madd0 |
+               {XLEN{op_b_sub  }} &  madd0 |
+               {XLEN{op_a2b  }} &  madd0 |
+               {XLEN{op_b2a  }} &  32'b0 | // FIXME (madd0^madd1) |
                {XLEN{doshr  }} &  mshr0 |
                {XLEN{msk_rdy}} &  rmask0;
 
-assign rd_s1 = {XLEN{donot  }} & ~mxor1 |
-               {XLEN{doxor  }} &  mxor1 |
-               {XLEN{doand  }} &  mand1 |
-               {XLEN{doior  }} & ~mand1 |
-               {XLEN{doadd  }} &  madd1 |
-               {XLEN{dosub  }} &  madd1 |
-               {XLEN{doa2b  }} &  madd1 |
-               {XLEN{dob2a  }} &  prng  |
+assign rd_s1 = {XLEN{op_b_not  }} & ~mxor1 |
+               {XLEN{op_b_xor  }} &  mxor1 |
+               {XLEN{op_b_and  }} &  mand1 |
+               {XLEN{op_b_ior  }} & ~mand1 |
+               {XLEN{op_b_add  }} &  madd1 |
+               {XLEN{op_b_sub  }} &  madd1 |
+               {XLEN{op_a2b  }} &  madd1 |
+               {XLEN{op_b2a  }} &  prng  |
                {XLEN{doshr  }} &  mshr1 |
                {XLEN{msk_rdy}} &  rmask1;
 
