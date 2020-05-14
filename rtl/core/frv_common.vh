@@ -212,9 +212,19 @@ localparam TRAP_INT_MEI = 6'd11;
 localparam TRAP_INT_NMI = 6'd16;
 
 //
+// Utility macros
+// ------------------------------------------------------------------------
+
+`define WORD_REV(IN,OUT,EN)       \
+    frv_masked_shuffle i_``IN   ( \
+        .i (IN              ),    \
+        .en(EN              ),    \
+        .o (OUT             )     \
+    );
+
+//
 // Formal verification macros
 // ------------------------------------------------------------------------
-//
 
 
 //

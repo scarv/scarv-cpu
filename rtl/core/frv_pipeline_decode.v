@@ -952,19 +952,19 @@ wire oprb_ld_en    = n_s2_valid && (
 );
 
 
-wire [XL:0] s1_rs1_rdata_rev;
+wire [XL:0] s1_rs1_rdatahi_rev;
 
 frv_masked_shuffle i_unshfl_rs1_s0(
-.i (s1_rs1_rdata    ),
-.en(1'b0            ),
-.o (s1_rs1_rdata_rev)
+.i (s1_rs1_rdatahi    ),
+.en(oprb_src_rs1_hi   ),
+.o (s1_rs1_rdatahi_rev)
 );
 
 assign n_s2_opr_b =
     {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
     {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
     {XLEN{oprb_src_imm    }} & n_s2_imm       |
-    {XLEN{oprb_src_rs1_hi }} & s1_rs1_rdatahi ;
+    {XLEN{oprb_src_rs1_hi }} & s1_rs1_rdatahi_rev ;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];

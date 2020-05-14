@@ -293,41 +293,30 @@ wire        msk_op_b_slli   = s2_uop == MSK_B_SLLI  ;
 wire        msk_op_b_rori   = s2_uop == MSK_B_RORI  ;
 
 wire [XL:0] msk_rs1_s0      = s2_opr_a;
-wire [XL:0] msk_rs1_s1      = s2_opr_c;
+wire [XL:0] msk_rs1_s1      ;
 wire [XL:0] msk_rs2_s0      = s2_opr_b;
-wire [XL:0] msk_rs2_s1      = s2_opr_d;
+wire [XL:0] msk_rs2_s1      ;
 
 wire [XL:0] msk_rs1 = msk_rs1_s0 ^ msk_rs1_s1;
 wire [XL:0] msk_rs2 = msk_rs2_s0 ^ msk_rs2_s1;
 wire [XL:0] msk_rd  = msk_rd_s0  ^ msk_rd_s1 ;
 
-wire en_unshfl_s0 = !msk_op_b_mask && !msk_op_a_mask;
+localparam REV_EN = 1'b1;
 
-//frv_masked_shuffle i_unshfl_rs1_s0(
-//.i (s2_opr_c        ),
-//.en(1'b1            ),
-//.o (msk_rs1_s1      )
-//);
-//
-//frv_masked_shuffle i_unshfl_rs2_s0(
-//.i (s2_opr_d        ),
-//.en(1'b1            ),
-//.o (msk_rs2_s1      )
-//);
+wire en_unshfl_s1 = REV_EN && !msk_op_b_mask && !msk_op_a_mask;
+
+`WORD_REV(s2_opr_c, msk_rs1_s1, en_unshfl_s1)
+`WORD_REV(s2_opr_d, msk_rs2_s1, en_unshfl_s1)
 
 wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
 wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
 
 wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
-//frv_masked_shuffle i_shfl_rd_s0(
-//.i (msk_rd_s1       ),
-//.en(1'b1            ),
-//.o (n_s3_opr_b_msk  )
-//);
+`WORD_REV(msk_rd_s1, n_s3_opr_b_msk, REV_EN)
 
 wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
-wire [XL:0] n_s3_opr_b_msk  = msk_rd_s1;
+wire [XL:0] n_s3_opr_b_msk  ;
 
 wire        msk_gpr_wide    = fu_msk;
 
