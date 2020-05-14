@@ -23,11 +23,13 @@ wire [XL:0] u_rd    = `XCFI_UNMASK_B(`RD , `RD_HI );
 
     assume(`FIELD_RD_ADDR != 0);
 
+    assume(u_rs1 == 32'habcd1234);
+
     assert(u_rd == u_result);
 
 `XCFI_SPEC_CHECK_END
 
-assign spec_valid       = rvfi_valid && dec_mask_b_slli;
+assign spec_valid       = rvfi_valid && dec_mask_b_rori;
 assign spec_trap        = 1'b0   ;
 assign spec_rs1_addr    = `FIELD_RS1_ADDR;
 assign spec_rs2_addr    = 0;
