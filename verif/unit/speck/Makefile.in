@@ -1,0 +1,18 @@
+
+
+SPECK_SRC = $(MASKING_ISE)/src/software/speck
+
+TEST_NAME = speck
+
+TEST_SRC  = $(UNIT_ROOT)/speck/test_speck.c \
+            $(SPECK_SRC)/speck_exp.S        \
+            $(SPECK_SRC)/speck_enc.S        \
+            $(SPECK_SRC)/speck_dec.S
+
+TEST_FLAGS= -I$(SPECK_SRC)
+
+ifneq ($(MASKING_ISE),)
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC),$(TEST_FLAGS)))
+
+endif

@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat May  9 10:54:37 2020
+[*] Thu May 14 10:02:23 2020
 [*]
-[dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.vcd"
-[dumpfile_mtime] "Sat May  9 10:43:53 2020"
-[dumpfile_size] 14434339
+[dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.vcd"
+[dumpfile_mtime] "Thu May 14 09:59:34 2020"
+[dumpfile_size] 54437714
 [savefile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 13255
+[timestart] 4597
 [size] 1920 1025
 [pos] -1 -1
-*-4.735717 13286 13206 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-8.970829 5266 13206 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -19,8 +19,8 @@
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s2_execute.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.
-[sst_width] 270
-[signals_width] 367
+[sst_width] 340
+[signals_width] 326
 [sst_expanded] 1
 [sst_vpaned_height] 411
 @28
@@ -97,7 +97,7 @@ TOP.frv_core.i_pipeline.dmem_error
 @800200
 -Trace
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
 TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.trs_instr[31:0]
@@ -242,7 +242,7 @@ TOP.frv_core.i_pipeline.s1_rs1_rdatahi[31:0]
 @1401200
 -Forwarding
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s2_opr_a[31:0]
@@ -250,13 +250,13 @@ TOP.frv_core.i_pipeline.s2_opr_b[31:0]
 TOP.frv_core.i_pipeline.s2_opr_c[31:0]
 TOP.frv_core.i_pipeline.s2_opr_d[31:0]
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
 TOP.frv_core.i_pipeline.s3_opr_b[31:0]
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
@@ -292,7 +292,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.oprd_ld_en
 @22
 TOP.frv_core.i_pipeline.s1_data[31:0]
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_bubble
@@ -342,7 +342,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_prng[31:0]
 TOP.frv_core.i_pipeline.s2_busy
 TOP.frv_core.i_pipeline.s2_valid
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @c00022
 TOP.frv_core.i_pipeline.s2_instr[31:0]
@@ -441,20 +441,10 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.flush
 @200
 -
 @28
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_a2b
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_a_mask
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_a_remask
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b2a
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_add
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_and
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_ior
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_mask
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_remask
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_rori
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_slli
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_srli
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_not
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_sub
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_xor
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.en_unshfl_s0
 @22
@@ -464,8 +454,48 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.rs2_s0[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.rs2_s1[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.rd_s0[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.rd_s1[31:0]
-@201
+@200
 -
+@c00022
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+@28
+(0)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(1)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(2)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(3)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(4)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(5)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(6)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(7)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(8)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(9)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(10)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(11)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(12)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(13)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(14)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(15)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(16)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(17)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(18)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(19)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(20)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(21)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(22)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(23)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(24)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(25)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(26)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(27)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(28)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(29)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(30)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+(31)TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs1[31:0]
+@1401200
+-group_end
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rs2[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_rd[31:0]
 @200
 -
 @22
@@ -506,10 +536,11 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_valid
 -Pipe - S3 Memory
 @28
 TOP.frv_core.i_pipeline.s3_busy
-@2022
-^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/isw_mul/isw_mul.gtkwl
+@2023
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+@2022
+^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
@@ -529,7 +560,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.n_s4_opr_a[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.n_s4_opr_b[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.s3_opr_a[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.s3_opr_b[31:0]
-@c00200
+@800200
 -LSU
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_req
@@ -578,9 +609,8 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_word
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.n_lsu_finished
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
-@1401200
--LSU
 @1000200
+-LSU
 -Pipe - S3 Memory
 @c00200
 -Pipe - S4 - Writeback
@@ -590,7 +620,7 @@ TOP.frv_core.i_pipeline.s4_flush
 @22
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]

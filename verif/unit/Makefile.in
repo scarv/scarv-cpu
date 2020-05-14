@@ -43,10 +43,14 @@ define unit_test_log
 $(UNIT_TEST_BUILD)/${1}/${1}.log
 endef
 
+#
+# 1. Test name
+# 2. Test sources
+# 3. Test flags
 define add_unit_test
 $(call unit_test_elf,${1}) : ${2} $(UNIT_SRCS) ;
 	@mkdir -p $(dir $(call unit_test_elf,${1}))
-	$(CC) -Wall $(UNIT_CFLAGS) -o $(call unit_test_elf,${1}) $(UNIT_SRCS) ${2}
+	$(CC) -Wall $(UNIT_CFLAGS) ${3} -o $(call unit_test_elf,${1}) $(UNIT_SRCS) ${2}
 
 $(call unit_test_objdump,${1}) : $(call unit_test_elf,${1}) ;
 	$(OBJDUMP) -D $(call unit_test_elf,${1}) > $(call unit_test_objdump,${1})
@@ -65,7 +69,9 @@ run-unit-${1} : $(call unit_test_srec,${1}) $(VL_OUT) ;
 	$(VL_OUT) +IMEM=$(call unit_test_srec,${1}) \
 	          +WAVES=$(call unit_test_waves,${1}) \
 	          +TIMEOUT=$(UNIT_TIMEOUT) \
-	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL)
+	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL) \
+              +IMEM_MAX_STALL=0 \
+              +DMEM_MAX_STALL=0
 
 $(call unit_test_waves,${1}) : run-unit-${1}
 $(call unit_test_log,${1}) : run-unit-${1}
@@ -96,6 +102,7 @@ include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
 include $(FRV_HOME)/verif/unit/counters/Makefile.in
 include $(FRV_HOME)/verif/unit/instructions/Makefile.in
 include $(FRV_HOME)/verif/unit/interrupts/Makefile.in
+include $(FRV_HOME)/verif/unit/speck/Makefile.in
 include $(FRV_HOME)/verif/unit/masking-ise/Makefile.in
 
 .PHONY: unit-tests-build
