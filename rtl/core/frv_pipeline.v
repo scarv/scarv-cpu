@@ -231,6 +231,8 @@ wire        s1_busy       ; // Stage ready to progress
 wire [XL:0] s1_data       ; // Data to be decoded.
 wire        s1_error      ;
 
+wire        s1_rs1_hi     ; // Also reading rs1 double word
+wire        s1_rs2_hi     ; //       "      rs2      "
 wire [ 4:0] s1_rs1_addr   ;
 wire [ 4:0] s1_rs2_addr   ;
 wire [ 4:0] s1_rs3_addr   ;
@@ -357,17 +359,36 @@ wire nz_s1_rs3     = |s1_rs3_addr;
     (A[0] == F[0] || A[0] && !F[0] && W)    \
 )
 
-wire hzd_rs1_s4 = `HAZARD(s1_rs1_addr, fwd_s4_rd, nz_s1_rs1, gpr_wide   );
-wire hzd_rs1_s3 = `HAZARD(s1_rs1_addr, fwd_s3_rd, nz_s1_rs1, fwd_s3_wide);
-wire hzd_rs1_s2 = `HAZARD(s1_rs1_addr, fwd_s2_rd, nz_s1_rs1, fwd_s2_wide);
+`define HI_HAZARD(A, F, H) ((A[4:1] == F[4:1]) && H && F[0])
 
-wire hzd_rs2_s4 = `HAZARD(s1_rs2_addr, fwd_s4_rd, nz_s1_rs2, gpr_wide   );
-wire hzd_rs2_s3 = `HAZARD(s1_rs2_addr, fwd_s3_rd, nz_s1_rs2, fwd_s3_wide);
-wire hzd_rs2_s2 = `HAZARD(s1_rs2_addr, fwd_s2_rd, nz_s1_rs2, fwd_s2_wide);
+wire hzd_rs1_s4 = `HAZARD(s1_rs1_addr, fwd_s4_rd, nz_s1_rs1, gpr_wide   ) ||
+                  hi_hzd_rs1_s4                                           ;
+
+wire hzd_rs1_s3 = `HAZARD(s1_rs1_addr, fwd_s3_rd, nz_s1_rs1, fwd_s3_wide) ||
+                  hi_hzd_rs1_s3                                           ;
+
+wire hzd_rs1_s2 = `HAZARD(s1_rs1_addr, fwd_s2_rd, nz_s1_rs1, fwd_s2_wide) ||
+                  hi_hzd_rs1_s2                                           ;
+
+wire hzd_rs2_s4 = `HAZARD(s1_rs2_addr, fwd_s4_rd, nz_s1_rs2, gpr_wide   ) ||
+                  hi_hzd_rs2_s4                                           ;
+
+wire hzd_rs2_s3 = `HAZARD(s1_rs2_addr, fwd_s3_rd, nz_s1_rs2, fwd_s3_wide) ||
+                  hi_hzd_rs2_s3                                           ;
+
+wire hzd_rs2_s2 = `HAZARD(s1_rs2_addr, fwd_s2_rd, nz_s1_rs2, fwd_s2_wide) ||
+                  hi_hzd_rs2_s2                                           ;
 
 wire hzd_rs3_s4 = `HAZARD(s1_rs3_addr, fwd_s4_rd, nz_s1_rs3, gpr_wide   );
 wire hzd_rs3_s3 = `HAZARD(s1_rs3_addr, fwd_s3_rd, nz_s1_rs3, fwd_s3_wide);
 wire hzd_rs3_s2 = `HAZARD(s1_rs3_addr, fwd_s2_rd, nz_s1_rs3, fwd_s2_wide);
+
+wire hi_hzd_rs1_s4 = `HI_HAZARD(s1_rs1_addr, fwd_s4_rd, s1_rs1_hi);
+wire hi_hzd_rs2_s4 = `HI_HAZARD(s1_rs2_addr, fwd_s4_rd, s1_rs2_hi);
+wire hi_hzd_rs1_s3 = `HI_HAZARD(s1_rs1_addr, fwd_s3_rd, s1_rs1_hi);
+wire hi_hzd_rs2_s3 = `HI_HAZARD(s1_rs2_addr, fwd_s3_rd, s1_rs2_hi);
+wire hi_hzd_rs1_s2 = `HI_HAZARD(s1_rs1_addr, fwd_s2_rd, s1_rs1_hi);
+wire hi_hzd_rs2_s2 = `HI_HAZARD(s1_rs2_addr, fwd_s2_rd, s1_rs2_hi);
 
 `undef HAZARD
 
@@ -497,7 +518,9 @@ frv_pipeline_decode #(
 .s1_flush           (s1_flush           ), // Flush pipe stage register.
 .s1_bubble          (s1_bubble          ), // Insert a pipeline bubble.
 .s1_rs1_addr        (s1_rs1_addr        ),
+.s1_rs1_hi          (s1_rs1_hi          ),
 .s1_rs2_addr        (s1_rs2_addr        ),
+.s1_rs2_hi          (s1_rs2_hi          ),
 .s1_rs3_addr        (s1_rs3_addr        ),
 .s1_rs1_rdata       (fwd_rs1_rdata      ),
 .s1_rs1_rdatahi     (fwd_rs1_rdatahi    ),

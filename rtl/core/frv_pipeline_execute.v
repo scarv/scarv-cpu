@@ -269,7 +269,7 @@ always @(posedge g_clk) begin
     end
 end
 
-wire        msk_prng_update = pipe_progress;
+wire        msk_prng_update = 1'b1;
 
 // Mask ALU input valid.
 wire        msk_valid       = fu_msk && msk_valid_en_r  ;
@@ -297,17 +297,21 @@ wire [XL:0] msk_rs1_s1      = s2_opr_c;
 wire [XL:0] msk_rs2_s0      ;
 wire [XL:0] msk_rs2_s1      = s2_opr_d;
 
+wire [XL:0] msk_rs1 = msk_rs1_s0 ^ msk_rs1_s1;
+wire [XL:0] msk_rs2 = msk_rs2_s0 ^ msk_rs2_s1;
+wire [XL:0] msk_rd  = msk_rd_s0  ^ msk_rd_s1 ;
+
 wire en_unshfl_s0 = !msk_op_b_mask && !msk_op_a_mask;
 
 frv_masked_shuffle i_unshfl_rs1_s0(
 .i (s2_opr_a        ),
-.en(en_unshfl_s0    ),
+.en(1'b0            ),
 .o (msk_rs1_s0      )
 );
 
 frv_masked_shuffle i_unshfl_rs2_s0(
 .i (s2_opr_b        ),
-.en(en_unshfl_s0    ),
+.en(1'b0            ),
 .o (msk_rs2_s0      )
 );
 
@@ -318,7 +322,7 @@ wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
 frv_masked_shuffle i_shfl_rd_s0(
 .i (msk_rd_s0       ),
-.en(1'b1            ),
+.en(1'b0            ),
 .o (n_s3_opr_a_msk  )
 );
 

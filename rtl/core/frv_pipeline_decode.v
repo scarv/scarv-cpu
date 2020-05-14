@@ -19,7 +19,9 @@ input  wire        s1_error      , // Is s1_data associated with a fetch error?
 input  wire        s1_flush      , // Flush pipe stage register.
 input  wire        s1_bubble     , // Insert a bubble into the pipeline.
 output wire [ 4:0] s1_rs1_addr   ,
+output wire        s1_rs1_hi     , // Are we reading double width rs1?
 output wire [ 4:0] s1_rs2_addr   ,
+output wire        s1_rs2_hi     , // Are we reading double width rs1?
 output wire [ 4:0] s1_rs3_addr   ,
 input  wire [XL:0] s1_rs1_rdata  ,
 input  wire [XL:0] s1_rs1_rdatahi,
@@ -523,14 +525,12 @@ wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
 wire  [4:0] rs_mask = {4'hF, !(dec_mask_b_remask || dec_mask_a_remask ||
                                dec_mask_a2b      )};
 
-wire  [4:0] rs1_adr=  no_rs1       ? 5'b0       :
+assign s1_rs1_addr =  no_rs1       ? 5'b0       :
                       instr_16bit  ? dec_rs1_16 :
                                      dec_rs1_32 &rs_mask;
 
-reg rs1_adr_0;
-always @(negedge g_clk) rs1_adr_0 <= rs1_adr[0];
-
-assign s1_rs1_addr =  {rs1_adr[4:1], rs1_adr_0};
+assign s1_rs1_hi   = n_s2_fu[P_FU_MSK] && !(dec_mask_b_mask || dec_mask_a_mask);
+assign s1_rs2_hi   = n_s2_fu[P_FU_MSK] && !no_rs2  ;
 
 assign s1_rs2_addr =  no_rs2       ? 5'b0       :
                       instr_16bit  ? dec_rs2_16 :
@@ -927,7 +927,7 @@ wire opra_src_rs1_rev = dec_mask_b_unmask || dec_mask_a_unmask;
 
 frv_masked_shuffle i_unshfl_rs1_s0(
 .i (s1_rs1_rdata    ),
-.en(1'b1            ),
+.en(1'b0            ),
 .o (s1_rs1_rdata_rev)
 );
 
