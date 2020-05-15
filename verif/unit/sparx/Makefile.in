@@ -1,0 +1,19 @@
+
+
+SPARX_SRC = $(MASKING_ISE)/src/software/sparx
+
+TEST_NAME = sparx
+
+TEST_SRC  = $(UNIT_ROOT)/sparx/test_sparx.c \
+            $(SPARX_SRC)/sparx_64_128_exp.S        \
+            $(SPARX_SRC)/sparx_64_128_enc.S        \
+            $(SPARX_SRC)/sparx_64_128_dec.S
+
+TEST_FLAGS= -I$(SPARX_SRC)
+
+ifneq ($(MASKING_ISE),)
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC),$(TEST_FLAGS)))
+
+endif
+

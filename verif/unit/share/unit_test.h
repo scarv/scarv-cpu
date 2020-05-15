@@ -85,6 +85,9 @@ void __puthex64_nlz(uint64_t w);
 //! Print a 32-bit number as hex
 void __puthex32(uint32_t w);
 
+//! Print a 16-bit number as hex
+void __puthex16(uint16_t w);
+
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w);
 

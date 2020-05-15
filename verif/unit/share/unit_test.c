@@ -70,6 +70,16 @@ void __puthex32(uint32_t w) {
     }
 }
 
+//! Print a 16-bit number as hex
+void __puthex16(uint16_t w) {
+    for(int i =  1; i >= 0; i --) {
+        uint8_t b_0 = (w >> (8*i    )) & 0xF;
+        uint8_t b_1 = (w >> (8*i + 4)) & 0xF;
+        __putchar(lut[b_1]);
+        __putchar(lut[b_0]);
+    }
+}
+
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w) {
     uint8_t b_0 = (w >> ( 0)) & 0xF;

@@ -103,6 +103,7 @@ include $(FRV_HOME)/verif/unit/counters/Makefile.in
 include $(FRV_HOME)/verif/unit/instructions/Makefile.in
 include $(FRV_HOME)/verif/unit/interrupts/Makefile.in
 include $(FRV_HOME)/verif/unit/speck/Makefile.in
+include $(FRV_HOME)/verif/unit/sparx/Makefile.in
 include $(FRV_HOME)/verif/unit/masking-ise/Makefile.in
 
 .PHONY: unit-tests-build
