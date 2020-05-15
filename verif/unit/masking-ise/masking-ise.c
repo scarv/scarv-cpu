@@ -10,6 +10,7 @@ extern uint32_t test_masked_sub(uint32_t a, uint32_t b);
 extern uint32_t test_masked_srli(uint32_t a);
 extern uint32_t test_masked_slli(uint32_t a);
 extern uint32_t test_masked_rori(uint32_t a);
+extern uint32_t test_masked_rori16(uint32_t a);
 extern uint32_t test_masked_brm(uint32_t a);   //boolean remask
 extern uint32_t test_masked_b2a(uint32_t a);
 extern uint32_t test_masked_arm(uint32_t a);   //arithmetic remask
@@ -43,6 +44,14 @@ int test_main() {
         fail = 1;
     }
 
+    uint16_t result_rori16 = test_masked_rori16(lhs);
+    uint16_t expect_rori16 = (((uint16_t)lhs >> 8) | ((uint16_t)lhs << 8));
+
+    if(result_rori16 != expect_rori16) {
+        __putstr("test_masked_rori16 [FAIL]\n");
+        print_result_expectation(lhs,lhs,result_rori16,expect_rori16);
+        fail = 1;
+    }
 
     uint32_t result_and = test_masked_and(lhs, rhs);
     uint32_t expect_and = (lhs & rhs);

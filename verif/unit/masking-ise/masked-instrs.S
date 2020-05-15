@@ -104,6 +104,17 @@ test_masked_slli:
     ret
 .endfunc
 
+.global test_masked_rori16
+.func   test_masked_rori16
+test_masked_rori16:
+    mask.b.mask    (t2,t1), a0
+    mask.b.slli (t2,t1), (t2,t1), 16
+    mask.b.srli (t2,t1), (t2,t1), 16-8
+    mask.b.srli (t4,t3), (t2,t1), 16
+    mask.b.xor  (t2,t1), (t2,t1), (t4,t3)
+    mask.b.unmask a0, (t2,t1)
+    ret
+.endfunc
 
 .global test_masked_rori
 .func   test_masked_rori
