@@ -1,0 +1,17 @@
+
+
+CHACHA20_SRC = $(MASKING_ISE)/src/software/chacha20
+
+TEST_NAME = chacha20
+
+TEST_SRC  = $(UNIT_ROOT)/chacha20/test_chacha20.c \
+            $(CHACHA20_SRC)/chacha20_block.c \
+            $(CHACHA20_SRC)/chacha20_block.S
+
+TEST_FLAGS= -I$(CHACHA20_SRC)
+
+ifneq ($(MASKING_ISE),)
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC),$(TEST_FLAGS)))
+
+endif
