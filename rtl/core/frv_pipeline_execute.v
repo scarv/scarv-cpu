@@ -115,6 +115,10 @@ parameter MASKING_ISE_TI      = 1'b1; // Threshold implementation (1) or (0)
 parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
+// Enable mask share 1 bit reversed storage representation.
+parameter MASK_REV_EN = 1'b0;
+
+//
 // Operation Decoding
 // -------------------------------------------------------------------------
 
@@ -305,7 +309,6 @@ wire [XL:0] msk_rs1 = msk_rs1_s0 ^ msk_rs1_s1;
 wire [XL:0] msk_rs2 = msk_rs2_s0 ^ msk_rs2_s1;
 wire [XL:0] msk_rd  = msk_rd_s0  ^ msk_rd_s1 ;
 
-parameter MASK_REV_EN = 1'b0;
 
 wire en_unshfl_s1 = MASK_REV_EN && !msk_op_b_mask && !msk_op_a_mask;
 

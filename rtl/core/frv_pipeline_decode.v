@@ -98,6 +98,10 @@ parameter XC_CLASS_LEAK_BUBBLE= 1'b1 && XC_CLASS_LEAK;
 // Partial Bitmanip Extension Support
 parameter BITMANIP_BASELINE   = 1'b1;
 
+//
+// Enable mask share 1 bit reversed storage representation.
+parameter MASK_REV_EN = 1'b0;
+
 // From (buffered) pipeline register of next stage.
 wire   p_s2_busy;
 
@@ -958,7 +962,6 @@ wire oprb_ld_en    = n_s2_valid && (
 
 wire [XL:0] s1_rs1_rdatahi_rev;
 
-parameter MASK_REV_EN = 1'b0;
 
 wire rev_rs1_hi = oprb_src_rs1_hi && MASK_REV_EN;
 

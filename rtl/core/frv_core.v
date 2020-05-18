@@ -141,6 +141,10 @@ parameter MASKING_ISE_TI      = 1'b0; // Threshold implementation (1) or (0)
 parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
+// Enable mask share 1 bit reversed storage representation.
+parameter MASK_REV_EN = 1'b0;
+
+//
 // Value of the M-mode implementation id register
 `ifdef SCARV_CPU_MIMPID
 parameter  CSR_MIMPID         = `SCARV_CPU_MIMPID;
@@ -224,7 +228,8 @@ frv_pipeline #(
 .CSR_MIMPID         (CSR_MIMPID         ),
 .MASKING_ISE_TRNG   (MASKING_ISE_TRNG   ),
 .MASKING_ISE_TI     (MASKING_ISE_TI     ),
-.MASKING_ISE_FAST   (MASKING_ISE_FAST   )
+.MASKING_ISE_FAST   (MASKING_ISE_FAST   ),
+.MASK_REV_EN        (MASK_REV_EN        )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset

@@ -164,6 +164,10 @@ parameter MASKING_ISE_TI      = 1'b1; // Threshold implementation (1) or (0)
 parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
+// Enable mask share 1 bit reversed storage representation.
+parameter MASK_REV_EN = 1'b0;
+
+//
 // Value of the M-mode implementation id register
 parameter  CSR_MIMPID           = 32'b0;
 
@@ -507,7 +511,8 @@ frv_pipeline_decode #(
 .XC_CLASS_MASK      (XC_CLASS_MASK      ),
 .XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
 .XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
-.BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
+.BITMANIP_BASELINE  (BITMANIP_BASELINE  ),
+.MASK_REV_EN        (MASK_REV_EN        )
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
 .g_resetn           (g_resetn           ), // synchronous reset
@@ -578,7 +583,8 @@ frv_pipeline_execute #(
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ),
 .MASKING_ISE_TRNG   (MASKING_ISE_TRNG   ),
 .MASKING_ISE_TI     (MASKING_ISE_TI     ),
-.MASKING_ISE_FAST   (MASKING_ISE_FAST   )
+.MASKING_ISE_FAST   (MASKING_ISE_FAST   ),
+.MASK_REV_EN        (MASK_REV_EN        )
 ) i_pipeline_s2_execute (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
