@@ -135,6 +135,7 @@ wire dec_xc_sha256_s2   = XC_CLASS_SHA2       && (d_data & 32'hfff0707f) == 32'h
 wire dec_xc_sha256_s3   = XC_CLASS_SHA2       && (d_data & 32'hfff0707f) == 32'he307003;
 wire dec_b_cmov        = BITMANIP_BASELINE && (d_data & 32'h600707f) == 32'h6005033;
 wire dec_b_ror         = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h60005033;
+wire dec_b_rol         = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h60001033;
 wire dec_b_rori        = BITMANIP_BASELINE && (d_data & 32'hfc00707f) == 32'h60005013;
 wire dec_b_fsl         = BITMANIP_BASELINE && (d_data & 32'h600707f) == 32'h4001033;
 wire dec_b_fsr         = BITMANIP_BASELINE && (d_data & 32'h600707f) == 32'h4005033;
@@ -206,5 +207,5 @@ dec_mask_b_unmask  || dec_mask_b_remask  || dec_mask_a_mask    ||
 dec_mask_a_unmask  || dec_mask_a_remask  || dec_mask_b_not     ||
 dec_mask_b_and     || dec_mask_b_ior     || dec_mask_b_xor     ||
 dec_mask_b_add     || dec_mask_b_sub     || dec_mask_b_slli    ||
-dec_mask_b_srli    || dec_mask_b_rori
+dec_mask_b_srli    || dec_mask_b_rori    || dec_b_rol
 );

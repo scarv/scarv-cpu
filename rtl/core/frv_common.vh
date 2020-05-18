@@ -50,6 +50,7 @@ localparam ALU_SRA      = {2'b11, 3'b001};
 localparam ALU_SRL      = {2'b11, 3'b010};
 localparam ALU_SLL      = {2'b11, 3'b100};
 localparam ALU_ROR      = {2'b11, 3'b110};
+localparam ALU_ROL      = {2'b11, 3'b111};
 
 localparam CFU_BEQ      = {2'b00, 3'b001};
 localparam CFU_BGE      = {2'b00, 3'b010};

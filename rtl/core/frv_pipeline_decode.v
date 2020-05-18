@@ -146,7 +146,8 @@ assign n_s2_fu[P_FU_ALU] =
     dec_c_slli     ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
     dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
-    dec_b_ror      || dec_b_rori     || dec_mask_b_unmask || dec_mask_a_unmask;
+    dec_b_ror      || dec_b_rori     || dec_b_rol      ||
+    dec_mask_b_unmask || dec_mask_a_unmask;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
@@ -274,6 +275,7 @@ wire [OP:0] uop_alu =
     {5{dec_c_slli    }} & ALU_SLL   |
     {5{dec_xc_psll   }} & ALU_SLL   |
     {5{dec_xc_psll_i }} & ALU_SLL   |
+    {5{dec_b_rol     }} & ALU_ROL   |
     {5{dec_b_ror     }} & ALU_ROR   |
     {5{dec_b_rori    }} & ALU_ROR   |
     {5{dec_xc_pror   }} & ALU_ROR   |
@@ -714,7 +716,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
     dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
     dec_mulhu      || dec_rem        || dec_remu       || dec_b_ror      ||
-    dec_b_rori     ||
+    dec_b_rori     || dec_b_rol      ||
     dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
     dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
     dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
@@ -761,6 +763,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
     dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
     dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_ror      ||
+    dec_b_rol      ||
     dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
     dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ||
     dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||

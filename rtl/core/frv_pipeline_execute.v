@@ -145,9 +145,12 @@ wire        alu_op_and      = fu_alu && s2_uop == ALU_AND;
 wire        alu_op_shf      = fu_alu && (s2_uop == ALU_SLL ||
                                          s2_uop == ALU_SRL ||
                                          s2_uop == ALU_SRA );
-wire        alu_op_rot      = fu_alu && (s2_uop == ALU_ROR );
+wire        alu_op_rot      = fu_alu && (s2_uop == ALU_ROR ||
+                                         s2_uop == ALU_ROL );
 
-wire        alu_op_shf_left = fu_alu && s2_uop == ALU_SLL;
+wire        alu_op_shf_left = fu_alu && (s2_uop == ALU_SLL ||
+                                         s2_uop == ALU_ROL );
+
 wire        alu_op_shf_arith= fu_alu && s2_uop == ALU_SRA;
 
 wire        alu_op_cmp      = fu_alu && (s2_uop == ALU_SLT  ||
