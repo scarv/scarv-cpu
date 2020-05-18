@@ -136,6 +136,7 @@ wire        alu_valid       = fu_alu    ; // Stall this stage
 wire        alu_flush       = flush     ; // flush the stage
 wire        alu_ready                   ; // stage ready to progress
 
+wire        alu_op_pack     = fu_alu && s2_uop == ALU_PACK;
 wire        alu_op_add      = fu_alu && s2_uop == ALU_ADD;
 wire        alu_op_sub      = fu_alu && s2_uop == ALU_SUB;
 wire        alu_op_xor      = fu_alu && s2_uop == ALU_XOR;
@@ -304,9 +305,9 @@ wire [XL:0] msk_rs1 = msk_rs1_s0 ^ msk_rs1_s1;
 wire [XL:0] msk_rs2 = msk_rs2_s0 ^ msk_rs2_s1;
 wire [XL:0] msk_rd  = msk_rd_s0  ^ msk_rd_s1 ;
 
-localparam REV_EN = 1'b1;
+parameter MASK_REV_EN = 1'b0;
 
-wire en_unshfl_s1 = REV_EN && !msk_op_b_mask && !msk_op_a_mask;
+wire en_unshfl_s1 = MASK_REV_EN && !msk_op_b_mask && !msk_op_a_mask;
 
 `WORD_REV(s2_opr_c, msk_rs1_s1, en_unshfl_s1)
 `WORD_REV(s2_opr_d, msk_rs2_s1, en_unshfl_s1)
@@ -316,7 +317,7 @@ wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
 
 wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
-`WORD_REV(msk_rd_s1, n_s3_opr_b_msk, REV_EN)
+`WORD_REV(msk_rd_s1, n_s3_opr_b_msk, MASK_REV_EN)
 
 wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
 wire [XL:0] n_s3_opr_b_msk  ;
@@ -507,6 +508,7 @@ frv_alu i_alu (
 .alu_flush       (alu_flush       ), // flush the stage
 .alu_ready       (alu_ready       ), // stage ready to progress
 .alu_pw          (alu_pw          ), // Pack width specifier.
+.alu_op_pack     (alu_op_pack     ), // 
 .alu_op_add      (alu_op_add      ), // 
 .alu_op_sub      (alu_op_sub      ), // 
 .alu_op_xor      (alu_op_xor      ), // 

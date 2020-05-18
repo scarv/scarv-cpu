@@ -44,6 +44,7 @@ localparam ALU_SUB      = {2'b00, 3'b000};
 localparam ALU_AND      = {2'b01, 3'b001};
 localparam ALU_OR       = {2'b01, 3'b010};
 localparam ALU_XOR      = {2'b01, 3'b100};
+localparam ALU_PACK     = {2'b01, 3'b101};
 localparam ALU_SLT      = {2'b10, 3'b001};
 localparam ALU_SLTU     = {2'b10, 3'b010};
 localparam ALU_SRA      = {2'b11, 3'b001};

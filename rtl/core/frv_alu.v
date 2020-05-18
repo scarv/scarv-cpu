@@ -15,6 +15,7 @@ input               alu_flush       , // flush the stage
 output              alu_ready       , // stage ready to progress
 
 input        [PW:0] alu_pw          , // Pack width specifer.
+input               alu_op_pack     , // Bitmanip pack
 input               alu_op_add      , // 
 input               alu_op_sub      , // 
 input               alu_op_xor      , // 
@@ -121,6 +122,12 @@ wire [  XL:0] bw_result     = {XLEN{alu_op_xor}} & (bw_lhs ^ bw_rhs) |
                               {XLEN{alu_op_and}} & (bw_lhs & bw_rhs) ;
 
 //
+// Bitmanip pack
+//
+
+wire [XL:0] pack_result =  {alu_rhs[15:0], alu_lhs[15:0]};
+
+//
 // Result multiplexing
 //
 
@@ -131,9 +138,10 @@ wire out_cmp    = alu_op_cmp ;
 
 assign alu_result = 
     out_adder ? adder_result[XL:0] :
-    {XLEN{out_shift}} & shift_result[XL:0]    |
-    {XLEN{out_bw   }} & bw_result             | 
-    {XLEN{out_cmp  }} & {31'b0, alu_lt}       ; 
+    {XLEN{out_shift   }} & shift_result[XL:0]    |
+    {XLEN{out_bw      }} & bw_result             | 
+    {XLEN{out_cmp     }} & {31'b0, alu_lt}       |
+    {XLEN{alu_op_pack }} & pack_result           ; 
 
 endmodule
 

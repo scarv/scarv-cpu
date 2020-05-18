@@ -147,6 +147,7 @@ wire dec_b_bdep        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h800
 wire dec_b_bext        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h8006033;
 wire dec_b_grev        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h40001033;
 wire dec_b_grevi       = BITMANIP_BASELINE && (d_data & 32'hfc00707f) == 32'h40001013;
+wire dec_b_pack        = BITMANIP_BASELINE && (d_data & 32'hfe00707f) == 32'h08004033;
 wire dec_mask_b2a       = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h5b;
 wire dec_mask_a2b       = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h805b;
 wire dec_mask_b_mask    = XC_CLASS_MASK && (d_data & 32'hfff070ff) == 32'h20005b;
@@ -186,9 +187,10 @@ wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp 
 ||dec_b_bdep  || dec_b_bext  || dec_b_clmul  || dec_b_clmulh   || dec_b_clmulr
 || dec_b_cmov   || dec_b_grev  || dec_b_grevi   || dec_b_fsl   || dec_b_fsr
-|| dec_b_fsri || dec_b_ror  || dec_b_rori  || dec_xc_aesmix_dec
-|| dec_xc_aesmix_enc  || dec_xc_aessub_dec   || dec_xc_aessub_decrot   ||
-dec_xc_aessub_enc   || dec_xc_aessub_encrot   || dec_xc_bop   ||
+|| dec_b_fsri || dec_b_ror  || dec_b_rori    || dec_b_rol      || dec_b_pack  
+|| dec_xc_aesmix_dec || dec_xc_aesmix_enc  || dec_xc_aessub_dec   ||
+dec_xc_aessub_decrot   || dec_xc_aessub_enc   || dec_xc_aessub_encrot   ||
+dec_xc_bop   ||
 dec_xc_gather_b   || dec_xc_gather_h   || dec_xc_ldr_b   || dec_xc_ldr_bu   ||
 dec_xc_ldr_h   || dec_xc_ldr_hu   || dec_xc_ldr_w || dec_xc_lut   ||
 dec_xc_macc_1   || dec_xc_madd_3   || dec_xc_mmul_3   || dec_xc_mror   ||
@@ -207,5 +209,5 @@ dec_mask_b_unmask  || dec_mask_b_remask  || dec_mask_a_mask    ||
 dec_mask_a_unmask  || dec_mask_a_remask  || dec_mask_b_not     ||
 dec_mask_b_and     || dec_mask_b_ior     || dec_mask_b_xor     ||
 dec_mask_b_add     || dec_mask_b_sub     || dec_mask_b_slli    ||
-dec_mask_b_srli    || dec_mask_b_rori    || dec_b_rol
+dec_mask_b_srli    || dec_mask_b_rori
 );
