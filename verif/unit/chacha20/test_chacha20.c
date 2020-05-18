@@ -36,14 +36,13 @@ int test_main() {
         uint32_t out_c  = block_out_c[i];
         uint32_t out_asm= block_out_asm[i] ^ block_out_asm[i+16];
 
-        __puthex32(out_c  ); __putchar(' ');
-        __puthex32(out_asm); __putchar(' ');
-
         if(out_c != out_asm) {
             fail |= 1;
+            __puthex32(out_c  ); __putchar(' ');
+            __puthex32(out_asm); __putchar(' ');
             __putchar('!');
+            __putchar('\n');
         }
-        __putchar('\n');
     }
 
     return fail;
