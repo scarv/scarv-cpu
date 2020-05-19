@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu May 14 10:02:23 2020
+[*] Tue May 19 09:32:40 2020
 [*]
-[dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.vcd"
-[dumpfile_mtime] "Thu May 14 09:59:34 2020"
-[dumpfile_size] 54437714
+[dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.vcd"
+[dumpfile_mtime] "Tue May 19 09:32:01 2020"
+[dumpfile_size] 7156020
 [savefile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 4597
+[timestart] 10173
 [size] 1920 1025
 [pos] -1 -1
-*-8.970829 5266 13206 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.573827 10426 13206 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -97,7 +97,7 @@ TOP.frv_core.i_pipeline.dmem_error
 @800200
 -Trace
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.trs_instr[31:0]
@@ -241,26 +241,42 @@ TOP.frv_core.i_pipeline.s1_rs1_rdatahi[31:0]
 -RS1
 @1401200
 -Forwarding
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_hi_rev
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_rev
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_hi_rev
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_rev
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs3_rev
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s2_opr_a[31:0]
 TOP.frv_core.i_pipeline.s2_opr_b[31:0]
 TOP.frv_core.i_pipeline.s2_opr_c[31:0]
 TOP.frv_core.i_pipeline.s2_opr_d[31:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s2_opr_c_rev
+@29
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s2_opr_d_rev
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
 TOP.frv_core.i_pipeline.s3_opr_b[31:0]
+@28
+TOP.frv_core.i_pipeline.s3_opr_b_rev
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
 TOP.frv_core.i_pipeline.s4_opr_b[31:0]
+@28
+TOP.frv_core.i_pipeline.s4_opr_b_rev
+@22
+TOP.frv_core.i_pipeline.i_gprs.gprs_odd_rev[15:0]
 @c00200
 -Pipe - S1 Decode
 -Masking
@@ -292,7 +308,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.oprd_ld_en
 @22
 TOP.frv_core.i_pipeline.s1_data[31:0]
 @2022
-^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_bubble
@@ -342,7 +358,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_prng[31:0]
 TOP.frv_core.i_pipeline.s2_busy
 TOP.frv_core.i_pipeline.s2_valid
 @2022
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @c00022
 TOP.frv_core.i_pipeline.s2_instr[31:0]
@@ -446,7 +462,6 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_add
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_mask
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_rori
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.op_b_xor
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.en_unshfl_s0
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.rs1_s0[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.i_frv_masked_alu.rs1_s1[31:0]
@@ -536,13 +551,11 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_valid
 -Pipe - S3 Memory
 @28
 TOP.frv_core.i_pipeline.s3_busy
-@2023
-^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.gtkwl
-TOP.frv_core.i_pipeline.s3_instr[31:0]
 @2022
-^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
+TOP.frv_core.i_pipeline.s3_instr[31:0]
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
 TOP.frv_core.i_pipeline.s3_opr_b[31:0]
 @2024
@@ -620,7 +633,7 @@ TOP.frv_core.i_pipeline.s4_flush
 @22
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @2022
-^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
+^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/masking-ise/masking-ise.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
@@ -664,7 +677,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wide
 @200
 -
 @2022
-^4 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/mtime-write/mtime-write.gtkwl
+^3 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/mtime-write/mtime-write.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
