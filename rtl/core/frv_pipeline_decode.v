@@ -28,6 +28,11 @@ input  wire [XL:0] s1_rs1_rdatahi,
 input  wire [XL:0] s1_rs2_rdata  ,
 input  wire [XL:0] s1_rs2_rdatahi,
 input  wire [XL:0] s1_rs3_rdata  ,
+input  wire        s1_rs1_rev    , // RS1 lo in bit reverse form
+input  wire        s1_rs1_hi_rev , // RS1 hi in bit reverse form
+input  wire        s1_rs2_rev    , // RS2 lo in bit reverse form
+input  wire        s1_rs2_hi_rev , // RS2 hi in bit reverse form
+input  wire        s1_rs3_rev    , // RS3 lo in bit reverse form
 
 output wire [XL:0] leak_prng     , // Current PRNG value.
 input  wire [12:0] leak_lkgcfg   , // Current lkgcfg register value.
@@ -54,7 +59,9 @@ output wire [ 4:0] s2_rd         , // Destination register address
 output wire [XL:0] s2_opr_a      , // Operand A
 output wire [XL:0] s2_opr_b      , // Operand B
 output wire [XL:0] s2_opr_c      , // Operand C
+output wire        s2_opr_c_rev  , // Operand C is bit reversed
 output wire [XL:0] s2_opr_d      , // Operand D
+output wire        s2_opr_d_rev  , // Operand C is bit reversed
 output wire [OP:0] s2_uop        , // Micro-op code
 output wire [FU:0] s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
 output wire [PW:0] s2_pw         , // Pack width specifier for IALU.
@@ -918,6 +925,32 @@ frv_leak #(
 .leak_fence    (leak_fence    )  // Fence instruction flying past.
 );
 
+
+//
+// Register value bit reverse handling.
+// -------------------------------------------------------------------------
+
+wire [XL:0] norm_rs1        ;
+wire [XL:0] norm_rs1_hi     ;
+wire [XL:0] norm_rs2        ;
+wire [XL:0] norm_rs2_hi     ;
+wire [XL:0] norm_rs3        ;
+
+wire        unshfl_rs1      = s1_rs1_rev    ;
+wire        unshfl_rs1_hi   = s1_rs1_hi_rev ;
+wire        unshfl_rs2      = s1_rs2_rev    ;
+wire        unshfl_rs2_hi   = s1_rs2_hi_rev ;
+wire        unshfl_rs3      = s1_rs3_rev    ;
+
+wire        n_s2_opr_c_rev  = 1'b0          ;
+wire        n_s2_opr_d_rev  = 1'b0          ;
+
+`WORD_REV(s1_rs1_rdata  , norm_rs1   , unshfl_rs1   )
+`WORD_REV(s1_rs1_rdatahi, norm_rs1_hi, unshfl_rs1_hi)
+`WORD_REV(s1_rs2_rdata  , norm_rs2   , unshfl_rs2   )
+`WORD_REV(s1_rs2_rdatahi, norm_rs2_hi, unshfl_rs2_hi)
+`WORD_REV(s1_rs3_rdata  , norm_rs3   , unshfl_rs3   )
+
 //
 // Operand Source decoding
 // -------------------------------------------------------------------------
@@ -937,7 +970,7 @@ wire opra_ld_en    = n_s2_valid && (
 
 assign n_s2_opr_a = 
     {XLEN{opra_src_zero   }} & 32'b0          |
-    {XLEN{opra_src_rs1    }} & s1_rs1_rdata   |
+    {XLEN{opra_src_rs1    }} & norm_rs1       |
     {XLEN{opra_src_pcim   }} & pc_plus_imm    |
     {XLEN{opra_src_csri   }} & csr_imm        ;
 
@@ -948,9 +981,10 @@ wire oprb_rs2_shf_1 = dec_xc_ldr_h     || dec_xc_ldr_hu    || dec_xc_str_h ||
 
 wire oprb_rs2_shf_2 = dec_xc_ldr_w     || dec_xc_str_w     ;
 
-wire [XL:0] s1_rs2_shf = oprb_rs2_shf_1 ? {s1_rs2_rdata[30:0],1'b0} :
-                         oprb_rs2_shf_2 ? {s1_rs2_rdata[29:0],2'b0} :
-                                           s1_rs2_rdata             ;
+// For scaling addresses with indexed load/store.
+wire [XL:0] s1_rs2_shf = oprb_rs2_shf_1 ? {norm_rs2[30:0],1'b0} :
+                         oprb_rs2_shf_2 ? {norm_rs2[29:0],2'b0} :
+                                           norm_rs2             ;
 
 wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
@@ -959,19 +993,11 @@ wire oprb_ld_en    = n_s2_valid && (
     oprb_src_rs2 || oprb_src_imm || oprb_src_zero || oprb_src_rs1_hi
 );
 
-
-wire [XL:0] s1_rs1_rdatahi_rev;
-
-
-wire rev_rs1_hi = oprb_src_rs1_hi && MASK_REV_EN;
-
-`WORD_REV(s1_rs1_rdatahi, s1_rs1_rdatahi_rev, rev_rs1_hi)
-
 assign n_s2_opr_b =
     {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
     {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
     {XLEN{oprb_src_imm    }} & n_s2_imm       |
-    {XLEN{oprb_src_rs1_hi }} & s1_rs1_rdatahi_rev ;
+    {XLEN{oprb_src_rs1_hi }} & norm_rs1_hi    ;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
@@ -985,16 +1011,16 @@ wire oprc_ld_en    = n_s2_valid && (
 );
 
 assign n_s2_opr_c = 
-    {XLEN{oprc_src_rs1_hi }} & s1_rs1_rdatahi |
-    {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
-    {XLEN{oprc_src_rs3    }} & s1_rs3_rdata   |
-    {XLEN{oprc_src_csra   }} & csr_addr       |
-    {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
+    {XLEN{oprc_src_rs1_hi }} & norm_rs1_hi      |
+    {XLEN{oprc_src_rs2    }} & norm_rs2         |
+    {XLEN{oprc_src_rs3    }} & norm_rs3         |
+    {XLEN{oprc_src_csra   }} & csr_addr         |
+    {XLEN{oprc_src_pcim   }} & pc_plus_imm      ;
 
 //
 // Operand D sourcing:
 
-wire [XL:0] n_s2_opr_d     = oprd_src_rs2_hi ? s1_rs2_rdatahi : {XLEN{1'b0}};
+wire [XL:0] n_s2_opr_d     = oprd_src_rs2_hi ? norm_rs2_hi : {XLEN{1'b0}};
 
 wire        oprd_ld_en     = n_s2_valid && oprd_src_rs2_hi;
 
@@ -1002,7 +1028,7 @@ wire        oprd_ld_en     = n_s2_valid && oprd_src_rs2_hi;
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 40 + (1+OP) + (1+FU) + (1+PW);
+localparam RL = 42 + (1+OP) + (1+FU) + (1+PW);
 
 `ifdef RVFI
 always @(posedge g_clk) begin
@@ -1016,14 +1042,14 @@ always @(posedge g_clk) begin
         rvfi_s2_rs1_data_hi <= 0;
         rvfi_s2_rs2_data_hi <= 0;
     end else if (pipe_progress) begin
-        rvfi_s2_rs1_addr <= s1_rs1_addr;
-        rvfi_s2_rs1_data <= s1_rs1_rdata;
-        rvfi_s2_rs2_addr <= s1_rs2_addr;
-        rvfi_s2_rs2_data <= s1_rs2_rdata;
-        rvfi_s2_rs3_addr <= s1_rs3_addr;
-        rvfi_s2_rs3_data <= s1_rs3_rdata;
-        rvfi_s2_rs1_data_hi <= s1_rs1_rdatahi;
-        rvfi_s2_rs2_data_hi <= s1_rs2_rdatahi;
+        rvfi_s2_rs1_addr    <= s1_rs1_addr  ;
+        rvfi_s2_rs1_data    <= norm_rs1     ;
+        rvfi_s2_rs2_addr    <= s1_rs2_addr  ;
+        rvfi_s2_rs2_data    <= norm_rs2     ;
+        rvfi_s2_rs3_addr    <= s1_rs3_addr  ;
+        rvfi_s2_rs3_data    <= norm_rs3     ;
+        rvfi_s2_rs1_data_hi <= norm_rs1_hi  ;
+        rvfi_s2_rs2_data_hi <= norm_rs2_hi  ;
     end
 end
 `endif
@@ -1043,7 +1069,9 @@ wire [RL-1:0] p_in = {
  s1_bubble ?  {1+PW{1'b0}}: n_s2_pw , // IALU pack width specifier.
  s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
 leak_stall || s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
- s1_bubble ? 32'b0      : n_s2_instr  // The instruction word
+ s1_bubble ? 32'b0      : n_s2_instr, // The instruction word
+ n_s2_opr_c_rev                     , // Is operand C reversed? 
+ n_s2_opr_d_rev                       // Is operand D reversed?
 };
 
 wire [RL-1:0] p_out;
@@ -1055,7 +1083,9 @@ assign {
  s2_pw         , // IALU pack width.
  s2_trap       , // Raise a trap?
  s2_size       , // Size of the instruction.
- s2_instr        // The instruction word
+ s2_instr      , // The instruction word
+ n_s2_opr_c_rev, // Is operand C reversed?
+ n_s2_opr_d_rev  // Is operand D reversed?
 } = p_out;
 
 frv_pipeline_register #(

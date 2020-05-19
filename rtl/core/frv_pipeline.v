@@ -245,6 +245,11 @@ wire [XL:0] s1_rs1_rdatahi;
 wire [XL:0] s1_rs2_rdata  ;
 wire [XL:0] s1_rs2_rdatahi;
 wire [XL:0] s1_rs3_rdata  ;
+wire        s1_rs1_lo_rev   ; // rs1_data in bit reverse form.
+wire        s1_rs1_hi_rev   ; // rs1_rdhi in bit reverse form.
+wire        s1_rs2_lo_rev   ; // rs2_data in bit reverse form.
+wire        s1_rs2_hi_rev   ; // rs2_rdhi in bit reverse form.
+wire        s1_rs3_lo_rev   ; // rs3_data in bit reverse form.
 
 wire        s2_valid      ; // Is the output data valid?
 wire        s2_busy       ; // Is the next stage ready for new inputs?
@@ -252,7 +257,9 @@ wire [ 4:0] s2_rd         ; // Destination register address
 wire [XL:0] s2_opr_a      ; // Operand A
 wire [XL:0] s2_opr_b      ; // Operand B
 wire [XL:0] s2_opr_c      ; // Operand C
+wire        s2_opr_c_rev  ; // Operand C in bit reversed form
 wire [XL:0] s2_opr_d      ; // Operand D
+wire        s2_opr_d_rev  ; // Operand D in bit reversed form
 wire [OP:0] s2_uop        ; // Micro-op code
 wire [FU:0] s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
 wire [PW:0] s2_pw         ; // IALU pack width specifer.
@@ -264,12 +271,14 @@ wire [ 4:0] fwd_s2_rd     ; // stage destination reg.
 wire        fwd_s2_wide   ; // Wide writeback
 wire [XL:0] fwd_s2_wdata  ; // Write data for writeback stage.
 wire [XL:0] fwd_s2_wdata_hi;// Write data for writeback stage.
+wire        fwd_s2_wdhi_rev;// s2_wdata_hi in bit reversed form.
 wire        fwd_s2_load   ; // stage has load in it.
 wire        fwd_s2_csr    ; // stage has CSR op in it.
 
 wire [ 4:0] s3_rd         ; // Destination register address
 wire [XL:0] s3_opr_a      ; // Operand A
 wire [XL:0] s3_opr_b      ; // Operand B
+wire        s3_opr_b_rev  ; // Operand B in bit reversed form
 wire [OP:0] s3_uop        ; // Micro-op code
 wire [FU:0] s3_fu         ; // Functional Unit
 wire        s3_trap       ; // Raise a trap?
@@ -282,12 +291,14 @@ wire [ 4:0] fwd_s3_rd     ; // Writeback stage destination reg.
 wire        fwd_s3_wide   ; // Wide writeback
 wire [XL:0] fwd_s3_wdata  ; // Write data for writeback stage.
 wire [XL:0] fwd_s3_wdata_hi;// Write data for writeback stage.
+wire        fwd_s3_wdhi_rev;// Write data for writeback stage bit reversed.
 wire        fwd_s3_load   ; // Writeback stage has load in it.
 wire        fwd_s3_csr    ; // Writeback stage has CSR op in it.
 
 wire [ 4:0] s4_rd         ; // Destination register address
 wire [XL:0] s4_opr_a      ; // Operand A
 wire [XL:0] s4_opr_b      ; // Operand B
+wire        s4_opr_b_rev  ; // Operand B in bit reversed form
 wire [OP:0] s4_uop        ; // Micro-op code
 wire [FU:0] s4_fu         ; // Functional Unit
 wire        s4_trap       ; // Raise a trap?
@@ -306,6 +317,7 @@ wire        gpr_wide      ; // GPR wide writeback.
 wire [ 4:0] gpr_rd        ; // GPR destination register.
 wire [XL:0] gpr_wdata     ; // GPR write data [31:0].
 wire [XL:0] gpr_wdata_hi  ; // GPR write data [63:32].
+wire        gpr_wdata_hi_rev;// write data [63:32] in bit reverse form.
 
 wire        hold_lsu_req  ; // Don't make LSU requests yet.
 
@@ -423,6 +435,42 @@ wire   s1_bubble   =
      s1_bubble_from_s3      ||
      s1_bubble_from_s2      ;
 
+//
+// Bit reversed form indicator bits
+
+wire        fwd_rs1_rev   =
+     hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdhi_rev : 1'b0)  :
+     hzd_rs1_s3 ? (fwd_s3_rs1_hi ? fwd_s3_wdhi_rev : 1'b0)  :
+     hzd_rs1_s4 ? (fwd_s4_rs1_hi ? gpr_wdata_hi_rev: 1'b0)  :
+                  (s1_rs1_lo_rev                         )  ;
+
+wire        fwd_rs1_hi_rev=
+     hzd_rs1_s2 ? fwd_s2_wdhi_rev   :
+     hzd_rs1_s3 ? fwd_s3_wdhi_rev   :
+     hzd_rs1_s4 ? gpr_wdata_hi_rev  :
+                  s1_rs1_hi_rev     ;
+
+wire        fwd_rs2_rev   =
+     hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdhi_rev : 1'b0)  :
+     hzd_rs2_s3 ? (fwd_s3_rs2_hi ? fwd_s3_wdhi_rev : 1'b0)  :
+     hzd_rs2_s4 ? (fwd_s4_rs2_hi ? gpr_wdata_hi_rev: 1'b0)  :
+                  (s1_rs2_lo_rev                         )  ;
+
+wire        fwd_rs2_hi_rev=
+     hzd_rs2_s2 ? fwd_s2_wdhi_rev   :
+     hzd_rs2_s3 ? fwd_s3_wdhi_rev   :
+     hzd_rs2_s4 ? gpr_wdata_hi_rev  :
+                  s1_rs2_hi_rev     ;
+
+wire        fwd_rs3_rev   =
+     hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdhi_rev : 1'b0)  :
+     hzd_rs3_s3 ? (fwd_s3_rs3_hi ? fwd_s3_wdhi_rev : 1'b0)  :
+     hzd_rs3_s4 ? (fwd_s4_rs3_hi ? gpr_wdata_hi_rev: 1'b0)  :
+                  (s1_rs3_lo_rev                         )  ;
+
+
+//
+// Register read data.
 
 wire [XL:0] fwd_rs1_rdata =
      hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
@@ -532,6 +580,11 @@ frv_pipeline_decode #(
 .s1_rs2_rdata       (fwd_rs2_rdata      ),
 .s1_rs2_rdatahi     (fwd_rs2_rdatahi    ),
 .s1_rs3_rdata       (fwd_rs3_rdata      ),
+.s1_rs1_rev         (fwd_rs1_rev        ), // RS1 lo in bit reverse form
+.s1_rs1_hi_rev      (fwd_rs1_hi_rev     ), // RS1 hi in bit reverse form
+.s1_rs2_rev         (fwd_rs2_rev        ), // RS2 lo in bit reverse form
+.s1_rs2_hi_rev      (fwd_rs2_hi_rev     ), // RS2 hi in bit reverse form
+.s1_rs3_rev         (fwd_rs3_rev        ), // RS3 lo in bit reverse form
 .leak_prng          (leak_prng          ), // current prng value.
 .leak_lkgcfg        (leak_lkgcfg        ), // current lkgcfg register value.
 .s1_leak_fence      (s1_leak_fence      ),
@@ -554,7 +607,9 @@ frv_pipeline_decode #(
 .s2_opr_a           (s2_opr_a           ), // Operand A
 .s2_opr_b           (s2_opr_b           ), // Operand B
 .s2_opr_c           (s2_opr_c           ), // Operand C
+.s2_opr_c_rev       (s2_opr_c_rev       ), // Operand C is bit reversed.
 .s2_opr_d           (s2_opr_d           ), // Operand D
+.s2_opr_d_rev       (s2_opr_d_rev       ), // Operand D is bit reversed.
 .s2_uop             (s2_uop             ), // Micro-op code
 .s2_fu              (s2_fu              ), // Functional Unit
 .s2_pw              (s2_pw              ), // IALU Pack width
@@ -592,7 +647,9 @@ frv_pipeline_execute #(
 .s2_opr_a         (s2_opr_a         ), // Operand A
 .s2_opr_b         (s2_opr_b         ), // Operand B
 .s2_opr_c         (s2_opr_c         ), // Operand C
+.s2_opr_c_rev     (s2_opr_c_rev     ), // Operand C is bit reversed.
 .s2_opr_d         (s2_opr_d         ), // Operand D
+.s2_opr_d_rev     (s2_opr_d_rev     ), // Operand D is bit reversed.
 .s2_uop           (s2_uop           ), // Micro-op code
 .s2_fu            (s2_fu            ), // Functional Unit
 .s2_pw            (s2_pw            ), // IALU Pack width
@@ -619,6 +676,7 @@ frv_pipeline_execute #(
 .fwd_s2_wide      (fwd_s2_wide      ), // Write writeback
 .fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.
 .fwd_s2_wdata_hi  (fwd_s2_wdata_hi  ), // Write data for writeback stage.
+.fwd_s2_wdhi_rev  (fwd_s2_wdhi_rev  ), // Write data for writeback stage.
 .fwd_s2_load      (fwd_s2_load      ), // Writeback stage has load in it.
 .fwd_s2_csr       (fwd_s2_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
@@ -646,6 +704,7 @@ frv_pipeline_execute #(
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
 .s3_opr_b         (s3_opr_b         ), // Operand B
+.s3_opr_b_rev     (s3_opr_b_rev     ), // Operand B in bit reverse form.
 .s3_uop           (s3_uop           ), // Micro-op code
 .s3_fu            (s3_fu            ), // Functional Unit
 .s3_trap          (s3_trap          ), // Raise a trap?
@@ -671,6 +730,7 @@ frv_pipeline_memory #(
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
 .s3_opr_b         (s3_opr_b         ), // Operand B
+.s3_opr_b_rev     (s3_opr_b_rev     ), // Operand B in bit reverse form.
 .s3_uop           (s3_uop           ), // Micro-op code
 .s3_fu            (s3_fu            ), // Functional Unit
 .s3_trap          (s3_trap          ), // Raise a trap?
@@ -687,6 +747,7 @@ frv_pipeline_memory #(
 .fwd_s3_wide      (fwd_s3_wide      ), // Write writeback
 .fwd_s3_wdata     (fwd_s3_wdata     ), // Write data for writeback stage.
 .fwd_s3_wdata_hi  (fwd_s3_wdata_hi  ), // Write data for writeback stage.
+.fwd_s3_wdhi_rev  (fwd_s3_wdhi_rev  ), // s3_wdata_hi in bit reverse form?
 .fwd_s3_load      (fwd_s3_load      ), // Writeback stage has load in it.
 .fwd_s3_csr       (fwd_s3_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
@@ -730,6 +791,7 @@ frv_pipeline_memory #(
 .s4_rd            (s4_rd            ), // Destination register address
 .s4_opr_a         (s4_opr_a         ), // Operand A
 .s4_opr_b         (s4_opr_b         ), // Operand B
+.s4_opr_b_rev     (s4_opr_b_rev     ), // Operand B bit reversed form.
 .s4_uop           (s4_uop           ), // Micro-op code
 .s4_fu            (s4_fu            ), // Functional Unit
 .s4_trap          (s4_trap          ), // Raise a trap?
@@ -801,6 +863,7 @@ frv_pipeline_writeback #(
 .s4_rd            (s4_rd            ), // Destination register address
 .s4_opr_a         (s4_opr_a         ), // Operand A
 .s4_opr_b         (s4_opr_b         ), // Operand B
+.s4_opr_b_rev     (s4_opr_b_rev     ), // Operand B bit reversed form.
 .s4_uop           (s4_uop           ), // Micro-op code
 .s4_fu            (s4_fu            ), // Functional Unit
 .s4_trap          (s4_trap          ), // Raise a trap?
@@ -817,6 +880,7 @@ frv_pipeline_writeback #(
 .gpr_rd           (gpr_rd           ), // GPR destination register.
 .gpr_wdata        (gpr_wdata        ), // GPR write data [31: 0].
 .gpr_wdata_hi     (gpr_wdata_hi     ), // GPR write data [63:32].
+.gpr_wdata_hi_rev (gpr_wdata_hi_rev ), // GPR write data [63:32].
 .int_trap_req     (int_trap_req     ), // Request WB stage trap an interrupt
 .int_trap_cause   (int_trap_cause   ), // Cause of interrupt
 .int_trap_ack     (int_trap_ack     ), // WB stage acknowledge the taken trap.
@@ -929,11 +993,17 @@ frv_gprs #(
 .rs2_rdhi   (s1_rs2_rdatahi ), // Source register 2 read data (wide, high)
 .rs3_addr   (s1_rs3_addr    ), // Source register 3 address
 .rs3_data   (s1_rs3_rdata   ), // Source register 3 read data
+.rs1_lo_rev (s1_rs1_lo_rev  ), // rs1_data in bit reverse form.
+.rs1_hi_rev (s1_rs1_hi_rev  ), // rs1_rdhi in bit reverse form.
+.rs2_lo_rev (s1_rs2_lo_rev  ), // rs2_data in bit reverse form.
+.rs2_hi_rev (s1_rs2_hi_rev  ), // rs2_rdhi in bit reverse form.
+.rs3_lo_rev (s1_rs3_lo_rev  ), // rs3_data in bit reverse form.
 .rd_wen     (gpr_wen        ), // Destination register write enable
 .rd_wide    (gpr_wide       ), // Wide register writeback.
 .rd_addr    (gpr_rd         ), // Destination register address
 .rd_wdata   (gpr_wdata      ), // Destination register write data [31: 0]
-.rd_wdata_hi(gpr_wdata_hi   )  // Destination register write data [63:32]
+.rd_wdata_hi(gpr_wdata_hi   ), // Destination register write data [63:32]
+.rd_wdata_hi_rev(gpr_wdata_hi_rev)  // Write data [63:32] in bit reverse form.
 );
 
 endmodule

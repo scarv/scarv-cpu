@@ -65,6 +65,7 @@ input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 input  wire [ 4:0] s4_rd           , // Destination register address
 input  wire [XL:0] s4_opr_a        , // Operand A
 input  wire [XL:0] s4_opr_b        , // Operand B
+input  wire        s4_opr_b_rev    , // Operand B in bit-reversed form.
 input  wire [OP:0] s4_uop          , // Micro-op code
 input  wire [FU:0] s4_fu           , // Functional Unit
 input  wire        s4_trap         , // Raise a trap?
@@ -83,6 +84,7 @@ output wire        gpr_wide        , // GPR wide writeback enable.
 output wire [ 4:0] gpr_rd          , // GPR destination register.
 output wire [XL:0] gpr_wdata       , // GPR write data [31: 0].
 output wire [XL:0] gpr_wdata_hi    , // GPR write data [63:32].
+output wire        gpr_wdata_hi_rev, // gpr_wdata_hi is bit reversed
 
 input  wire        int_trap_req    , // Request WB stage trap an interrupt
 input  wire [ 5:0] int_trap_cause  , // Cause of interrupt
@@ -477,7 +479,8 @@ assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{mul_gpr_wen}} & mul_gpr_wdata |
                   {32{asi_gpr_wen}} & asi_gpr_wdata ;
 
-assign gpr_wdata_hi = s4_opr_b;
+assign gpr_wdata_hi     = s4_opr_b      ;
+assign gpr_wdata_hi_rev = s4_opr_b_rev  ;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;

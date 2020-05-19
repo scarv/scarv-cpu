@@ -13,7 +13,9 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [XL:0] s2_opr_a        , // Operand A
 input  wire [XL:0] s2_opr_b        , // Operand B
 input  wire [XL:0] s2_opr_c        , // Operand C
+input  wire        s2_opr_c_rev    , // Operand C bit reversed
 input  wire [XL:0] s2_opr_d        , // Operand D
+input  wire        s2_opr_d_rev    , // Operand D bit reversed
 input  wire [OP:0] s2_uop          , // Micro-op code
 input  wire [FU:0] s2_fu           , // Functional Unit
 input  wire [PW:0] s2_pw           , // IALU pack width specifer.
@@ -45,6 +47,7 @@ output wire [ 4:0] fwd_s2_rd       , // Writeback stage destination reg.
 output wire        fwd_s2_wide     , // stage wide writeback
 output wire [XL:0] fwd_s2_wdata    , // Write data for writeback stage.
 output wire [XL:0] fwd_s2_wdata_hi , // Write data for writeback stage.
+output wire        fwd_s2_wdhi_rev , // s2_wdata_hi bit reversed.
 output wire        fwd_s2_load     , // Writeback stage has load in it.
 output wire        fwd_s2_csr      , // Writeback stage has CSR op in it.
 
@@ -74,6 +77,7 @@ output reg  [ 2:0] rvfi_s3_rng_stat , // RNG status
 output wire [ 4:0] s3_rd           , // Destination register address
 output wire [XL:0] s3_opr_a        , // Operand A
 output wire [XL:0] s3_opr_b        , // Operand B
+output wire        s3_opr_b_rev    , // Operand B bit reversed
 output wire [OP:0] s3_uop          , // Micro-op code
 output wire [FU:0] s3_fu           , // Functional Unit
 output wire        s3_trap         , // Raise a trap?
@@ -310,17 +314,20 @@ wire [XL:0] msk_rs2 = msk_rs2_s0 ^ msk_rs2_s1;
 wire [XL:0] msk_rd  = msk_rd_s0  ^ msk_rd_s1 ;
 
 
-wire en_unshfl_s1 = MASK_REV_EN && !msk_op_b_mask && !msk_op_a_mask;
+wire en_unshfl_opr_c = MASK_REV_EN && s2_opr_c_rev;
+wire en_unshfl_opr_d = MASK_REV_EN && s2_opr_d_rev;
 
-`WORD_REV(s2_opr_c, msk_rs1_s1, en_unshfl_s1)
-`WORD_REV(s2_opr_d, msk_rs2_s1, en_unshfl_s1)
+`WORD_REV(s2_opr_c, msk_rs1_s1, en_unshfl_opr_c)
+`WORD_REV(s2_opr_d, msk_rs2_s1, en_unshfl_opr_d)
 
 wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
 wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
 
 wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
-`WORD_REV(msk_rd_s1, n_s3_opr_b_msk, MASK_REV_EN)
+wire en_shfl_msk_s1 = MASK_REV_EN;
+
+`WORD_REV(msk_rd_s1, n_s3_opr_b_msk, en_shfl_msk_s1)
 
 wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
 wire [XL:0] n_s3_opr_b_msk  ;
@@ -681,7 +688,7 @@ frv_rngif i_frv_rngif (
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam RL = 42 + OP + FU;
+localparam RL = 43 + OP + FU;
 
 wire leak_fence    = fu_rng && s2_uop == RNG_ALFENCE;
 
@@ -726,6 +733,8 @@ wire [XL:0] n_s3_opr_b =
         {XLEN{fu_msk}} & n_s3_opr_b_msk 
     );
 
+wire        n_s3_opr_b_rev = fu_msk ? en_shfl_msk_s1: 1'b0;
+
 wire opra_ld_en = p_valid && (
     fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_asi || fu_bit ||
     fu_rng || fu_msk ); 
@@ -745,6 +754,9 @@ assign fwd_s2_wdata = n_s3_opr_a;
 assign fwd_s2_wdata_hi = fu_mul ? imul_result_wide[63:32]   :
                          fu_bit ? n_s3_opr_b_bit            :
                                   n_s3_opr_b_msk            ;
+
+assign fwd_s2_wdhi_rev = n_s3_opr_b_rev;
+
 assign fwd_s2_wide  =
     fu_mul && (imul_gpr_wide) ||
     fu_msk && (msk_gpr_wide ) ||
@@ -762,6 +774,7 @@ wire [RL-1:0] pipe_reg_in = {
     n_s3_fu           , // Functional Unit
     n_s3_trap         , // Raise a trap?
     n_s3_size         , // Size of the instruction.
+    n_s3_opr_b_rev    , // S3 opr_b in bit reverse form.
     n_s3_instr          // The instruction word
 };
 
@@ -772,6 +785,7 @@ assign {
     s3_fu             , // Functional Unit
     s3_trap           , // Raise a trap?
     s3_size           , // Size of the instruction.
+    s3_opr_b_rev      , // S3 opr_b in bit reverse form.
     s3_instr            // The instruction word
 } = pipe_reg_out;
 

@@ -14,6 +14,7 @@ input  wire        flush           , // Flush this pipeline stage.
 input  wire [ 4:0] s3_rd           , // Destination register address
 input  wire [XL:0] s3_opr_a        , // Operand A
 input  wire [XL:0] s3_opr_b        , // Operand B
+output wire        s3_opr_b_rev    , // Operand B in bit reversed form
 input  wire [OP:0] s3_uop          , // Micro-op code
 input  wire [FU:0] s3_fu           , // Functional Unit
 input  wire        s3_trap         , // Raise a trap?
@@ -33,6 +34,7 @@ output wire [ 4:0] fwd_s3_rd       , // stage destination reg.
 output wire        fwd_s3_wide     , // stage wide writeback
 output wire [XL:0] fwd_s3_wdata    , // Write data for writeback stage.
 output wire [XL:0] fwd_s3_wdata_hi , // Write data for writeback stage.
+output wire        fwd_s3_wdhi_rev , // s3_wdata_hi in bit reverse form.
 output wire        fwd_s3_load     , // stage has load in it.
 output wire        fwd_s3_csr      , // stage has CSR op in it.
 
@@ -81,6 +83,7 @@ input  wire        dmem_gnt        , // request accepted
 output wire [ 4:0] s4_rd           , // Destination register address
 output wire [XL:0] s4_opr_a        , // Operand A
 output wire [XL:0] s4_opr_b        , // Operand B
+output wire        s4_opr_b_rev    , // Operand B in bit reversed form
 output wire [OP:0] s4_uop          , // Micro-op code
 output wire [FU:0] s4_fu           , // Functional Unit
 output wire        s4_trap         , // Raise a trap?
@@ -208,6 +211,7 @@ wire oprb_ld_en = p_valid && (
 
 wire [XL:0] n_s4_opr_a  = lsu_valid ? n_s4_opr_a_lsu : s3_opr_a; // Operand A
 wire [XL:0] n_s4_opr_b  = lsu_valid ? n_s4_opr_b_lsu : s3_opr_b; // Operand B
+wire        n_s4_opr_b_rev=lsu_valid? 1'b0           : s3_opr_b_rev;
 
 wire [OP:0] n_s4_uop    = s3_uop  ; // Micro-op code
 wire [FU:0] n_s4_fu     = s3_fu   ; // Functional Unit
@@ -218,14 +222,15 @@ wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 // Forwaring / bubbling signals.
 // -------------------------------------------------------------------------
 
-assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
-assign fwd_s3_wdata = s3_opr_a          ;
-assign fwd_s3_wdata_hi = s3_opr_b       ;
-assign fwd_s3_wide  = imul_gpr_wide ||
-                      msk_gpr_wide  ||
-                      bitw_gpr_wide ;
-assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
-assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
+assign fwd_s3_rd        = s3_rd             ; // Stage destination reg.
+assign fwd_s3_wdata     = s3_opr_a          ;
+assign fwd_s3_wdata_hi  = s3_opr_b          ;
+assign fwd_s3_wdhi_rev  = s3_opr_b_rev      ;
+assign fwd_s3_wide      = imul_gpr_wide     ||
+                          msk_gpr_wide      ||
+                          bitw_gpr_wide     ;
+assign fwd_s3_load      = fu_lsu && lsu_load; // Stage has load in it.
+assign fwd_s3_csr       = fu_csr            ; // Stage has CSR op in it.
 
 //
 // Submodule instances.
@@ -272,7 +277,7 @@ frv_lsu #(
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam RL = 42 + OP + FU;
+localparam RL = 43 + OP + FU;
 
 wire leak_fence = fu_rng && s3_uop == RNG_ALFENCE;
 
@@ -287,6 +292,7 @@ wire [RL-1:0] pipe_reg_in = {
     n_s4_fu           , // Functional Unit
     n_s4_trap         , // Raise a trap?
     n_s4_size         , // Size of the instruction.
+    n_s4_opr_b_rev    , // Operand b in bit reversed form?
     n_s4_instr          // The instruction word
 };
 
@@ -296,6 +302,7 @@ assign {
     s4_fu             , // Functional Unit
     s4_trap           , // Raise a trap?
     s4_size           , // Size of the instruction.
+    s4_opr_b_rev      , // Operand b in bit reversed form?
     s4_instr            // The instruction word
 } = pipe_reg_out;
 
