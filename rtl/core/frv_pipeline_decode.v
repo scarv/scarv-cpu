@@ -936,14 +936,17 @@ wire [XL:0] norm_rs2        ;
 wire [XL:0] norm_rs2_hi     ;
 wire [XL:0] norm_rs3        ;
 
-wire        unshfl_rs1      = s1_rs1_rev    ;
-wire        unshfl_rs1_hi   = s1_rs1_hi_rev ;
-wire        unshfl_rs2      = s1_rs2_rev    ;
-wire        unshfl_rs2_hi   = s1_rs2_hi_rev ;
-wire        unshfl_rs3      = s1_rs3_rev    ;
+// Always reverse share 1 register operand bits for masking FU instructions.
+wire        reverse_s1      = n_s2_fu[P_FU_MSK];
 
-wire        n_s2_opr_c_rev  = 1'b0          ;
-wire        n_s2_opr_d_rev  = 1'b0          ;
+wire        unshfl_rs1      =                               s1_rs1_rev      ;
+wire        unshfl_rs1_hi   = reverse_s1 ? !s1_rs1_hi_rev : s1_rs1_hi_rev   ;
+wire        unshfl_rs2      =                               s1_rs2_rev      ;
+wire        unshfl_rs2_hi   = reverse_s1 ? !s1_rs2_hi_rev : s1_rs2_hi_rev   ;
+wire        unshfl_rs3      =                               s1_rs3_rev      ;
+
+wire        n_s2_opr_c_rev  = reverse_s1 && MASK_REV_EN   ;
+wire        n_s2_opr_d_rev  = reverse_s1 && MASK_REV_EN   ;
 
 `WORD_REV(s1_rs1_rdata  , norm_rs1   , unshfl_rs1   )
 `WORD_REV(s1_rs1_rdatahi, norm_rs1_hi, unshfl_rs1_hi)
@@ -1084,8 +1087,8 @@ assign {
  s2_trap       , // Raise a trap?
  s2_size       , // Size of the instruction.
  s2_instr      , // The instruction word
- n_s2_opr_c_rev, // Is operand C reversed?
- n_s2_opr_d_rev  // Is operand D reversed?
+ s2_opr_c_rev  , // Is operand C reversed?
+ s2_opr_d_rev    // Is operand D reversed?
 } = p_out;
 
 frv_pipeline_register #(
