@@ -15,7 +15,7 @@ extern uint32_t test_masked_brm(uint32_t a);   //boolean remask
 extern uint32_t test_masked_b2a(uint32_t a);
 extern uint32_t test_masked_arm(uint32_t a);   //arithmetic remask
 extern uint32_t test_masked_a2b(uint32_t a);
-
+extern uint32_t test_bit_reverse_representation(uint32_t a, uint32_t b);
 
 void print_result_expectation(
     uint32_t lhs,
@@ -34,6 +34,8 @@ int test_main() {
     uint32_t rhs = 0xDEADBEAD;
 
     __putstr("# Masking ISE Unit Test\n");
+
+    test_bit_reverse_representation(lhs,rhs);
 
     uint32_t result_not = test_masked_not(lhs);
     uint32_t expect_not = (~lhs);

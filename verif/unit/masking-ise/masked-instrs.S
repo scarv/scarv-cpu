@@ -1,6 +1,53 @@
 
 .text
 
+.extern test_fail
+
+.global test_bit_reverse_representation
+.func   test_bit_reverse_representation
+test_bit_reverse_representation:
+
+    addi        sp, sp, -32     // Stack space
+
+    xor         a7, a0, a1      // Create expected answer in non masked form.
+    sh          a7, 16(sp)      // Store halfword result to stack.
+
+    mask.b.mask (t2,t1), a0     // Mask lhs
+    mask.b.mask (a1,a0), a1     // Mask rhs
+
+    nop
+    nop                         // Gap to make reasoning about forwarding
+    nop                         // easier.
+    nop
+    nop
+
+    sh          t1, 0(sp)       // Store mask shares to stack.
+    sh          t2, 4(sp)
+    sh          a0, 8(sp)
+    sh          a1,12(sp)
+
+    lhu         t1, 0(sp)       // load mask shares from stack.
+    lhu         t2, 4(sp)
+    lhu         a0, 8(sp)
+    lhu         a1,12(sp)
+    lhu         a7,16(sp)       // Load back reference answer.
+
+    mask.b.xor  (t4,t3), (t2,t1), (a1,a0) // Masked result
+    mask.b.unmask a6,(t4,t3)    // Unmask result.
+
+    slli    a6, a6, 16
+    srli    a6, a6, 16
+
+    beq a6, a7, .bit_rev_test_pass
+    
+    .bit_rev_test_fail:
+        j test_fail
+
+    .bit_rev_test_pass:
+        addi sp, sp, 32
+        ret
+.endfunc
+
 .global test_masked_not
 .func   test_masked_not
 test_masked_not:
