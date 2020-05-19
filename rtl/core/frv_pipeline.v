@@ -445,10 +445,10 @@ wire        fwd_rs1_rev   =
                   (s1_rs1_lo_rev                         )  ;
 
 wire        fwd_rs1_hi_rev=
-     hzd_rs1_s2 ? fwd_s2_wdhi_rev   :
-     hzd_rs1_s3 ? fwd_s3_wdhi_rev   :
-     hzd_rs1_s4 ? gpr_wdata_hi_rev  :
-                  s1_rs1_hi_rev     ;
+     fwd_s2_wide && hzd_rs1_s2 ? fwd_s2_wdhi_rev   :
+     fwd_s3_wide && hzd_rs1_s3 ? fwd_s3_wdhi_rev   :
+     gpr_wide    && hzd_rs1_s4 ? gpr_wdata_hi_rev  :
+                                 s1_rs1_hi_rev     ;
 
 wire        fwd_rs2_rev   =
      hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdhi_rev : 1'b0)  :
@@ -457,10 +457,10 @@ wire        fwd_rs2_rev   =
                   (s1_rs2_lo_rev                         )  ;
 
 wire        fwd_rs2_hi_rev=
-     hzd_rs2_s2 ? fwd_s2_wdhi_rev   :
-     hzd_rs2_s3 ? fwd_s3_wdhi_rev   :
-     hzd_rs2_s4 ? gpr_wdata_hi_rev  :
-                  s1_rs2_hi_rev     ;
+     fwd_s2_wide && hzd_rs2_s2 ? fwd_s2_wdhi_rev   :
+     fwd_s3_wide && hzd_rs2_s3 ? fwd_s3_wdhi_rev   :
+     gpr_wide    && hzd_rs2_s4 ? gpr_wdata_hi_rev  :
+                                 s1_rs2_hi_rev     ;
 
 wire        fwd_rs3_rev   =
      hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdhi_rev : 1'b0)  :

@@ -142,7 +142,7 @@ parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
 // Enable mask share 1 bit reversed storage representation.
-parameter MASK_REV_EN = 1'b0;
+parameter MASK_REV_EN = 1'b1;
 
 //
 // Value of the M-mode implementation id register
