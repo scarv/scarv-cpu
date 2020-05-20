@@ -309,8 +309,8 @@ wire [XL:0] msk_rs1_s1      ;
 wire [XL:0] msk_rs2_s0      = s2_opr_b;
 wire [XL:0] msk_rs2_s1      ;
 
-wire en_unshfl_opr_c = MASK_REV_EN && s2_opr_c_rev;
-wire en_unshfl_opr_d = MASK_REV_EN && s2_opr_d_rev;
+wire en_unshfl_opr_c = MASK_REV_EN;
+wire en_unshfl_opr_d = MASK_REV_EN;
 
 `WORD_REV(s2_opr_c, msk_rs1_s1, en_unshfl_opr_c)
 `WORD_REV(s2_opr_d, msk_rs2_s1, en_unshfl_opr_d)
