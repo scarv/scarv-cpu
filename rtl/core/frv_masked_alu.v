@@ -526,6 +526,12 @@ always @(posedge g_clk)
 
 wire ini = ena && (seq_cnt == 3'd1);
 
+wire [31:0] o_s0_gated;
+wire [31:0] o_s1_gated;
+
+assign o_s0 = (rdy || seq_cnt == 3'd1) ? o_s0_gated : 32'b0;
+assign o_s1 = (rdy || seq_cnt == 3'd1) ? o_s1_gated : 32'b0;
+
 assign gs_i = (ini)?   i_gs : gs;
 assign p0_i = (ini)?   mxor0: p0;
 assign p1_i = (ini)?   mxor1: p1;
@@ -556,8 +562,8 @@ postprocess posproc_ins(
     .i_pk1(     mxor1), 
     .i_gk0(     g0),
     .i_gk1(     g1),
-    .o_s0(      o_s0),
-    .o_s1(      o_s1));
+    .o_s0(      o_s0_gated),
+    .o_s1(      o_s1_gated));
 
 assign rdy = (seq_cnt==3'd6);
 endmodule
