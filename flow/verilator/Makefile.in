@@ -24,7 +24,7 @@ VL_CSRC  = $(VL_CSRC_DIR)/main.cpp \
            $(VL_CSRC_DIR)/memory_device_uart.cpp \
            $(VL_CSRC_DIR)/srec.cpp
 
-VL_FLAGS = --cc -CFLAGS "-O3" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
+VL_FLAGS = --cc -CFLAGS "-O2" --Mdir $(VL_DIR) -CFLAGS -g\
             -I$(CPU_RTL_DIR) -DRVFI \
             --exe --trace \
             $(VL_VERILOG_PARAMETERS) \

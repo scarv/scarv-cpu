@@ -45,6 +45,13 @@ int test_main() {
     // Key expansion.
     bmsk_speck_key_exp_asm(ekey, mk);
 
+    //for(int i = 0; i < 27; i++) {
+    //    uint32_t s0 = ekey[i +  0];
+    //    uint32_t s1 = ekey[i + 27];
+    //    uint32_t k  = s0 ^ s1;
+    //    __puthex32(k); __putchar('\n');
+    //}
+
     // Encrypt.
     bmsk_speck_encrypt_asm(ekey, &px, &py);
 

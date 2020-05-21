@@ -312,8 +312,8 @@ wire [XL:0] msk_rs2_s1      ;
 wire en_unshfl_opr_c = MASK_REV_EN;
 wire en_unshfl_opr_d = MASK_REV_EN;
 
-`WORD_REV(s2_opr_c, msk_rs1_s1, en_unshfl_opr_c)
-`WORD_REV(s2_opr_d, msk_rs2_s1, en_unshfl_opr_d)
+`WORD_SHUFFLE(s2_opr_c, msk_rs1_s1, en_unshfl_opr_c, 0)
+`WORD_SHUFFLE(s2_opr_d, msk_rs2_s1, en_unshfl_opr_d, 0)
 
 wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
 wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
@@ -322,7 +322,7 @@ wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
 wire en_shfl_msk_s1 = MASK_REV_EN;
 
-`WORD_REV(msk_rd_s1, n_s3_opr_b_msk, en_shfl_msk_s1)
+`WORD_SHUFFLE(msk_rd_s1, n_s3_opr_b_msk, en_shfl_msk_s1, 1)
 
 wire [XL:0] n_s3_opr_a_msk  = msk_rd_s0;
 wire [XL:0] n_s3_opr_b_msk  ;
