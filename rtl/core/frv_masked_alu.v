@@ -14,14 +14,16 @@ input  wire           en,
 output wire [LEN-1:0] o
 );
 
-wire [LEN-1:0] shuffled;
+(* keep = "true" *) wire [LEN-1:0] shuffled;
 
 genvar J;
 generate for (J = 0; J < LEN; J = J+1) begin
     assign shuffled[J] = i[(LEN-1)-J];
 end endgenerate
 
-assign o = en ? shuffled : i;
+(* keep = "true" *) wire [31:0] out = en ? shuffled : i;
+
+assign o = out;
 
 endmodule
 
