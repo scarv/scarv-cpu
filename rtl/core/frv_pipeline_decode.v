@@ -948,11 +948,11 @@ wire        unshfl_rs3      =                               s1_rs3_rev      ;
 wire        n_s2_opr_c_rev  = reverse_s1 && MASK_REV_EN   ;
 wire        n_s2_opr_d_rev  = reverse_s1 && MASK_REV_EN   ;
 
-`WORD_REV(s1_rs1_rdata  , norm_rs1   , unshfl_rs1   )
-`WORD_REV(s1_rs1_rdatahi, norm_rs1_hi, unshfl_rs1_hi)
-`WORD_REV(s1_rs2_rdata  , norm_rs2   , unshfl_rs2   )
-`WORD_REV(s1_rs2_rdatahi, norm_rs2_hi, unshfl_rs2_hi)
-`WORD_REV(s1_rs3_rdata  , norm_rs3   , unshfl_rs3   )
+`WORD_SHUFFLE(s1_rs1_rdata  , norm_rs1   , unshfl_rs1   , 0)
+`WORD_SHUFFLE(s1_rs1_rdatahi, norm_rs1_hi, unshfl_rs1_hi, reverse_s1)
+`WORD_SHUFFLE(s1_rs2_rdata  , norm_rs2   , unshfl_rs2   , 0)
+`WORD_SHUFFLE(s1_rs2_rdatahi, norm_rs2_hi, unshfl_rs2_hi, reverse_s1)
+`WORD_SHUFFLE(s1_rs3_rdata  , norm_rs3   , unshfl_rs3   , 0)
 
 //
 // Operand Source decoding

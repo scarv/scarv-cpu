@@ -217,11 +217,12 @@ localparam TRAP_INT_NMI = 6'd16;
 // Utility macros
 // ------------------------------------------------------------------------
 
-`define WORD_REV(IN,OUT,EN)       \
-    frv_masked_shuffle i_``IN   ( \
-        .i (IN              ),    \
-        .en(EN              ),    \
-        .o (OUT             )     \
+`define WORD_SHUFFLE(IN,OUT,EN,FWD) \
+    frv_masked_shuffle i_``IN (     \
+        .i  (IN             ),      \
+        .en (EN             ),      \
+        .fwd(FWD            ),      \
+        .o  (OUT            )       \
     );
 
 //
