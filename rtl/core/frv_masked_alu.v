@@ -534,8 +534,8 @@ generate
         assign o_xor0 = i_a0 ^ i_b0;
         assign o_xor1 = i_a1 ^ i_b1;  
     
-        assign o_and0 = (i_a0 & i_b1) ^ (i_a0 | ~i_b0);
-        assign o_and1 = (i_a1 & i_b1) ^ (i_a1 | ~i_b0);  
+        assign o_and0 = i_gs ^ (i_a0 & i_b1) ^ (i_a0 | ~i_b0);
+        assign o_and1 = i_gs ^ (i_a1 & i_b1) ^ (i_a1 | ~i_b0);  
     end
 endgenerate
 
@@ -715,8 +715,8 @@ generate
         assign o_pk0 = tp0 ^ tp2;
         assign o_pk1 = tp1 ^ tp3;
     end else begin                    : masking_non_TI
-        wire [31:0] pk0 = (i_pk0 & pkj1) ^ (i_pk0 | ~pkj0);
-        wire [31:0] pk1 = (i_pk1 & pkj1) ^ (i_pk1 | ~pkj0);  
+        wire [31:0] pk0 = i_gs ^ (i_pk0 & pkj1) ^ (i_pk0 | ~pkj0);
+        wire [31:0] pk1 = i_gs ^ (i_pk1 & pkj1) ^ (i_pk1 | ~pkj0);  
         FF_Nb #(.Nb(32)) ff_pk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk0), .dout(o_pk0));
         FF_Nb #(.Nb(32)) ff_pk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk1), .dout(o_pk1));
 
