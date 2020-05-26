@@ -127,15 +127,14 @@ int test_main() {
         fail = 1;
     }
 
-    // FIXME
-    //uint32_t result_b2a = test_masked_b2a(lhs);
-    //uint32_t expect_b2a = (lhs);
+    uint32_t result_b2a = test_masked_b2a(lhs);
+    uint32_t expect_b2a = (lhs);
 
-    //if(result_b2a != expect_b2a) {
-    //    __putstr("test_masked_b2a [FAIL]\n");
-    //    print_result_expectation(lhs,rhs,result_b2a,expect_b2a);
-    //    fail = 1;
-    //}
+    if(result_b2a != expect_b2a) {
+        __putstr("test_masked_b2a [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_b2a,expect_b2a);
+        fail = 1;
+    }
 
     uint32_t result_arm = test_masked_arm(lhs); //arithmetic remask
     uint32_t expect_arm = (lhs);
