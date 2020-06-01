@@ -385,8 +385,9 @@ wire [XL:0] fwd_s4_wdata_hi = gpr_wdata_hi      ;
 // RS.hi hazard with stage X.lo
 `define HAZARD_HI_LO(RS_HI, RS_ADDR, FWD_RD, FWD_WIDE) (  \
     RS_HI                               &&  \
-    RS_ADDR          == FWD_RD          &&  \
-    RS_ADDR[0]                          &&  \
+    RS_ADDR    [4:1] == FWD_RD   [4:1]  &&  \
+    !RS_ADDR   [  0]                    &&  \
+    FWD_RD     [  0]                    &&  \
     !FWD_WIDE                           )
     
 // RS.hi hazard with stage X.hi

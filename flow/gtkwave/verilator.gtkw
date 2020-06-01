@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Jun  1 09:55:29 2020
+[*] Mon Jun  1 13:15:59 2020
 [*]
 [dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/sparx/sparx.vcd"
-[dumpfile_mtime] "Mon Jun  1 09:40:48 2020"
-[dumpfile_size] 51979977
+[dumpfile_mtime] "Mon Jun  1 13:09:03 2020"
+[dumpfile_size] 35759117
 [savefile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 97112
+[timestart] 84071
 [size] 1920 1025
 [pos] -1 -1
-*-5.271645 97186 13206 79926 97066 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.951870 84126 13206 80146 97066 97186 84046 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -22,7 +22,7 @@
 [sst_width] 340
 [signals_width] 504
 [sst_expanded] 1
-[sst_vpaned_height] 411
+[sst_vpaned_height] 396
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -109,6 +109,7 @@ TOP.frv_core.trs_pc[31:0]
 -
 @28
 >0
+TOP.frv_core.i_pipeline.trap_cpu
 TOP.frv_core.trs_valid
 TOP.frv_core.i_pipeline.cf_req
 TOP.frv_core.i_pipeline.cf_ack
@@ -123,7 +124,6 @@ TOP.frv_core.i_pipeline.cf_target[31:0]
 TOP.frv_core.i_pipeline.gpr_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.gpr_wdata[31:0]
-@23
 TOP.frv_core.i_pipeline.gpr_wdata_hi[31:0]
 @28
 TOP.frv_core.i_pipeline.gpr_wide
@@ -195,6 +195,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_valid
 -Forwarding
 @28
 TOP.frv_core.i_pipeline.s1_bubble
+TOP.frv_core.i_pipeline.s1_rs1_hi
 @c00200
 -Hazzards
 @28
@@ -222,10 +223,17 @@ TOP.frv_core.i_pipeline.fwd_s3_wdata[31:0]
 TOP.frv_core.i_pipeline.fwd_s3_wdata_hi[31:0]
 @1401200
 -Hazzards
-@24
+@2024
+^2 /home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s1_rs1_addr[4:0]
+^2 /home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s1_rs2_addr[4:0]
+^2 /home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s1_rs3_addr[4:0]
+@28
+TOP.frv_core.i_pipeline.fwd_s2_wide
+TOP.frv_core.i_pipeline.fwd_s3_wide
+TOP.frv_core.i_pipeline.gpr_wide
 @800200
 -RS1
 @28
@@ -233,9 +241,6 @@ TOP.frv_core.i_pipeline.nz_s1_rs1
 TOP.frv_core.i_pipeline.hzd_rs1_s2
 TOP.frv_core.i_pipeline.hzd_rs1_s3
 TOP.frv_core.i_pipeline.hzd_rs1_s4
-TOP.frv_core.i_pipeline.fwd_s2_rs1_hi
-TOP.frv_core.i_pipeline.fwd_s3_rs1_hi
-TOP.frv_core.i_pipeline.fwd_s4_rs1_hi
 @22
 TOP.frv_core.i_pipeline.fwd_rs1_rdata[31:0]
 TOP.frv_core.i_pipeline.fwd_rs1_rdatahi[31:0]
@@ -243,28 +248,17 @@ TOP.frv_core.i_pipeline.s1_rs1_rdata[31:0]
 TOP.frv_core.i_pipeline.s1_rs1_rdatahi[31:0]
 @1000200
 -RS1
-@800200
+@c00200
 -RS2
-@22
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_rdatahi[31:0]
-TOP.frv_core.i_pipeline.fwd_rs2_rdata[31:0]
-TOP.frv_core.i_pipeline.fwd_rs2_rdatahi[31:0]
 @28
-TOP.frv_core.i_pipeline.fwd_s2_rs2_hi
-TOP.frv_core.i_pipeline.fwd_s3_rs2_hi
-TOP.frv_core.i_pipeline.fwd_s4_rs2_hi
 TOP.frv_core.i_pipeline.hzd_rs2_s2
-TOP.frv_core.i_pipeline.hzd_rs2_s3
 TOP.frv_core.i_pipeline.hzd_rs2_s4
-@1000200
+@22
+TOP.frv_core.i_pipeline.s1_rs2_rdatahi[31:0]
+@1401200
 -RS2
+@1000200
 -Forwarding
-@28
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_hi_rev
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_rev
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_hi_rev
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_rev
-TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs3_rev
 @2022
 ^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/sparx/sparx.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
