@@ -366,59 +366,102 @@ wire nz_s1_rs1     = |s1_rs1_addr;
 wire nz_s1_rs2     = |s1_rs2_addr;
 wire nz_s1_rs3     = |s1_rs3_addr;
 
-// Top 4 bits of address match AND
-// Address is non-zero AND
-// LSB matches OR RD[0] clear and wide
-`define HAZARD(A, F, NZ, W) (               \
-    (A[4:1] == F[4:1]) &&                   \
-    (NZ || !NZ && A[0] && !F[0] && W  ) &&  \
-    (A[0] == F[0] || A[0] && !F[0] && W)    \
+wire        fwd_s4_wide     = gpr_wide          ;
+wire        fwd_s4_wdhi_rev = gpr_wdata_hi_rev  ;
+wire [XL:0] fwd_s4_wdata_hi = gpr_wdata_hi      ;
+
+// RS.lo hazard with stage X.lo
+`define HAZARD_LO_LO(RS_ADDR, FWD_RD, FWD_WIDE) (   \
+    RS_ADDR == FWD_RD && |RS_ADDR           \
 )
+    
+// RS.lo hazard with stage X.hi
+`define HAZARD_LO_HI(RS_ADDR, FWD_RD, FWD_WIDE) (  \
+    RS_ADDR    [4:1] == FWD_RD   [4:1]  &&  \
+    RS_ADDR    [  0] == 1'b1            &&  \
+    FWD_RD     [  0] == 1'b0            &&  \
+    FWD_WIDE                            )
 
-`define HI_HAZARD(A, F, H) ((A[4:1] == F[4:1]) && H && F[0])
+// RS.hi hazard with stage X.lo
+`define HAZARD_HI_LO(RS_HI, RS_ADDR, FWD_RD, FWD_WIDE) (  \
+    RS_HI                               &&  \
+    RS_ADDR          == FWD_RD          &&  \
+    RS_ADDR[0]                          &&  \
+    !FWD_WIDE                           )
+    
+// RS.hi hazard with stage X.hi
+`define HAZARD_HI_HI(RS_HI, RS_ADDR, FWD_RD, FWD_WIDE) (  \
+    RS_HI                               &&  \
+    RS_ADDR          == FWD_RD          &&  \
+    FWD_WIDE                           )
 
-wire hzd_rs1_s4 = `HAZARD(s1_rs1_addr, fwd_s4_rd, nz_s1_rs1, gpr_wide   ) ||
-                  hi_hzd_rs1_s4                                           ;
+wire hzd_rs1lo_s2lo=`HAZARD_LO_LO(s1_rs1_addr, fwd_s2_rd, fwd_s2_wide);
+wire hzd_rs1lo_s2hi=`HAZARD_LO_HI(s1_rs1_addr, fwd_s2_rd, fwd_s2_wide);
+wire hzd_rs1hi_s2lo=`HAZARD_HI_LO(s1_rs1_hi,s1_rs1_addr,fwd_s2_rd,fwd_s2_wide);
+wire hzd_rs1hi_s2hi=`HAZARD_HI_HI(s1_rs1_hi,s1_rs1_addr,fwd_s2_rd,fwd_s2_wide);
+wire hzd_rs1_s2_lo = hzd_rs1lo_s2lo || hzd_rs1lo_s2hi ;
+wire hzd_rs1_s2_hi = hzd_rs1hi_s2lo || hzd_rs1hi_s2hi ;
+wire hzd_rs1_s2    = hzd_rs1_s2_lo  || hzd_rs1_s2_hi  ;
 
-wire hzd_rs1_s3 = `HAZARD(s1_rs1_addr, fwd_s3_rd, nz_s1_rs1, fwd_s3_wide) ||
-                  hi_hzd_rs1_s3                                           ;
+wire hzd_rs1lo_s3lo=`HAZARD_LO_LO(s1_rs1_addr, fwd_s3_rd, fwd_s3_wide);
+wire hzd_rs1lo_s3hi=`HAZARD_LO_HI(s1_rs1_addr, fwd_s3_rd, fwd_s3_wide);
+wire hzd_rs1hi_s3lo=`HAZARD_HI_LO(s1_rs1_hi,s1_rs1_addr,fwd_s3_rd,fwd_s3_wide);
+wire hzd_rs1hi_s3hi=`HAZARD_HI_HI(s1_rs1_hi,s1_rs1_addr,fwd_s3_rd,fwd_s3_wide);
+wire hzd_rs1_s3_lo = hzd_rs1lo_s3lo || hzd_rs1lo_s3hi ;
+wire hzd_rs1_s3_hi = hzd_rs1hi_s3lo || hzd_rs1hi_s3hi ;
+wire hzd_rs1_s3    = hzd_rs1_s3_lo  || hzd_rs1_s3_hi  ;
 
-wire hzd_rs1_s2 = `HAZARD(s1_rs1_addr, fwd_s2_rd, nz_s1_rs1, fwd_s2_wide) ||
-                  hi_hzd_rs1_s2                                           ;
+wire hzd_rs1lo_s4lo=`HAZARD_LO_LO(s1_rs1_addr, fwd_s4_rd, fwd_s4_wide);
+wire hzd_rs1lo_s4hi=`HAZARD_LO_HI(s1_rs1_addr, fwd_s4_rd, fwd_s4_wide);
+wire hzd_rs1hi_s4lo=`HAZARD_HI_LO(s1_rs1_hi,s1_rs1_addr,fwd_s4_rd,fwd_s4_wide);
+wire hzd_rs1hi_s4hi=`HAZARD_HI_HI(s1_rs1_hi,s1_rs1_addr,fwd_s4_rd,fwd_s4_wide);
+wire hzd_rs1_s4_lo = hzd_rs1lo_s4lo || hzd_rs1lo_s4hi ;
+wire hzd_rs1_s4_hi = hzd_rs1hi_s4lo || hzd_rs1hi_s4hi ;
+wire hzd_rs1_s4    = hzd_rs1_s4_lo  || hzd_rs1_s4_hi  ;
 
-wire hzd_rs2_s4 = `HAZARD(s1_rs2_addr, fwd_s4_rd, nz_s1_rs2, gpr_wide   ) ||
-                  hi_hzd_rs2_s4                                           ;
 
-wire hzd_rs2_s3 = `HAZARD(s1_rs2_addr, fwd_s3_rd, nz_s1_rs2, fwd_s3_wide) ||
-                  hi_hzd_rs2_s3                                           ;
+wire hzd_rs2lo_s2lo=`HAZARD_LO_LO(s1_rs2_addr, fwd_s2_rd, fwd_s2_wide);
+wire hzd_rs2lo_s2hi=`HAZARD_LO_HI(s1_rs2_addr, fwd_s2_rd, fwd_s2_wide);
+wire hzd_rs2hi_s2lo=`HAZARD_HI_LO(s1_rs2_hi,s1_rs2_addr,fwd_s2_rd,fwd_s2_wide);
+wire hzd_rs2hi_s2hi=`HAZARD_HI_HI(s1_rs2_hi,s1_rs2_addr,fwd_s2_rd,fwd_s2_wide);
+wire hzd_rs2_s2_lo = hzd_rs2lo_s2lo || hzd_rs2lo_s2hi ;
+wire hzd_rs2_s2_hi = hzd_rs2hi_s2lo || hzd_rs2hi_s2hi ;
+wire hzd_rs2_s2    = hzd_rs2_s2_lo  || hzd_rs2_s2_hi  ;
 
-wire hzd_rs2_s2 = `HAZARD(s1_rs2_addr, fwd_s2_rd, nz_s1_rs2, fwd_s2_wide) ||
-                  hi_hzd_rs2_s2                                           ;
+wire hzd_rs2lo_s3lo=`HAZARD_LO_LO(s1_rs2_addr, fwd_s3_rd, fwd_s3_wide);
+wire hzd_rs2lo_s3hi=`HAZARD_LO_HI(s1_rs2_addr, fwd_s3_rd, fwd_s3_wide);
+wire hzd_rs2hi_s3lo=`HAZARD_HI_LO(s1_rs2_hi,s1_rs2_addr,fwd_s3_rd,fwd_s3_wide);
+wire hzd_rs2hi_s3hi=`HAZARD_HI_HI(s1_rs2_hi,s1_rs2_addr,fwd_s3_rd,fwd_s3_wide);
+wire hzd_rs2_s3_lo = hzd_rs2lo_s3lo || hzd_rs2lo_s3hi ;
+wire hzd_rs2_s3_hi = hzd_rs2hi_s3lo || hzd_rs2hi_s3hi ;
+wire hzd_rs2_s3    = hzd_rs2_s3_lo  || hzd_rs2_s3_hi  ;
 
-wire hzd_rs3_s4 = `HAZARD(s1_rs3_addr, fwd_s4_rd, nz_s1_rs3, gpr_wide   );
-wire hzd_rs3_s3 = `HAZARD(s1_rs3_addr, fwd_s3_rd, nz_s1_rs3, fwd_s3_wide);
-wire hzd_rs3_s2 = `HAZARD(s1_rs3_addr, fwd_s2_rd, nz_s1_rs3, fwd_s2_wide);
+wire hzd_rs2lo_s4lo=`HAZARD_LO_LO(s1_rs2_addr, fwd_s4_rd, fwd_s4_wide);
+wire hzd_rs2lo_s4hi=`HAZARD_LO_HI(s1_rs2_addr, fwd_s4_rd, fwd_s4_wide);
+wire hzd_rs2hi_s4lo=`HAZARD_HI_LO(s1_rs2_hi,s1_rs2_addr,fwd_s4_rd,fwd_s4_wide);
+wire hzd_rs2hi_s4hi=`HAZARD_HI_HI(s1_rs2_hi,s1_rs2_addr,fwd_s4_rd,fwd_s4_wide);
+wire hzd_rs2_s4_lo = hzd_rs2lo_s4lo || hzd_rs2lo_s4hi ;
+wire hzd_rs2_s4_hi = hzd_rs2hi_s4lo || hzd_rs2hi_s4hi ;
+wire hzd_rs2_s4    = hzd_rs2_s4_lo  || hzd_rs2_s4_hi  ;
 
-wire hi_hzd_rs1_s4 = `HI_HAZARD(s1_rs1_addr, fwd_s4_rd, s1_rs1_hi);
-wire hi_hzd_rs2_s4 = `HI_HAZARD(s1_rs2_addr, fwd_s4_rd, s1_rs2_hi);
-wire hi_hzd_rs1_s3 = `HI_HAZARD(s1_rs1_addr, fwd_s3_rd, s1_rs1_hi);
-wire hi_hzd_rs2_s3 = `HI_HAZARD(s1_rs2_addr, fwd_s3_rd, s1_rs2_hi);
-wire hi_hzd_rs1_s2 = `HI_HAZARD(s1_rs1_addr, fwd_s2_rd, s1_rs1_hi);
-wire hi_hzd_rs2_s2 = `HI_HAZARD(s1_rs2_addr, fwd_s2_rd, s1_rs2_hi);
+wire hzd_rs3lo_s2lo=`HAZARD_LO_LO(s1_rs3_addr, fwd_s2_rd, fwd_s2_wide);
+wire hzd_rs3lo_s2hi=`HAZARD_LO_HI(s1_rs3_addr, fwd_s2_rd, fwd_s2_wide);
+wire hzd_rs3_s2_lo = hzd_rs3lo_s2lo || hzd_rs3lo_s2hi ;
+wire hzd_rs3_s2    = hzd_rs3_s2_lo                    ;
 
-`undef HAZARD
+wire hzd_rs3lo_s3lo=`HAZARD_LO_LO(s1_rs3_addr, fwd_s3_rd, fwd_s3_wide);
+wire hzd_rs3lo_s3hi=`HAZARD_LO_HI(s1_rs3_addr, fwd_s3_rd, fwd_s3_wide);
+wire hzd_rs3_s3_lo = hzd_rs3lo_s3lo || hzd_rs3lo_s3hi ;
+wire hzd_rs3_s3    = hzd_rs3_s3_lo                    ;
 
-wire fwd_s2_rs1_hi = s1_rs1_addr[0] && fwd_s2_wide;
-wire fwd_s3_rs1_hi = s1_rs1_addr[0] && fwd_s3_wide;
-wire fwd_s4_rs1_hi = s1_rs1_addr[0] && gpr_wide   ;
+wire hzd_rs3lo_s4lo=`HAZARD_LO_LO(s1_rs3_addr, fwd_s4_rd, fwd_s4_wide);
+wire hzd_rs3lo_s4hi=`HAZARD_LO_HI(s1_rs3_addr, fwd_s4_rd, fwd_s4_wide);
+wire hzd_rs3_s4_lo = hzd_rs3lo_s4lo || hzd_rs3lo_s4hi ;
+wire hzd_rs3_s4    = hzd_rs3_s4_lo                    ;
 
-wire fwd_s2_rs2_hi = s1_rs2_addr[0] && fwd_s2_wide;
-wire fwd_s3_rs2_hi = s1_rs2_addr[0] && fwd_s3_wide;
-wire fwd_s4_rs2_hi = s1_rs2_addr[0] && gpr_wide   ;
-
-wire fwd_s2_rs3_hi = s1_rs3_addr[0] && fwd_s2_wide;
-wire fwd_s3_rs3_hi = s1_rs3_addr[0] && fwd_s3_wide;
-wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
+wire hzd_any       = hzd_rs1_s2 || hzd_rs1_s3 || hzd_rs1_s4 ||
+                     hzd_rs2_s2 || hzd_rs2_s3 || hzd_rs2_s4 ||
+                     hzd_rs3_s2 || hzd_rs3_s3 || hzd_rs3_s4 ;
 
 //
 // Bubbling occurs when:
@@ -426,9 +469,9 @@ wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 // - There is a leakage fence in decode and subsequent stages still have
 //   an instruction in them.
 wire   s1_bubble_no_instr = !s1_valid && !s2_busy ;
-wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4));
-wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3));
-wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2));
+wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_any));
+wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_any));
+wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_any));
 wire   s1_bubble   =
      s1_bubble_no_instr     ||
      s1_bubble_from_s4      ||
@@ -439,68 +482,68 @@ wire   s1_bubble   =
 // Bit reversed form indicator bits
 
 wire        fwd_rs1_rev   =
-     hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdhi_rev : 1'b0)  :
-     hzd_rs1_s3 ? (fwd_s3_rs1_hi ? fwd_s3_wdhi_rev : 1'b0)  :
-     hzd_rs1_s4 ? (fwd_s4_rs1_hi ? gpr_wdata_hi_rev: 1'b0)  :
-                  (s1_rs1_lo_rev                         )  ;
-
-wire        fwd_rs1_hi_rev=
-     fwd_s2_wide && hzd_rs1_s2 ? fwd_s2_wdhi_rev   :
-     fwd_s3_wide && hzd_rs1_s3 ? fwd_s3_wdhi_rev   :
-     gpr_wide    && hzd_rs1_s4 ? gpr_wdata_hi_rev  :
-                                 s1_rs1_hi_rev     ;
-
-wire        fwd_rs2_rev   =
-     hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdhi_rev : 1'b0)  :
-     hzd_rs2_s3 ? (fwd_s3_rs2_hi ? fwd_s3_wdhi_rev : 1'b0)  :
-     hzd_rs2_s4 ? (fwd_s4_rs2_hi ? gpr_wdata_hi_rev: 1'b0)  :
-                  (s1_rs2_lo_rev                         )  ;
-
-wire        fwd_rs2_hi_rev=
-     fwd_s2_wide && hzd_rs2_s2 ? fwd_s2_wdhi_rev   :
-     fwd_s3_wide && hzd_rs2_s3 ? fwd_s3_wdhi_rev   :
-     gpr_wide    && hzd_rs2_s4 ? gpr_wdata_hi_rev  :
-                                 s1_rs2_hi_rev     ;
-
-wire        fwd_rs3_rev   =
-     hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdhi_rev : 1'b0)  :
-     hzd_rs3_s3 ? (fwd_s3_rs3_hi ? fwd_s3_wdhi_rev : 1'b0)  :
-     hzd_rs3_s4 ? (fwd_s4_rs3_hi ? gpr_wdata_hi_rev: 1'b0)  :
-                  (s1_rs3_lo_rev                         )  ;
+    hzd_rs1_s2_lo ? (hzd_rs1lo_s2hi ? fwd_s2_wdhi_rev : 1'b0) :
+    hzd_rs1_s3_lo ? (hzd_rs1lo_s3hi ? fwd_s3_wdhi_rev : 1'b0) :
+    hzd_rs1_s4_lo ? (hzd_rs1lo_s4hi ? fwd_s4_wdhi_rev : 1'b0) :
+                     s1_rs1_lo_rev                            ;
+                                                            
+wire        fwd_rs1_hi_rev=                                 
+    hzd_rs1_s2_hi ? (hzd_rs1hi_s2hi ? fwd_s2_wdhi_rev : 1'b0) :
+    hzd_rs1_s3_hi ? (hzd_rs1hi_s3hi ? fwd_s3_wdhi_rev : 1'b0) :
+    hzd_rs1_s4_hi ? (hzd_rs1hi_s4hi ? fwd_s4_wdhi_rev : 1'b0) :
+                     s1_rs1_hi_rev                            ;
+                                                            
+wire        fwd_rs2_rev   =                                 
+    hzd_rs2_s2_lo ? (hzd_rs2lo_s2hi ? fwd_s2_wdhi_rev : 1'b0) :
+    hzd_rs2_s3_lo ? (hzd_rs2lo_s3hi ? fwd_s3_wdhi_rev : 1'b0) :
+    hzd_rs2_s4_lo ? (hzd_rs2lo_s4hi ? fwd_s4_wdhi_rev : 1'b0) :
+                     s1_rs2_lo_rev                            ;
+                                                            
+wire        fwd_rs2_hi_rev=                                 
+    hzd_rs2_s2_hi ? (hzd_rs2hi_s2hi ? fwd_s2_wdhi_rev : 1'b0) :
+    hzd_rs2_s3_hi ? (hzd_rs2hi_s3hi ? fwd_s3_wdhi_rev : 1'b0) :
+    hzd_rs2_s4_hi ? (hzd_rs2hi_s4hi ? fwd_s4_wdhi_rev : 1'b0) :
+                     s1_rs2_hi_rev                            ;
+                                                            
+wire        fwd_rs3_rev   =                                 
+    hzd_rs3_s2_lo ? (hzd_rs3lo_s2hi ? fwd_s2_wdhi_rev : 1'b0) :
+    hzd_rs3_s3_lo ? (hzd_rs3lo_s3hi ? fwd_s3_wdhi_rev : 1'b0) :
+    hzd_rs3_s4_lo ? (hzd_rs3lo_s4hi ? fwd_s4_wdhi_rev : 1'b0) :
+                     s1_rs3_lo_rev                            ;
 
 
 //
 // Register read data.
 
 wire [XL:0] fwd_rs1_rdata =
-     hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
-     hzd_rs1_s3 ? (fwd_s3_rs1_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
-     hzd_rs1_s4 ? (fwd_s4_rs1_hi ? gpr_wdata_hi    : gpr_wdata   )  :
-                  s1_rs1_rdata   ;
+    hzd_rs1_s2_lo ? (hzd_rs1lo_s2lo ? fwd_s2_wdata : fwd_s2_wdata_hi) :
+    hzd_rs1_s3_lo ? (hzd_rs1lo_s3lo ? fwd_s3_wdata : fwd_s3_wdata_hi) :
+    hzd_rs1_s4_lo ? (hzd_rs1lo_s4lo ? fwd_s4_wdata : fwd_s4_wdata_hi) :
+                     s1_rs1_rdata                                     ;
 
 wire [XL:0] fwd_rs1_rdatahi =
-     fwd_s2_wide && hzd_rs1_s2 ? fwd_s2_wdata_hi   :
-     fwd_s3_wide && hzd_rs1_s3 ? fwd_s3_wdata_hi   :
-     gpr_wide    && hzd_rs1_s4 ? gpr_wdata_hi      :
-                                 s1_rs1_rdatahi    ;
+    hzd_rs1_s2_hi ? (hzd_rs1hi_s2hi ? fwd_s2_wdata_hi : fwd_s2_wdata) :
+    hzd_rs1_s3_hi ? (hzd_rs1hi_s3hi ? fwd_s3_wdata_hi : fwd_s3_wdata) :
+    hzd_rs1_s4_hi ? (hzd_rs1hi_s4hi ? fwd_s4_wdata_hi : fwd_s4_wdata) :
+                     s1_rs1_rdatahi                                   ;
 
 wire [XL:0] fwd_rs2_rdata =
-     hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
-     hzd_rs2_s3 ? (fwd_s3_rs2_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
-     hzd_rs2_s4 ? (fwd_s4_rs2_hi ? gpr_wdata_hi    : gpr_wdata   )  :
-                  s1_rs2_rdata   ;
+    hzd_rs2_s2_lo ? (hzd_rs2lo_s2lo ? fwd_s2_wdata : fwd_s2_wdata_hi) :
+    hzd_rs2_s3_lo ? (hzd_rs2lo_s3lo ? fwd_s3_wdata : fwd_s3_wdata_hi) :
+    hzd_rs2_s4_lo ? (hzd_rs2lo_s4lo ? fwd_s4_wdata : fwd_s4_wdata_hi) :
+                     s1_rs2_rdata                                    ;
 
 wire [XL:0] fwd_rs2_rdatahi =
-     fwd_s2_wide && hzd_rs2_s2 ? fwd_s2_wdata_hi   :
-     fwd_s3_wide && hzd_rs2_s3 ? fwd_s3_wdata_hi   :
-     gpr_wide    && hzd_rs2_s4 ? gpr_wdata_hi      :
-                                 s1_rs2_rdatahi    ;
+    hzd_rs2_s2_hi ? (hzd_rs2hi_s2hi ? fwd_s2_wdata_hi : fwd_s2_wdata) :
+    hzd_rs2_s3_hi ? (hzd_rs2hi_s3hi ? fwd_s3_wdata_hi : fwd_s3_wdata) :
+    hzd_rs2_s4_hi ? (hzd_rs2hi_s4hi ? fwd_s4_wdata_hi : fwd_s4_wdata) :
+                     s1_rs2_rdatahi                                   ;
 
 wire [XL:0] fwd_rs3_rdata =
-     hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
-     hzd_rs3_s3 ? (fwd_s3_rs3_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
-     hzd_rs3_s4 ? (fwd_s4_rs3_hi ? gpr_wdata_hi    : gpr_wdata   )  :
-                  s1_rs3_rdata   ;
+    hzd_rs3_s2_lo ? (hzd_rs3lo_s2lo ? fwd_s2_wdata : fwd_s2_wdata_hi) :
+    hzd_rs3_s3_lo ? (hzd_rs3lo_s3lo ? fwd_s3_wdata : fwd_s3_wdata_hi) :
+    hzd_rs3_s4_lo ? (hzd_rs3lo_s4lo ? fwd_s4_wdata : fwd_s4_wdata_hi) :
+                     s1_rs3_rdata                                    ;
 
 //
 // Submodule Instances.

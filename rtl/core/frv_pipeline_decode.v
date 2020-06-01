@@ -543,7 +543,10 @@ assign s1_rs1_addr =  no_rs1       ? 5'b0       :
                       instr_16bit  ? dec_rs1_16 :
                                      dec_rs1_32 &rs_mask;
 
-assign s1_rs1_hi   = n_s2_fu[P_FU_MSK] && !(dec_mask_b_mask || dec_mask_a_mask);
+assign s1_rs1_hi   = 
+    n_s2_fu[P_FU_MSK] && !(dec_mask_b_mask || dec_mask_a_mask)  ||
+    dec_mask_b_unmask || dec_mask_a_unmask;
+
 assign s1_rs2_hi   = n_s2_fu[P_FU_MSK] && !no_rs2  ;
 
 assign s1_rs2_addr =  no_rs2       ? 5'b0       :

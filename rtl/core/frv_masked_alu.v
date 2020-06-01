@@ -8,7 +8,7 @@
 //
 module frv_masked_shuffle #(
 parameter LEN   = 32,
-parameter CONST = 32'habcd4567
+parameter CONST = 32'h0
 )(
 input  wire [LEN-1:0] i  ,
 input  wire           en ,

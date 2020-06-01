@@ -309,6 +309,10 @@ wire [XL:0] msk_rs1_s1      ;
 wire [XL:0] msk_rs2_s0      = s2_opr_b;
 wire [XL:0] msk_rs2_s1      ;
 
+wire [XL:0] msk_rs1 = msk_rs1_s0 ^ msk_rs1_s1;
+wire [XL:0] msk_rs2 = msk_rs2_s0 ^ msk_rs2_s1;
+wire [XL:0] msk_rd  = msk_rd_s0  ^ msk_rd_s1;
+
 wire en_unshfl_opr_c = MASK_REV_EN;
 wire en_unshfl_opr_d = MASK_REV_EN;
 

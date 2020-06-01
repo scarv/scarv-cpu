@@ -482,6 +482,11 @@ assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
 assign gpr_wdata_hi     = s4_opr_b      ;
 assign gpr_wdata_hi_rev = s4_opr_b_rev  ;
 
+wire [XL:0] unrev_wdata_hi;
+`WORD_SHUFFLE(gpr_wdata_hi,unrev_wdata_hi,gpr_wdata_hi_rev,1'b0)
+
+wire [XL:0] unmasked_wdata = gpr_wdata ^ unrev_wdata_hi;
+
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;
 assign fwd_s4_load  = fu_lsu && lsu_load;
