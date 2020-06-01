@@ -19,6 +19,8 @@ uint32_t test_vectors[1][8] = {
 
 // Constant mask to make debugging easier.
 uint32_t mask = 0x0;
+    
+uint32_t plainek[  27];
 
 int test_main() {
 
@@ -42,15 +44,17 @@ int test_main() {
         mk[i  ] = k[i] ^ mask;
     }
 
+    speck_key_exp(plainek, k);
+
     // Key expansion.
     bmsk_speck_key_exp_asm(ekey, mk);
 
-    //for(int i = 0; i < 27; i++) {
-    //    uint32_t s0 = ekey[i +  0];
-    //    uint32_t s1 = ekey[i + 27];
-    //    uint32_t k  = s0 ^ s1;
-    //    __puthex32(k); __putchar('\n');
-    //}
+    for(int i = 0; i < 27; i++) {
+        uint32_t s0 = ekey[i +  0];
+        uint32_t s1 = ekey[i + 27];
+        uint32_t k  = s0 ^ s1;
+        __puthex32(k); __putchar('\n');
+    }
 
     // Encrypt.
     bmsk_speck_encrypt_asm(ekey, &px, &py);

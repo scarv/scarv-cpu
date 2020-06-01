@@ -32,6 +32,9 @@ test_bit_reverse_representation:
     lhu         a1,12(sp)
     lhu         a7,16(sp)       // Load back reference answer.
 
+    nop
+    nop
+
     mask.b.xor  (t4,t3), (t2,t1), (a1,a0) // Masked result
     mask.b.unmask a6,(t4,t3)    // Unmask result.
 
