@@ -460,6 +460,11 @@ wire hzd_rs3lo_s4hi=`HAZARD_LO_HI(s1_rs3_addr, fwd_s4_rd, fwd_s4_wide);
 wire hzd_rs3_s4_lo = hzd_rs3lo_s4lo || hzd_rs3lo_s4hi ;
 wire hzd_rs3_s4    = hzd_rs3_s4_lo                    ;
 
+`undef HAZARD_LO_LO
+`undef HAZARD_LO_HI
+`undef HAZARD_HI_LO
+`undef HAZARD_HI_HI
+
 wire hzd_any       = hzd_rs1_s2 || hzd_rs1_s3 || hzd_rs1_s4 ||
                      hzd_rs2_s2 || hzd_rs2_s3 || hzd_rs2_s4 ||
                      hzd_rs3_s2 || hzd_rs3_s3 || hzd_rs3_s4 ;
