@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Jun  1 13:15:59 2020
+[*] Fri Jun  5 08:29:26 2020
 [*]
-[dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/sparx/sparx.vcd"
-[dumpfile_mtime] "Mon Jun  1 13:09:03 2020"
-[dumpfile_size] 35759117
+[dumpfile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/speck/speck.vcd"
+[dumpfile_mtime] "Fri Jun  5 08:23:54 2020"
+[dumpfile_size] 47462264
 [savefile] "/home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 84071
+[timestart] 123054
 [size] 1920 1025
 [pos] -1 -1
-*-4.951870 84126 13206 80146 97066 97186 84046 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.750972 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -117,7 +117,7 @@ TOP.frv_core.i_pipeline.cf_ack
 TOP.frv_core.i_pipeline.cf_target[31:0]
 @1000200
 -Trace
-@800200
+@c00200
 -GPR
 @2024
 ^2 /home/work/scarv/scarv-soc/extern/scarv-cpu/flow/gtkwave/filter-gprs.txt
@@ -130,7 +130,7 @@ TOP.frv_core.i_pipeline.gpr_wide
 TOP.frv_core.i_pipeline.gpr_wen
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.unmasked_wdata[31:0]
-@1000200
+@1401200
 -GPR
 @c00200
 -Interrupts
@@ -191,7 +191,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_error
 TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.s1_valid
 @1401200
 -Pipe - S0 - Fetch
-@800200
+@c00200
 -Forwarding
 @28
 TOP.frv_core.i_pipeline.s1_bubble
@@ -234,7 +234,7 @@ TOP.frv_core.i_pipeline.s1_rs3_addr[4:0]
 TOP.frv_core.i_pipeline.fwd_s2_wide
 TOP.frv_core.i_pipeline.fwd_s3_wide
 TOP.frv_core.i_pipeline.gpr_wide
-@800200
+@c00200
 -RS1
 @28
 TOP.frv_core.i_pipeline.nz_s1_rs1
@@ -246,7 +246,7 @@ TOP.frv_core.i_pipeline.fwd_rs1_rdata[31:0]
 TOP.frv_core.i_pipeline.fwd_rs1_rdatahi[31:0]
 TOP.frv_core.i_pipeline.s1_rs1_rdata[31:0]
 TOP.frv_core.i_pipeline.s1_rs1_rdatahi[31:0]
-@1000200
+@1401200
 -RS1
 @c00200
 -RS2
@@ -257,8 +257,9 @@ TOP.frv_core.i_pipeline.hzd_rs2_s4
 TOP.frv_core.i_pipeline.s1_rs2_rdatahi[31:0]
 @1401200
 -RS2
-@1000200
 -Forwarding
+@c00201
+-Pipeline Tracing
 @2022
 ^1 /home/work/scarv/scarv-soc/extern/scarv-cpu/work/unit/sparx/sparx.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
@@ -296,6 +297,8 @@ TOP.frv_core.i_pipeline.s4_opr_b[31:0]
 TOP.frv_core.i_pipeline.s4_opr_b_rev
 @22
 TOP.frv_core.i_pipeline.i_gprs.gprs_odd_rev[15:0]
+@1401201
+-Pipeline Tracing
 @c00200
 -Pipe - S1 Decode
 -Masking
@@ -371,7 +374,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_frv_leak.leak_prng[31:0]
 @1401200
 -Leakage Instructions
 -Pipe - S1 Decode
-@800200
+@c00200
 -Pipe - S2 Execute
 @28
 TOP.frv_core.i_pipeline.s2_busy
@@ -522,7 +525,6 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_ready
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_valid
 @1401200
 -ALI
-@1000200
 -Pipe - S2 Execute
 @800200
 -Pipe - S3 Memory
