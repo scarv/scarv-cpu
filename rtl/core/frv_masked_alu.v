@@ -329,26 +329,26 @@ generate
 endgenerate
 
 // OUTPUT MUX: gather and multiplexing results
-assign rd_s0 = {XLEN{op_b_not}} &  mnot0 |
-               {XLEN{op_b_xor}} &  mxor0 |
+assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
+               {XLEN{op_b_xor}} &  (n_prng ^ mxor0) |
                {XLEN{op_b_and}} &  mand0 |
                {XLEN{op_b_ior}} &  mior0 |
+               {XLEN{op_shr  }} &  mshr0 |
                {XLEN{op_b_add}} &  madd0 |
                {XLEN{op_b_sub}} &  madd0 |
                {XLEN{op_a2b  }} &  madd0 |
                {XLEN{op_b2a  }} &  mb2a0 | 
-               {XLEN{op_shr  }} &  mshr0 |
                {XLEN{op_msk  }} &  rmask0;
 
-assign rd_s1 = {XLEN{op_b_not}} &  mnot1 |
-               {XLEN{op_b_xor}} &  mxor1 |
+assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
+               {XLEN{op_b_xor}} &  (n_prng ^ mxor1) |
                {XLEN{op_b_and}} &  mand1 |
                {XLEN{op_b_ior}} &  mior1 |
+               {XLEN{op_shr  }} &  mshr1 |
                {XLEN{op_b_add}} &  madd1 |
                {XLEN{op_b_sub}} &  madd1 |
                {XLEN{op_a2b  }} &  madd1 |
                {XLEN{op_b2a  }} &  mb2a1 |
-               {XLEN{op_shr  }} &  mshr1 |
                {XLEN{op_msk  }} &  rmask1;
 
 assign ready = mnot_rdy || (dologic && mlogic_rdy) || madd_rdy || shr_rdy || msk_rdy ;

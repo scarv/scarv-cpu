@@ -528,6 +528,7 @@ wire [XL:0] fwd_rs1_rdata =
                      s1_rs1_rdata                                     ;
 
 wire [XL:0] fwd_rs1_rdatahi =
+    !s1_rs1_hi    ? {XLEN{1'b0}}                                      :
     hzd_rs1_s2_hi ? (hzd_rs1hi_s2hi ? fwd_s2_wdata_hi : fwd_s2_wdata) :
     hzd_rs1_s3_hi ? (hzd_rs1hi_s3hi ? fwd_s3_wdata_hi : fwd_s3_wdata) :
     hzd_rs1_s4_hi ? (hzd_rs1hi_s4hi ? fwd_s4_wdata_hi : fwd_s4_wdata) :
@@ -540,6 +541,7 @@ wire [XL:0] fwd_rs2_rdata =
                      s1_rs2_rdata                                    ;
 
 wire [XL:0] fwd_rs2_rdatahi =
+    !s1_rs2_hi    ? {XLEN{1'b0}}                                      :
     hzd_rs2_s2_hi ? (hzd_rs2hi_s2hi ? fwd_s2_wdata_hi : fwd_s2_wdata) :
     hzd_rs2_s3_hi ? (hzd_rs2hi_s3hi ? fwd_s3_wdata_hi : fwd_s3_wdata) :
     hzd_rs2_s4_hi ? (hzd_rs2hi_s4hi ? fwd_s4_wdata_hi : fwd_s4_wdata) :

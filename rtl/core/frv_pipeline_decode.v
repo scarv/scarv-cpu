@@ -18,9 +18,9 @@ input  wire        s1_error      , // Is s1_data associated with a fetch error?
 
 input  wire        s1_flush      , // Flush pipe stage register.
 input  wire        s1_bubble     , // Insert a bubble into the pipeline.
-output wire [ 4:0] s1_rs1_addr   ,
+output reg  [ 4:0] s1_rs1_addr   ,
 output wire        s1_rs1_hi     , // Are we reading double width rs1?
-output wire [ 4:0] s1_rs2_addr   ,
+output reg  [ 4:0] s1_rs2_addr   ,
 output wire        s1_rs2_hi     , // Are we reading double width rs1?
 output wire [ 4:0] s1_rs3_addr   ,
 input  wire [XL:0] s1_rs1_rdata  ,
@@ -533,25 +533,36 @@ wire [4:0] dec_rd_16 =
     {5{dec_c_sub     }} & {2'b01, s1_data[9:7]} |
     {5{dec_c_xor     }} & {2'b01, s1_data[9:7]} ;
 
-wire   no_rs1      = !(opra_src_rs1 );
-wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
+wire   en_rs1      = (opra_src_rs1 );
+wire   en_rs2      = (oprb_src_rs2 || oprc_src_rs2);
 
 wire  [4:0] rs_mask = {4'hF, !(dec_mask_b_remask || dec_mask_a_remask ||
                                dec_mask_a2b      )};
 
-assign s1_rs1_addr =  no_rs1       ? 5'b0       :
-                      instr_16bit  ? dec_rs1_16 :
-                                     dec_rs1_32 &rs_mask;
 
 assign s1_rs1_hi   = 
     n_s2_fu[P_FU_MSK] && !(dec_mask_b_mask || dec_mask_a_mask)  ||
     dec_mask_b_unmask || dec_mask_a_unmask;
 
-assign s1_rs2_hi   = n_s2_fu[P_FU_MSK] && !no_rs2  ;
+assign s1_rs2_hi   = n_s2_fu[P_FU_MSK] && en_rs2  ;
 
-assign s1_rs2_addr =  no_rs2       ? 5'b0       :
-                      instr_16bit  ? dec_rs2_16 :
-                                     dec_rs2_32 ;
+
+wire [4:0] n_s1_rs1_addr = {5{en_rs1}} & (
+    instr_16bit  ? dec_rs1_16 : dec_rs1_32 &rs_mask
+) ;
+
+wire [4:0] n_s1_rs2_addr = 
+    {5{en_rs2}} & (instr_16bit ? dec_rs2_16 : dec_rs2_32);
+
+always @(negedge g_clk) begin
+    if(!g_resetn) begin
+        s1_rs1_addr <= 5'b0;
+        s1_rs2_addr <= 5'b0;
+    end else begin
+        if(en_rs1) s1_rs1_addr <= n_s1_rs1_addr;
+        if(en_rs2) s1_rs2_addr <= n_s1_rs2_addr;
+    end
+end
 
 wire   rd_as_rs3   = dec_xc_bop;
 
