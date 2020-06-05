@@ -465,9 +465,9 @@ wire hzd_rs3_s4    = hzd_rs3_s4_lo                    ;
 `undef HAZARD_HI_LO
 `undef HAZARD_HI_HI
 
-wire hzd_any       = hzd_rs1_s2 || hzd_rs1_s3 || hzd_rs1_s4 ||
-                     hzd_rs2_s2 || hzd_rs2_s3 || hzd_rs2_s4 ||
-                     hzd_rs3_s2 || hzd_rs3_s3 || hzd_rs3_s4 ;
+wire hzd_s2 = hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2 ;
+wire hzd_s3 = hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3 ;
+wire hzd_s4 = hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4 ;
 
 //
 // Bubbling occurs when:
@@ -475,9 +475,9 @@ wire hzd_any       = hzd_rs1_s2 || hzd_rs1_s3 || hzd_rs1_s4 ||
 // - There is a leakage fence in decode and subsequent stages still have
 //   an instruction in them.
 wire   s1_bubble_no_instr = !s1_valid && !s2_busy ;
-wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_any));
-wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_any));
-wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_any));
+wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_s4));
+wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_s3));
+wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_s2));
 wire   s1_bubble   =
      s1_bubble_no_instr     ||
      s1_bubble_from_s4      ||
