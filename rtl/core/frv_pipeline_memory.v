@@ -14,7 +14,7 @@ input  wire        flush           , // Flush this pipeline stage.
 input  wire [ 4:0] s3_rd           , // Destination register address
 input  wire [XL:0] s3_opr_a        , // Operand A
 input  wire [XL:0] s3_opr_b        , // Operand B
-output wire        s3_opr_b_rev    , // Operand B in bit reversed form
+input  wire        s3_opr_b_rev    , // Operand B in bit reversed form
 input  wire [OP:0] s3_uop          , // Micro-op code
 input  wire [FU:0] s3_fu           , // Functional Unit
 input  wire        s3_trap         , // Raise a trap?
