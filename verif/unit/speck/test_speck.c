@@ -30,6 +30,8 @@ int test_main() {
     uint32_t py, px;
     uint32_t cy, cx; 
 
+    uint32_t tx,ty;
+
     py   = test_vectors[0][TV_PY];
     px   = test_vectors[0][TV_PX];
     k[0] = test_vectors[0][TV_K0];
@@ -39,25 +41,52 @@ int test_main() {
     cy   = test_vectors[0][TV_CY];
     cx   = test_vectors[0][TV_CX];
 
+    tx   = px;
+    ty   = py;
+
     for(int i = 0; i< 4; i ++) {
         mk[i+4] = mask;
         mk[i  ] = k[i] ^ mask;
     }
+    
+    //
+    // Un-Masked Version
+    //
 
-    speck_key_exp(plainek, k);
+
+    MEASURE_PERF_BEGIN(SPECK_EXP)
+    speck_key_exp_asm(plainek, k);
+    MEASURE_PERF_END(SPECK_EXP)
+    
+    MEASURE_PERF_BEGIN(SPECK_ENC)
+    speck_encrypt_asm(k, &tx, &ty);
+    MEASURE_PERF_END(SPECK_ENC)
+    
+    MEASURE_PERF_BEGIN(SPECK_DEC)
+    speck_decrypt_asm(k, &tx, &ty);
+    MEASURE_PERF_END(SPECK_DEC)
+
+    //
+    // Masked Version
+    //
+
 
     // Key expansion.
+    MEASURE_PERF_BEGIN(SPECK_MSK_EXP)
     bmsk_speck_key_exp_asm(ekey, mk);
+    MEASURE_PERF_END(SPECK_MSK_EXP)
 
-    for(int i = 0; i < 27; i++) {
-        uint32_t s0 = ekey[i +  0];
-        uint32_t s1 = ekey[i + 27];
-        uint32_t k  = s0 ^ s1;
-        __puthex32(k); __putchar('\n');
-    }
+    //for(int i = 0; i < 27; i++) {
+    //    uint32_t s0 = ekey[i +  0];
+    //    uint32_t s1 = ekey[i + 27];
+    //    uint32_t k  = s0 ^ s1;
+    //    __puthex32(k); __putchar('\n');
+    //}
 
     // Encrypt.
+    MEASURE_PERF_BEGIN(SPECK_MSK_ENC)
     bmsk_speck_encrypt_asm(ekey, &px, &py);
+    MEASURE_PERF_END(SPECK_MSK_ENC)
 
     uint32_t grm_cx = test_vectors[0][TV_CX];
     uint32_t grm_cy = test_vectors[0][TV_CY];
@@ -70,7 +99,9 @@ int test_main() {
     }
 
     // Decrypt
+    MEASURE_PERF_BEGIN(SPECK_MSK_DEC)
     bmsk_speck_decrypt_asm(ekey, &cx, &cy);
+    MEASURE_PERF_END(SPECK_MSK_DEC)
     
     uint32_t grm_px = test_vectors[0][TV_PX];
     uint32_t grm_py = test_vectors[0][TV_PY];

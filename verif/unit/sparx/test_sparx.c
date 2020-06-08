@@ -32,10 +32,14 @@ int test_main() {
     }
     
     // Expand key under normal C code implementation.
+    MEASURE_PERF_BEGIN(SPARX_EXP)
     sparx_64_128_key_exp_asm     (c_subkey, c_key);
+    MEASURE_PERF_END(SPARX_EXP)
 
     // Expand key under masked asm implementation.
+    MEASURE_PERF_BEGIN(SPARX_MSK_EXP)
     bmsk_sparx_64_128_key_exp_asm(m_subkey, m_key);
+    MEASURE_PERF_END(SPARX_MSK_EXP)
 
     for(int i = 0; i < SK_LEN; i ++) {
         uint32_t c_elem = c_subkey[i];
@@ -61,19 +65,23 @@ int test_main() {
     }
 
     // Encrypt under un-masked implementation.
+    MEASURE_PERF_BEGIN(SPARX_ENC)
     sparx_64_128_encrypt_asm (c_ptxt, c_subkey);
+    MEASURE_PERF_END(SPARX_ENC)
 
     // Encrypt under masked implementation.
+    MEASURE_PERF_BEGIN(SPARX_MSK_ENC)
     bmsk_sparx_64_128_encrypt_asm (m_ptxt, m_subkey);
+    MEASURE_PERF_END(SPARX_MSK_ENC)
 
     for(int i = 0; i < 4; i ++) {
         uint32_t c_elem = c_ptxt[i];
         uint32_t m_elem = m_ptxt[i] ^ m_ptxt[i+4];
         uint32_t g_elem = ciphertext[i];
 
-        __puthex16(g_elem); __putchar(' ' );
-        __puthex16(c_elem); __putchar(' ' );
-        __puthex16(m_elem); __putchar('\n');
+        //__puthex16(g_elem); __putchar(' ' );
+        //__puthex16(c_elem); __putchar(' ' );
+        //__puthex16(m_elem); __putchar('\n');
 
         if(g_elem != c_elem) {
             __putstr("GRM != unmasked model\n");
@@ -85,6 +93,15 @@ int test_main() {
         }
     }
 
+    // Encrypt under un-masked implementation.
+    MEASURE_PERF_BEGIN(SPARX_DEC)
+    sparx_64_128_decrypt_asm (c_ptxt, c_subkey);
+    MEASURE_PERF_END(SPARX_DEC)
+
+    // Encrypt under masked implementation.
+    MEASURE_PERF_BEGIN(SPARX_MSK_DEC)
+    bmsk_sparx_64_128_decrypt_asm (m_ptxt, m_subkey);
+    MEASURE_PERF_END(SPARX_MSK_DEC)
 
     return 0;
 

@@ -27,10 +27,14 @@ int test_main() {
     }
 
     // Plain C block function.
+    MEASURE_PERF_BEGIN(CHACHA20)
     chacha20_block(block_out_c, block_in_c);
+    MEASURE_PERF_END(CHACHA20)
 
     // Boolean masked block function.
+    MEASURE_PERF_BEGIN(CHACHA20_MSK)
     bmsk_chacha20_block_asm(block_out_asm, block_in_asm);
+    MEASURE_PERF_END(CHACHA20_MSK)
 
     for(int i = 0; i < 16; i ++) {
         uint32_t out_c  = block_out_c[i];

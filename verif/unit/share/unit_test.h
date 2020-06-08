@@ -91,5 +91,26 @@ void __puthex16(uint16_t w);
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w);
 
+#define MEASURE_PERF_BEGIN(NAME) {                        \
+    uint32_t instr_start, instr_end                     ; \
+    uint32_t cycle_start, cycle_end                     ; \
+    asm volatile("rdcycle   %0" : "=r"(cycle_start))    ; \
+    asm volatile("rdinstret %0" : "=r"(instr_start))    ;
+    
+
+#define MEASURE_PERF_END(NAME)                            \
+    asm volatile("rdcycle   %0" : "=r"(cycle_end))      ; \
+    asm volatile("rdinstret %0" : "=r"(instr_end))      ; \
+    instr_end  -= instr_start                           ; \
+    cycle_end  -= cycle_start                           ; \
+    __putstr(#NAME " Cycles: ")                         ; \
+    __puthex32(cycle_end)                               ; \
+    __putstr(", Instrs: ")                              ; \
+    __puthex32(instr_end)                               ; \
+    __putchar('\n')                                     ; \
+}
+
+
+
 #endif
 
