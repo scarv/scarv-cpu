@@ -288,21 +288,21 @@ wire        msk_valid       = fu_msk && msk_valid_en_r  ;
 wire        msk_flush       = flush                     ;
 wire        msk_ready       ; // Mask ALU operation complete.
     
-wire        msk_op_b2a      = s2_uop == MSK_B2A     ;
-wire        msk_op_a2b      = s2_uop == MSK_A2B     ;
-wire        msk_op_b_mask   = s2_uop == MSK_B_MASK  ;
-wire        msk_op_b_remask = s2_uop == MSK_B_REMASK;
-wire        msk_op_a_mask   = s2_uop == MSK_A_MASK  ;
-wire        msk_op_a_remask = s2_uop == MSK_A_REMASK;
-wire        msk_op_b_not    = s2_uop == MSK_B_NOT   ;
-wire        msk_op_b_and    = s2_uop == MSK_B_AND   ;
-wire        msk_op_b_ior    = s2_uop == MSK_B_IOR   ;
-wire        msk_op_b_xor    = s2_uop == MSK_B_XOR   ;
-wire        msk_op_b_add    = s2_uop == MSK_B_ADD   ;
-wire        msk_op_b_sub    = s2_uop == MSK_B_SUB   ;
-wire        msk_op_b_srli   = s2_uop == MSK_B_SRLI  ;
-wire        msk_op_b_slli   = s2_uop == MSK_B_SLLI  ;
-wire        msk_op_b_rori   = s2_uop == MSK_B_RORI  ;
+wire        msk_op_b2a      = XC_CLASS_MASK && s2_uop == MSK_B2A     ;
+wire        msk_op_a2b      = XC_CLASS_MASK && s2_uop == MSK_A2B     ;
+wire        msk_op_b_mask   = XC_CLASS_MASK && s2_uop == MSK_B_MASK  ;
+wire        msk_op_b_remask = XC_CLASS_MASK && s2_uop == MSK_B_REMASK;
+wire        msk_op_a_mask   = XC_CLASS_MASK && s2_uop == MSK_A_MASK  ;
+wire        msk_op_a_remask = XC_CLASS_MASK && s2_uop == MSK_A_REMASK;
+wire        msk_op_b_not    = XC_CLASS_MASK && s2_uop == MSK_B_NOT   ;
+wire        msk_op_b_and    = XC_CLASS_MASK && s2_uop == MSK_B_AND   ;
+wire        msk_op_b_ior    = XC_CLASS_MASK && s2_uop == MSK_B_IOR   ;
+wire        msk_op_b_xor    = XC_CLASS_MASK && s2_uop == MSK_B_XOR   ;
+wire        msk_op_b_add    = XC_CLASS_MASK && s2_uop == MSK_B_ADD   ;
+wire        msk_op_b_sub    = XC_CLASS_MASK && s2_uop == MSK_B_SUB   ;
+wire        msk_op_b_srli   = XC_CLASS_MASK && s2_uop == MSK_B_SRLI  ;
+wire        msk_op_b_slli   = XC_CLASS_MASK && s2_uop == MSK_B_SLLI  ;
+wire        msk_op_b_rori   = XC_CLASS_MASK && s2_uop == MSK_B_RORI  ;
 
 wire [XL:0] msk_rs1_s0      = s2_opr_a;
 wire [XL:0] msk_rs1_s1      ;
@@ -542,6 +542,8 @@ frv_alu i_alu (
 //
 //  Implements all of the masked ALU functionality.
 //
+generate if (XC_CLASS_MASK) begin : masking_ise_implemented
+
 frv_masked_alu #(
 .MASKING_ISE_TRNG(MASKING_ISE_TRNG),
 .MASKING_ISE_TI  (MASKING_ISE_TI  ),
@@ -576,6 +578,15 @@ frv_masked_alu #(
 .rd_s0       (msk_rd_s0       ), // Output share 0
 .rd_s1       (msk_rd_s1       )  // Output share 1
 );
+
+end else begin: masking_ise_not_implemented
+    
+    assign msk_mask = 32'b0;
+    assign msk_rd_s0= 32'b0;
+    assign msk_rd_s1= 32'b0;
+    assign msk_ready= 1'b0;
+
+end endgenerate
 
 //
 // instance: xc_malu
