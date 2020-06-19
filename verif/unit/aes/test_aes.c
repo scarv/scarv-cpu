@@ -17,43 +17,36 @@ int test_aes_128() {
     uint32_t    erk [AES_128_RK_WORDS];
     uint32_t    drk [AES_128_RK_WORDS];
 
-    uint64_t    cycles_0 = __rd_mtime();
-    uint64_t    insret_0 = __rdinstret();
+    uint64_t cycles_eks;
+    uint64_t cycles_enc;
+    uint64_t cycles_dks;
+    uint64_t cycles_dec;
+    uint64_t insret_eks;
+    uint64_t insret_enc;
+    uint64_t insret_dks;
+    uint64_t insret_dec;
 
+    MEASURE_PERF_BEGIN("EKS")
     aes_128_enc_key_schedule(erk, ck);
-    
-    uint64_t    cycles_1 = __rd_mtime();
-    uint64_t    insret_1 = __rdinstret();
+    MEASURE_PERF_END("EKS",insret_eks,cycles_eks)
 
+    MEASURE_PERF_BEGIN("ENC")
     aes_128_enc_block(ct, pt, erk);
+    MEASURE_PERF_END("ENC",insret_enc,cycles_enc)
     
-    uint64_t    cycles_2 = __rd_mtime();
-    uint64_t    insret_2 = __rdinstret();
-    
+    MEASURE_PERF_BEGIN("DKS")
     aes_128_dec_key_schedule(drk, ck);
-    
-    uint64_t    cycles_3 = __rd_mtime();
-    uint64_t    insret_3 = __rdinstret();
+    MEASURE_PERF_END("DKS",insret_dks,cycles_dks)
 
+    MEASURE_PERF_BEGIN("DEC")
     aes_128_dec_block(fi, ct, drk);
-    
-    uint64_t    cycles_4 = __rd_mtime();
-    uint64_t    insret_4 = __rdinstret();
+    MEASURE_PERF_END("DEC",insret_dec,cycles_dec)
 
     for(int i = 0; i < 16; i ++){
         if(pt[i] != fi[i]) {
             tr |= 1;
         }
     }
-
-    uint64_t cycles_eks = cycles_1 - cycles_0 ;
-    uint64_t cycles_enc = cycles_2 - cycles_1 ;
-    uint64_t cycles_dks = cycles_3 - cycles_2 ;
-    uint64_t cycles_dec = cycles_4 - cycles_3 ;
-    uint64_t insret_eks = insret_1 - insret_0 ;
-    uint64_t insret_enc = insret_2 - insret_1 ;
-    uint64_t insret_dks = insret_3 - insret_2 ;
-    uint64_t insret_dec = insret_4 - insret_3 ;
 
     __putstr("pt : "); __puthexstr(pt , 16); __putchar('\n');
     __putstr("ct : "); __puthexstr(ct , 16); __putchar('\n');

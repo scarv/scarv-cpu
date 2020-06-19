@@ -94,5 +94,19 @@ void __puthex8(uint8_t w);
 //! Print a string of 8-bit numbers as hex.
 void __puthexstr(uint8_t * str, int len);
 
+#define MEASURE_PERF_BEGIN(NAME)     {                    \
+    uint32_t instr_start, instr_end                     ; \
+    uint32_t cycle_start, cycle_end                     ; \
+    asm volatile("rdcycle   %0" : "=r"(cycle_start))    ; \
+    asm volatile("rdinstret %0" : "=r"(instr_start))    ;
+    
+
+#define MEASURE_PERF_END(NAME, I, C)                      \
+    asm volatile("rdcycle   %0" : "=r"(cycle_end))      ; \
+    asm volatile("rdinstret %0" : "=r"(instr_end))      ; \
+    I = instr_end - instr_start                         ; \
+    C = cycle_end - cycle_start                         ; \
+}
+
 #endif
 
