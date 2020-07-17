@@ -23,6 +23,13 @@ implementation.*
 
 <!--- -------------------------------------------------------------------- --->
 
+**Note:** This is the `scarv/skywater/main` branch. It is used for substantial
+work on the core, related to a possible future tapeout. You can see
+open issues related to Project Skywater 
+[here](https://github.com/scarv/scarv-cpu/issues?q=is%3Aissue+is%3Aopen+label%3Askywater).
+
+<!--- -------------------------------------------------------------------- --->
+
 - [Overview](#Overview)
 - [Documentation](#Documentation)
 - [Quickstart](#Quickstart)
