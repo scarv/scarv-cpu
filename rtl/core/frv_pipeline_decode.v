@@ -20,14 +20,8 @@ input  wire        s1_flush      , // Flush pipe stage register.
 input  wire        s1_bubble     , // Insert a bubble into the pipeline.
 output wire [ 4:0] s1_rs1_addr   ,
 output wire [ 4:0] s1_rs2_addr   ,
-output wire [ 4:0] s1_rs3_addr   ,
 input  wire [XL:0] s1_rs1_rdata  ,
 input  wire [XL:0] s1_rs2_rdata  ,
-input  wire [XL:0] s1_rs3_rdata  ,
-
-output wire [XL:0] leak_prng     , // Current PRNG value.
-input  wire [12:0] leak_lkgcfg   , // Current lkgcfg register value.
-output wire        s1_leak_fence , // Leakage fence currently in decode.
 
 input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
@@ -36,10 +30,8 @@ input  wire        cf_ack        , // Control flow change acknowledge.
 `ifdef RVFI
 output reg  [ 4:0] rvfi_s2_rs1_addr,
 output reg  [ 4:0] rvfi_s2_rs2_addr,
-output reg  [ 4:0] rvfi_s2_rs3_addr,
 output reg  [XL:0] rvfi_s2_rs1_data,
 output reg  [XL:0] rvfi_s2_rs2_data,
-output reg  [XL:0] rvfi_s2_rs3_data,
 `endif
 
 output wire        s2_valid      , // Is the output data valid?
@@ -50,7 +42,6 @@ output wire [XL:0] s2_opr_b      , // Operand B
 output wire [XL:0] s2_opr_c      , // Operand C
 output wire [OP:0] s2_uop        , // Micro-op code
 output wire [FU:0] s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
-output wire [PW:0] s2_pw         , // Pack width specifier for IALU.
 output wire        s2_trap       , // Raise a trap?
 output wire [ 1:0] s2_size       , // Size of the instruction.
 output wire [31:0] s2_instr        // The instruction word
@@ -95,7 +86,7 @@ wire   p_s2_busy;
 
 wire pipe_progress = s1_valid && !s1_busy;
 
-assign s1_busy      = p_s2_busy || s1_bubble || leak_stall;
+assign s1_busy      = p_s2_busy || s1_bubble;
 wire   n_s2_valid   = s1_valid  || s1_bubble;
 
 wire [ 4:0] n_s2_rd         ; // Destination register address
@@ -106,7 +97,6 @@ wire [XL:0] n_s2_imm        ; //
 wire [XL:0] n_s2_pc_imm     ; // 
 wire [OP:0] n_s2_uop        ; // Micro-op code
 wire [FU:0] n_s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
-wire [PW:0] n_s2_pw         ; // IALU pack width specifier.
 wire        n_s2_trap       ; // Raise a trap?
 wire [ 1:0] n_s2_size       ; // Size of the instruction.
 wire [31:0] n_s2_instr      ; // The instruction word
@@ -135,17 +125,11 @@ assign n_s2_fu[P_FU_ALU] =
     dec_slt        || dec_slti       || dec_sltu       || dec_sltiu      ||
     dec_sra        || dec_srai       || dec_c_srai     || dec_c_srli     ||
     dec_srl        || dec_srli       || dec_sll        || dec_slli       ||
-    dec_c_slli     ||
-    dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
-    dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
-    dec_b_ror      || dec_b_rori     ;
+    dec_c_slli     ;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
-    dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ||
-    dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
-    dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ||
-    dec_xc_mmul_3  || dec_xc_madd_3  || dec_xc_msub_3  || dec_xc_macc_1  ;
+    dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ;
 
 assign n_s2_fu[P_FU_CFU] = 
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
@@ -157,31 +141,11 @@ assign n_s2_fu[P_FU_CFU] =
 assign n_s2_fu[P_FU_LSU] = 
     dec_lb         || dec_lbu       || dec_lh          || dec_lhu        ||
     dec_lw         || dec_c_lw      || dec_c_lwsp      || dec_c_sw       ||
-    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ||
-    dec_xc_ldr_b   || dec_xc_ldr_h  || dec_xc_ldr_w    ||
-    dec_xc_ldr_bu  || dec_xc_ldr_hu || dec_xc_str_b    || dec_xc_str_h   ||
-    dec_xc_str_w   ||
-    dec_xc_scatter_b || dec_xc_scatter_h || dec_xc_gather_b || dec_xc_gather_h;
+    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ;
 
 assign n_s2_fu[P_FU_CSR] =
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
     dec_csrrw      || dec_csrrwi     ;
-
-assign n_s2_fu[P_FU_BIT] = 
-    dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
-    dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
-    dec_b_fsri     || dec_b_cmov     || dec_xc_mror    ;
-
-assign n_s2_fu[P_FU_ASI] = 
-    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
-    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
-    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
-    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
-    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3      ;
-
-assign n_s2_fu[P_FU_RNG] = 
-    dec_xc_rngtest  || dec_xc_rngseed  || dec_xc_rngsamp  ||
-    dec_xc_lkgfence ;
 
 
 //
@@ -190,15 +154,10 @@ assign n_s2_fu[P_FU_RNG] =
 
 wire [4:0] dec_rs1_32 = s1_data[19:15];
 wire [4:0] dec_rs2_32 = s1_data[24:20];
-wire [4:0] dec_rs3_32 = s1_data[31:27];
+wire [4:0] dec_rd_32  = s1_data[11:7];
 
-wire       clr_rd_lsb = dec_xc_mror   || dec_xc_madd_3 || dec_xc_msub_3 ||
-                        dec_xc_mmul_3 || dec_xc_macc_1 ;
-
-wire [4:0] dec_rd_32  = {s1_data[11: 8], clr_rd_lsb ? 1'b0 : s1_data[7]};
-
-wire       instr_16bit= s1_data[1:0] != 2'b11;
-wire       instr_32bit= s1_data[1:0] == 2'b11;
+wire       instr_16bit= s1_data[ 1:0] != 2'b11;
+wire       instr_32bit= s1_data[ 1:0] == 2'b11;
 
 assign     n_s2_size[0]  = instr_16bit;
 assign     n_s2_size[1]  = instr_32bit;
@@ -215,7 +174,6 @@ end endgenerate
 
 wire [OP:0] uop_alu = 
     {5{dec_add       }} & ALU_ADD   |
-    {5{dec_xc_padd   }} & ALU_ADD   |
     {5{dec_addi      }} & ALU_ADD   |
     {5{dec_c_add     }} & ALU_ADD   |
     {5{dec_c_addi    }} & ALU_ADD   |
@@ -225,7 +183,6 @@ wire [OP:0] uop_alu =
     {5{dec_auipc     }} & ALU_ADD   |
     {5{dec_c_sub     }} & ALU_SUB   |
     {5{dec_sub       }} & ALU_SUB   |
-    {5{dec_xc_psub   }} & ALU_SUB   |
     {5{dec_and       }} & ALU_AND   |
     {5{dec_andi      }} & ALU_AND   |
     {5{dec_c_and     }} & ALU_AND   |
@@ -250,17 +207,9 @@ wire [OP:0] uop_alu =
     {5{dec_c_srli    }} & ALU_SRL   |
     {5{dec_srl       }} & ALU_SRL   |
     {5{dec_srli      }} & ALU_SRL   |
-    {5{dec_xc_psrl   }} & ALU_SRL   |
-    {5{dec_xc_psrl_i }} & ALU_SRL   |
     {5{dec_sll       }} & ALU_SLL   |
     {5{dec_slli      }} & ALU_SLL   |
-    {5{dec_c_slli    }} & ALU_SLL   |
-    {5{dec_xc_psll   }} & ALU_SLL   |
-    {5{dec_xc_psll_i }} & ALU_SLL   |
-    {5{dec_b_ror     }} & ALU_ROR   |
-    {5{dec_b_rori    }} & ALU_ROR   |
-    {5{dec_xc_pror   }} & ALU_ROR   |
-    {5{dec_xc_pror_i }} & ALU_ROR   ;
+    {5{dec_c_slli    }} & ALU_SLL   ;
 
 wire [OP:0] uop_cfu =
     {5{dec_beq       }} & CFU_BEQ   |
@@ -285,24 +234,16 @@ wire [OP:0] uop_cfu =
 wire [1:0] lsu_width = 
     {2{dec_lb        }} & LSU_BYTE |
     {2{dec_lbu       }} & LSU_BYTE |
-    {2{dec_xc_ldr_b  }} & LSU_BYTE |
-    {2{dec_xc_ldr_bu }} & LSU_BYTE |
     {2{dec_sb        }} & LSU_BYTE |
-    {2{dec_xc_str_b  }} & LSU_BYTE |
     {2{dec_lh        }} & LSU_HALF |
     {2{dec_lhu       }} & LSU_HALF |
-    {2{dec_xc_ldr_h  }} & LSU_HALF |
-    {2{dec_xc_ldr_hu }} & LSU_HALF |
     {2{dec_sh        }} & LSU_HALF |
-    {2{dec_xc_str_h  }} & LSU_HALF |
     {2{dec_lw        }} & LSU_WORD |
-    {2{dec_xc_ldr_w  }} & LSU_WORD |
     {2{dec_c_lw      }} & LSU_WORD |
     {2{dec_c_lwsp    }} & LSU_WORD |
     {2{dec_c_sw      }} & LSU_WORD |
     {2{dec_c_swsp    }} & LSU_WORD |
-    {2{dec_sw        }} & LSU_WORD |
-    {2{dec_xc_str_w  }} & LSU_WORD ;
+    {2{dec_sw        }} & LSU_WORD ;
 
 wire [OP:0] uop_lsu;
 
@@ -311,14 +252,9 @@ assign uop_lsu[2:1]      = lsu_width;
 assign uop_lsu[LSU_LOAD] = 
     dec_lb          ||
     dec_lbu         ||
-    dec_xc_ldr_b    ||
-    dec_xc_ldr_bu   ||
     dec_lh          ||
     dec_lhu         ||
-    dec_xc_ldr_h    ||
-    dec_xc_ldr_hu   ||
     dec_lw          ||
-    dec_xc_ldr_w    ||
     dec_c_lw        ||
     dec_c_lwsp      ;
 
@@ -326,17 +262,12 @@ assign uop_lsu[LSU_STORE] =
     dec_sb          ||
     dec_sh          ||
     dec_sw          ||
-    dec_xc_str_b    ||
-    dec_xc_str_h    ||
-    dec_xc_str_w    ||
     dec_c_sw        ||
     dec_c_swsp      ;
 
 assign uop_lsu[LSU_SIGNED] = 
     dec_lb          ||
-    dec_xc_ldr_b    ||
-    dec_lh          ||
-    dec_xc_ldr_h    ; 
+    dec_lh          ;
 
 wire [OP:0] uop_mul = 
     {5{dec_div          }} & MUL_DIV    |
@@ -344,20 +275,9 @@ wire [OP:0] uop_mul =
     {5{dec_rem          }} & MUL_REM    |
     {5{dec_remu         }} & MUL_REMU   |
     {5{dec_mul          }} & MUL_MUL    |
-    {5{dec_xc_pmul_l    }} & MUL_PMUL_L |
     {5{dec_mulh         }} & MUL_MULH   |
-    {5{dec_xc_pmul_h    }} & MUL_PMUL_H |
     {5{dec_mulhsu       }} & MUL_MULHSU |
-    {5{dec_mulhu        }} & MUL_MULHU  |
-    {5{dec_xc_mmul_3    }} & MUL_MMUL   |
-    {5{dec_xc_madd_3    }} & MUL_MADD   |
-    {5{dec_xc_msub_3    }} & MUL_MSUB   |
-    {5{dec_xc_macc_1    }} & MUL_MACC   |
-    {5{dec_xc_pclmul_l  }} & MUL_CLMUL_L|
-    {5{dec_b_clmul      }} & MUL_CLMUL_L|
-    {5{dec_xc_pclmul_h  }} & MUL_CLMUL_H|
-    {5{dec_b_clmulh     }} & MUL_CLMUL_H|
-    {5{dec_b_clmulr     }} & MUL_CLMUL_R;
+    {5{dec_mulhu        }} & MUL_MULHU  ;
 
 wire [OP:0] uop_csr;
 
@@ -376,51 +296,12 @@ assign uop_csr[CSR_SET  ] = dec_csrrs || dec_csrrsi ;
 assign uop_csr[CSR_CLEAR] = dec_csrrc || dec_csrrci ;
 assign uop_csr[CSR_SWAP ] = dec_csrrw || dec_csrrwi ;
 
-wire [OP:0] uop_bit =
-    {1+OP{dec_b_cmov          }} & BIT_CMOV         |
-    {1+OP{dec_b_bdep          }} & BIT_BDEP         |
-    {1+OP{dec_b_bext          }} & BIT_BEXT         |
-    {1+OP{dec_b_grev          }} & BIT_GREV         |
-    {1+OP{dec_b_grevi         }} & BIT_GREVI        |
-    {1+OP{dec_xc_lut          }} & BIT_LUT          |
-    {1+OP{dec_xc_bop          }} & BIT_BOP          |
-    {1+OP{dec_b_fsl           }} & BIT_FSL          |
-    {1+OP{dec_b_fsr           }} & BIT_FSR          |
-    {1+OP{dec_b_fsri          }} & BIT_FSR          |
-    {1+OP{dec_xc_mror         }} & BIT_RORW         ;
-
-wire [OP:0] uop_asi =
-    {1+OP{dec_xc_aessub_enc   }} & ASI_AESSUB_ENC   |
-    {1+OP{dec_xc_aessub_encrot}} & ASI_AESSUB_ENCROT|
-    {1+OP{dec_xc_aessub_dec   }} & ASI_AESSUB_DEC   |
-    {1+OP{dec_xc_aessub_decrot}} & ASI_AESSUB_DECROT|
-    {1+OP{dec_xc_aesmix_enc   }} & ASI_AESMIX_ENC   |
-    {1+OP{dec_xc_aesmix_dec   }} & ASI_AESMIX_DEC   |
-    {1+OP{dec_xc_sha3_xy      }} & ASI_SHA3_XY      |
-    {1+OP{dec_xc_sha3_x1      }} & ASI_SHA3_X1      |
-    {1+OP{dec_xc_sha3_x2      }} & ASI_SHA3_X2      |
-    {1+OP{dec_xc_sha3_x4      }} & ASI_SHA3_X4      |
-    {1+OP{dec_xc_sha3_yx      }} & ASI_SHA3_YX      |
-    {1+OP{dec_xc_sha256_s0    }} & ASI_SHA256_S0    |
-    {1+OP{dec_xc_sha256_s1    }} & ASI_SHA256_S1    |
-    {1+OP{dec_xc_sha256_s2    }} & ASI_SHA256_S2    |
-    {1+OP{dec_xc_sha256_s3    }} & ASI_SHA256_S3    ;
-
-wire [OP:0] uop_rng =
-    {1+OP{dec_xc_rngtest      }} & RNG_RNGTEST      |
-    {1+OP{dec_xc_rngseed      }} & RNG_RNGSEED      |
-    {1+OP{dec_xc_rngsamp      }} & RNG_RNGSAMP      |
-    {1+OP{dec_xc_lkgfence     }} & RNG_ALFENCE      ;
-
 assign n_s2_uop =
     uop_alu |
     uop_cfu |
     uop_lsu |
     uop_mul |
-    uop_csr |
-    uop_bit |
-    uop_asi |
-    uop_rng ;
+    uop_csr ;
 
 //
 // Register Address Decoding
@@ -486,11 +367,6 @@ wire [4:0] dec_rd_16 =
 
 wire   no_rs1      = !(opra_src_rs1);
 wire   no_rs2      = !(oprb_src_rs2 || oprc_src_rs2);
-wire   no_rs3      = !(oprc_src_rs3) || 
-                     !(XC_CLASS_MULTIARITH ||
-                       XC_CLASS_BIT || 
-                       XC_CLASS_MEMORY ||
-                       XC_CLASS_BASELINE);
 
 assign s1_rs1_addr =  no_rs1       ? 5'b0       :
                       instr_16bit  ? dec_rs1_16 :
@@ -498,12 +374,6 @@ assign s1_rs1_addr =  no_rs1       ? 5'b0       :
 assign s1_rs2_addr =  no_rs2       ? 5'b0       :
                       instr_16bit  ? dec_rs2_16 :
                                      dec_rs2_32 ;
-
-wire   rd_as_rs3   = dec_xc_bop;
-
-assign s1_rs3_addr = no_rs3        ? 5'b0       :
-                     rd_as_rs3     ? dec_rd_32  :
-                                     dec_rs3_32 ;
 
 wire lsu_no_rd = uop_lsu[LSU_STORE] && n_s2_fu[P_FU_LSU];
 wire cfu_no_rd = (uop_cfu!=CFU_JALI && uop_cfu!=CFU_JALR) &&
@@ -584,18 +454,10 @@ wire use_imm32_b = dec_beq  || dec_bge    || dec_bgeu   || dec_blt    ||
                    dec_bltu || dec_bne  ;
 wire use_imm_csr = dec_csrrc || dec_csrrs || dec_csrrw;
 wire use_imm_csri= dec_csrrci || dec_csrrsi || dec_csrrwi;
-wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     || 
-                   dec_xc_psll_i || dec_xc_psrl_i   || dec_xc_pror_i||
-                   dec_b_rori    ;
-
-wire use_imm_wshf= dec_b_fsri; // Wide shift immediate
+wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     ;
 
 wire use_pc_imm  = use_imm32_b  || use_imm32_j  || dec_c_beqz   ||
                    dec_c_bnez   || dec_c_j      || dec_c_jal     ;
-
-wire use_imm_sha3= 
-    dec_xc_sha3_xy || dec_xc_sha3_x1 || dec_xc_sha3_x2 || dec_xc_sha3_x4 ||
-    dec_xc_sha3_yx ;
 
 // Immediate which will be added to the program counter.
 wire [31:0] n_s2_imm_pc = 
@@ -609,7 +471,6 @@ wire [31:0] n_s2_imm_pc =
 
 assign n_s2_imm = 
                            n_s2_imm_pc     |
-    {32{use_imm_sha3  }} & {30'b0,d_data[31:30]} |
     {32{use_imm32_i   }} & imm32_i      |
     {32{use_imm32_s   }} & imm32_s      |
     {32{dec_c_addi    }} & imm_c_addi   |
@@ -628,25 +489,7 @@ assign n_s2_imm =
     {32{use_imm_csri  }} & {imm_csr_a, 15'b0, s1_data[19:15]} |
     {32{use_imm_csr   }} & {imm_csr_a, 20'b0} |
     {32{dec_fence_i   }} & 32'd4        |
-    {32{use_imm_shfi  }} & {27'b0, s1_data[24:20]} |
-    {32{use_imm_wshf  }} & {26'b0, s1_data[25:20]} ;
-
-//
-// Pack width decoding
-
-wire packed_instruction = 
-    dec_xc_padd   || dec_xc_psub   || dec_xc_pror     || dec_xc_psll    ||
-    dec_xc_psrl   || dec_xc_pror_i || dec_xc_psll_i   || dec_xc_psrl_i  ||
-    dec_xc_pmul_l || dec_xc_pmul_h || dec_xc_pclmul_l || dec_xc_pclmul_h ;
-
-// Lut select is MS bit of instruction word.
-wire bop_lut_sel = d_data[31];
-
-// LSB of PW is used to select which uxcrpyto CSR field is fed to bop
-// instructions as the lookup table.
-assign n_s2_pw = packed_instruction ? {1'b0,d_data[31:30]} : 
-                 dec_xc_bop         ? {2'b0,bop_lut_sel  } :
-                                      PW_32                ;
+    {32{use_imm_shfi  }} & {27'b0, s1_data[24:20]} ;
 
 //
 // Operand Sourcing.
@@ -669,26 +512,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_c_swsp     || dec_sb         || dec_sh         || dec_sw         ||
     dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
     dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
-    dec_mulhu      || dec_rem        || dec_remu       || dec_b_ror      ||
-    dec_b_rori     ||
-    dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || dec_xc_psrl_i  ||
-    dec_xc_psll    || dec_xc_psll_i  || dec_xc_pror    || dec_xc_pror_i  ||
-    dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
-    dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
-    dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
-    dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_grevi    ||
-    dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
-    dec_b_fsri     || dec_b_cmov     || dec_b_clmul    || dec_b_clmulr   ||
-    dec_b_clmulh   ||
-    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
-    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
-    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
-    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
-    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ||
-    dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
-    dec_xc_macc_1        || dec_xc_mror          || dec_xc_rngseed       ||
-    dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ;
+    dec_mulhu      || dec_rem        || dec_remu       ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -709,19 +533,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_bgeu       || dec_blt        || dec_bltu       || dec_bne        ||
     dec_c_bnez     || dec_div        || dec_divu       || dec_mul        ||
     dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
-    dec_remu       || dec_c_mv       ||
-    dec_xc_padd    || dec_xc_psub    || dec_xc_psrl    || 
-    dec_xc_psll    || dec_xc_pror    || dec_b_cmov     ||
-    dec_xc_ldr_b   || dec_xc_ldr_bu  || dec_xc_ldr_h   || dec_xc_ldr_hu  ||
-    dec_xc_ldr_w   || dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   ||
-    dec_xc_pmul_l  || dec_xc_pmul_h  || dec_xc_pclmul_l|| dec_xc_pclmul_h||
-    dec_b_bdep     || dec_b_bext     || dec_b_grev     || dec_b_ror      ||
-    dec_xc_lut     || dec_xc_bop     || dec_b_fsl      || dec_b_fsr      ||
-    dec_b_clmul    || dec_b_clmulr   || dec_b_clmulh   ||
-    dec_xc_mmul_3        || dec_xc_madd_3        || dec_xc_msub_3        ||
-    dec_xc_macc_1        || dec_xc_mror          ||
-    dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ;
+    dec_remu       || dec_c_mv       ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
@@ -732,11 +544,7 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_lbu        || dec_lh         || dec_lhu        || dec_lw         ||
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
     dec_sb         || dec_sh         || dec_sw         || dec_c_addi16sp ||
-    dec_c_addi4spn ||
-    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
-    dec_xc_sha3_x4       || dec_xc_sha3_yx       ||
-    dec_xc_psrl_i  || dec_xc_psll_i  || dec_xc_pror_i  || dec_b_grevi    ||
-    dec_b_rori     || dec_b_fsri     ;
+    dec_c_addi4spn ;
 
 wire   oprb_src_zero =  // Operand B sources zero
     dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||
@@ -744,20 +552,7 @@ wire   oprb_src_zero =  // Operand B sources zero
 
 assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
-    dec_sw         ||
-    dec_xc_aessub_enc    || dec_xc_aessub_encrot || dec_xc_aessub_dec    ||
-    dec_xc_aessub_decrot || dec_xc_aesmix_enc    || dec_xc_aesmix_dec    ||
-    dec_xc_sha3_xy       || dec_xc_sha3_x1       || dec_xc_sha3_x2       ||
-    dec_xc_sha3_x4       || dec_xc_sha3_yx       || dec_xc_sha256_s0     ||
-    dec_xc_sha256_s1     || dec_xc_sha256_s2     || dec_xc_sha256_s3     ;
-
-assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
-    dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||
-    dec_xc_madd_3  || dec_xc_msub_3  || dec_xc_macc_1  || dec_xc_mror    ||
-    dec_b_fsl      || dec_b_fsr      || dec_b_fsri     || dec_xc_lut     ||
-    dec_xc_bop     || dec_b_cmov     ||
-    dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
-    dec_xc_scatter_h     ;
+    dec_sw         ;
 
 assign n_s2_opr_src[DIS_OPRC_CSRA] = // Operand C sources CSR address immediate
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
@@ -811,49 +606,13 @@ assign      pc_plus_imm = program_counter + n_s2_imm_pc;
 // Leakage Fencing
 // -------------------------------------------------------------------------
 
-// Fence instruction flying past.
-wire         leak_fence      = dec_xc_lkgfence && s1_valid;
-assign       s1_leak_fence   = leak_fence;
-
-reg [1:0]    lf_count;
-wire[1:0]  n_lf_count = lf_count + 1;
-
-wire         leak_stall     = leak_fence    && 
-                              lf_count < 3  &&
-                              XC_CLASS_LEAK_BUBBLE;
-wire         lf_count_ld    = leak_fence && !p_s2_busy && XC_CLASS_LEAK_BUBBLE;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        lf_count <= 0;
-    end else if(lf_count_ld) begin
-        lf_count <= n_lf_count;
-    end
-end
-
-//
-// instance: frv_leak
-//
-//  Handles the leakage barrier instruction state and some functionality.
-//  Contains the configuration register and pseudo random number source.
-//
-frv_leak #(
-.XC_CLASS_LEAK       (XC_CLASS_LEAK       ),
-.XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG) 
-) i_frv_leak(
-.g_clk         (g_clk         ),
-.g_resetn      (g_resetn      ),
-.leak_prng     (leak_prng     ), // current prng value.
-.leak_fence    (leak_fence    )  // Fence instruction flying past.
-);
+// TODO: re-implement leakage fence instruction.
+wire leak_fence = 1'b0;
+wire leak_stall = 1'b0;
 
 //
 // Operand Source decoding
 // -------------------------------------------------------------------------
-
-wire opra_flush = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_A]);
-wire oprb_flush = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_B]);
-wire oprc_flush = (pipe_progress && leak_fence && leak_lkgcfg[LEAK_CFG_S2_OPR_C]);
 
 // Operand A sourcing.
 wire opra_src_rs1  = n_s2_opr_src[DIS_OPRA_RS1 ];
@@ -872,15 +631,6 @@ assign n_s2_opr_a =
 
 // Operand B sourcing.
 
-wire oprb_rs2_shf_1 = dec_xc_ldr_h     || dec_xc_ldr_hu    || dec_xc_str_h || 
-                      dec_xc_scatter_h || dec_xc_gather_h  ;
-
-wire oprb_rs2_shf_2 = dec_xc_ldr_w     || dec_xc_str_w     ;
-
-wire [XL:0] s1_rs2_shf = oprb_rs2_shf_1 ? {s1_rs2_rdata[30:0],1'b0} :
-                         oprb_rs2_shf_2 ? {s1_rs2_rdata[29:0],2'b0} :
-                                           s1_rs2_rdata             ;
-
 wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
@@ -890,22 +640,20 @@ wire oprb_ld_en    = n_s2_valid && (
 
 assign n_s2_opr_b =
     {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
-    {XLEN{oprb_src_rs2    }} & s1_rs2_shf     |
+    {XLEN{oprb_src_rs2    }} & s1_rs2_rdata   |
     {XLEN{oprb_src_imm    }} & n_s2_imm       ;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];
-wire oprc_src_rs3  = n_s2_opr_src[DIS_OPRC_RS3 ];
 wire oprc_src_csra = n_s2_opr_src[DIS_OPRC_CSRA];
 wire oprc_src_pcim = n_s2_opr_src[DIS_OPRC_PCIM];
 
 wire oprc_ld_en    = n_s2_valid && (
-    oprc_src_rs2  || oprc_src_rs3  || oprc_src_csra || oprc_src_pcim
+    oprc_src_rs2  || oprc_src_csra || oprc_src_pcim
 );
 
 assign n_s2_opr_c = 
     {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
-    {XLEN{oprc_src_rs3    }} & s1_rs3_rdata   |
     {XLEN{oprc_src_csra   }} & csr_addr       |
     {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
 
@@ -913,7 +661,7 @@ assign n_s2_opr_c =
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 40 + (1+OP) + (1+FU) + (1+PW);
+localparam RL = 40 + (1+OP) + (1+FU);
 
 `ifdef RVFI
 always @(posedge g_clk) begin
@@ -922,15 +670,11 @@ always @(posedge g_clk) begin
         rvfi_s2_rs2_addr <= 0;
         rvfi_s2_rs1_data <= 0;
         rvfi_s2_rs2_data <= 0;
-        rvfi_s2_rs3_data <= 0;
-        rvfi_s2_rs3_data <= 0;
     end else if (pipe_progress) begin
         rvfi_s2_rs1_addr <= s1_rs1_addr;
         rvfi_s2_rs1_data <= s1_rs1_rdata;
         rvfi_s2_rs2_addr <= s1_rs2_addr;
         rvfi_s2_rs2_data <= s1_rs2_rdata;
-        rvfi_s2_rs3_addr <= s1_rs3_addr;
-        rvfi_s2_rs3_data <= s1_rs3_rdata;
     end
 end
 `endif
@@ -940,14 +684,13 @@ wire [RL-1:0] p_mr;
 // When bubbling due to a leakage fence, insert dummy fence
 // operations into the pipeline which will randomise the registers,
 // but not increment the PC since the s*_valid signal won't be asserted.
-wire [OP:0] bubble_uop = leak_fence ? RNG_ALFENCE   : {1+OP{1'b0}};
-wire [FU:0] bubble_fu  = leak_fence ? 8'b1<<P_FU_RNG: {1+FU{1'b0}};
+wire [OP:0] bubble_uop = {1+OP{1'b0}};
+wire [FU:0] bubble_fu  = {1+FU{1'b0}};
 
 wire [RL-1:0] p_in = {
  s1_bubble ?  5'b0      : n_s2_rd   , // Destination register address
  s1_bubble ?  bubble_uop: n_s2_uop  , // Micro-op code
  s1_bubble ?  bubble_fu : n_s2_fu   , // Functional Unit (alu/mem/jump/mul/csr)
- s1_bubble ?  {1+PW{1'b0}}: n_s2_pw , // IALU pack width specifier.
  s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
 leak_stall || s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
  s1_bubble ? 32'b0      : n_s2_instr  // The instruction word
@@ -959,7 +702,6 @@ assign {
  s2_rd         , // Destination register address
  s2_uop        , // Micro-op code
  s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
- s2_pw         , // IALU pack width.
  s2_trap       , // Raise a trap?
  s2_size       , // Size of the instruction.
  s2_instr        // The instruction word
@@ -993,8 +735,8 @@ frv_pipeline_register #(
 .i_valid  (opra_ld_en   ), // Input data valid?
 .o_busy   (             ), // Stage N+1 ready to continue?
 .mr_data  (             ), // Most recent data into the stage.
-.flush    (opra_flush   ), // Flush the contents of the pipeline
-.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.flush    (1'b0         ), // Flush the contents of the pipeline
+.flush_dat(32'b0        ), // Data flushed into the pipeline.
 .o_data   (s2_opr_a     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?
 .i_busy   (s2_busy      )  // Stage N+1 ready to continue?
@@ -1010,8 +752,8 @@ frv_pipeline_register #(
 .i_valid  (oprb_ld_en   ), // Input data valid?
 .o_busy   (             ), // Stage N+1 ready to continue?
 .mr_data  (             ), // Most recent data into the stage.
-.flush    (oprb_flush   ), // Flush the contents of the pipeline
-.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.flush    (1'b0         ), // Flush the contents of the pipeline
+.flush_dat(32'b0        ), // Data flushed into the pipeline.
 .o_data   (s2_opr_b     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?
 .i_busy   (s2_busy      )  // Stage N+1 ready to continue?
@@ -1027,8 +769,8 @@ frv_pipeline_register #(
 .i_valid  (oprc_ld_en   ), // Input data valid?
 .o_busy   (             ), // Stage N+1 ready to continue?
 .mr_data  (             ), // Most recent data into the stage.
-.flush    (oprc_flush   ), // Flush the contents of the pipeline
-.flush_dat(leak_prng    ), // Data flushed into the pipeline.
+.flush    (1'b0         ), // Flush the contents of the pipeline
+.flush_dat(32'b0        ), // Data flushed into the pipeline.
 .o_data   (s2_opr_c     ), // Output data for stage N+1
 .o_valid  (             ), // Input data from stage N valid?
 .i_busy   (s2_busy      )  // Stage N+1 ready to continue?

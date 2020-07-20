@@ -23,13 +23,9 @@ output [NRET * 2    - 1 : 0] rvfi_mode      ,
 
 output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
-output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
-output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_aux       ,
-output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
-output [NRET *  3   - 1 : 0] rvfi_rng_stat  , // RNG status
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
 output [NRET        - 1 : 0] rvfi_rd_wide   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
@@ -46,13 +42,9 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 
 input  wire [XL:0] rvfi_s4_rs1_rdata, // Source register data 1
 input  wire [XL:0] rvfi_s4_rs2_rdata, // Source register data 2
-input  wire [XL:0] rvfi_s4_rs3_rdata, // Source register data 3
 input  wire [ 4:0] rvfi_s4_rs1_addr , // Source register address 1
 input  wire [ 4:0] rvfi_s4_rs2_addr , // Source register address 2
-input  wire [ 4:0] rvfi_s4_rs3_addr , // Source register address 3
 input  wire [XL:0] rvfi_s4_aux      , // Auxiliary needed information.
-input  wire [31:0] rvfi_s4_rng_data , // RNG read data
-input  wire [ 2:0] rvfi_s4_rng_stat , // RNG status
 input  wire [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 `endif
 
@@ -73,10 +65,8 @@ output wire        fwd_s4_load     , // Writeback stage has load in it.
 output wire        fwd_s4_csr      , // Writeback stage has CSR op in it.
 
 output wire        gpr_wen         , // GPR write enable.
-output wire        gpr_wide        , // GPR wide writeback enable.
 output wire [ 4:0] gpr_rd          , // GPR destination register.
 output wire [XL:0] gpr_wdata       , // GPR write data [31: 0].
-output wire [XL:0] gpr_wdata_hi    , // GPR write data [63:32].
 
 input  wire        int_trap_req    , // Request WB stage trap an interrupt
 input  wire [ 5:0] int_trap_cause  , // Cause of interrupt
@@ -166,9 +156,6 @@ wire fu_mul = s4_fu[P_FU_MUL];
 wire fu_lsu = s4_fu[P_FU_LSU];
 wire fu_cfu = s4_fu[P_FU_CFU];
 wire fu_csr = s4_fu[P_FU_CSR];
-wire fu_asi = s4_fu[P_FU_ASI];
-wire fu_bit = s4_fu[P_FU_BIT];
-wire fu_rng = s4_fu[P_FU_RNG];
 
 //
 // Functional Unit: ALU
@@ -183,30 +170,6 @@ wire [XL:0] alu_gpr_wdata   = s4_opr_a;
 
 wire        mul_gpr_wen     = fu_mul;
 wire [XL:0] mul_gpr_wdata   = s4_opr_a;
-
-//
-// Functional Unit: ASI
-// -------------------------------------------------------------------------
-
-wire        asi_gpr_wen     = fu_asi;
-wire [XL:0] asi_gpr_wdata   = s4_opr_a;
-
-//
-// Functional Unit: BIT
-// -------------------------------------------------------------------------
-
-wire        bit_gpr_wen     = fu_bit;
-wire [XL:0] bit_gpr_wdata   = s4_opr_a;
-
-//
-// Functional Unit: RNG
-// -------------------------------------------------------------------------
-
-wire        rng_gpr_wen     = fu_rng && (
-    s4_uop == RNG_RNGSAMP ||
-    s4_uop == RNG_RNGTEST
-);
-wire [XL:0] rng_gpr_wdata   = s4_opr_a;
 
 //
 // Functional Unit: CSR
@@ -431,31 +394,15 @@ end
 
 assign gpr_rd   = s4_rd;
 
-assign gpr_wide = 
-    fu_mul && (
-        s4_uop == MUL_MMUL ||
-        s4_uop == MUL_MADD ||
-        s4_uop == MUL_MSUB ||
-        s4_uop == MUL_MACC 
-    )    ||
-    fu_bit && (s4_uop == BIT_RORW) ;
-
-
 assign gpr_wen  = !s4_trap && !trap_int &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
-     cfu_gpr_wen || mul_gpr_wen || asi_gpr_wen ||
-     bit_gpr_wen || rng_gpr_wen                );
+     cfu_gpr_wen || mul_gpr_wen );
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
-                  {32{bit_gpr_wen}} & bit_gpr_wdata |
-                  {32{rng_gpr_wen}} & rng_gpr_wdata |
                   {32{lsu_gpr_wen}} & lsu_gpr_wdata |
                   {32{cfu_gpr_wen}} & cfu_gpr_wdata |
-                  {32{mul_gpr_wen}} & mul_gpr_wdata |
-                  {32{asi_gpr_wen}} & asi_gpr_wdata ;
-
-assign gpr_wdata_hi = s4_opr_b;
+                  {32{mul_gpr_wen}} & mul_gpr_wdata ;
 
 assign fwd_s4_rd    = gpr_rd;
 assign fwd_s4_wdata = gpr_wdata;
@@ -550,7 +497,6 @@ end
 // wrote so we report it correctly.
 reg [ 4:0] saved_gpr_waddr;
 reg [XL:0] saved_gpr_wdata;
-reg [XL:0] saved_gpr_wdata_hi;
 reg        use_saved_gpr_wdata;
 
 wire       n_use_saved_gpr_wdata =
@@ -567,11 +513,9 @@ end
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         saved_gpr_wdata     <= 0;
-        saved_gpr_wdata_hi  <= 0;
         saved_gpr_waddr     <= 0;
     end else if(gpr_wen) begin
         saved_gpr_wdata     <= gpr_wdata;
-        saved_gpr_wdata_hi  <= gpr_wdata_hi;
         saved_gpr_waddr     <= gpr_rd   ;
     end
 end
@@ -632,20 +576,13 @@ assign rvfi_intr  = intr_tracker;
 
 assign rvfi_rs1_addr = rvfi_s4_rs1_addr ;
 assign rvfi_rs2_addr = rvfi_s4_rs2_addr ;
-assign rvfi_rs3_addr = rvfi_s4_rs3_addr ;
 assign rvfi_rs1_rdata= rvfi_s4_rs1_rdata;
 assign rvfi_rs2_rdata= rvfi_s4_rs2_rdata;
-assign rvfi_rs3_rdata= rvfi_s4_rs3_rdata;
 
 assign rvfi_rd_addr  = use_saved_gpr_wdata ? saved_gpr_waddr :
                        gpr_wen             ? gpr_rd          : 0;
 assign rvfi_rd_wdata = |s4_rd && !trap_cpu ?
                        (use_saved_gpr_wdata ? saved_gpr_wdata : gpr_wdata) : 0;
-assign rvfi_rd_wdatahi =
-     gpr_wide && !trap_cpu ?
-    (use_saved_gpr_wdata ? saved_gpr_wdata_hi : gpr_wdata_hi) : 0;
-
-assign rvfi_rd_wide  = gpr_wide ;
 
 assign rvfi_pc_rdata = trs_pc   ; 
 assign rvfi_pc_wdata = cf_req_noint ? cf_target_noint            :
@@ -660,9 +597,6 @@ assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata :
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 assign rvfi_aux      = rvfi_s4_aux;
-
-assign rvfi_rng_data = rvfi_s4_rng_data;
-assign rvfi_rng_stat = rvfi_s4_rng_stat;
 
 // Constant assignments to features of RVFI not supported/relevent.
 assign rvfi_halt  = 0;

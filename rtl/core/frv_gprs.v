@@ -15,14 +15,9 @@ output wire [31:0]  rs1_data, // Source register 1 read data
 input  wire [ 4:0]  rs2_addr, // Source register 2 address
 output wire [31:0]  rs2_data, // Source register 2 read data
 
-input  wire [ 4:0]  rs3_addr, // Source register 3 address
-output wire [31:0]  rs3_data, // Source register 3 read data
-
-input  wire        rd_wen    , // Destination write enable
-input  wire        rd_wide   , // Destination wide write
-input  wire [ 4:0] rd_addr   , // Destination address
-input  wire [31:0] rd_wdata  , // Destination write data [31:0]
-input  wire [31:0] rd_wdata_hi  // Destination write data [63:32]
+input  wire        rd_wen   , // Destination write enable
+input  wire [ 4:0] rd_addr  , // Destination address
+input  wire [31:0] rd_wdata   // Destination write data [31:0]
 
 );
 
@@ -37,7 +32,6 @@ wire [31:0] gprs      [31:0];
 
 assign rs1_data = gprs[rs1_addr];
 assign rs2_data = gprs[rs2_addr];
-assign rs3_data = gprs[rs3_addr];
 
 wire        rd_odd       =  rd_addr[0];
 wire        rd_even      = !rd_addr[0];
@@ -45,9 +39,9 @@ wire        rd_even      = !rd_addr[0];
 wire [ 3:0] rd_top       =  rd_addr[4:1];
 
 wire        rd_wen_even  = rd_even && rd_wen;
-wire        rd_wen_odd   = (rd_odd || rd_wide) && rd_wen;
+wire        rd_wen_odd   = rd_odd && rd_wen;
 
-wire [31:0] rd_wdata_odd = rd_wide ? rd_wdata_hi : rd_wdata;
+wire [31:0] rd_wdata_odd = rd_wdata;
 
 genvar i ;
 generate for(i = 0; i < 16; i = i+1) begin

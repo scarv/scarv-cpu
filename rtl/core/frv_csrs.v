@@ -41,12 +41,6 @@ output wire        inhibit_cy       , // Stop cycle counter incrementing.
 output wire        inhibit_tm       , // Stop time counter incrementing.
 output wire        inhibit_ir       , // Stop instret incrementing.
 
-output reg         uxcrypto_ct      , // UXCrypto constant time bit.
-output reg  [ 7:0] uxcrypto_b0      , // UXCrypto lookup table 0.
-output reg  [ 7:0] uxcrypto_b1      , // UXCrypto lookup table 1.
-
-output wire [12:0] leak_lkgcfg      , // FENL Leakage configuration register.
-
 input  wire        trap_cpu         , // A trap occured due to CPU
 input  wire        trap_int         , // A trap occured due to interrupt
 input  wire [ 5:0] trap_cause       , // A trap occured due to interrupt
@@ -522,97 +516,6 @@ wire [31:0] reg_mcountin = {
     mcountin_cy
 };
 
-//
-// UXCRYPTO
-// -------------------------------------------------------------------------
-
-// Output register ports:
-// - [0:0] uxcrypto_ct
-// - [7:0] uxcrypto_b0
-// - [7:0] uxcrypto_b1
-
-wire [11:0] uxcrypto_features = {
-    XC_CLASS_LEAK       ,
-    XC_CLASS_BIT        ,
-    XC_CLASS_MEMORY     ,
-    XC_CLASS_RANDOMNESS ,
-    XC_CLASS_PACKED     ,
-    XC_CLASS_PACKED     ,
-    XC_CLASS_PACKED     ,
-    XC_CLASS_PACKED     ,
-    XC_CLASS_MULTIARITH ,
-    XC_CLASS_SHA3       ,
-    XC_CLASS_SHA2       ,
-    XC_CLASS_AES         
-};
-
-wire [31:0] reg_uxcrypto = {
-    uxcrypto_b1      ,
-    uxcrypto_b0      ,
-    3'b000           ,
-    uxcrypto_features,
-    uxcrypto_ct
-};
-
-wire       wen_uxcrypto = csr_wr && csr_addr == CSR_ADDR_UXCRYPTO;
-
-wire       n_uxcrypto_ct = 
-    csr_wr_set ? uxcrypto_ct |  csr_wdata[0] :
-    csr_wr_clr ? uxcrypto_ct & ~csr_wdata[0] :
-                                csr_wdata[0] ;
-
-wire [7:0] n_uxcrypto_b0 = 
-    csr_wr_set ? uxcrypto_b0 |  csr_wdata[23:16] :
-    csr_wr_clr ? uxcrypto_b0 & ~csr_wdata[23:16] :
-                                csr_wdata[23:16] ;
-
-wire [7:0] n_uxcrypto_b1 = 
-    csr_wr_set ? uxcrypto_b1 |  csr_wdata[31:24] :
-    csr_wr_clr ? uxcrypto_b1 & ~csr_wdata[31:24] :
-                                csr_wdata[31:24] ;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        uxcrypto_ct <= 0;
-        uxcrypto_b0 <= 0;
-        uxcrypto_b1 <= 0;
-    end else if(wen_uxcrypto) begin
-        uxcrypto_ct <= n_uxcrypto_ct;
-        uxcrypto_b0 <= n_uxcrypto_b0;
-        uxcrypto_b1 <= n_uxcrypto_b1;
-    end
-end
-
-
-//
-// LKGCFG
-//
-//  FENL - Leakage Fence configuration register.
-//
-// -------------------------------------------------------------------------
-
-reg  [12:0]   reg_lkgcfg ;
-
-assign        leak_lkgcfg= reg_lkgcfg;
-
-wire [12:0] n_reg_lkgcfg =
-    csr_wr_set ? reg_lkgcfg |  csr_wdata[12: 0] :
-    csr_wr_clr ? reg_lkgcfg & ~csr_wdata[12: 0] :
-                               csr_wdata[12: 0] ;
-
-wire          wen_lkgcfg = csr_wr && csr_addr == CSR_ADDR_LKGCFG;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        
-        reg_lkgcfg <= 13'b0;
-
-    end else if(wen_lkgcfg) begin
-        
-        reg_lkgcfg <= n_reg_lkgcfg;
-
-    end
-end
 
 //
 // CSR read responses.
@@ -644,8 +547,6 @@ wire   read_minstret  = csr_en && csr_addr == CSR_ADDR_MINSTRET ;
 wire   read_mcycleh   = csr_en && csr_addr == CSR_ADDR_MCYCLEH  ;
 wire   read_minstreth = csr_en && csr_addr == CSR_ADDR_MINSTRETH;
 wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
-wire   read_uxcrypto  = csr_en && csr_addr == CSR_ADDR_UXCRYPTO ;
-wire   read_lkgcfg    = csr_en && csr_addr == CSR_ADDR_LKGCFG   ;
 
 wire   valid_addr     = 
     read_mstatus   ||
@@ -673,9 +574,7 @@ wire   valid_addr     =
     read_minstret  ||
     read_mcycleh   ||
     read_minstreth ||
-    read_mcountin  ||
-    read_uxcrypto  ||
-    read_lkgcfg    ;
+    read_mcountin  ;
 
 wire invalid_addr = !valid_addr;
 
@@ -711,9 +610,7 @@ assign csr_rdata =
     {32{read_minstret }} & ctr_instret  [31: 0] |
     {32{read_mcycleh  }} & ctr_cycle    [63:32] |
     {32{read_minstreth}} & ctr_instret  [63:32] |
-    {32{read_mcountin }} & reg_mcountin         |
-    {32{read_uxcrypto }} & reg_uxcrypto         |
-    {32{read_lkgcfg   }} & {19'b0,reg_lkgcfg}   ;
+    {32{read_mcountin }} & reg_mcountin         ;
 
 endmodule
 

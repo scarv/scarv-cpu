@@ -1,8 +1,12 @@
 #!/bin/sh
 
+set -e
+set -x
+
 VARIANTS="rv32i rv32im rv32imc"
 
-OBJCOPY=$RISCV/bin/riscv32-unknown-elf-objcopy
+OBJCOPY=$RISCV/bin/riscv64-unknown-elf-objcopy
+OBJDUMP=$RISCV/bin/riscv64-unknown-elf-objdump
 DEST=$FRV_HOME/work/riscv-compliance
 
 mkdir -p $DEST
@@ -18,6 +22,7 @@ do
     for F in $SRC_FILES
     do
         $OBJCOPY -O srec --srec-forceS3 $F $F.srec
+        $OBJDUMP -D $F > $DEST/$V/$BNAME.dis
         chmod -x $F.srec
         BNAME=`basename $F`
         grep "80.*:" $F.objdump \
@@ -26,7 +31,6 @@ do
             | sed 's/\(^....    \)    /0000\1/' \
             > $DEST/$V/$BNAME.gtkwl
         mv $F.srec $DEST/$V/$BNAME.srec
-        echo $DEST/$V/$BNAME.srec
     done
 
 done

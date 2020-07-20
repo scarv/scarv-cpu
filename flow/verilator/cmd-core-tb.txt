@@ -1,0 +1,9 @@
+-cc
+-CFLAGS -O3
+-CFLAGS -g
+-I$(SCARV_CPU)/rtl/core
+-DRVFI
+--exe
+--trace
+-F $(SCARV_CPU)/flow/verilator/manifest-core-tb.txt
+-F $(SCARV_CPU)/flow/verilator/manifest-core-rtl.txt

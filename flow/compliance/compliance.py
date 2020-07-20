@@ -114,7 +114,7 @@ def loadTests(srec_root, objdump_root, testclass):
 
     return tests
 
-def __main__():
+def main():
     tests   = []
     
     tests   += loadTests("work/riscv-compliance/rv32i",
@@ -135,7 +135,7 @@ def __main__():
         "I-MISALIGN_LDST-01"
     ]
 
-    sim     = "work/verilator/verilated"
+    sim     = "work/verilator/frv_core/verilated-frv_core"
     wavesdir= "work/riscv-compliance"
     timeout = 5000
     exitcode= 0
@@ -193,7 +193,7 @@ def __main__():
                 expected_fails += 1
             else:
                 msg = "FAIL"
-                exitcode = 1
+                exitcode += 1
                 fails += 1
 
         elif(">> TIMEOUT" in result.stdout):
@@ -204,7 +204,7 @@ def __main__():
                 expected_fails += 1
             else:
                 msg = "TIMEOUT"
-                exitcode = 1
+                exitcode += 1
                 timeouts += 1
         
         logpath = os.path.join(wavesdir,t.test_class,t.name+".log")
@@ -219,9 +219,13 @@ def __main__():
         passes, fails, timeouts, len(tests)-passes-fails-timeouts,
         expected_fails
     ))
-
-    sys.exit(exitcode)
+    return fails + timeouts - expected_fails
 
 if(__name__ == "__main__"):
-    __main__()
+    ec = main()
+    if(ec == 0):
+        print("--- Success ---")
+    else:
+        print("--- Failure ---")
+    sys.exit(ec)
 

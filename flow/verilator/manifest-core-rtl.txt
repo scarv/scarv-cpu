@@ -1,0 +1,17 @@
+$SCARV_CPU/rtl/core/frv_alu.v
+$SCARV_CPU/rtl/core/frv_mdu.v
+$SCARV_CPU/rtl/core/frv_core_fetch_buffer.v
+$SCARV_CPU/rtl/core/frv_core.v
+$SCARV_CPU/rtl/core/frv_counters.v
+$SCARV_CPU/rtl/core/frv_csrs.v
+$SCARV_CPU/rtl/core/frv_gprs.v
+$SCARV_CPU/rtl/core/frv_interrupts.v
+$SCARV_CPU/rtl/core/frv_lsu.v
+$SCARV_CPU/rtl/core/frv_pipeline_decode.v
+$SCARV_CPU/rtl/core/frv_pipeline_execute.v
+$SCARV_CPU/rtl/core/frv_pipeline_fetch.v
+$SCARV_CPU/rtl/core/frv_pipeline_memory.v
+$SCARV_CPU/rtl/core/frv_pipeline_register.v
+$SCARV_CPU/rtl/core/frv_pipeline.v
+$SCARV_CPU/rtl/core/frv_pipeline_writeback.v
+

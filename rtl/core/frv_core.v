@@ -20,13 +20,9 @@ output [NRET * 2    - 1 : 0] rvfi_mode      ,
 
 output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
-output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
-output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN -1  : 0] rvfi_aux       ,
-output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
-output [NRET *  3   - 1 : 0] rvfi_rng_stat  , // RNG status
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
 output [NRET        - 1 : 0] rvfi_rd_wide   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
@@ -45,20 +41,6 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
-
-output wire [XL:0]  leak_prng       , // Current PRNG value.
-output wire         leak_fence_unc0 , // uncore 0 fence
-output wire         leak_fence_unc1 , // uncore 1 fence
-output wire         leak_fence_unc2 , // uncore 2 fence
-
-output wire         rng_req_valid   , // Signal a new request to the RNG
-output wire [ 2:0]  rng_req_op      , // Operation to perform on the RNG
-output wire [31:0]  rng_req_data    , // Suplementary seed/init data
-input  wire         rng_req_ready   , // RNG accepts request
-input  wire         rng_rsp_valid   , // RNG response data valid
-input  wire [ 2:0]  rng_rsp_status  , // RNG status
-input  wire [31:0]  rng_rsp_data    , // RNG response / sample data.
-output wire         rng_rsp_ready   , // CPU accepts response.
 
 input  wire         int_nmi         , // Non-maskable interrupt.
 input  wire         int_external    , // External interrupt trigger line.
@@ -220,13 +202,9 @@ frv_pipeline #(
 .rvfi_mode     (rvfi_mode     ),
 .rvfi_rs1_addr (rvfi_rs1_addr ),
 .rvfi_rs2_addr (rvfi_rs2_addr ),
-.rvfi_rs3_addr (rvfi_rs3_addr ),
 .rvfi_rs1_rdata(rvfi_rs1_rdata),
 .rvfi_rs2_rdata(rvfi_rs2_rdata),
-.rvfi_rs3_rdata(rvfi_rs3_rdata),
 .rvfi_aux      (rvfi_aux      ),
-.rvfi_rng_data (rvfi_rng_data ), 
-.rvfi_rng_stat (rvfi_rng_stat ), 
 .rvfi_rd_addr  (rvfi_rd_addr  ),
 .rvfi_rd_wide  (rvfi_rd_wide  ),
 .rvfi_rd_wdata (rvfi_rd_wdata ),
@@ -242,18 +220,6 @@ frv_pipeline #(
 .trs_pc        (trs_pc        ), // Trace program counter.
 .trs_instr     (trs_instr     ), // Trace instruction.
 .trs_valid     (trs_valid     ), // Trace output valid.
-.leak_prng      (leak_prng      ), // Leakage fence PRNG value
-.leak_fence_unc0(leak_fence_unc0), // Leakage fence uncore resource 0
-.leak_fence_unc1(leak_fence_unc1), // Leakage fence uncore resource 1
-.leak_fence_unc2(leak_fence_unc2), // Leakage fence uncore resource 2
-.rng_req_valid  (rng_req_valid  ), // Signal a new request to the RNG
-.rng_req_op     (rng_req_op     ), // Operation to perform on the RNG
-.rng_req_data   (rng_req_data   ), // Suplementary seed/init data
-.rng_req_ready  (rng_req_ready  ), // RNG accepts request
-.rng_rsp_valid  (rng_rsp_valid  ), // RNG response data valid
-.rng_rsp_status (rng_rsp_status ), // RNG status
-.rng_rsp_data   (rng_rsp_data   ), // RNG response / sample data.
-.rng_rsp_ready  (rng_rsp_ready  ), // CPU accepts response.
 .instr_ret      (instr_ret      ), // Instruction retired.
 .mstatus_mie    (mstatus_mie    ), // Global interrupt enable.
 .mie_meie       (mie_meie       ), // External interrupt enable.

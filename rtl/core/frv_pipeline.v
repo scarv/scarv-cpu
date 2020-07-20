@@ -20,13 +20,9 @@ output [NRET * 2    - 1 : 0] rvfi_mode      ,
 
 output [NRET *    5 - 1 : 0] rvfi_rs1_addr  ,
 output [NRET *    5 - 1 : 0] rvfi_rs2_addr  ,
-output [NRET *    5 - 1 : 0] rvfi_rs3_addr  ,
 output [NRET * XLEN - 1 : 0] rvfi_rs1_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_rs2_rdata ,
-output [NRET * XLEN - 1 : 0] rvfi_rs3_rdata ,
 output [NRET * XLEN - 1 : 0] rvfi_aux       ,
-output [NRET * 32   - 1 : 0] rvfi_rng_data  , // RNG read data
-output [NRET *  3   - 1 : 0] rvfi_rng_stat  , // RNG status
 output [NRET *    5 - 1 : 0] rvfi_rd_addr   ,
 output [NRET        - 1 : 0] rvfi_rd_wide   ,
 output [NRET * XLEN - 1 : 0] rvfi_rd_wdata  ,
@@ -45,20 +41,6 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
-
-output wire [XL:0]  leak_prng       , // Current PRNG value.
-output wire         leak_fence_unc0 , // uncore 0 fence
-output wire         leak_fence_unc1 , // uncore 1 fence
-output wire         leak_fence_unc2 , // uncore 2 fence
-
-output wire         rng_req_valid   , // Signal a new request to the RNG
-output wire [ 2:0]  rng_req_op      , // Operation to perform on the RNG
-output wire [31:0]  rng_req_data    , // Suplementary seed/init data
-input  wire         rng_req_ready   , // RNG accepts request
-input  wire         rng_rsp_valid   , // RNG response data valid
-input  wire [ 2:0]  rng_rsp_status  , // RNG status
-input  wire [31:0]  rng_rsp_data    , // RNG response / sample data.
-output wire         rng_rsp_ready   , // CPU accepts response.
 
 output wire         instr_ret       , // Instruction retired.
 
@@ -164,11 +146,6 @@ parameter  CSR_MIMPID           = 32'b0;
 
 // -------------------------------------------------------------------------
 
-
-wire        uxcrypto_ct; // UXCrypto constant time bit.
-wire [ 7:0] uxcrypto_b0; // UXCrypto lookup table 0.
-wire [ 7:0] uxcrypto_b1; // UXCrypto lookup table 1.
-
 //
 // Alias'd / miscellaneous signals.
 assign      instr_ret = trs_valid;
@@ -178,11 +155,6 @@ assign      instr_ret = trs_valid;
 wire        cf_req     ; // Control flow change request
 wire [XL:0] cf_target  ; // Control flow change destination
 wire        cf_ack     ; // Control flow change acknolwedge
-
-//
-// Leakage barrier instruction wiring.
-wire [12:0] leak_lkgcfg   ; // Current lkgcfg register value.
-wire        s1_leak_fence ; // Currently a lkgfence in decode.
 
 //
 // CSR access bus.
@@ -225,10 +197,8 @@ wire        s1_error      ;
 
 wire [ 4:0] s1_rs1_addr   ;
 wire [ 4:0] s1_rs2_addr   ;
-wire [ 4:0] s1_rs3_addr   ;
 wire [XL:0] s1_rs1_rdata  ;
 wire [XL:0] s1_rs2_rdata  ;
-wire [XL:0] s1_rs3_rdata  ;
 
 wire        s2_valid      ; // Is the output data valid?
 wire        s2_busy       ; // Is the next stage ready for new inputs?
@@ -238,13 +208,11 @@ wire [XL:0] s2_opr_b      ; // Operand B
 wire [XL:0] s2_opr_c      ; // Operand C
 wire [OP:0] s2_uop        ; // Micro-op code
 wire [FU:0] s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
-wire [PW:0] s2_pw         ; // IALU pack width specifer.
 wire        s2_trap       ; // Raise a trap?
 wire [ 1:0] s2_size       ; // Size of the instruction.
 wire [31:0] s2_instr      ; // The instruction word
 
 wire [ 4:0] fwd_s2_rd     ; // stage destination reg.
-wire        fwd_s2_wide   ; // Wide writeback
 wire [XL:0] fwd_s2_wdata  ; // Write data for writeback stage.
 wire [XL:0] fwd_s2_wdata_hi;// Write data for writeback stage.
 wire        fwd_s2_load   ; // stage has load in it.
@@ -262,7 +230,6 @@ wire        s3_busy       ; // Can this stage accept new inputs?
 wire        s3_valid      ; // Is this input valid?
 
 wire [ 4:0] fwd_s3_rd     ; // Writeback stage destination reg.
-wire        fwd_s3_wide   ; // Wide writeback
 wire [XL:0] fwd_s3_wdata  ; // Write data for writeback stage.
 wire [XL:0] fwd_s3_wdata_hi;// Write data for writeback stage.
 wire        fwd_s3_load   ; // Writeback stage has load in it.
@@ -285,38 +252,26 @@ wire        fwd_s4_load   ; // Writeback stage has load in it.
 wire        fwd_s4_csr    ; // Writeback stage has CSR op in it.
 
 wire        gpr_wen       ; // GPR write enable.
-wire        gpr_wide      ; // GPR wide writeback.
 wire [ 4:0] gpr_rd        ; // GPR destination register.
 wire [XL:0] gpr_wdata     ; // GPR write data [31:0].
-wire [XL:0] gpr_wdata_hi  ; // GPR write data [63:32].
 
 wire        hold_lsu_req  ; // Don't make LSU requests yet.
 
 `ifdef RVFI
 wire [XL:0] rvfi_s2_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s2_rs2_rdata; // Source register data 2
-wire [XL:0] rvfi_s2_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s2_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s2_rs2_addr ; // Source register address 2
-wire [ 4:0] rvfi_s2_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s3_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s3_rs2_rdata; // Source register data 2
-wire [XL:0] rvfi_s3_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s3_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s3_rs2_addr ; // Source register address 2
-wire [ 4:0] rvfi_s3_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s3_aux      ; // Auxiliary needed information.
-wire [31:0] rvfi_s3_rng_data ; // RNG read data
-wire [ 2:0] rvfi_s3_rng_stat ; // RNG status
 wire [XL:0] rvfi_s4_rs1_rdata; // Source register data 1
 wire [XL:0] rvfi_s4_rs2_rdata; // Source register data 2
-wire [XL:0] rvfi_s4_rs3_rdata; // Source register data 3
 wire [ 4:0] rvfi_s4_rs1_addr ; // Source register address 1
 wire [ 4:0] rvfi_s4_rs2_addr ; // Source register address 2
-wire [ 4:0] rvfi_s4_rs3_addr ; // Source register address 3
 wire [XL:0] rvfi_s4_aux      ; // Auxiliary needed information.
-wire [31:0] rvfi_s4_rng_data ; // RNG read data
-wire [ 2:0] rvfi_s4_rng_stat ; // RNG status
 wire [XL:0] rvfi_s4_mem_wdata; // Memory write data.
 `endif
 
@@ -327,7 +282,6 @@ wire [XL:0] rvfi_s4_mem_wdata; // Memory write data.
 
 wire nz_s1_rs1     = |s1_rs1_addr;
 wire nz_s1_rs2     = |s1_rs2_addr;
-wire nz_s1_rs3     = |s1_rs3_addr;
 
 // Top 4 bits of address match AND
 // Address is non-zero AND
@@ -338,31 +292,15 @@ wire nz_s1_rs3     = |s1_rs3_addr;
     (A[0] == F[0] || A[0] && !F[0] && W)    \
 )
 
-wire hzd_rs1_s4 = `HAZARD(s1_rs1_addr, fwd_s4_rd, nz_s1_rs1, gpr_wide   );
-wire hzd_rs1_s3 = `HAZARD(s1_rs1_addr, fwd_s3_rd, nz_s1_rs1, fwd_s3_wide);
-wire hzd_rs1_s2 = `HAZARD(s1_rs1_addr, fwd_s2_rd, nz_s1_rs1, fwd_s2_wide);
+wire hzd_rs1_s4 = `HAZARD(s1_rs1_addr, fwd_s4_rd, nz_s1_rs1, 1'b0       );
+wire hzd_rs1_s3 = `HAZARD(s1_rs1_addr, fwd_s3_rd, nz_s1_rs1, 1'b0       );
+wire hzd_rs1_s2 = `HAZARD(s1_rs1_addr, fwd_s2_rd, nz_s1_rs1, 1'b0       );
 
-wire hzd_rs2_s4 = `HAZARD(s1_rs2_addr, fwd_s4_rd, nz_s1_rs2, gpr_wide   );
-wire hzd_rs2_s3 = `HAZARD(s1_rs2_addr, fwd_s3_rd, nz_s1_rs2, fwd_s3_wide);
-wire hzd_rs2_s2 = `HAZARD(s1_rs2_addr, fwd_s2_rd, nz_s1_rs2, fwd_s2_wide);
-
-wire hzd_rs3_s4 = `HAZARD(s1_rs3_addr, fwd_s4_rd, nz_s1_rs3, gpr_wide   );
-wire hzd_rs3_s3 = `HAZARD(s1_rs3_addr, fwd_s3_rd, nz_s1_rs3, fwd_s3_wide);
-wire hzd_rs3_s2 = `HAZARD(s1_rs3_addr, fwd_s2_rd, nz_s1_rs3, fwd_s2_wide);
+wire hzd_rs2_s4 = `HAZARD(s1_rs2_addr, fwd_s4_rd, nz_s1_rs2, 1'b0       );
+wire hzd_rs2_s3 = `HAZARD(s1_rs2_addr, fwd_s3_rd, nz_s1_rs2, 1'b0       );
+wire hzd_rs2_s2 = `HAZARD(s1_rs2_addr, fwd_s2_rd, nz_s1_rs2, 1'b0       );
 
 `undef HAZARD
-
-wire fwd_s2_rs1_hi = s1_rs1_addr[0] && fwd_s2_wide;
-wire fwd_s3_rs1_hi = s1_rs1_addr[0] && fwd_s3_wide;
-wire fwd_s4_rs1_hi = s1_rs1_addr[0] && gpr_wide   ;
-
-wire fwd_s2_rs2_hi = s1_rs2_addr[0] && fwd_s2_wide;
-wire fwd_s3_rs2_hi = s1_rs2_addr[0] && fwd_s3_wide;
-wire fwd_s4_rs2_hi = s1_rs2_addr[0] && gpr_wide   ;
-
-wire fwd_s2_rs3_hi = s1_rs3_addr[0] && fwd_s2_wide;
-wire fwd_s3_rs3_hi = s1_rs3_addr[0] && fwd_s3_wide;
-wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 
 //
 // Bubbling occurs when:
@@ -370,9 +308,9 @@ wire fwd_s4_rs3_hi = s1_rs3_addr[0] && gpr_wide   ;
 // - There is a leakage fence in decode and subsequent stages still have
 //   an instruction in them.
 wire   s1_bubble_no_instr = !s1_valid && !s2_busy ;
-wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 || hzd_rs3_s4));
-wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 || hzd_rs3_s3));
-wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 || hzd_rs3_s2));
+wire   s1_bubble_from_s4  = fwd_s4_csr||(fwd_s4_load && (hzd_rs1_s4 || hzd_rs2_s4 ));
+wire   s1_bubble_from_s3  = fwd_s3_csr||(fwd_s3_load && (hzd_rs1_s3 || hzd_rs2_s3 ));
+wire   s1_bubble_from_s2  = fwd_s2_csr||(fwd_s2_load && (hzd_rs1_s2 || hzd_rs2_s2 ));
 wire   s1_bubble   =
      s1_bubble_no_instr     ||
      s1_bubble_from_s4      ||
@@ -381,22 +319,16 @@ wire   s1_bubble   =
 
 
 wire [XL:0] fwd_rs1_rdata =
-     hzd_rs1_s2 ? (fwd_s2_rs1_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
-     hzd_rs1_s3 ? (fwd_s3_rs1_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
-     hzd_rs1_s4 ? (fwd_s4_rs1_hi ? gpr_wdata_hi    : gpr_wdata   )  :
+     hzd_rs1_s2 ? fwd_s2_wdata   :
+     hzd_rs1_s3 ? fwd_s3_wdata   :
+     hzd_rs1_s4 ? gpr_wdata      :
                   s1_rs1_rdata   ;
 
 wire [XL:0] fwd_rs2_rdata =
-     hzd_rs2_s2 ? (fwd_s2_rs2_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
-     hzd_rs2_s3 ? (fwd_s3_rs2_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
-     hzd_rs2_s4 ? (fwd_s4_rs2_hi ? gpr_wdata_hi    : gpr_wdata   )  :
+     hzd_rs2_s2 ? fwd_s2_wdata   :
+     hzd_rs2_s3 ? fwd_s3_wdata   :
+     hzd_rs2_s4 ? gpr_wdata      :
                   s1_rs2_rdata   ;
-
-wire [XL:0] fwd_rs3_rdata =
-     hzd_rs3_s2 ? (fwd_s2_rs3_hi ? fwd_s2_wdata_hi : fwd_s2_wdata)  :
-     hzd_rs3_s3 ? (fwd_s3_rs3_hi ? fwd_s3_wdata_hi : fwd_s3_wdata)  :
-     hzd_rs3_s4 ? (fwd_s4_rs3_hi ? gpr_wdata_hi    : gpr_wdata   )  :
-                  s1_rs3_rdata   ;
 
 //
 // Submodule Instances.
@@ -466,23 +398,16 @@ frv_pipeline_decode #(
 .s1_bubble          (s1_bubble          ), // Insert a pipeline bubble.
 .s1_rs1_addr        (s1_rs1_addr        ),
 .s1_rs2_addr        (s1_rs2_addr        ),
-.s1_rs3_addr        (s1_rs3_addr        ),
 .s1_rs1_rdata       (fwd_rs1_rdata      ),
 .s1_rs2_rdata       (fwd_rs2_rdata      ),
-.s1_rs3_rdata       (fwd_rs3_rdata      ),
-.leak_prng          (leak_prng          ), // current prng value.
-.leak_lkgcfg        (leak_lkgcfg        ), // current lkgcfg register value.
-.s1_leak_fence      (s1_leak_fence      ),
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change
 `ifdef RVFI
 .rvfi_s2_rs1_addr   (rvfi_s2_rs1_addr   ),
 .rvfi_s2_rs2_addr   (rvfi_s2_rs2_addr   ),
-.rvfi_s2_rs3_addr   (rvfi_s2_rs3_addr   ),
 .rvfi_s2_rs1_data   (rvfi_s2_rs1_rdata  ),
 .rvfi_s2_rs2_data   (rvfi_s2_rs2_rdata  ),
-.rvfi_s2_rs3_data   (rvfi_s2_rs3_rdata  ),
 `endif
 .s2_valid           (s2_valid           ), // Is the output data valid?
 .s2_busy            (s2_busy            ), // Is next stage ready?
@@ -492,7 +417,6 @@ frv_pipeline_decode #(
 .s2_opr_c           (s2_opr_c           ), // Operand C
 .s2_uop             (s2_uop             ), // Micro-op code
 .s2_fu              (s2_fu              ), // Functional Unit
-.s2_pw              (s2_pw              ), // IALU Pack width
 .s2_trap            (s2_trap            ), // Raise a trap?
 .s2_size            (s2_size            ), // Size of the instruction.
 .s2_instr           (s2_instr           )  // The instruction word
@@ -524,48 +448,26 @@ frv_pipeline_execute #(
 .s2_opr_c         (s2_opr_c         ), // Operand C
 .s2_uop           (s2_uop           ), // Micro-op code
 .s2_fu            (s2_fu            ), // Functional Unit
-.s2_pw            (s2_pw            ), // IALU Pack width
 .s2_trap          (s2_trap          ), // Raise a trap?
 .s2_size          (s2_size          ), // Size of the instruction.
 .s2_instr         (s2_instr         ), // The instruction word
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
-.leak_prng        (leak_prng        ), // current prng value.
-.leak_lkgcfg       (leak_lkgcfg       ), // current lkgcfg register value.
-.rng_req_valid    (rng_req_valid    ), // Signal a new request to the RNG
-.rng_req_op       (rng_req_op       ), // Operation to perform on the RNG
-.rng_req_data     (rng_req_data     ), // Suplementary seed/init data
-.rng_req_ready    (rng_req_ready    ), // RNG accepts request
-.rng_rsp_valid    (rng_rsp_valid    ), // RNG response data valid
-.rng_rsp_status   (rng_rsp_status   ), // RNG status
-.rng_rsp_data     (rng_rsp_data     ), // RNG response / sample data.
-.rng_rsp_ready    (rng_rsp_ready    ), // CPU accepts response.
-.uxcrypto_ct      (uxcrypto_ct      ), // UXCrypto constant time bit.
-.uxcrypto_b0      (uxcrypto_b0      ), // UXCrypto lookup table 0.
-.uxcrypto_b1      (uxcrypto_b1      ), // UXCrypto lookup table 1.
 .flush            (s2_flush         ), // Flush this pipeline stage.
 .fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
-.fwd_s2_wide      (fwd_s2_wide      ), // Write writeback
 .fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.
-.fwd_s2_wdata_hi  (fwd_s2_wdata_hi  ), // Write data for writeback stage.
 .fwd_s2_load      (fwd_s2_load      ), // Writeback stage has load in it.
 .fwd_s2_csr       (fwd_s2_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
 .rvfi_s2_rs1_rdata(rvfi_s2_rs1_rdata), // Source register data 1
 .rvfi_s2_rs2_rdata(rvfi_s2_rs2_rdata), // Source register data 2
-.rvfi_s2_rs3_rdata(rvfi_s2_rs3_rdata), // Source register data 2
 .rvfi_s2_rs1_addr (rvfi_s2_rs1_addr ), // Source register address 1
 .rvfi_s2_rs2_addr (rvfi_s2_rs2_addr ), // Source register address 2
-.rvfi_s2_rs3_addr (rvfi_s2_rs3_addr ), // Source register address 2
 .rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
 .rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
-.rvfi_s3_rs3_rdata(rvfi_s3_rs3_rdata), // Source register data 2
 .rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
-.rvfi_s3_rs3_addr (rvfi_s3_rs3_addr ), // Source register address 2
 .rvfi_s3_aux      (rvfi_s3_aux      ), // Auxiliary data
-.rvfi_s3_rng_data (rvfi_s3_rng_data ), 
-.rvfi_s3_rng_stat (rvfi_s3_rng_stat ), 
 `endif // RVFI
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
@@ -602,36 +504,21 @@ frv_pipeline_memory #(
 .s3_instr         (s3_instr         ), // The instruction word
 .s3_busy          (s3_busy          ), // Can this stage accept new inputs?
 .s3_valid         (s3_valid         ), // Is this input valid?
-.leak_prng        (leak_prng        ), // current prng value.
-.leak_lkgcfg       (leak_lkgcfg       ), // current lkgcfg register value.
-.leak_fence_unc0  (leak_fence_unc0  ), // Leakage fence uncore resource 0
-.leak_fence_unc1  (leak_fence_unc1  ), // Leakage fence uncore resource 1
-.leak_fence_unc2  (leak_fence_unc2  ), // Leakage fence uncore resource 2
 .fwd_s3_rd        (fwd_s3_rd        ), // Writeback stage destination reg.
-.fwd_s3_wide      (fwd_s3_wide      ), // Write writeback
 .fwd_s3_wdata     (fwd_s3_wdata     ), // Write data for writeback stage.
-.fwd_s3_wdata_hi  (fwd_s3_wdata_hi  ), // Write data for writeback stage.
 .fwd_s3_load      (fwd_s3_load      ), // Writeback stage has load in it.
 .fwd_s3_csr       (fwd_s3_csr       ), // Writeback stage has CSR op in it.
 `ifdef RVFI
 .rvfi_s3_rs1_rdata(rvfi_s3_rs1_rdata), // Source register data 1
 .rvfi_s3_rs2_rdata(rvfi_s3_rs2_rdata), // Source register data 2
-.rvfi_s3_rs3_rdata(rvfi_s3_rs3_rdata), // Source register data 3
 .rvfi_s3_rs1_addr (rvfi_s3_rs1_addr ), // Source register address 1
 .rvfi_s3_rs2_addr (rvfi_s3_rs2_addr ), // Source register address 2
-.rvfi_s3_rs3_addr (rvfi_s3_rs3_addr ), // Source register address 3
 .rvfi_s3_aux      (rvfi_s3_aux      ), // Auxiliary data
-.rvfi_s3_rng_data (rvfi_s3_rng_data ), 
-.rvfi_s3_rng_stat (rvfi_s3_rng_stat ), 
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
-.rvfi_s4_rs3_rdata(rvfi_s4_rs3_rdata), // Source register data 3
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
-.rvfi_s4_rs3_addr (rvfi_s4_rs3_addr ), // Source register address 3
 .rvfi_s4_aux      (rvfi_s4_aux      ), // Auxiliary data
-.rvfi_s4_rng_data (rvfi_s4_rng_data ), 
-.rvfi_s4_rng_stat (rvfi_s4_rng_stat ), 
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
@@ -681,13 +568,9 @@ frv_pipeline_writeback #(
 .rvfi_mode        (rvfi_mode        ),
 .rvfi_rs1_addr    (rvfi_rs1_addr    ),
 .rvfi_rs2_addr    (rvfi_rs2_addr    ),
-.rvfi_rs3_addr    (rvfi_rs3_addr    ),
 .rvfi_rs1_rdata   (rvfi_rs1_rdata   ),
 .rvfi_rs2_rdata   (rvfi_rs2_rdata   ),
-.rvfi_rs3_rdata   (rvfi_rs3_rdata   ),
 .rvfi_aux         (rvfi_aux         ), // Auxiliary data
-.rvfi_rng_data    (rvfi_rng_data    ), 
-.rvfi_rng_stat    (rvfi_rng_stat    ), 
 .rvfi_rd_addr     (rvfi_rd_addr     ),
 .rvfi_rd_wide     (rvfi_rd_wide     ),
 .rvfi_rd_wdata    (rvfi_rd_wdata    ),
@@ -701,13 +584,9 @@ frv_pipeline_writeback #(
 .rvfi_mem_wdata   (rvfi_mem_wdata   ),
 .rvfi_s4_rs1_rdata(rvfi_s4_rs1_rdata), // Source register data 1
 .rvfi_s4_rs2_rdata(rvfi_s4_rs2_rdata), // Source register data 2
-.rvfi_s4_rs3_rdata(rvfi_s4_rs3_rdata), // Source register data 3
 .rvfi_s4_rs1_addr (rvfi_s4_rs1_addr ), // Source register address 1
 .rvfi_s4_rs2_addr (rvfi_s4_rs2_addr ), // Source register address 2
-.rvfi_s4_rs3_addr (rvfi_s4_rs3_addr ), // Source register address 2
 .rvfi_s4_aux      (rvfi_s4_aux      ), // Auxiliary trace data.
-.rvfi_s4_rng_data (rvfi_s4_rng_data ), 
-.rvfi_s4_rng_stat (rvfi_s4_rng_stat ), 
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .s4_rd            (s4_rd            ), // Destination register address
@@ -725,10 +604,8 @@ frv_pipeline_writeback #(
 .fwd_s4_load      (fwd_s4_load      ), // Writeback stage has load in it.
 .fwd_s4_csr       (fwd_s4_csr       ), // Writeback stage has CSR op in it.
 .gpr_wen          (gpr_wen          ), // GPR write enable.
-.gpr_wide         (gpr_wide         ), // GPR wide writeback.
 .gpr_rd           (gpr_rd           ), // GPR destination register.
 .gpr_wdata        (gpr_wdata        ), // GPR write data [31: 0].
-.gpr_wdata_hi     (gpr_wdata_hi     ), // GPR write data [63:32].
 .int_trap_req     (int_trap_req     ), // Request WB stage trap an interrupt
 .int_trap_cause   (int_trap_cause   ), // Cause of interrupt
 .int_trap_ack     (int_trap_ack     ), // WB stage acknowledge the taken trap.
@@ -810,10 +687,6 @@ frv_csrs #(
 .inhibit_cy       (inhibit_cy       ), // Stop cycle counter incrementing.
 .inhibit_tm       (inhibit_tm       ), // Stop time counter incrementing.
 .inhibit_ir       (inhibit_ir       ), // Stop instret incrementing.
-.uxcrypto_ct      (uxcrypto_ct      ), // UXCrypto constant time bit.
-.uxcrypto_b0      (uxcrypto_b0      ), // UXCrypto lookup table 0.
-.uxcrypto_b1      (uxcrypto_b1      ), // UXCrypto lookup table 1.
-.leak_lkgcfg      (leak_lkgcfg      ), // FENL Leakage config register.
 .trap_cpu         (trap_cpu         ), // A trap occured due to CPU
 .trap_int         (trap_int         ), // A trap occured due to interrupt
 .trap_cause       (trap_cause       ), // Cause of a trap.
@@ -836,13 +709,9 @@ frv_gprs #(
 .rs1_data   (s1_rs1_rdata   ), // Source register 1 read data
 .rs2_addr   (s1_rs2_addr    ), // Source register 2 address
 .rs2_data   (s1_rs2_rdata   ), // Source register 2 read data
-.rs3_addr   (s1_rs3_addr    ), // Source register 3 address
-.rs3_data   (s1_rs3_rdata   ), // Source register 3 read data
 .rd_wen     (gpr_wen        ), // Destination register write enable
-.rd_wide    (gpr_wide       ), // Wide register writeback.
 .rd_addr    (gpr_rd         ), // Destination register address
-.rd_wdata   (gpr_wdata      ), // Destination register write data [31: 0]
-.rd_wdata_hi(gpr_wdata_hi   )  // Destination register write data [63:32]
+.rd_wdata   (gpr_wdata      )  // Destination register write data [31: 0]
 );
 
 endmodule
