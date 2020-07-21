@@ -198,7 +198,7 @@ wire        csr_read        = fu_csr && s4_uop[CSR_READ];
 
 wire        csr_trap        = csr_error;
 
-wire        csr_gpr_wen     = csr_read && !csr_done;
+wire        csr_gpr_wen     = csr_read && !csr_done && !csr_error;
 wire [XL:0] csr_gpr_wdata   = csr_rdata;
 
 //
