@@ -11,7 +11,7 @@ before_install :
 - sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev
 jobs:
   include:
-  - name: "Confidence Checks"
+  - name: "riscv-compliance"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
