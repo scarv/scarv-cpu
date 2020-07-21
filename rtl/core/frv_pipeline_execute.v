@@ -60,25 +60,6 @@ output wire        s3_valid          // Is this input valid?
 wire pipe_progress = !s2_busy && s2_valid;
 
 //
-// XCrypto feature class config bits.
-parameter XC_CLASS_RANDOMNESS = 1'b1;
-parameter XC_CLASS_MEMORY     = 1'b1;
-parameter XC_CLASS_BIT        = 1'b1;
-parameter XC_CLASS_PACKED     = 1'b1;
-parameter XC_CLASS_MULTIARITH = 1'b1;
-parameter XC_CLASS_AES        = 1'b1;
-parameter XC_CLASS_SHA2       = 1'b1;
-parameter XC_CLASS_SHA3       = 1'b1;
-
-// Single cycle implementations of AES instructions?
-parameter AES_SUB_FAST = 1'b1;
-parameter AES_MIX_FAST = 1'b1;
-
-//
-// Partial Bitmanip Extension Support
-parameter BITMANIP_BASELINE   = 1'b1;
-
-//
 // Operation Decoding
 // -------------------------------------------------------------------------
 

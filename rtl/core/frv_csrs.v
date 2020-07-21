@@ -97,18 +97,6 @@ localparam CSR_ADDR_MHARTID     = 12'hF14;
 localparam CSR_ADDR_UXCRYPTO    = 12'h800;
 localparam CSR_ADDR_LKGCFG      = 12'h801;
 
-//
-// XCrypto feature class config bits.
-parameter XC_CLASS_BASELINE   = 1'b1;
-parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_MEMORY     = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 
 //
 // Partial Bitmanip Extension Support
@@ -134,7 +122,7 @@ wire [ 1:0] reg_misa_mxl        = 2'b01;
 wire [25:0] reg_misa_extensions = {
     1'b0,               // Z
     1'b0,               // Y
-    XC_CLASS_BASELINE,  // X - Non-standard/XCrypto
+    1'b0,               // X - Non-standard
     1'b0,               // W
     1'b0,               // V
     1'b0,               // U

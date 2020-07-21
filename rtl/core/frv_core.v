@@ -86,32 +86,6 @@ parameter BRAM_REGFILE = 0;
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
 
-//
-// XCrypto feature class config bits.
-parameter XC_CLASS_BASELINE   = 1'b1;
-parameter XC_CLASS_RANDOMNESS = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_MEMORY     = 1'b0 && XC_CLASS_BASELINE;
-parameter XC_CLASS_BIT        = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_PACKED     = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_MULTIARITH = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_AES        = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_SHA2       = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_SHA3       = 1'b1 && XC_CLASS_BASELINE;
-parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
-
-// Randomise registers (if set) or zero them (if clear)
-parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
-
-// Leakage fence instructions bubble the pipeline.
-parameter XC_CLASS_LEAK_BUBBLE= 1'b1 && XC_CLASS_LEAK;
-
-// Single cycle implementations of AES instructions?
-parameter AES_SUB_FAST        = 1'b0;
-parameter AES_MIX_FAST        = 1'b0;
-
-//
-// Partial Bitmanip Extension Support
-parameter BITMANIP_BASELINE   = 1'b1;
 
 //
 // Value of the M-mode implementation id register
@@ -173,21 +147,6 @@ frv_pipeline #(
 .TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
 .MMIO_BASE_ADDR     (MMIO_BASE_ADDR     ),
 .MMIO_BASE_MASK     (MMIO_BASE_MASK     ),
-.XC_CLASS_BASELINE  (XC_CLASS_BASELINE  ),
-.XC_CLASS_RANDOMNESS(XC_CLASS_RANDOMNESS),
-.XC_CLASS_MEMORY    (XC_CLASS_MEMORY    ),
-.XC_CLASS_BIT       (XC_CLASS_BIT       ),
-.XC_CLASS_PACKED    (XC_CLASS_PACKED    ),
-.XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
-.XC_CLASS_AES       (XC_CLASS_AES       ),
-.XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
-.XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
-.XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
-.XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
-.XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
-.AES_SUB_FAST       (AES_SUB_FAST       ),
-.AES_MIX_FAST       (AES_MIX_FAST       ),
-.BITMANIP_BASELINE  (BITMANIP_BASELINE  ), 
 .CSR_MIMPID         (CSR_MIMPID         )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
