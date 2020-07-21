@@ -121,8 +121,9 @@ run-embench-${1}: $(EXE_CORE) $(call map_embench_srec,${1}) $(CCX_UNIT_ROM_HEX) 
         +IMEM=$(call map_embench_srec,${1}) \
         +PASS_ADDR=$(EMBENCH_PASS_ADDR) \
         +FAIL_ADDR=$(EMBENCH_FAIL_ADDR) \
-        +TIMEOUT=$(EMBENCH_TIMEOUT) $(call map_embench_waves_or_not,${1}) \
-        | tee $(call map_embench_log,${1})
+        +IMEM_MAX_STALL=0 \
+        +DMEM_MAX_STALL=0 \
+        +TIMEOUT=$(EMBENCH_TIMEOUT) $(call map_embench_waves_or_not,${1})
 
 EMBENCH_BUILD_TARGETS += $(call map_embench_objdump,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_srec,${1})

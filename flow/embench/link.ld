@@ -10,14 +10,10 @@ SECTIONS {
 
     .text ALIGN(8) : SUBALIGN(8) {
         *(.text.boot) 
-        *(.text.*) 
         *(.text) 
-        . = ALIGN(4);
     } > ram
-    .data  ALIGN(8) : SUBALIGN(8) { *(.data.*) } > ram
-    .sdata ALIGN(8) : SUBALIGN(8) { *(.sdata.*) } > ram
-    .bss   ALIGN(8) : SUBALIGN(8) { *(.bss)    } > ram
-    .sbss  ALIGN(8) : SUBALIGN(8) { *(.sbss)    } > ram
+    .data  ALIGN(8) : SUBALIGN(8) { *(.data) } > ram
+    .bss   ALIGN(8) : SUBALIGN(8) { *(.bss)  } > ram
 
     /DISCARD/ : { *(.comment) }
 

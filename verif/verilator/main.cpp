@@ -36,8 +36,8 @@ std::string srec_path           = "";
 
 // Maximum amounts of time for which memory reqests/responses
 // will be stalled for.
-uint32_t    max_stall_imem      = 5;
-uint32_t    max_stall_dmem      = 5;
+uint32_t    max_stall_imem      = 0;
+uint32_t    max_stall_dmem      = 0;
 
 /*
 @brief Responsible for parsing all of the command line arguments.
