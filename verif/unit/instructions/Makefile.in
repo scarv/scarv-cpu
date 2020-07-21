@@ -1,6 +1,0 @@
-
-TEST_NAME = instructions
-TEST_SRC  = $(UNIT_ROOT)/instructions/instructions.c
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

@@ -18,6 +18,13 @@ jobs:
     - source ./bin/conf.sh
     - make riscv-compliance-build
     - make riscv-compliance-run
+  - name: "Unit Tests"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make unit-tests-build
+    - make unit-tests-run
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh

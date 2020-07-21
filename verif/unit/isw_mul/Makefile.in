@@ -1,7 +1,0 @@
-
-TEST_NAME = isw_mul
-TEST_SRC  = $(UNIT_ROOT)/isw_mul/test_isw.c \
-            $(UNIT_ROOT)/isw_mul/mul_isw.S
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-
