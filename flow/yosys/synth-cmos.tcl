@@ -13,15 +13,16 @@ tee -o $::env(FRV_WORK)/synth/logic-loops.rpt check -assert
 # Generic yosys synthesis command
 synth -top frv_core
 
-# Print some statistics out
-tee -o $::env(FRV_WORK)/synth/synth-statistics.rpt stat -width
+# Map to CMOS cells
+abc -g cmos4
+
+# Simple optimisations
+opt -fast
 
 # Write out the synthesised verilog
-write_verilog $::env(FRV_WORK)/synth/synth-cells.v
+write_verilog $::env(FRV_WORK)/synth/frv_core_synth.v
 
-dfflibmap -liberty $::env(YOSYS_ROOT)/techlibs/common/cells.lib
-abc -liberty $::env(YOSYS_ROOT)/examples/cmos/cmos_cells.lib
-tee -o $::env(FRV_WORK)/synth/synth-gates.rpt stat
-
-write_verilog $::env(FRV_WORK)/synth-gates.v
-
+# Statistics: size and latency
+flatten
+tee -o $::env(FRV_WORK)/synth/synth-cmos.rpt stat
+tee -a $::env(FRV_WORK)/synth/synth-cmos.rpt ltp  -noff

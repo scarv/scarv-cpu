@@ -16,7 +16,8 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - echo "Flow not yet implemeted."
+    - make riscv-compliance-build
+    - make riscv-compliance-run
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
@@ -35,7 +36,7 @@ jobs:
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/conf.sh
-    - echo "Flow not yet implemeted."
+    - make synthesise
   - name: "Benchmarks - Embench IoT"
     script:
     - source ./bin/install-verilator.sh
