@@ -1,0 +1,53 @@
+os      : linux
+language: c
+dist    : bionic
+env     :
+  global:
+  - TOOLS_DIR: ~/tools
+  - VERILATOR_ROOT: ~/tools/verilator
+  - YOSYS_ROOT: ~/tools/yosys
+  - RISCV: ~/tools/riscv64-unknown-elf
+before_install :
+- sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev
+jobs:
+  include:
+  - name: "Confidence Checks"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - echo "Flow not yet implemeted."
+  - name: "Designer Assertions"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/install-symbiyosys.sh
+    - source ./bin/install-boolector.sh
+    - source ./bin/conf.sh
+    - echo "Flow not yet implemeted."
+  - name: "riscv-formal"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/install-symbiyosys.sh
+    - source ./bin/install-boolector.sh
+    - source ./bin/conf.sh
+    - echo "Flow not yet implemeted."
+  - name: "Synthesis - Core"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/conf.sh
+    - echo "Flow not yet implemeted."
+  - name: "Benchmarks - Embench IoT"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - echo "Flow not yet implemeted."
+cache   :
+  directories:
+  - ~/tools/verilator
+  - ~/tools/yosys
+  - ~/tools/symbiyosys
+  - ~/tools/boolector
+  - ~/tools/riscv64-unknown-elf
+
+

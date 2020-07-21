@@ -5,7 +5,7 @@ export SCARV_CPU=$FRV_HOME
 export AES_RTL_DIR=$FRV_HOME/../../rtl/aes
 
 if [[ -z "$RISCV" ]]; then
-    export RISCV=/opt/riscv32
+    export RISCV=/opt/riscv
 fi
 
 if [[ -z "$VERILATOR_ROOT" ]]; then
