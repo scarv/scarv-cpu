@@ -55,7 +55,7 @@ output wire        s3_valid          // Is this input valid?
 
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 wire pipe_progress = !s2_busy && s2_valid;
 

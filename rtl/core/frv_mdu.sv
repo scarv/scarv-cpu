@@ -29,7 +29,7 @@ output wire [XL: 0] rd            // Result
 
 );
 
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 localparam MLEN = XLEN*2;
 localparam MW   = MLEN-1;

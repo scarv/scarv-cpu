@@ -31,7 +31,7 @@ input  wire         int_trap_ack      // WB stage acknowledges the taken trap.
 
 );
 
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 // NMI pending bit,
 reg mip_nmi;

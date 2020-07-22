@@ -115,7 +115,7 @@ parameter TRACE_INSTR_WORD = 1'b1;
 parameter  CSR_MIMPID           = 32'b0;
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 // -------------------------------------------------------------------------
 

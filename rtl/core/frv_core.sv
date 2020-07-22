@@ -96,7 +96,7 @@ parameter  CSR_MIMPID         = 32'b0;
 `endif
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 // -------------------------------------------------------------------------
 

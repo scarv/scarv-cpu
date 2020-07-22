@@ -40,7 +40,7 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 parameter FRV_MAX_REQS_OUTSTANDING = 1;
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 //
 // Pipeline progression

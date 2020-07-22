@@ -2,7 +2,7 @@
 yosys -import
 
 # Read in the design
-read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/*.v
+read_verilog -sv -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/*.sv
 
 # Synthesise processes ready for SCC check.
 procs
@@ -20,7 +20,7 @@ abc -g cmos4
 opt -fast
 
 # Write out the synthesised verilog
-write_verilog $::env(FRV_WORK)/synth/frv_core_synth.v
+write_verilog $::env(FRV_WORK)/synth/frv_core_synth.sv
 
 # Statistics: size and latency
 flatten

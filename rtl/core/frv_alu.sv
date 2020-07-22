@@ -32,7 +32,7 @@ output wire [   XL:0]   result    // Operation result
 );
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 //
 // Miscellaneous

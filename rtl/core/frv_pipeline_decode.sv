@@ -49,7 +49,7 @@ output wire [31:0] s2_instr        // The instruction word
 );
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
@@ -87,7 +87,7 @@ wire [ 8:0] n_s2_opr_src    ; // Operand sourcing.
 wire [XL:0] d_data =  s1_data;
 
 // Includes individual instruction decoding.
-`include "frv_pipeline_decode.vh"
+`include "frv_pipeline_decode.svh"
 
 //
 // Functional Unit Decoding / Selection

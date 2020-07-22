@@ -74,7 +74,7 @@ parameter   MMIO_BASE_ADDR        = 32'h0000_1000;
 parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 
 //

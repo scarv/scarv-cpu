@@ -50,7 +50,7 @@ input  wire [XL:0] trap_pc            // PC value associated with the trap.
 );
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 //
 // CSR addresses and constant values.

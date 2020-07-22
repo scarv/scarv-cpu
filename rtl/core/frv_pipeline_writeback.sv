@@ -115,7 +115,7 @@ input  wire [XL:0] dmem_rdata        // Read data
 
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;

@@ -31,7 +31,7 @@ input              buf_ready      // Eat 2/4 bytes
 );
 
 // Common core parameters and constants
-`include "frv_common.vh"
+`include "frv_common.svh"
 
 reg  [63:0] buffer  ;
 wire [63:0] n_buffer;
