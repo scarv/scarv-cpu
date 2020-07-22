@@ -95,6 +95,15 @@ mtvec_trap_handler_unaligned:
     sw t4, 0(t3)
     sw t4, 4(t3)
 
+    csrr t0, mepc       // Load address of faulting instruction.
+    lbu  t1, 0(t0)      // Load 0'th byte of faulting instruction.
+    xori t1, t1, 0b11   // Toggle LS two bits
+    addi t0, t0, 2      // Increment MEPC by two.
+    beqz t1, unaligned_only_add_2
+    addi t0, t0, 2      // Increment MEPC by two.
+    unaligned_only_add_2:
+    csrw mepc, t0       // Writeback new mepc.
+
     lw t0, 4(sp)
     lw t1, 8(sp)
     lw t2,12(sp)
@@ -130,6 +139,15 @@ mtvec_trap_handler_aligned:
     li t4, -1
     sw t4, 0(t3)
     sw t4, 4(t3)
+    
+    csrr t0, mepc       // Load address of faulting instruction.
+    lbu  t1, 0(t0)      // Load 0'th byte of faulting instruction.
+    xori t1, t1, 0b11   // Toggle LS two bits
+    addi t0, t0, 2      // Increment MEPC by two.
+    beqz t1, aligned_only_add_2
+    addi t0, t0, 2      // Increment MEPC by two.
+    aligned_only_add_2:
+    csrw mepc, t0       // Writeback new mepc.
     
     lw t0, 4(sp)
     lw t1, 8(sp)
