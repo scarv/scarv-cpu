@@ -103,11 +103,6 @@ parameter  CSR_MIMPID         = 32'b0;
 
 // -------------------------------------------------------------------------
 
-wire        instr_ret        ; // Instruction retired.
-
-wire [63:0] ctr_time         ; // The time counter value.
-wire [63:0] ctr_cycle        ; // The cycle counter value.
-wire [63:0] ctr_instret      ; // The instret counter value.
 
 wire        mstatus_mie      ; // Global interrupt enable.
 wire        mie_meie         ; // External interrupt enable.
