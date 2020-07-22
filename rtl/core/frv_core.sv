@@ -41,12 +41,19 @@ output [NRET * XLEN  - 1: 0] rvfi_mem_wdata ,
 output wire [XL:0]  trs_pc          , // Trace program counter.
 output wire [31:0]  trs_instr       , // Trace instruction.
 output wire         trs_valid       , // Trace output valid.
+output wire         instr_ret       , // Instruction retired
 
 input  wire         int_nmi         , // Non-maskable interrupt.
 input  wire         int_external    , // External interrupt trigger line.
 input  wire [ 3:0]  int_extern_cause, // External interrupt cause code.
 input  wire         int_software    , // Software interrupt trigger line.
-output wire         int_mtime       , // Machine timer interrupt triggered.
+input  wire         int_mtime       , // Machine timer interrupt triggered.
+
+input  wire [63:0]  ctr_time        , // Current mtime counter value.
+input  wire [63:0]  ctr_cycle       , // Current cycle counter value.
+input  wire [63:0]  ctr_instret     , // Instruction retired counter value.
+output wire         ctr_inhibit_cy  , // Stop cycle counter incrementing.
+output wire         ctr_inhibit_ir  , // Stop instret incrementing.
 
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
@@ -71,10 +78,6 @@ input  wire         dmem_error      , // Error
 input  wire [XL:0]  dmem_rdata        // Read data
 
 );
-
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR   = 32'h0000_1000;
-parameter   MMIO_BASE_MASK   = 32'hFFFF_F000;
 
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
@@ -111,28 +114,16 @@ wire        mie_meie         ; // External interrupt enable.
 wire        mie_mtie         ; // Timer interrupt enable.
 wire        mie_msie         ; // Software interrupt enable.
 
-wire        ti_pending       ; // Raise a timer interrupt. From frv_counters.
-
 wire        mip_meip         ; // External interrupt pending
 wire        mip_mtip         ; // Timer interrupt pending
 wire        mip_msip         ; // Software interrupt pending
-
-assign      int_mtime = mip_mtip;
 
 wire        int_trap_req     ; // Request WB stage trap an interrupt
 wire [ 5:0] int_trap_cause   ; // Cause of interrupt
 wire        int_trap_ack     ; // WB stage acknowledges the taken trap.
 
 wire        inhibit_cy       ; // Stop cycle counter incrementing.
-wire        inhibit_tm       ; // Stop time counter incrementing.
 wire        inhibit_ir       ; // Stop instret incrementing.
-
-wire        mmio_en          ; // MMIO enable
-wire        mmio_wen         ; // MMIO write enable
-wire [31:0] mmio_addr        ; // MMIO address
-wire [31:0] mmio_wdata       ; // MMIO write data
-wire [31:0] mmio_rdata       ; // MMIO read data
-wire        mmio_error       ; // MMIO error
 
 // -------------------------------------------------------------------------
 
@@ -145,8 +136,6 @@ frv_pipeline #(
 .FRV_PC_RESET_VALUE (FRV_PC_RESET_VALUE ),
 .BRAM_REGFILE       (BRAM_REGFILE       ),
 .TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
-.MMIO_BASE_ADDR     (MMIO_BASE_ADDR     ),
-.MMIO_BASE_MASK     (MMIO_BASE_MASK     ),
 .CSR_MIMPID         (CSR_MIMPID         )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
@@ -194,14 +183,7 @@ frv_pipeline #(
 .ctr_cycle      (ctr_cycle      ), // The cycle counter value.
 .ctr_instret    (ctr_instret    ), // The instret counter value.
 .inhibit_cy     (inhibit_cy     ), // Stop cycle counter incrementing.
-.inhibit_tm     (inhibit_tm     ), // Stop time counter incrementing.
 .inhibit_ir     (inhibit_ir     ), // Stop instret incrementing.
-.mmio_en        (mmio_en        ), // MMIO enable
-.mmio_wen       (mmio_wen       ), // MMIO write enable
-.mmio_addr      (mmio_addr      ), // MMIO address
-.mmio_wdata     (mmio_wdata     ), // MMIO write data
-.mmio_rdata     (mmio_rdata     ), // MMIO read data
-.mmio_error     (mmio_error     ), // MMIO error
 .imem_req      (imem_req      ), // Start memory request
 .imem_wen      (imem_wen      ), // Write enable
 .imem_strb     (imem_strb     ), // Write strobe
@@ -240,7 +222,7 @@ frv_interrupt i_interrupts (
 .nmi_pending   (int_nmi         ),
 .ex_pending    (int_external    ), // External interrupt pending?
 .ex_cause      (int_extern_cause),// External interrupt cause code.
-.ti_pending    (ti_pending      ), // From mrv_counters is mtime pending?
+.ti_pending    (int_mtime       ), // From mrv_counters is mtime pending?
 .sw_pending    (int_software    ), // Software interrupt pending?
 .mip_meip      (mip_meip        ), // External interrupt pending
 .mip_mtip      (mip_mtip        ), // Timer interrupt pending
@@ -250,32 +232,5 @@ frv_interrupt i_interrupts (
 .int_trap_ack  (int_trap_ack    )  // WB stage acknowledges the taken trap.
 );
 
-
-//
-// instance: frv_counters
-//
-//  Responsible for all performance counters and timers.
-//
-frv_counters #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
-) i_counters(
-.g_clk          (g_clk          ), // global clock
-.g_resetn       (g_resetn       ), // synchronous reset
-.instr_ret      (instr_ret      ), // Instruction retired.
-.timer_interrupt(ti_pending     ), // Raise a timer interrupt
-.ctr_time       (ctr_time       ), // The time counter value.
-.ctr_cycle      (ctr_cycle      ), // The cycle counter value.
-.ctr_instret    (ctr_instret    ), // The instret counter value.
-.inhibit_cy     (inhibit_cy     ), // Stop cycle counter incrementing.
-.inhibit_tm     (inhibit_tm     ), // Stop time counter incrementing.
-.inhibit_ir     (inhibit_ir     ), // Stop instret incrementing.
-.mmio_en        (mmio_en        ), // MMIO enable
-.mmio_wen       (mmio_wen       ), // MMIO write enable
-.mmio_addr      (mmio_addr      ), // MMIO address
-.mmio_wdata     (mmio_wdata     ), // MMIO write data
-.mmio_rdata     (mmio_rdata     ), // MMIO read data
-.mmio_error     (mmio_error     )  // MMIO error
-);
 
 endmodule

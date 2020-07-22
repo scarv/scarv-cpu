@@ -43,11 +43,6 @@ output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 
 input  wire        hold_lsu_req    , // Hold LSU requests for now.
 
-output wire        mmio_en         , // MMIO enable
-output wire        mmio_wen        , // MMIO write enable
-output wire [31:0] mmio_addr       , // MMIO address
-output wire [31:0] mmio_wdata      , // MMIO write data
-
 output wire        dmem_req        , // Start memory request
 output wire        dmem_wen        , // Write enable
 output wire [3:0]  dmem_strb       , // Write strobe
@@ -67,11 +62,6 @@ input  wire        s4_busy         , // Can this stage accept new inputs?
 output wire        s4_valid          // Is this input valid?
 
 );
-
-
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR        = 32'h0000_1000;
-parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
 
 // Common core parameters and constants
 `include "frv_common.svh"
@@ -111,8 +101,6 @@ wire        lsu_valid  = fu_lsu         ; // Inputs are valid.
 wire        lsu_a_error                 ; // Address error. TODO
 wire        lsu_ready                   ; // Load/Store instruction complete.
 
-wire        lsu_mmio                    ; // Is this an MMIO access?
-
 wire        lsu_load   = s3_uop[LSU_LOAD ];
 wire        lsu_store  = s3_uop[LSU_STORE];
 
@@ -128,7 +116,7 @@ wire [5:0]  lsu_cause =
            (lsu_store  &&lsu_a_error)? TRAP_STALIGN  :
                                         0            ;
 
-wire [XL:0] n_s4_opr_a_lsu = {27'b0,lsu_mmio,dmem_strb};
+wire [XL:0] n_s4_opr_a_lsu = {28'b0,dmem_strb};
 wire [XL:0] n_s4_opr_b_lsu = lsu_addr;
 
 //
@@ -180,15 +168,12 @@ assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
 //  Load store unit. Responsible for all data accesses.
 //
 frv_lsu #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
 ) i_lsu(
 .g_clk       (g_clk       ), // Global clock
 .g_resetn    (g_resetn    ), // Global reset.
 .lsu_valid   (lsu_valid   ), // Inputs are valid.
 .lsu_a_error (lsu_a_error ), // Address error.
 .lsu_ready   (lsu_ready   ), // Outputs are valid / instruction complete.
-.lsu_mmio    (lsu_mmio    ), // Is this an MMIO access?
 .pipe_prog   (pipe_progress),// Pipeline is progressing this cycle.
 .lsu_addr    (lsu_addr    ), // Memory address to access.
 .lsu_wdata   (lsu_wdata   ), // Data to write to memory.
@@ -199,10 +184,6 @@ frv_lsu #(
 .lsu_word    (lsu_word    ), // Word operation width.
 .lsu_signed  (lsu_signed  ), // Sign extend loaded data?
 .hold_lsu_req(hold_lsu_req), // Don't make LSU requests yet.
-.mmio_en     (mmio_en     ), // MMIO enable
-.mmio_wen    (mmio_wen    ), // MMIO write enable
-.mmio_addr   (mmio_addr   ), // MMIO address
-.mmio_wdata  (mmio_wdata  ), // MMIO write data
 .dmem_req    (dmem_req    ), // Start memory request
 .dmem_wen    (dmem_wen    ), // Write enable
 .dmem_strb   (dmem_strb   ), // Write strobe
@@ -315,7 +296,7 @@ reg [31:0] mem_wdata_store;
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         rvfi_s4_mem_wdata <= 0;
-    end else if(p_valid && !p_busy && (mmio_en || dmem_req && dmem_gnt)) begin
+    end else if(p_valid && !p_busy && (dmem_req && dmem_gnt)) begin
         rvfi_s4_mem_wdata <= dmem_wdata;
     end else if(p_valid && !p_busy) begin
         rvfi_s4_mem_wdata <= mem_wdata_store;
@@ -325,7 +306,7 @@ end
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         mem_wdata_store <= 0;
-    end else if(mmio_en || dmem_req && dmem_gnt) begin
+    end else if(dmem_req && dmem_gnt) begin
         mem_wdata_store <= dmem_wdata;
     end
 end

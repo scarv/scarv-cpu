@@ -17,7 +17,6 @@ output reg  [63:0] ctr_cycle        , // The cycle counter value.
 output reg  [63:0] ctr_instret      , // The instret counter value.
 
 input  wire        inhibit_cy       , // Stop cycle counter incrementing.
-input  wire        inhibit_tm       , // Stop time counter incrementing.
 input  wire        inhibit_ir       , // Stop instret incrementing.
 
 input  wire        mmio_en          , // MMIO enable
@@ -75,7 +74,7 @@ always @(posedge g_clk) begin
         mapped_mtime <= {mmio_wdata, mapped_mtime[31:0]};
     end else if(wr_mtime_lo) begin
         mapped_mtime <= {mapped_mtime[63:32], mmio_wdata};
-    end else if(!inhibit_tm) begin
+    end else begin
         mapped_mtime <= n_mapped_mtime;
     end
 end

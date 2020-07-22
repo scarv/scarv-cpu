@@ -62,15 +62,7 @@ input  wire [ 5:0]  int_trap_cause  , // Cause of interrupt
 output wire         int_trap_ack    , // WB stage acknowledges the taken trap.
 
 output wire         inhibit_cy      , // Stop cycle counter incrementing.
-output wire         inhibit_tm      , // Stop time counter incrementing.
 output wire         inhibit_ir      , // Stop instret incrementing.
-
-output wire         mmio_en         , // MMIO enable
-output wire         mmio_wen        , // MMIO write enable
-output wire [31:0]  mmio_addr       , // MMIO address
-output wire [31:0]  mmio_wdata      , // MMIO write data
-input  wire [31:0]  mmio_rdata      , // MMIO read data
-input  wire         mmio_error      , // MMIO error
 
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
@@ -101,10 +93,6 @@ parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
 // Use a BRAM/DMEM friendly register file?
 parameter BRAM_REGFILE = 0;
-
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR        = 32'h0000_1000;
-parameter   MMIO_BASE_MASK        = 32'hFFFF_F000;
 
 // If set, trace the instruction word through the pipeline. Otherwise,
 // set it to zeros and let it be optimised away.
@@ -437,8 +425,6 @@ frv_pipeline_execute #(
 //  Memory stage of the pipeline, responsible making memory requests.
 //
 frv_pipeline_memory #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
 ) i_pipeline_s3_memory(
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
@@ -471,10 +457,6 @@ frv_pipeline_memory #(
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
-.mmio_en          (mmio_en          ), // MMIO enable
-.mmio_wen         (mmio_wen         ), // MMIO write enable
-.mmio_addr        (mmio_addr        ), // MMIO address
-.mmio_wdata       (mmio_wdata       ), // MMIO write data
 .dmem_req         (dmem_req         ), // Start memory request
 .dmem_wen         (dmem_wen         ), // Write enable
 .dmem_strb        (dmem_strb        ), // Write strobe
@@ -582,8 +564,6 @@ frv_pipeline_writeback #(
 .cf_target        (cf_target        ), // Control flow change target
 .cf_ack           (cf_ack           ), // Control flow change acknowledge.
 .hold_lsu_req     (hold_lsu_req     ), // Don't make LSU requests yet.
-.mmio_rdata       (mmio_rdata       ), // MMIO read data
-.mmio_error       (mmio_error       ), // MMIO error
 .dmem_recv        (dmem_recv        ), // Instruction memory recieve response.
 .dmem_ack         (dmem_ack         ), // Data memory ack response.
 .dmem_error       (dmem_error       ), // Error
@@ -623,7 +603,6 @@ frv_csrs #(
 .ctr_cycle        (ctr_cycle        ), // The cycle counter value.
 .ctr_instret      (ctr_instret      ), // The instret counter value.
 .inhibit_cy       (inhibit_cy       ), // Stop cycle counter incrementing.
-.inhibit_tm       (inhibit_tm       ), // Stop time counter incrementing.
 .inhibit_ir       (inhibit_ir       ), // Stop instret incrementing.
 .trap_cpu         (trap_cpu         ), // A trap occured due to CPU
 .trap_int         (trap_int         ), // A trap occured due to interrupt

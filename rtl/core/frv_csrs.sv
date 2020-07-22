@@ -38,7 +38,6 @@ input  wire [63:0] ctr_cycle        , // The cycle counter value.
 input  wire [63:0] ctr_instret      , // The instret counter value.
 
 output wire        inhibit_cy       , // Stop cycle counter incrementing.
-output wire        inhibit_tm       , // Stop time counter incrementing.
 output wire        inhibit_ir       , // Stop instret incrementing.
 
 input  wire        trap_cpu         , // A trap occured due to CPU
@@ -478,9 +477,7 @@ reg mcountin_ir;
 reg mcountin_tm;
 reg mcountin_cy;
 
-// TODO: Turn into ports.
 assign inhibit_ir = mcountin_ir;
-assign inhibit_tm = mcountin_tm;
 assign inhibit_cy = mcountin_cy;
 
 wire wen_mcountin = csr_wr && csr_addr == CSR_ADDR_MCOUNTIN;

@@ -103,9 +103,6 @@ input  wire        cf_ack          , // Control flow change acknowledge.
 
 output wire        hold_lsu_req    , // Don't make LSU requests yet.
 
-input  wire [31:0] mmio_rdata      , // MMIO read data
-input  wire        mmio_error      , // MMIO error
-
 input  wire        dmem_recv       , // Instruction memory recieve response.
 output wire        dmem_ack        , // Data memory ack response.
 input  wire        dmem_error      , // Error
@@ -282,10 +279,6 @@ wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 // -------------------------------------------------------------------------
 
 //
-// Are we expecting an MMIO access?
-wire        lsu_mmio        = fu_lsu    && s4_opr_a[4];
-
-//
 // Are we recieving a data memory response which we expected?
 wire        lsu_txn_recv    = lsu_load               &&
                               dmem_recv && dmem_ack  &&
@@ -295,22 +288,21 @@ wire        lsu_txn_recv    = lsu_load               &&
 // Track whether we've already seen the expected memory response for the
 // current writeback stage instruction.
 wire        n_lsu_rsp_seen  = 
-    !pipe_progress && (lsu_rsp_seen || lsu_mmio || (dmem_recv && dmem_ack));
+    !pipe_progress && (lsu_rsp_seen || (dmem_recv && dmem_ack));
 
 reg         lsu_rsp_seen;
 
 //
 // Do we *expect* to see a data memory response, given the current
 // instruction?
-wire        lsu_rsp_expected= fu_lsu && !lsu_rsp_seen && !lsu_mmio;
+wire        lsu_rsp_expected= fu_lsu && !lsu_rsp_seen;
 
 //
 // Only accept data memory responses if we expect them.
 assign      dmem_ack    = lsu_rsp_expected;
 
-wire        lsu_gpr_wen     = (lsu_txn_recv && !dmem_error ||
-                               lsu_mmio     && !mmio_error  ) &&
-                              !lsu_rsp_seen &&  lsu_load       ;
+wire        lsu_gpr_wen     = (lsu_txn_recv && !dmem_error ) &&
+                              !lsu_rsp_seen &&  lsu_load      ;
 
 wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
 
@@ -330,10 +322,10 @@ wire [ 3:0] lsu_strb    = s4_opr_a[3:0];
 // Are we still waiting for the memory response?
 wire        lsu_busy    =
     fu_lsu && !(
-        lsu_rsp_seen || (dmem_recv && dmem_ack) || lsu_mmio
+        lsu_rsp_seen || (dmem_recv && dmem_ack)
     );
 
-wire [31:0] mem_rdata = lsu_mmio ? mmio_rdata : dmem_rdata;
+wire [31:0] mem_rdata = dmem_rdata;
 
 //
 // Re-arrange the byte data on a memory read response as needed.
@@ -375,8 +367,7 @@ end
 
 //
 // LSU Bus error? Due to MMIO or DMEM bus?
-wire        lsu_b_error = n_dmem_error_seen       ||
-                          lsu_mmio && mmio_error  ;
+wire        lsu_b_error = n_dmem_error_seen       ;
 
 wire        lsu_trap    = lsu_b_error;
 
@@ -528,7 +519,7 @@ reg        use_saved_mem_rdata;
 
 wire       n_use_saved_mem_rdata =
     !pipe_progress && (
-        use_saved_mem_rdata || ((dmem_recv && dmem_ack) || lsu_mmio)
+        use_saved_mem_rdata || ((dmem_recv && dmem_ack))
     );
 
 always @(posedge g_clk) begin
@@ -543,7 +534,7 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         saved_mem_rdata <= 0;
     end else if(n_use_saved_mem_rdata && !use_saved_gpr_wdata) begin
-        saved_mem_rdata <= lsu_mmio ? mmio_rdata : dmem_rdata;
+        saved_mem_rdata <= dmem_rdata;
     end
 end
 
@@ -561,12 +552,6 @@ always @(posedge g_clk) begin
     end else if(pipe_progress) begin
         intr_tracker <= n_intr_tracker;
     end
-end
-
-//
-// Assume we never get an MMIO error, because RVFI can't handle them well.
-always @(posedge g_clk) begin
-    assume(!mmio_error);
 end
 
 assign rvfi_valid = trs_valid;
@@ -592,7 +577,6 @@ assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
 assign rvfi_mem_rmask= fu_lsu && lsu_load  ? lsu_strb : 4'b0000 ;
 assign rvfi_mem_wmask= fu_lsu && lsu_store ? lsu_strb : 4'b0000 ;
 assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata :
-                       lsu_mmio            ? mmio_rdata      :
                                              dmem_rdata      ;
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 

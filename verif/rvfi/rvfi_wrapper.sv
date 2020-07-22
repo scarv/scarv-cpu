@@ -11,9 +11,10 @@ module rvfi_wrapper (
 	`RVFI_OUTPUTS
 );
 
-wire         trs_valid       ; // Trace output valid.
-wire [31:0]  trs_pc          ; // Trace program counter object.
-wire [31:0]  trs_instr       ; // Instruction traced out.
+wire         trs_valid      ; // Trace output valid.
+wire [31:0]  trs_pc         ; // Trace program counter object.
+wire [31:0]  trs_instr      ; // Instruction traced out.
+wire         instr_ret      ; // Instruction retired.
 
 wire         g_resetn = !reset;
 
@@ -21,32 +22,39 @@ parameter NRET = 1       ;
 parameter XLEN = 32      ;
 parameter XL   = XLEN - 1;
 
-(*keep*) `rvformal_rand_reg         int_nmi     ; // Non-maskable interrupt
-(*keep*) wire                       int_mtime   ; // Machine timer interrupt
-(*keep*) `rvformal_rand_reg         int_external; // External interrupt
-(*keep*) `rvformal_rand_reg         int_software; // Software interrupt
+(*keep*) reg         int_nmi      = $anyseq ; // Non-maskable interrupt
+(*keep*) reg         int_external = $anyseq ; // External interrupt
+(*keep*) reg [ 3:0]  int_extern_cause= $anyseq ; // External interrupt
+(*keep*) reg         int_software = $anyseq ; // Software interrupt
+(*keep*) reg         int_mtime    = $anyseq ; // Machine timer interrupt.
 
-(*keep*) wire                       imem_req  ; // Start memory request
-(*keep*) wire                       imem_wen  ; // Write enable
-(*keep*) wire [3:0]                 imem_strb ; // Write strobe
-(*keep*) wire [XL:0]                imem_wdata; // Write data
-(*keep*) wire [XL:0]                imem_addr ; // Read/Write address
-(*keep*) `rvformal_rand_reg         imem_gnt  ; // request accepted
-(*keep*) `rvformal_rand_reg         imem_recv ; // memory recieve response.
-(*keep*) wire                       imem_ack  ; // memory ack response.
-(*keep*) `rvformal_rand_reg         imem_error; // Error
-(*keep*) `rvformal_rand_reg [XL:0]  imem_rdata; // Read data
+(*keep*) reg [63:0]  ctr_time     = $anyseq ; // mtime counter value.
+(*keep*) reg [63:0]  ctr_cycle    = $anyseq ; // cycle counter value.
+(*keep*) reg [63:0]  ctr_instret  = $anyseq ; // Instructions retired.
+(*keep*) wire        ctr_inhibit_cy         ; // Stop cycle counter.
+(*keep*) wire        ctr_inhibit_ir         ; // Stop instret incrementing.
 
-(*keep*) wire                       dmem_req  ; // Start memory request
-(*keep*) wire                       dmem_wen  ; // Write enable
-(*keep*) wire [3:0]                 dmem_strb ; // Write strobe
-(*keep*) wire [31:0]                dmem_wdata; // Write data
-(*keep*) wire [31:0]                dmem_addr ; // Read/Write address
-(*keep*) `rvformal_rand_reg         dmem_gnt  ; // request accepted
-(*keep*) `rvformal_rand_reg         dmem_recv ; // memory recieve response.
-(*keep*) wire                       dmem_ack  ; // memory ack response.
-(*keep*) `rvformal_rand_reg         dmem_error; // Error
-(*keep*) `rvformal_rand_reg [XL:0]  dmem_rdata; // Read data
+(*keep*) wire        imem_req               ; // Start memory request
+(*keep*) wire        imem_wen               ; // Write enable
+(*keep*) wire [3:0]  imem_strb              ; // Write strobe
+(*keep*) wire [XL:0] imem_wdata             ; // Write data
+(*keep*) wire [XL:0] imem_addr              ; // Read/Write address
+(*keep*) reg         imem_gnt     = $anyseq ; // request accepted
+(*keep*) reg         imem_recv    = $anyseq ; // memory recieve response.
+(*keep*) wire        imem_ack               ; // memory ack response.
+(*keep*) reg         imem_error   = $anyseq ; // Error
+(*keep*) reg  [XL:0] imem_rdata   = $anyseq ; // Read data
+
+(*keep*) wire        dmem_req               ; // Start memory request
+(*keep*) wire        dmem_wen               ; // Write enable
+(*keep*) wire [3:0]  dmem_strb              ; // Write strobe
+(*keep*) wire [31:0] dmem_wdata             ; // Write data
+(*keep*) wire [31:0] dmem_addr              ; // Read/Write address
+(*keep*) reg         dmem_gnt     = $anyseq ; // request accepted
+(*keep*) reg         dmem_recv    = $anyseq ; // memory recieve response.
+(*keep*) wire        dmem_ack               ; // memory ack response.
+(*keep*) reg         dmem_error   = $anyseq ; // Error
+(*keep*) reg  [XL:0] dmem_rdata   = $anyseq ; // Read data
 
 //
 // Fairness Assumptions / Restrictions
@@ -104,10 +112,18 @@ frv_core #(
 .trs_pc         (trs_pc         ), // Trace program counter.
 .trs_instr      (trs_instr      ), // Trace instruction.
 .trs_valid      (trs_valid      ), // Trace output valid.
+.instr_ret      (instr_ret      ), // Instruction retired
 .int_nmi        (int_nmi        ), // Non-maskable interrupt trigger line.
 .int_mtime      (int_mtime      ), // Non-maskable interrupt trigger line.
 .int_external   (int_external   ), // External interrupt trigger line.
+.int_extern_cause(int_extern_cause), // External interrupt trigger line.
 .int_software   (int_software   ), // Software interrupt trigger line.
+.int_mtime      (int_mtime      ), // Machine timer interrupt triggered.
+.ctr_time       (ctr_time       ), // Current mtime counter value.
+.ctr_cycle      (ctr_cycle      ), // Current cycle counter value.
+.ctr_instret    (ctr_instret    ), // Instruction retired counter value.
+.ctr_inhibit_cy (ctr_inhibit_cy ), // Stop cycle counter incrementing.
+.ctr_inhibit_ir (ctr_inhibit_ir ), // Stop instret incrementing.
 .imem_req       (imem_req       ), // Start memory request
 .imem_wen       (imem_wen       ), // Write enable
 .imem_strb      (imem_strb      ), // Write strobe
