@@ -117,9 +117,6 @@ wire        int_trap_req     ; // Request WB stage trap an interrupt
 wire [ 5:0] int_trap_cause   ; // Cause of interrupt
 wire        int_trap_ack     ; // WB stage acknowledges the taken trap.
 
-wire        inhibit_cy       ; // Stop cycle counter incrementing.
-wire        inhibit_ir       ; // Stop instret incrementing.
-
 // -------------------------------------------------------------------------
 
 //
@@ -177,8 +174,8 @@ frv_pipeline #(
 .ctr_time       (ctr_time       ), // The time counter value.
 .ctr_cycle      (ctr_cycle      ), // The cycle counter value.
 .ctr_instret    (ctr_instret    ), // The instret counter value.
-.inhibit_cy     (inhibit_cy     ), // Stop cycle counter incrementing.
-.inhibit_ir     (inhibit_ir     ), // Stop instret incrementing.
+.inhibit_cy     (ctr_inhibit_cy ), // Stop cycle counter incrementing.
+.inhibit_ir     (ctr_inhibit_ir ), // Stop instret incrementing.
 .imem_req      (imem_req      ), // Start memory request
 .imem_wen      (imem_wen      ), // Write enable
 .imem_strb     (imem_strb     ), // Write strobe
