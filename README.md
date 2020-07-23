@@ -1,5 +1,9 @@
 # [SCARV](https://github.com/scarv/scarv): processor core implementation 
 
+`master`    |   scarv/skywater/main` | scarv/skywater/dev`
+------------|------------------------|---------------------
+[![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=master)](https://travis-ci.org/scarv/scarv-cpu) | [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fskywater%2Fmain)](https://travis-ci.org/scarv/scarv-cpu) | [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fskywater%2Fdev)](https://travis-ci.org/scarv/scarv-cpu)
+
 <!--- -------------------------------------------------------------------- --->
 
 *Acting as a component part of the wider
