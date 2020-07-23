@@ -22,3 +22,10 @@ riscv-formal-prepare: $(CFG) $(WRAPPER) $(CPU_RTL_SRCS)
 riscv-formal-run:
 	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(CHECKS)
 	rm -rf $(RVFML)
+
+riscv-formal-report:
+	grep "Status: " `find work/riscv-formal/ -path *engine_0/logfile.txt` \
+    | rev | sort | rev \
+    | sed 's@work/riscv-formal/insn_@@' \
+    | sed 's@engine_0/logfile.txt@@'
+
