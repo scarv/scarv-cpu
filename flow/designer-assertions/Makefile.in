@@ -1,0 +1,42 @@
+
+DESIGN_ASSERTIONS  =
+
+ASSERT_SBY_SRC = $(shell find $(SCARV_CPU)/flow/designer-assertions -name *.sby)
+
+
+#
+# 1. Input SBY config file.
+define map_sby
+$(patsubst $(SCARV_CPU)/flow/%,$(FRV_WORK)/%,${1})
+endef
+
+
+#
+# 1. Input SBY config file
+define map_da_target
+da-prove-$(notdir $(basename ${1}))
+endef
+
+
+#
+# 1. Input SBY config file
+define add_assert_target
+
+$(call map_sby,${1}) : ${1}
+	@mkdir -p $(dir $(call map_sby,${1}))
+	cp $${<} $${@}
+	sed -i "s+SCARV_CPU+$(SCARV_CPU)+g" $${@}
+
+$(call map_da_target,${1}) : $(call map_sby,${1})
+	sby -f $${<}
+
+DESIGN_ASSERTIONS += $(call map_da_target,${1})
+
+endef
+
+
+$(foreach ASS,$(ASSERT_SBY_SRC),$(eval $(call add_assert_target,$(ASS))))
+
+da-prove-all: $(DESIGN_ASSERTIONS)
+
+

@@ -86,6 +86,12 @@ endef
 
 #
 # 1. Benchmark name
+define map_embench_gtkwl
+$(call map_embench_dir,${1})/${1}.gtkwl
+endef
+
+#
+# 1. Benchmark name
 define map_embench_vcd
 $(call map_embench_dir,${1})/${1}.vcd
 endef
@@ -111,6 +117,13 @@ define embench_add
 
 $(call map_embench_objdump,${1}) : $(call map_embench_exe,${1})
 	$(OBJDUMP) -D $${<} > $${@}
+        
+$(call map_embench_gtkwl,${1}) : $(call map_embench_objdump,${1})
+	grep "80.*:" $${<} \
+	    | grep -v ">:" | cut -c 11- | sed 's/\t//' \
+	    | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
+	    | sed 's/\(^....    \)    /0000\1/' \
+	    > $${@} 
 
 $(call map_embench_srec,${1}) : $(call map_embench_exe,${1})
 	$(OBJCOPY) $(EMBENCH_OBJCOPY_FLAGS) -O srec $${<} $${@}
@@ -126,6 +139,7 @@ run-embench-${1}: $(EXE_CORE) $(call map_embench_srec,${1}) $(CCX_UNIT_ROM_HEX) 
         +TIMEOUT=$(EMBENCH_TIMEOUT) $(call map_embench_waves_or_not,${1})
 
 EMBENCH_BUILD_TARGETS += $(call map_embench_objdump,${1})
+EMBENCH_BUILD_TARGETS += $(call map_embench_gtkwl,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_srec,${1})
 EMBENCH_RUN_TARGETS   += run-embench-${1}
 

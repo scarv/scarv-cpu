@@ -80,11 +80,14 @@ wire        e_new_req           = imem_req && imem_gnt;
 
 // New response recieved this cycle.
 reg         e_new_rsp           ;
+reg         p_new_rsp           ;
 
 always @(posedge g_clk) if(!g_resetn) begin
     e_new_rsp <= 1'b0;
+    p_new_rsp <= 1'b0;
 end else begin
     e_new_rsp <= e_new_req;
+    p_new_rsp <= e_new_req;
 end
 
 //
@@ -97,17 +100,11 @@ wire [XL:0] n_imem_addr         = imem_addr + 4;
 // We only hold half of a 32-bit instruction.
 wire        incomplete_instr    = buf_32 && buf_depth == 1;
 
-wire   allow_req_bd_2 = !e_new_req && !e_new_rsp && !buf_out_4  ||
-                        !e_new_req &&  e_new_rsp &&  buf_out_4  ||
-                        !e_new_req &&  e_new_rsp &&  buf_out_2  ;
+wire nc_1 = n_buf_depth == 1              ;
+wire nc_2 = n_buf_depth <= 3 && !e_new_req;
+wire nc_3 = 1'b0;
 
-wire   allow_req_bd_3 = 1'b0;
-
-// Make a request on the next cycle?
-wire        n_imem_req          =
-    e_cf_change                               ||
-    buf_depth <= 2 && allow_req_bd_2          ||
-    buf_depth == 3 && allow_req_bd_3          ;
+wire   n_imem_req = nc_1 || nc_2 || nc_3;
 
 //
 // Update the fetch address in terms of control flow changes and natural

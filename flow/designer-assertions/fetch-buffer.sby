@@ -1,0 +1,32 @@
+[tasks]
+task_cover cover
+task_prove prove
+
+[options]
+depth   15
+
+prove: mode bmc
+cover: mode cover
+
+[engines]
+smtbmc  boolector
+
+[script]
+echo on
+verilog_defaults -add -ISCARV_CPU/rtl/core/
+verilog_defaults -add -ISCARV_CPU/rtl/core/
+read_verilog -formal SCARV_CPU/verif/designer-assertions/wrapper.sv
+read_verilog -formal SCARV_CPU/verif/designer-assertions/fairness.sv
+read_verilog -formal SCARV_CPU/rtl/core/*.sv
+prep -flatten -nordff -top design_assertions_wrapper 
+chformal -early
+
+[files]
+SCARV_CPU/external/riscv-formal/checks/rvfi_macros.vh
+
+[file defines.svh]
+`define DESIGNER_ASSERTION_FETCH_BUFFER 1
+`define RISCV_FORMAL_NRET 1
+`define RISCV_FORMAL_ILEN 32
+`define RISCV_FORMAL_XLEN 32
+`define RVFI
