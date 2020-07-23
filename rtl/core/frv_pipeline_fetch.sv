@@ -19,8 +19,6 @@ output wire [3:0]   imem_strb       , // Write strobe
 output wire [XL:0]  imem_wdata      , // Write data
 output reg  [XL:0]  imem_addr       , // Read/Write address
 input  wire         imem_gnt        , // request accepted
-output wire         imem_ack        , // Instruction memory ack response.
-input  wire         imem_recv       , // Instruction memory recieve response.
 input  wire         imem_error      , // Error
 input  wire [XL:0]  imem_rdata      , // Read data
 
@@ -47,10 +45,13 @@ parameter FRV_MAX_REQS_OUTSTANDING = 1;
 // --------------------------------------------------------------
 
 // Stage can progress if buffer has enough data in it for an instruction.
-assign s1_valid = buf_valid;
+assign  s1_valid    = buf_valid;
 
-// TODO: track when to ignore requests more inteligently.
-assign cf_ack   = (!imem_req) || (imem_req && imem_gnt);
+// When can we accept a control flow change?
+assign  cf_ack      = (!imem_req) || (imem_req && imem_gnt);
+
+// New control flow change occuring right now.
+wire    e_cf_change = cf_req && cf_ack;
 
 //
 // Request buffer interface signals.
@@ -63,6 +64,7 @@ wire f_2byte;   // Buffer should store 2 bytes of input.
 wire       buf_16;
 wire       buf_32;
 wire [2:0] buf_depth; // Current buffer depth.
+wire [2:0] n_buf_depth; // Next buffer depth.
 
 wire buf_out_2 ; // Buffer has entire valid 2 byte instruction.
 wire buf_out_4 ; // Buffer has entire valid 4 byte instruction.
@@ -70,52 +72,42 @@ wire buf_valid ; // D output data is valid
 wire buf_ready = s1_valid && !s1_busy; // Eat 2/4 bytes
 
 //
+// Memory Event tracking.
+// --------------------------------------------------------------
+
+// New request issued this cycle.
+wire        e_new_req           = imem_req && imem_gnt;
+
+// New response recieved this cycle.
+reg         e_new_rsp           ;
+
+always @(posedge g_clk) if(!g_resetn) begin
+    e_new_rsp <= 1'b0;
+end else begin
+    e_new_rsp <= e_new_req;
+end
+
+//
 // Memory bus requests
 // --------------------------------------------------------------
 
-// Counter to store the number of future memory responses to be ignored.
-reg  [2:0] ignore_rsps       ;
-wire [2:0] n_ignore_rsps     ;
+// Next natural instruction memory fetch address.
+wire [XL:0] n_imem_addr         = imem_addr + 4;
 
-assign     n_ignore_rsps    = ignore_rsps - {2'b00, rsp_recv};
+// We only hold half of a 32-bit instruction.
+wire        incomplete_instr    = buf_32 && buf_depth == 1;
 
-// If we get a memory response while ignoring them, drop the response so
-// it doesn't enter the fetch buffer.
-wire        drop_response   = |ignore_rsps;
+wire   allow_req_bd_2 = !e_new_req && !e_new_rsp && !buf_out_4  ||
+                        !e_new_req &&  e_new_rsp &&  buf_out_4  ||
+                        !e_new_req &&  e_new_rsp &&  buf_out_2  ;
 
-// The number of outstanding memory requests for which we haven't yet
-// recieved a response. This counter is updated whether or not the
-// response is dropped or not.
-reg  [2:0]   reqs_outstanding;
-wire [2:0]   reqs_outstanding_add = {2'b0,(imem_req && imem_gnt)};
-wire [2:0]   reqs_outstanding_sub = {2'b0,(rsp_recv            )};
+wire   allow_req_bd_3 = 1'b0;
 
-wire [2:0] n_reqs_outstanding = reqs_outstanding     +
-                                reqs_outstanding_add -
-                                reqs_outstanding_sub ;
-
-wire cf_change          = cf_req && cf_ack;
-
-// Update the memory fetch address each time we get a response.
-wire progress_imem_addr = imem_req && imem_gnt;
-
-wire [XL:0] n_imem_addr = imem_addr + 4;
-
-wire incomplete_instr = buf_32 && buf_depth == 1;
-
-// Don't start a memory fetch request if there are already a bunch of
-// outstanding, unrecieved responses.
-wire allow_new_mem_req  =
-      reqs_outstanding <  FRV_MAX_REQS_OUTSTANDING ||
-    n_reqs_outstanding == 0                        ||
-   (  reqs_outstanding == FRV_MAX_REQS_OUTSTANDING &&
-    n_reqs_outstanding == FRV_MAX_REQS_OUTSTANDING );
-
-wire new_mem_req        = f_ready || cf_change;
-
-wire        n_imem_req  =
-    (new_mem_req && allow_new_mem_req || incomplete_instr) ||
-    (imem_req && !imem_gnt);
+// Make a request on the next cycle?
+wire        n_imem_req          =
+    e_cf_change                               ||
+    buf_depth <= 2 && allow_req_bd_2          ||
+    buf_depth == 3 && allow_req_bd_3          ;
 
 //
 // Update the fetch address in terms of control flow changes and natural
@@ -123,37 +115,21 @@ wire        n_imem_req  =
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         imem_addr <= FRV_PC_RESET_VALUE;
-    end else if(cf_change) begin
+    end else if(e_cf_change) begin
         imem_addr <= {cf_target[31:2],2'b00};
-    end else if(progress_imem_addr) begin
+    end else if(e_new_req) begin
         imem_addr <= n_imem_addr;
     end
 end
 
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        imem_req    <= 1'b0;
-    end else begin
-        imem_req    <= n_imem_req;
-    end
-end
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        reqs_outstanding <= 3'b0;
-    end else begin
-        reqs_outstanding <= n_reqs_outstanding;
-    end
-end
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        ignore_rsps <= 3'b0;
-    end else if(cf_change) begin
-        ignore_rsps <= n_reqs_outstanding;
-    end else if(|ignore_rsps) begin
-        ignore_rsps <= n_ignore_rsps;
-    end
+//
+// Update instruction memory fetch request bit.
+always @(posedge g_clk) if(!g_resetn) begin
+    imem_req    <= 1'b0;
+end else if(imem_req && !imem_gnt) begin
+    imem_req    <= 1'b1;
+end else begin
+    imem_req    <= n_imem_req;
 end
 
 //
@@ -166,7 +142,7 @@ end
 // should only store the "upper" halfword of the response.
 reg  fetch_misaligned;
 wire n_fetch_misaligned =
-    cf_change ? cf_target[1] : fetch_misaligned && !f_2byte;
+    e_cf_change ? cf_target[1] : fetch_misaligned && !f_2byte;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -180,15 +156,22 @@ end
 // Memory bus responses
 // --------------------------------------------------------------
 
-wire   rsp_recv= imem_recv && imem_ack;
+// When to discard returning fetch data.
+wire   n_drop_response    = e_cf_change;
+
+reg      drop_response    ;
+
+always @(posedge g_clk) if(!g_resetn) begin
+    drop_response <= 1'b0;
+end else begin
+    drop_response <= n_drop_response;
+end
 
 // Store the entire 4-byte response data
-assign f_4byte = rsp_recv && !fetch_misaligned && !drop_response;
+assign f_4byte = e_new_rsp && !fetch_misaligned && !drop_response;
 
 // Store the upper halfword of the response data.
-assign f_2byte = rsp_recv &&  fetch_misaligned && !drop_response;
-
-assign imem_ack= f_ready;
+assign f_2byte = e_new_rsp &&  fetch_misaligned && !drop_response;
 
 //
 // Constant assignments for un-used signals.
@@ -204,12 +187,13 @@ frv_core_fetch_buffer i_core_fetch_buffer (
 .g_clk    (g_clk        ), // Global clock
 .g_resetn (g_resetn     ), // Global negative level triggered reset
 .flush    (s0_flush     ),
-.f_ready  (f_ready      ),
+.f_ready  (f_ready      ), // Buffer ready for more input data.
 .f_4byte  (f_4byte      ), // Input data valid
 .f_2byte  (f_2byte      ), // Load only the 2 MS bytes
 .f_err    (imem_error   ), // Input error
 .f_in     (imem_rdata   ), // Input data
 .buf_depth(buf_depth    ), // Number of halfwords in buffer.
+.n_buf_depth(n_buf_depth    ), // Number of halfwords in buffer.
 .buf_out  (s1_data      ), // Output data
 .buf_16   (buf_16       ), // 16 bit instruction next to be output
 .buf_32   (buf_32       ), // 32 bit instruction next to be output

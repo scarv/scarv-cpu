@@ -15,7 +15,6 @@ sram_agent::sram_agent (
 void sram_agent::set_reset(){
 
     *mem_gnt = 0;
-    *mem_recv= 0;
 
     // Empty the request queue.
     while(this -> req_q.empty() == false) {
@@ -35,7 +34,6 @@ void sram_agent::clear_reset(){
 //! Drive any signal updates
 void sram_agent::drive_signals(){
 
-    *mem_recv   = n_mem_recv;
     *mem_error  = n_mem_error;
     *mem_rdata  = n_mem_rdata;
     *mem_gnt    = n_mem_gnt;
@@ -48,17 +46,13 @@ void sram_agent::drive_response(){
 
     //
     // Respond to any outstanding transactions.
-    if(req_q.empty() == false && 
-       (this -> rand_chance(7,10) || (rsp_stall_len >= max_rsp_stall))) {
+    if(req_q.empty() == false) {
 
         memory_req_txn * req = req_q.front();
 
         memory_rsp_txn * rsp = this -> mem -> request(req);
         
         n_mem_error = rsp -> error();
-        n_mem_recv  = 1;
-
-        rsp_stall_len = 0;
 
         if(req -> is_read()) {
             n_mem_rdata = rsp -> data_word();
@@ -69,11 +63,8 @@ void sram_agent::drive_response(){
         delete req;
 
     } else {
-
-        rsp_stall_len += req_q.size() > 0 ? 1 : 0;
         
         n_mem_error = 0;
-        n_mem_recv  = 0;
         n_mem_rdata = 0;
 
     }
@@ -122,18 +113,6 @@ void sram_agent::posedge_clk(){
                 (req_stall_len >= max_req_stall);
 
     
-    if       (!*mem_recv  && !*mem_ack) {
-        drive_response();
-
-    } else if(!*mem_recv  &&  *mem_ack) {
-        drive_response();
-    
-    } else if( *mem_recv  && !*mem_ack) {
-        // Do nothing, waiting to accept response.
-    
-    } else if( *mem_recv  &&  *mem_ack) {
-        drive_response();
-
-    }
-
+    // Drive the memory transaction response signals rdata and error.
+    drive_response();
 }

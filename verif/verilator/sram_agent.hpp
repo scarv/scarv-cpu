@@ -40,24 +40,16 @@ public:
     uint32_t * mem_addr ; // Read/Write address
 
     // Response channel
-    uint8_t  * mem_recv ; // memory recieve response.
-    uint8_t  * mem_ack  ; // memory acknowledge response.
     uint8_t  * mem_error; // Error
     uint32_t * mem_rdata; // Read data
 
     //! Maximum length of a stalled request.
     uint32_t   max_req_stall = 5;
 
-    //! Maximum length of a stalled response.
-    uint32_t   max_rsp_stall = 5;
-
 protected:
 
     //! Current request stall length.
     uint32_t   req_stall_len = 0;
-
-    //! Current response stall length.
-    uint32_t   rsp_stall_len = 0;
     
     //! memory bus this agent can access.
     memory_bus * mem;
@@ -66,7 +58,6 @@ protected:
     std::queue<memory_req_txn *> req_q;
     
     uint8_t  n_mem_error;  // Next Error
-    uint8_t  n_mem_recv ;  // Next Memory stall
     uint32_t n_mem_rdata;  // Next Read data
     uint32_t n_mem_gnt  ;  // Next request grant.
     

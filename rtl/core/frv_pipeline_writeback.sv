@@ -103,8 +103,8 @@ input  wire        cf_ack          , // Control flow change acknowledge.
 
 output wire        hold_lsu_req    , // Don't make LSU requests yet.
 
-input  wire        dmem_recv       , // Instruction memory recieve response.
-output wire        dmem_ack        , // Data memory ack response.
+input  wire        dmem_req        , // Data memory request
+input  wire        dmem_gnt        , // Data memory request granted.
 input  wire        dmem_error      , // Error
 input  wire [XL:0] dmem_rdata        // Read data
 
@@ -278,33 +278,20 @@ wire [XL:0] cfu_gpr_wdata = n_s4_pc;
 // Functional Unit: LSU
 // -------------------------------------------------------------------------
 
-//
-// Are we recieving a data memory response which we expected?
-wire        lsu_txn_recv    = lsu_load               &&
-                              dmem_recv && dmem_ack  &&
-                              lsu_rsp_expected       ;
+reg         dmem_rsp    ;
+always @(posedge g_clk) if(!g_resetn) begin
+    dmem_rsp <= 1'b0;
+end else begin
+    dmem_rsp <= dmem_req && dmem_gnt;
+end
 
-//
-// Track whether we've already seen the expected memory response for the
-// current writeback stage instruction.
-wire        n_lsu_rsp_seen  = 
-    !pipe_progress && (lsu_rsp_seen || (dmem_recv && dmem_ack));
-
-reg         lsu_rsp_seen;
-
-//
-// Do we *expect* to see a data memory response, given the current
-// instruction?
-wire        lsu_rsp_expected= fu_lsu && !lsu_rsp_seen;
-
-//
-// Only accept data memory responses if we expect them.
-assign      dmem_ack    = lsu_rsp_expected;
-
-wire        lsu_gpr_wen     = (lsu_txn_recv && !dmem_error ) &&
-                              !lsu_rsp_seen &&  lsu_load      ;
-
-wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
+reg         dmem_r_error;
+wire        n_dmem_r_error = dmem_rsp && dmem_error || dmem_r_error;
+always @(posedge g_clk) if(!g_resetn || pipe_progress) begin
+    dmem_r_error <= 1'b0;
+end else if(dmem_rsp) begin
+    dmem_r_error <= dmem_error;
+end
 
 wire        lsu_load    = fu_lsu && s4_uop[LSU_LOAD];
 wire        lsu_store   = fu_lsu && s4_uop[LSU_STORE]   ;
@@ -320,72 +307,57 @@ wire [ 3:0] lsu_strb    = s4_opr_a[3:0];
 
 //
 // Are we still waiting for the memory response?
-wire        lsu_busy    =
-    fu_lsu && !(
-        lsu_rsp_seen || (dmem_recv && dmem_ack)
-    );
-
-wire [31:0] mem_rdata = dmem_rdata;
+wire        lsu_busy    = 1'b0;
 
 //
 // Re-arrange the byte data on a memory read response as needed.
 wire [ 7: 0] rdata_b0 =
-    {8{lsu_strb[0]                       }} & mem_rdata[ 7: 0] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & mem_rdata[15: 8] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & mem_rdata[23:16] |
-    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & mem_rdata[23:16] |
-    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & mem_rdata[31:24] ;
+    {8{lsu_strb[0]                       }} & dmem_rdata[ 7: 0] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b01}} & dmem_rdata[15: 8] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b10}} & dmem_rdata[23:16] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[23:16] |
+    {8{lsu_byte && lsu_addr[1:0] == 2'b11}} & dmem_rdata[31:24] ;
 
 wire [ 7: 0] rdata_b1 =
     {8{lsu_byte && lsu_signed            }} & {8{rdata_b0[7] }} |
-    {8{lsu_half && lsu_addr[  1] == 1'b0 }} &  mem_rdata[15: 8] |
-    {8{lsu_word                          }} &  mem_rdata[15: 8] |
-    {8{lsu_half && lsu_addr[  1] == 1'b1 }} &  mem_rdata[31:24] ;
+    {8{lsu_half && lsu_addr[  1] == 1'b0 }} & dmem_rdata[15: 8] |
+    {8{lsu_word                          }} & dmem_rdata[15: 8] |
+    {8{lsu_half && lsu_addr[  1] == 1'b1 }} & dmem_rdata[31:24] ;
 
 wire [15: 0] rdata_h1 =
     {16{lsu_byte && lsu_signed           }} & {16{rdata_b1[7]}} |
     {16{lsu_half && lsu_signed           }} & {16{rdata_b1[7]}} |
-    {16{lsu_word                         }} &  mem_rdata[31:16] ;
+    {16{lsu_word                         }} & dmem_rdata[31:16] ;
 
-//                         31....16,15.....8,7......0
-wire [XL:0] lsu_rdata   = {rdata_h1,rdata_b1,rdata_b0};
+//                             31....16,15.....8,7......0
+wire [XL:0] lsu_rdata       = {rdata_h1,rdata_b1,rdata_b0};
 
-reg  dmem_error_seen;
+wire        lsu_gpr_wen     = lsu_load;
 
-wire n_dmem_error_seen = 
-    dmem_error_seen || (lsu_rsp_expected && dmem_error && dmem_recv);
+wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
 
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        dmem_error_seen <= 1'b0;
-    end else if(pipe_progress) begin
-        dmem_error_seen <= 1'b0;
-    end else begin
-        dmem_error_seen <= n_dmem_error_seen;
-    end
-end
+wire        lsu_bus_error   = fu_lsu && dmem_r_error;
 
-//
-// LSU Bus error? Due to MMIO or DMEM bus?
-wire        lsu_b_error = n_dmem_error_seen       ;
-
-wire        lsu_trap    = lsu_b_error;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        lsu_rsp_seen <= 1'b0;
-    end else begin
-        lsu_rsp_seen <= n_lsu_rsp_seen;
-    end
-end
+wire        lsu_trap        = lsu_bus_error;
 
 //
 // GPR writeback and forwarding
 // -------------------------------------------------------------------------
 
+// Allows the GPR writeback bit to be high for only one cycle per instruction.
+reg gpr_write_done;
+
+always @(posedge g_clk) if(!g_resetn) begin
+    gpr_write_done <= 1'b0;
+end else if(pipe_progress) begin
+    gpr_write_done <= 1'b0;
+end else if(gpr_wen) begin
+    gpr_write_done <= 1'b1;
+end
+
 assign gpr_rd   = s4_rd;
 
-assign gpr_wen  = !s4_trap && !trap_int &&
+assign gpr_wen  = !s4_trap && !trap_int && !gpr_write_done &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
      cfu_gpr_wen || mul_gpr_wen );
 
@@ -421,15 +393,16 @@ end
 assign int_trap_ack = 1'b0;
 
 // Trap occured due to CPU exception or instruction.
-assign trap_cpu   = cfu_trap || lsu_trap || s4_trap || csr_trap;
+assign trap_cpu   = !trap_int && (
+    cfu_trap || lsu_trap || s4_trap || csr_trap
+);
 
- // A trap occured due to interrupt. trap_cpu takes priority.
-assign trap_int   = (int_trap_req || trap_int_pending) &&
-                    !trap_cpu && !lsu_rsp_expected;
+ // A trap occured due to interrupt.
+assign trap_int   = (int_trap_req || trap_int_pending);
 
 assign trap_cause = // Cause of the trap.
-    lsu_b_error && lsu_load     ? TRAP_LDACCESS :
-    lsu_b_error && lsu_store    ? TRAP_STACCESS :
+    lsu_bus_error && lsu_load   ? TRAP_LDACCESS :
+    lsu_bus_error && lsu_store  ? TRAP_STACCESS :
     cfu_ebreak                  ? TRAP_BREAKPT  :
     cfu_ecall                   ?   TRAP_ECALLM :
     csr_error                   ? TRAP_IOPCODE  :
@@ -514,27 +487,15 @@ end
 //
 // If memory read transactions complete before the pipeline moves on,
 // save what we read so we report it correctly.
-reg [XL:0] saved_mem_rdata;
-reg        use_saved_mem_rdata;
 
-wire       n_use_saved_mem_rdata =
-    !pipe_progress && (
-        use_saved_mem_rdata || ((dmem_recv && dmem_ack))
-    );
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        use_saved_mem_rdata <= 1'b0;
-    end else begin
-        use_saved_mem_rdata <= n_use_saved_mem_rdata;
-    end
-end
+reg  [31:0]   saved_mem_rdata ;
+wire [31:0] n_saved_mem_rdata = dmem_rsp ? dmem_rdata : saved_mem_rdata;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         saved_mem_rdata <= 0;
-    end else if(n_use_saved_mem_rdata && !use_saved_gpr_wdata) begin
-        saved_mem_rdata <= dmem_rdata;
+    end else begin
+        saved_mem_rdata <= n_saved_mem_rdata;
     end
 end
 
@@ -576,8 +537,7 @@ assign rvfi_pc_wdata = cf_req_noint ? cf_target_noint            :
 assign rvfi_mem_addr = {s4_opr_b[XL:2], 2'b00} ;
 assign rvfi_mem_rmask= fu_lsu && lsu_load  ? lsu_strb : 4'b0000 ;
 assign rvfi_mem_wmask= fu_lsu && lsu_store ? lsu_strb : 4'b0000 ;
-assign rvfi_mem_rdata= use_saved_mem_rdata ? saved_mem_rdata :
-                                             dmem_rdata      ;
+assign rvfi_mem_rdata= n_saved_mem_rdata;
 assign rvfi_mem_wdata= rvfi_s4_mem_wdata;
 
 assign rvfi_aux      = rvfi_s4_aux;

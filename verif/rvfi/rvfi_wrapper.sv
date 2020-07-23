@@ -40,8 +40,6 @@ parameter XL   = XLEN - 1;
 (*keep*) wire [XL:0] imem_wdata             ; // Write data
 (*keep*) wire [XL:0] imem_addr              ; // Read/Write address
 (*keep*) reg         imem_gnt     = $anyseq ; // request accepted
-(*keep*) reg         imem_recv    = $anyseq ; // memory recieve response.
-(*keep*) wire        imem_ack               ; // memory ack response.
 (*keep*) reg         imem_error   = $anyseq ; // Error
 (*keep*) reg  [XL:0] imem_rdata   = $anyseq ; // Read data
 
@@ -51,8 +49,6 @@ parameter XL   = XLEN - 1;
 (*keep*) wire [31:0] dmem_wdata             ; // Write data
 (*keep*) wire [31:0] dmem_addr              ; // Read/Write address
 (*keep*) reg         dmem_gnt     = $anyseq ; // request accepted
-(*keep*) reg         dmem_recv    = $anyseq ; // memory recieve response.
-(*keep*) wire        dmem_ack               ; // memory ack response.
 (*keep*) reg         dmem_error   = $anyseq ; // Error
 (*keep*) reg  [XL:0] dmem_rdata   = $anyseq ; // Read data
 
@@ -70,13 +66,9 @@ fi_fairness i_fairness (
 .int_software(int_software), // Software interrupt trigger line.
 .imem_req    (imem_req    ),
 .imem_gnt    (imem_gnt    ),
-.imem_recv   (imem_recv   ),
-.imem_ack    (imem_ack    ),
 .imem_error  (imem_error  ),
 .dmem_req    (dmem_req    ),
 .dmem_gnt    (dmem_gnt    ),
-.dmem_recv   (dmem_recv   ),
-.dmem_ack    (dmem_ack    ),
 .dmem_error  (dmem_error  ) 
 );
 
@@ -130,8 +122,6 @@ frv_core #(
 .imem_wdata     (imem_wdata     ), // Write data
 .imem_addr      (imem_addr      ), // Read/Write address
 .imem_gnt       (imem_gnt       ), // request accepted
-.imem_recv      (imem_recv      ), // Instruction memory recieve response.
-.imem_ack       (imem_ack       ), // Instruction memory ack response.
 .imem_error     (imem_error     ), // Error
 .imem_rdata     (imem_rdata     ), // Read data
 .dmem_req       (dmem_req       ), // Start memory request
@@ -140,8 +130,6 @@ frv_core #(
 .dmem_wdata     (dmem_wdata     ), // Write data
 .dmem_addr      (dmem_addr      ), // Read/Write address
 .dmem_gnt       (dmem_gnt       ), // request accepted
-.dmem_recv      (dmem_recv      ), // Data memory recieve response.
-.dmem_ack       (dmem_ack       ), // Data memory ack response.
 .dmem_error     (dmem_error     ), // Error
 .dmem_rdata     (dmem_rdata     )  // Read data
 );

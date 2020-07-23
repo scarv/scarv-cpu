@@ -61,8 +61,6 @@ output wire [3:0]   imem_strb       , // Write strobe
 output wire [XL:0]  imem_wdata      , // Write data
 output wire [XL:0]  imem_addr       , // Read/Write address
 input  wire         imem_gnt        , // request accepted
-input  wire         imem_recv       , // Instruction memory recieve response.
-output wire         imem_ack        , // Instruction memory ack response.
 input  wire         imem_error      , // Error
 input  wire [XL:0]  imem_rdata      , // Read data
 
@@ -72,8 +70,6 @@ output wire [3:0]   dmem_strb       , // Write strobe
 output wire [XL:0]  dmem_wdata      , // Write data
 output wire [XL:0]  dmem_addr       , // Read/Write address
 input  wire         dmem_gnt        , // request accepted
-input  wire         dmem_recv       , // Data memory recieve response.
-output wire         dmem_ack        , // Data memory ack response.
 input  wire         dmem_error      , // Error
 input  wire [XL:0]  dmem_rdata        // Read data
 
@@ -182,8 +178,6 @@ frv_pipeline #(
 .imem_wdata    (imem_wdata    ), // Write data
 .imem_addr     (imem_addr     ), // Read/Write address
 .imem_gnt      (imem_gnt      ), // request accepted
-.imem_recv     (imem_recv     ), // Instruction memory recieve response.
-.imem_ack      (imem_ack      ), // Response acknowledge
 .imem_error    (imem_error    ), // Error
 .imem_rdata    (imem_rdata    ), // Read data
 .dmem_req      (dmem_req      ), // Start memory request
@@ -192,8 +186,6 @@ frv_pipeline #(
 .dmem_wdata    (dmem_wdata    ), // Write data
 .dmem_addr     (dmem_addr     ), // Read/Write address
 .dmem_gnt      (dmem_gnt      ), // request accepted
-.dmem_recv     (dmem_recv     ), // Instruction memory recieve response.
-.dmem_ack      (dmem_ack      ), // Response acknowledge
 .dmem_error    (dmem_error    ), // Error
 .dmem_rdata    (dmem_rdata    )  // Read data
 );
