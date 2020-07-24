@@ -40,7 +40,7 @@ jobs:
     - source ./bin/conf.sh
     - make riscv-formal-clean
     - make riscv-formal-prepare
-    - make riscv-formal-run     NJOBS=2
+    - make riscv-formal-run     NJOBS=2 CHECKS=insn_add_ch0
   - name: "Synthesis - Core"
     script:
     - source ./bin/install-yosys.sh
