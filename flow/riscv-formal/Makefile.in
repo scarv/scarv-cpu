@@ -14,6 +14,7 @@ riscv-formal-clean:
 
 riscv-formal-prepare: $(CFG) $(WRAPPER) $(CPU_RTL_SRCS)
 	mkdir -p $(RVFML)
+	mkdir -p $(FMLWORK)
 	cp $(CFG) $(RVFML)/checks.cfg
 	cd $(RVFML) && \
         python3 ../../checks/genchecks.py
