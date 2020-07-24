@@ -1,4 +1,6 @@
 
+#include <iostream>
+
 #include "memory_txns.hpp"
 #include "memory_device.hpp"
 #include "memory_device_ram.hpp"
@@ -61,6 +63,9 @@ public:
     bool            sim_finished    = false;
 
     bool            sim_passed      = false;
+
+    //! IFF true, print the trace of PC and instruction words to stdout.
+    bool            dump_trace_stdout = true;
 
 protected:
     

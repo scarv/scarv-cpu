@@ -53,6 +53,15 @@ void testbench::run() {
 
         if(dut -> dut_trace.empty() == false) {
             trs_item = dut -> dut_trace.front();
+
+            if(this -> dump_trace_stdout) {
+                std::cout 
+                     << "trs: " 
+                     << std::hex << trs_item.program_counter
+                     << " "
+                     << std::hex << trs_item.instr_word
+                     << std::endl;
+            }
             
             if(trs_item.program_counter == pass_address) {
                 sim_passed  = true;
