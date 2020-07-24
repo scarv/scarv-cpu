@@ -38,7 +38,9 @@ jobs:
     - source ./bin/install-symbiyosys.sh
     - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
-    - echo "Flow not yet implemeted."
+    - make riscv-formal-clean
+    - make riscv-formal-prepare
+    - make riscv-formal-run     NJOBS=2
   - name: "Synthesis - Core"
     script:
     - source ./bin/install-yosys.sh
