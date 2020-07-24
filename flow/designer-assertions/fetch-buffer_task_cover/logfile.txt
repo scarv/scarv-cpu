@@ -1,3 +1,0 @@
-SBY 16:13:10 [/home/work/scarv/skywater/scarv-cpu/flow/designer-assertions/fetch-buffer_task_cover] Removing direcory '/home/work/scarv/skywater/scarv-cpu/flow/designer-assertions/fetch-buffer_task_cover'.
-SBY 16:13:10 [/home/work/scarv/skywater/scarv-cpu/flow/designer-assertions/fetch-buffer_task_cover] Writing '/home/work/scarv/skywater/scarv-cpu/flow/designer-assertions/fetch-buffer_task_cover/src/defines.svh'.
-SBY 16:13:10 [/home/work/scarv/skywater/scarv-cpu/flow/designer-assertions/fetch-buffer_task_cover] Copy 'SCARV_CPU/extern/riscv-formal/checks/rvfi_macros.vh' to '/home/work/scarv/skywater/scarv-cpu/flow/designer-assertions/fetch-buffer_task_cover/src/rvfi_macros.vh'.
