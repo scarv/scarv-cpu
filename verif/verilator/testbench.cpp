@@ -36,6 +36,10 @@ void testbench::pre_run() {
 
 //! The main phase of the DUT simulation.
 void testbench::run() {
+
+    if(this -> dump_trace) {
+        this -> dump_trace_fh = fopen(this -> dump_trace_file.c_str(),"w");
+    }
    
     // Run the DUT for a few cycles while held in reset.
     for(int i = 0; i < 5; i ++) {
@@ -54,13 +58,13 @@ void testbench::run() {
         if(dut -> dut_trace.empty() == false) {
             trs_item = dut -> dut_trace.front();
 
-            if(this -> dump_trace_stdout) {
-                std::cout 
-                     << "trs: " 
-                     << std::hex << trs_item.program_counter
-                     << " "
-                     << std::hex << trs_item.instr_word
-                     << std::endl;
+            if(this -> dump_trace) {
+                fprintf(
+                    this -> dump_trace_fh,
+                    "0x%08x 0x%08x\n",
+                    trs_item.program_counter,
+                    trs_item.instr_word
+                );
             }
             
             if(trs_item.program_counter == pass_address) {
@@ -74,6 +78,10 @@ void testbench::run() {
             dut -> dut_trace.pop();
         }
 
+    }
+
+    if(this -> dump_trace) {
+        fclose(this -> dump_trace_fh);
     }
 
 }

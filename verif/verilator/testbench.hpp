@@ -1,5 +1,5 @@
 
-#include <iostream>
+#include <cstdio>
 
 #include "memory_txns.hpp"
 #include "memory_device.hpp"
@@ -65,7 +65,9 @@ public:
     bool            sim_passed      = false;
 
     //! IFF true, print the trace of PC and instruction words to stdout.
-    bool            dump_trace_stdout = true;
+    bool            dump_trace      = false;
+    std::string     dump_trace_file = "";
+    FILE          * dump_trace_fh   ;
 
 protected:
     

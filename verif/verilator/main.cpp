@@ -34,7 +34,8 @@ uint64_t    max_sim_time        = 10000;
 bool        load_srec           = false;
 std::string srec_path           = "";
 
-bool        dump_trace_stdout   = false;
+bool        dump_trace          = false;
+std::string dump_trace_file     = "";
 
 // Maximum amounts of time for which memory reqests/responses
 // will be stalled for.
@@ -142,8 +143,13 @@ void process_arguments(int argc, char ** argv) {
                 }
             }
         }
-        else if(s.find("+TRACE") != std::string::npos) {
-            dump_trace_stdout = true;
+        else if(s.find("+TRACE=") != std::string::npos) {
+            dump_trace      = true;
+            dump_trace_file = s.substr(7);
+                if(!quiet){
+                std::cout << ">> Dump trace to: " << dump_trace_file
+                          << std::endl;
+                }
         }
         else if(s == "+q") {
             quiet = true;
@@ -291,7 +297,8 @@ int main(int argc, char** argv) {
     tb.dut -> set_imem_max_stall(max_stall_imem);
     tb.dut -> set_dmem_max_stall(max_stall_dmem);
 
-    tb.dump_trace_stdout = dump_trace_stdout;
+    tb.dump_trace   = dump_trace;
+    tb.dump_trace_file= dump_trace_file;
 
     tb.run_simulation();
 

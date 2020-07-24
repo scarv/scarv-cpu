@@ -6,6 +6,8 @@ EMBENCH_LOG     = $(EMBENCH_BUILD)
 EMBENCH_LD      = $(FRV_HOME)/flow/embench/link.ld
 EMBENCH_BOOT    = $(FRV_HOME)/flow/embench/boot.S
 
+EMBENCH_EXP_TEMPLATE = $(FRV_HOME)/flow/embench/expect_template.sh
+
 EMBENCH_CFLAGS  = "-march=rv32imac -O3 -mabi=ilp32 -nostartfiles -c"
 EMBENCH_LDFLAGS = "-march=rv32imac -O3 -mabi=ilp32 -nostartfiles -T$(EMBENCH_LD)"
 EMBENCH_ULIBS   = "$(EMBENCH_BOOT) -lm"
@@ -98,6 +100,30 @@ endef
 
 #
 # 1. Benchmark name
+define map_embench_expect_script
+$(call map_embench_dir,${1})/expect.sh
+endef
+
+#
+# 1. Benchmark name
+define map_embench_grm_log
+$(call map_embench_dir,${1})/grm.log
+endef
+
+#
+# 1. Benchmark name
+define map_embench_grm_trace
+$(call map_embench_dir,${1})/grm_trace.log
+endef
+
+#
+# 1. Benchmark name
+define map_embench_dut_trace
+$(call map_embench_dir,${1})/dut_trace.log
+endef
+
+#
+# 1. Benchmark name
 # 2. EMBENCH_WAVES
 ifeq ($(EMBENCH_WAVES),1)
 define map_embench_waves_or_not
@@ -136,11 +162,32 @@ run-embench-${1}: $(EXE_CORE) $(call map_embench_srec,${1}) $(CCX_UNIT_ROM_HEX) 
         +FAIL_ADDR=$(EMBENCH_FAIL_ADDR) \
         +IMEM_MAX_STALL=0 \
         +DMEM_MAX_STALL=0 \
-        +TIMEOUT=$(EMBENCH_TIMEOUT) $(call map_embench_waves_or_not,${1})
+        +TIMEOUT=$(EMBENCH_TIMEOUT) $(call map_embench_waves_or_not,${1}) \
+        +TRACE=$(call map_embench_dut_trace,${1})
+
+$(call map_embench_expect_script,${1}) : $(EMBENCH_EXP_TEMPLATE)
+	cp $${<} $${@}
+	sed -i 's:<SPIKE>:$(RISCV)/bin/spike:'  $${@}
+	sed -i 's:<ELF>:$(call map_embench_exe,${1}):'  $${@}
+	sed -i 's:<TIMEOUT>:$(EMBENCH_TIMEOUT):'  $${@}
+
+$(call map_embench_grm_log,${1}) : $(call map_embench_expect_script,${1}) \
+                                      $(call map_embench_exe,${1})
+	expect $(call map_embench_expect_script,${1}) > $${@}
+
+$(call map_embench_grm_trace,${1}) : $(call map_embench_grm_log,${1})
+	grep "core   0: 0xff" $${<} \
+        | sed 's/core.* 0xffffffff8/0x8/' \
+        | sed 's/(//' \
+        | sed 's/).*//' \
+        > $${@}
 
 EMBENCH_BUILD_TARGETS += $(call map_embench_objdump,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_gtkwl,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_srec,${1})
+EMBENCH_BUILD_TARGETS += $(call map_embench_expect_script,${1})
+EMBENCH_BUILD_TARGETS += $(call map_embench_grm_log,${1})
+EMBENCH_BUILD_TARGETS += $(call map_embench_grm_trace,${1})
 EMBENCH_RUN_TARGETS   += run-embench-${1}
 
 endef
