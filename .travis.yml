@@ -31,7 +31,7 @@ jobs:
     - source ./bin/install-symbiyosys.sh
     - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
-    - echo "Flow not yet implemeted."
+    - make -j 2 da-prove-all
   - name: "riscv-formal"
     script:
     - source ./bin/install-yosys.sh
