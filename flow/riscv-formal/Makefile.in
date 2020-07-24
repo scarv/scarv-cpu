@@ -18,6 +18,7 @@ riscv-formal-prepare: $(CFG) $(WRAPPER) $(CPU_RTL_SRCS)
 	cd $(RVFML) && \
         python3 ../../checks/genchecks.py
 	mv $(RVFML)/checks $(FMLWORK)
+	sed -i 's/mode bmc/mode bmc\ntimeout 600/' work/riscv-formal/reg_ch0.sby
 
 riscv-formal-run:
 	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(CHECKS)
