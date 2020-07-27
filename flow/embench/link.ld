@@ -13,7 +13,9 @@ SECTIONS {
         *(.text) 
     } > ram
     .data  ALIGN(8) : SUBALIGN(8) { *(.data) } > ram
+    PROVIDE (__bss_begin        = . );
     .bss   ALIGN(8) : SUBALIGN(8) { *(.bss)  } > ram
+    PROVIDE (__bss_end          = . );
 
     /DISCARD/ : { *(.comment) }
 

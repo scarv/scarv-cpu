@@ -45,6 +45,13 @@ _start:
     csrw    mscratch, 0     // Clear scratch register.
     csrw    mtval   , 0     // Clear mtval.
 
+    la      t0, __bss_begin // Start of BSS region.
+    la      t1, __bss_end   // End of BSS region.
+    .bss_clear_loop:
+        sb  zero, 0(t0)
+        addi t0, t0, 1
+        bltu t0, t1, .bss_clear_loop
+
     call    main            // Jump to main.
 
     beqz    a0, __embench_pass
