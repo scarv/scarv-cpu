@@ -478,7 +478,7 @@ wire use_imm_bs  = dec_saes32_encs || dec_saes32_encsm || dec_saes32_decs ||
 wire [31:0] n_s2_imm_pc = 
     {32{use_imm32_b   }} & imm32_b      |
     {32{use_imm32_j   }} & imm32_j      |
-    {32{use_imm32_u   }} & imm32_u      |
+    {32{dec_auipc     }} & imm32_u      |
     {32{dec_c_beqz    }} & imm_c_bz     |
     {32{dec_c_bnez    }} & imm_c_bz     |
     {32{dec_c_j       }} & imm_c_j      |
@@ -488,6 +488,7 @@ assign n_s2_imm =
                            n_s2_imm_pc     |
     {32{use_imm32_i   }} & imm32_i      |
     {32{use_imm32_s   }} & imm32_s      |
+    {32{dec_lui       }} & imm32_u      |
     {32{dec_c_addi    }} & imm_c_addi   |
     {32{dec_c_addi16sp}} & imm_addi16sp |
     {32{dec_c_addi4spn}} & imm_addi4spn |

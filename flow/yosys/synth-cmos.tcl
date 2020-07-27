@@ -16,13 +16,14 @@ synth -top frv_core
 # Map to CMOS cells
 abc -g cmos4
 
+# Statistics: size and latency
+flatten
+
 # Simple optimisations
-opt -fast
+opt -full
 
 # Write out the synthesised verilog
 write_verilog $::env(FRV_WORK)/synth/frv_core_synth.sv
 
-# Statistics: size and latency
-flatten
 tee -o $::env(FRV_WORK)/synth/synth-cmos.rpt stat
 tee -a $::env(FRV_WORK)/synth/synth-cmos.rpt ltp  -noff
