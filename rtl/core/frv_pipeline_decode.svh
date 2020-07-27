@@ -83,6 +83,28 @@ wire dec_c_jalr     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:
 wire dec_c_add      = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:12] == 1'd1 && d_data[6:2] != 5'd0;
 wire dec_c_swsp     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd6;
 
+// TODO: Correct decode of crypto extension instructions.
+wire dec_lut4lo        = 1'b0;
+wire dec_lut4hi        = 1'b0;
+wire dec_saes32_encs   = 1'b0;
+wire dec_saes32_encsm  = 1'b0;
+wire dec_saes32_decs   = 1'b0;
+wire dec_saes32_decsm  = 1'b0;
+wire dec_ssha256_sig0  = 1'b0;
+wire dec_ssha256_sig1  = 1'b0;
+wire dec_ssha256_sum0  = 1'b0;
+wire dec_ssha256_sum1  = 1'b0;
+wire dec_ssha512_sum0r = 1'b0;
+wire dec_ssha512_sum1r = 1'b0;
+wire dec_ssha512_sig0l = 1'b0;
+wire dec_ssha512_sig0h = 1'b0;
+wire dec_ssha512_sig1l = 1'b0;
+wire dec_ssha512_sig1h = 1'b0;
+wire dec_ssm3_p0       = 1'b0;
+wire dec_ssm3_p1       = 1'b0;
+wire dec_ssm4_ks       = 1'b0;
+wire dec_ssm4_ed       = 1'b0;
+
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge
@@ -101,4 +123,12 @@ wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_c_srli    ||dec_c_srai    ||dec_c_andi    ||dec_c_sub     ||dec_c_xor
 ||dec_c_or      ||dec_c_and     ||dec_c_j       ||dec_c_beqz    ||dec_c_bnez
 ||dec_c_slli    ||dec_c_lwsp    ||dec_c_jr      ||dec_c_mv
-||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp );
+||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp    ||
+dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
+dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
+dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
+dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
+dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
+dec_ssm4_ks         || dec_ssm4_ed
+);

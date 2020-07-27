@@ -68,6 +68,7 @@ wire fu_mul = s2_fu[P_FU_MUL];
 wire fu_lsu = s2_fu[P_FU_LSU];
 wire fu_cfu = s2_fu[P_FU_CFU];
 wire fu_csr = s2_fu[P_FU_CSR];
+wire fu_cry = s2_fu[P_FU_CRY];
 
 //
 // Functional Unit Interfacing: ALU
@@ -185,6 +186,52 @@ wire [XL:0] n_s3_opr_a_cfu =
 wire [XL:0] n_s3_opr_b_cfu = 32'b0;
 
 //
+// Functional Unit Interfacing: Crypto FU
+// -------------------------------------------------------------------------
+
+localparam LUT4_EN         = 1; // Enable lut4 instructions.
+localparam SAES_EN         = 1; // Enable saes32/64 instructions.
+localparam SAES_DEC_EN     = 1; // Enable saes32/64 decrypt instructions.
+localparam SSHA256_EN      = 1; // Enable ssha256.* instructions.
+localparam SSHA512_EN      = 1; // Enable ssha256.* instructions.
+localparam SSM3_EN         = 1; // Enable ssm3.* instructions.
+localparam SSM4_EN         = 1; // Enable ssm4.* instructions.
+localparam COMBINE_AES_SM4 = 1; // Enable combined RV32 AES/SM4 module.
+localparam LOGIC_GATING    = 1; // Gate sub-module inputs to save toggling
+
+wire        cry_valid      = fu_cry         ; // Inputs valid.
+wire [XL:0] cry_rs1        = s2_opr_a       ; // Source register 1
+wire [XL:0] cry_rs2        = s2_opr_b       ; // Source register 2
+wire [ 3:0] cry_imm        = s2_opr_c[3:0]  ; // enc_rcon for aes32/64.
+
+wire        cry_op_lut4lo        = fu_cry && s2_uop == CRY_LUT4LO       ;
+wire        cry_op_lut4hi        = fu_cry && s2_uop == CRY_LUT4HI       ;
+wire        cry_op_saes32_encs   = fu_cry && s2_uop == CRY_SAES32_ENCS  ;
+wire        cry_op_saes32_encsm  = fu_cry && s2_uop == CRY_SAES32_ENCSM ;
+wire        cry_op_saes32_decs   = fu_cry && s2_uop == CRY_SAES32_DECS  ;
+wire        cry_op_saes32_decsm  = fu_cry && s2_uop == CRY_SAES32_DECSM ;
+wire        cry_op_ssha256_sig0  = fu_cry && s2_uop == CRY_SSM3_P0      ;
+wire        cry_op_ssha256_sig1  = fu_cry && s2_uop == CRY_SSM3_P1      ;
+wire        cry_op_ssha256_sum0  = fu_cry && s2_uop == CRY_SSM4_KS      ;
+wire        cry_op_ssha256_sum1  = fu_cry && s2_uop == CRY_SSM4_ED      ;
+wire        cry_op_ssha512_sum0r = fu_cry && s2_uop == CRY_SSHA256_SIG0 ;
+wire        cry_op_ssha512_sum1r = fu_cry && s2_uop == CRY_SSHA256_SIG1 ;
+wire        cry_op_ssha512_sig0l = fu_cry && s2_uop == CRY_SSHA256_SUM0 ;
+wire        cry_op_ssha512_sig0h = fu_cry && s2_uop == CRY_SSHA256_SUM1 ;
+wire        cry_op_ssha512_sig1l = fu_cry && s2_uop == CRY_SSHA512_SUM0R;
+wire        cry_op_ssha512_sig1h = fu_cry && s2_uop == CRY_SSHA512_SUM1R;
+wire        cry_op_ssm3_p0       = fu_cry && s2_uop == CRY_SSHA512_SIG0L;
+wire        cry_op_ssm3_p1       = fu_cry && s2_uop == CRY_SSHA512_SIG0H;
+wire        cry_op_ssm4_ks       = fu_cry && s2_uop == CRY_SSHA512_SIG1L;
+wire        cry_op_ssm4_ed       = fu_cry && s2_uop == CRY_SSHA512_SIG1H;
+
+wire        cry_ready            ; // Outputs ready.
+wire [XL:0] cry_rd               ;
+
+wire [XL:0] n_s3_opr_a_cry       = cry_rd;
+wire [XL:0] n_s3_opr_b_cry       = {XLEN{1'b0}};
+
+//
 // Functional Unit Interfacing: CSR
 // -------------------------------------------------------------------------
 
@@ -204,6 +251,7 @@ wire   p_valid   = s2_valid && !s2_busy;
 // Is this stage currently busy?
 assign s2_busy = p_busy                    ||
                  lsu_valid  && !lsu_ready  ||
+                 cry_valid  && !cry_ready  ||
                  imul_valid && !imul_ready ;
 
 // Is the next stage currently busy?
@@ -255,6 +303,49 @@ frv_mdu i_frv_mdu (
 );
 
 
+riscv_crypto_fu #(
+.XLEN           (XLEN           ),
+.LUT4_EN        (LUT4_EN        ), // Enable lut4 instructions.
+.SAES_EN        (SAES_EN        ), // Enable saes32/64 instructions.
+.SAES_DEC_EN    (SAES_DEC_EN    ), // Enable saes32/64 decrypt instructions.
+.SSHA256_EN     (SSHA256_EN     ), // Enable ssha256.* instructions.
+.SSHA512_EN     (SSHA512_EN     ), // Enable ssha256.* instructions.
+.SSM3_EN        (SSM3_EN        ), // Enable ssm3.* instructions.
+.SSM4_EN        (SSM4_EN        ), // Enable ssm4.* instructions.
+.COMBINE_AES_SM4(COMBINE_AES_SM4), // Enable combined RV32 AES/SM4 module.
+.LOGIC_GATING   (LOGIC_GATING   )  // Gate sub-module inputs to save toggling
+) i_frv_crypto (
+.g_clk           (g_clk               ), // Global clock
+.g_resetn        (g_resetn            ), // Synchronous active low reset.
+.valid           (cry_valid           ), // Inputs valid.
+.rs1             (cry_rs1             ), // Source register 1
+.rs2             (cry_rs2             ), // Source register 2
+.imm             (cry_imm             ), // bs, enc_rcon for aes32/64.
+.op_lut4lo       (cry_op_lut4lo       ), // RV32 lut4-lo instruction
+.op_lut4hi       (cry_op_lut4hi       ), // RV32 lut4-hi instruction
+.op_saes32_encs  (cry_op_saes32_encs  ), // RV32 AES Encrypt SBox
+.op_saes32_encsm (cry_op_saes32_encsm ), // RV32 AES Encrypt SBox + MixCols
+.op_saes32_decs  (cry_op_saes32_decs  ), // RV32 AES Decrypt SBox
+.op_saes32_decsm (cry_op_saes32_decsm ), // RV32 AES Decrypt SBox + MixCols
+.op_ssha256_sig0 (cry_op_ssha256_sig0 ), //      SHA256 Sigma 0
+.op_ssha256_sig1 (cry_op_ssha256_sig1 ), //      SHA256 Sigma 1
+.op_ssha256_sum0 (cry_op_ssha256_sum0 ), //      SHA256 Sum 0
+.op_ssha256_sum1 (cry_op_ssha256_sum1 ), //      SHA256 Sum 1
+.op_ssha512_sum0r(cry_op_ssha512_sum0r), // RV32 SHA512 Sum 0
+.op_ssha512_sum1r(cry_op_ssha512_sum1r), // RV32 SHA512 Sum 1
+.op_ssha512_sig0l(cry_op_ssha512_sig0l), // RV32 SHA512 Sigma 0 low
+.op_ssha512_sig0h(cry_op_ssha512_sig0h), // RV32 SHA512 Sigma 0 high
+.op_ssha512_sig1l(cry_op_ssha512_sig1l), // RV32 SHA512 Sigma 1 low
+.op_ssha512_sig1h(cry_op_ssha512_sig1h), // RV32 SHA512 Sigma 1 high
+.op_ssm3_p0      (cry_op_ssm3_p0      ), //      SSM3 P0
+.op_ssm3_p1      (cry_op_ssm3_p1      ), //      SSM3 P1
+.op_ssm4_ks      (cry_op_ssm4_ks      ), //      SSM4 KeySchedule
+.op_ssm4_ed      (cry_op_ssm4_ed      ), //      SSM4 Encrypt/Decrypt
+.ready           (cry_ready           ), // Outputs ready.
+.rd              (cry_rd              )
+);
+
+
 //
 // Pipeline Register
 // -------------------------------------------------------------------------
@@ -282,7 +373,8 @@ wire [XL:0] n_s3_opr_a =
     {XLEN{fu_mul}} & n_s3_opr_a_mul |
     {XLEN{fu_lsu}} & n_s3_opr_a_lsu |
     {XLEN{fu_cfu}} & n_s3_opr_a_cfu |
-    {XLEN{fu_csr}} & n_s3_opr_a_csr ;
+    {XLEN{fu_csr}} & n_s3_opr_a_csr |
+    {XLEN{fu_cry}} & n_s3_opr_a_cry ;
 
 wire [XL:0] n_s3_opr_b =
     n_s3_trap ? {26'b0,n_trap_cause} : (
@@ -294,7 +386,7 @@ wire [XL:0] n_s3_opr_b =
     );
 
 wire opra_ld_en = p_valid && (
-    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr 
+    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_cry
 ); 
 
 wire oprb_ld_en = p_valid && (

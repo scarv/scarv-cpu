@@ -125,6 +125,15 @@ assign n_s2_fu[P_FU_CSR] =
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
     dec_csrrw      || dec_csrrwi     ;
 
+assign n_s2_fu[P_FU_CRY] =
+    dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+    dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
+    dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
+    dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
+    dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
+    dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
+    dec_ssm4_ks         || dec_ssm4_ed         ;
+
 
 //
 // Encoding field extraction
@@ -257,6 +266,29 @@ wire [OP:0] uop_mul =
     {5{dec_mulhsu       }} & MUL_MULHSU |
     {5{dec_mulhu        }} & MUL_MULHU  ;
 
+
+wire [OP:0] uop_cry = 
+    {5{dec_lut4lo       }} & CRY_LUT4LO        |
+    {5{dec_lut4hi       }} & CRY_LUT4HI        |
+    {5{dec_saes32_encs  }} & CRY_SAES32_ENCS   |
+    {5{dec_saes32_encsm }} & CRY_SAES32_ENCSM  |
+    {5{dec_saes32_decs  }} & CRY_SAES32_DECS   |
+    {5{dec_saes32_decsm }} & CRY_SAES32_DECSM  |
+    {5{dec_ssha256_sig0 }} & CRY_SSHA256_SIG0  |
+    {5{dec_ssha256_sig1 }} & CRY_SSHA256_SIG1  |
+    {5{dec_ssha256_sum0 }} & CRY_SSHA256_SUM0  |
+    {5{dec_ssha256_sum1 }} & CRY_SSHA256_SUM1  |
+    {5{dec_ssha512_sum0r}} & CRY_SSHA512_SUM0R |
+    {5{dec_ssha512_sum1r}} & CRY_SSHA512_SUM1R |
+    {5{dec_ssha512_sig0l}} & CRY_SSHA512_SIG0L |
+    {5{dec_ssha512_sig0h}} & CRY_SSHA512_SIG0H |
+    {5{dec_ssha512_sig1l}} & CRY_SSHA512_SIG1L |
+    {5{dec_ssha512_sig1h}} & CRY_SSHA512_SIG1H |
+    {5{dec_ssm3_p0      }} & CRY_SSM3_P0       |
+    {5{dec_ssm3_p1      }} & CRY_SSM3_P1       |
+    {5{dec_ssm4_ks      }} & CRY_SSM4_KS       |
+    {5{dec_ssm4_ed      }} & CRY_SSM4_ED       ;
+
 wire [OP:0] uop_csr;
 
 wire       csr_op = 
@@ -279,7 +311,8 @@ assign n_s2_uop =
     uop_cfu |
     uop_lsu |
     uop_mul |
-    uop_csr ;
+    uop_csr |
+    uop_cry ;
 
 //
 // Register Address Decoding
@@ -422,20 +455,24 @@ wire [31:0] imm_c_bz = {
     {24{s1_data[12]}},s1_data[6:5],s1_data[2],s1_data[11:10],s1_data[4:3],1'b0
 };
 
-wire use_imm32_i = dec_andi || dec_slti   || dec_jalr   || dec_lb     ||
-                   dec_lbu  || dec_lh     || dec_lhu    || dec_lw     ||
-                   dec_ori  || dec_sltiu  || dec_xori   || dec_addi   ; 
-wire use_imm32_j = dec_jal  ;
-wire use_imm32_s = dec_sb   || dec_sh     || dec_sw     ;
-wire use_imm32_u = dec_auipc|| dec_lui    ;
-wire use_imm32_b = dec_beq  || dec_bge    || dec_bgeu   || dec_blt    ||
-                   dec_bltu || dec_bne  ;
-wire use_imm_csr = dec_csrrc || dec_csrrs || dec_csrrw;
-wire use_imm_csri= dec_csrrci || dec_csrrsi || dec_csrrwi;
-wire use_imm_shfi= dec_slli      || dec_srli        || dec_srai     ;
+wire use_imm32_i = dec_andi    || dec_slti    || dec_jalr     || dec_lb     ||
+                   dec_lbu     || dec_lh      || dec_lhu      || dec_lw     ||
+                   dec_ori     || dec_sltiu   || dec_xori     || dec_addi   ; 
+wire use_imm32_j = dec_jal     ;
+wire use_imm32_s = dec_sb      || dec_sh      || dec_sw       ;
+wire use_imm32_u = dec_auipc   || dec_lui     ;
+wire use_imm32_b = dec_beq     || dec_bge     || dec_bgeu     || dec_blt    ||
+                   dec_bltu    || dec_bne     ;
+wire use_imm_csr = dec_csrrc   || dec_csrrs   || dec_csrrw    ;
+wire use_imm_csri= dec_csrrci  || dec_csrrsi  || dec_csrrwi   ;
+wire use_imm_shfi= dec_slli    || dec_srli    || dec_srai     ;
 
-wire use_pc_imm  = use_imm32_b  || use_imm32_j  || dec_c_beqz   ||
-                   dec_c_bnez   || dec_c_j      || dec_c_jal     ;
+wire use_pc_imm  = use_imm32_b || use_imm32_j || dec_c_beqz   ||
+                   dec_c_bnez  || dec_c_j     || dec_c_jal    ;
+
+// 2-bit immediate for saes32.* and ssm4.* instructions
+wire use_imm_bs  = dec_saes32_encs || dec_saes32_encsm || dec_saes32_decs ||
+                   dec_saes32_decsm|| dec_ssm4_ks      || dec_ssm4_ed     ;
 
 // Immediate which will be added to the program counter.
 wire [31:0] n_s2_imm_pc = 
@@ -490,7 +527,14 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_c_swsp     || dec_sb         || dec_sh         || dec_sw         ||
     dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
     dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
-    dec_mulhu      || dec_rem        || dec_remu       ;
+    dec_mulhu      || dec_rem        || dec_remu       ||
+    dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+    dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
+    dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
+    dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
+    dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
+    dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
+    dec_ssm4_ks         || dec_ssm4_ed          ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -511,7 +555,12 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_bgeu       || dec_blt        || dec_bltu       || dec_bne        ||
     dec_c_bnez     || dec_div        || dec_divu       || dec_mul        ||
     dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
-    dec_remu       || dec_c_mv       ;
+    dec_remu       || dec_c_mv       ||
+    dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+    dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
+    dec_ssha512_sum0r   || dec_ssha512_sum1r   || dec_ssha512_sig0l   ||
+    dec_ssha512_sig0h   || dec_ssha512_sig1l   || dec_ssha512_sig1h   || 
+    dec_ssm4_ks         || dec_ssm4_ed          ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||

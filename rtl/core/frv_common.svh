@@ -24,9 +24,10 @@ localparam P_FU_MUL     = 1;    // Multiply/divide
 localparam P_FU_LSU     = 2;    // Load store unit
 localparam P_FU_CFU     = 3;    // Control flow unit
 localparam P_FU_CSR     = 4;    // CSR accesses
+localparam P_FU_CRY     = 5;    // Crypto FU
 
-localparam FU           = 4;    // Width of functional unit specifier field
-localparam OP           = 4;    // Width of micro-op specifier field.
+localparam FU           = 5;    // Width-1 of functional unit specifier field
+localparam OP           = 4;    // Width-1 of micro-op specifier field.
 
 localparam ALU_ADD      = {2'b00, 3'b001};
 localparam ALU_SUB      = {2'b00, 3'b000};
@@ -69,6 +70,27 @@ localparam MUL_MUL      = {2'b01, 3'b100};
 localparam MUL_MULH     = {2'b01, 3'b110};
 localparam MUL_MULHSU   = {2'b01, 3'b111};
 localparam MUL_MULHU    = {2'b01, 3'b101};
+
+localparam CRY_LUT4LO        = 5'b00_001; // lut4-lo instruction
+localparam CRY_LUT4HI        = 5'b00_010; // lut4-hi instruction
+localparam CRY_SAES32_ENCS   = 5'b01_000; // AES Encrypt SBox
+localparam CRY_SAES32_ENCSM  = 5'b01_001; // AES Encrypt SBox + MixCols
+localparam CRY_SAES32_DECS   = 5'b01_010; // AES Decrypt SBox
+localparam CRY_SAES32_DECSM  = 5'b01_011; // AES Decrypt SBox + MixCols
+localparam CRY_SSM3_P0       = 5'b01_100; // SSM3 P0
+localparam CRY_SSM3_P1       = 5'b01_101; // SSM3 P1
+localparam CRY_SSM4_KS       = 5'b01_110; // SSM4 KeySchedule
+localparam CRY_SSM4_ED       = 5'b01_111; // SSM4 Encrypt/Decrypt
+localparam CRY_SSHA256_SIG0  = 5'b10_000; // SHA256 Sigma 0
+localparam CRY_SSHA256_SIG1  = 5'b10_001; // SHA256 Sigma 1
+localparam CRY_SSHA256_SUM0  = 5'b10_010; // SHA256 Sum 0
+localparam CRY_SSHA256_SUM1  = 5'b10_011; // SHA256 Sum 1
+localparam CRY_SSHA512_SUM0R = 5'b11_000; // SHA512 Sum 0
+localparam CRY_SSHA512_SUM1R = 5'b11_001; // SHA512 Sum 1
+localparam CRY_SSHA512_SIG0L = 5'b11_010; // SHA512 Sigma 0 low
+localparam CRY_SSHA512_SIG0H = 5'b11_011; // SHA512 Sigma 0 high
+localparam CRY_SSHA512_SIG1L = 5'b11_100; // SHA512 Sigma 1 low
+localparam CRY_SSHA512_SIG1H = 5'b11_101; // SHA512 Sigma 1 high
 
 localparam CSR_READ     = 4;
 localparam CSR_WRITE    = 3;
