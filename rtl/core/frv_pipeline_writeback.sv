@@ -367,7 +367,7 @@ assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{cfu_gpr_wen}} & cfu_gpr_wdata |
                   {32{mul_gpr_wen}} & mul_gpr_wdata ;
 
-assign fwd_s4_rd    = gpr_rd;
+assign fwd_s4_rd    = |s4_size ? gpr_rd : 5'b0;
 assign fwd_s4_wdata = gpr_wdata;
 assign fwd_s4_load  = fu_lsu && lsu_load;
 assign fwd_s4_csr   = fu_csr;

@@ -97,6 +97,7 @@ UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
 endef
 
 include $(FRV_HOME)/verif/unit/example/Makefile.in
+include $(FRV_HOME)/verif/unit/mul-ld/Makefile.in
 #include $(FRV_HOME)/verif/unit/mtime-read/Makefile.in
 #include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
 #include $(FRV_HOME)/verif/unit/counters/Makefile.in

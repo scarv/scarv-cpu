@@ -71,17 +71,34 @@ output wire        s4_valid          // Is this input valid?
 // Stalling / Pipeline Progression
 // -------------------------------------------------------------------------
 
-// Input into pipeline register, which then drives s3_p_valid;
-wire   p_valid   = s3_valid && !s3_busy;
-
 // Is this stage currently busy?
 assign s3_busy = p_busy                   ||
                  lsu_valid  && !lsu_ready ;
 
+wire   s3_full = |s3_size;
+
 // Is the next stage currently busy?
 wire   p_busy    ;
 
-wire pipe_progress = !s3_busy && s3_valid;
+// Instruction in Execute is progressing to Memory.
+wire instr_in      = s3_valid   && !s3_busy;
+
+// Instruction in Memory is progressing to Writeback.
+wire instr_out     = s3_full    && !s3_busy && !instr_done;
+
+wire nop_out       =               !s3_busy               ;
+
+wire pipe_prog_out = instr_out || nop_out;
+
+reg  instr_done;
+wire n_instr_done  = instr_in ? 1'b0                                    :
+                                instr_done || (instr_out && !instr_in)  ;
+
+always @(posedge g_clk) if(!g_resetn) begin
+    instr_done <= 1'b0;
+end else begin
+    instr_done <= n_instr_done;
+end
 
 //
 // Operation Decoding
@@ -97,9 +114,9 @@ wire fu_csr = s3_fu[P_FU_CSR];
 // Functional Unit Interfacing: LSU
 // -------------------------------------------------------------------------
 
-wire        lsu_valid  = fu_lsu         ; // Inputs are valid.
-wire        lsu_a_error                 ; // Address error. TODO
-wire        lsu_ready                   ; // Load/Store instruction complete.
+wire        lsu_valid  = fu_lsu && !instr_done  ; // Inputs are valid.
+wire        lsu_a_error                         ; // Address error. TODO
+wire        lsu_ready                           ; // Load/Store complete.
 
 wire        lsu_load   = s3_uop[LSU_LOAD ];
 wire        lsu_store  = s3_uop[LSU_STORE];
@@ -133,20 +150,23 @@ wire[4:0] n_s4_rd     =     s3_trap  ? s3_rd         :
 // Next pipestage value progression.
 // -------------------------------------------------------------------------
 
-wire opra_ld_en = p_valid && (
+wire opra_ld_en = instr_out && (
     fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr
 ); 
 
-wire oprb_ld_en = p_valid && (
+wire oprb_ld_en = instr_out && (
     fu_lsu || fu_csr
 ); 
 
 wire [XL:0] n_s4_opr_a  = lsu_valid ? n_s4_opr_a_lsu : s3_opr_a; // Operand A
 wire [XL:0] n_s4_opr_b  = lsu_valid ? n_s4_opr_b_lsu : s3_opr_b; // Operand B
 
-wire [OP:0] n_s4_uop    = s3_uop  ; // Micro-op code
-wire [FU:0] n_s4_fu     = s3_fu   ; // Functional Unit
-wire [ 1:0] n_s4_size   = s3_size ; // Size of the instruction.
+wire [OP:0] n_s4_uop    = instr_done ? {1+OP{1'b0}} : s3_uop; // Micro-op code
+wire [FU:0] n_s4_fu     = instr_done ? {1+FU{1'b0}} : s3_fu ; // Func Unit
+
+// Size of the instruction.
+wire [ 1:0] n_s4_size   = instr_done ? 2'b00        : s3_size ;
+
 wire [31:0] n_s4_instr  = s3_instr; // The instruction word
 
 //
@@ -174,7 +194,7 @@ frv_lsu #(
 .lsu_valid   (lsu_valid   ), // Inputs are valid.
 .lsu_a_error (lsu_a_error ), // Address error.
 .lsu_ready   (lsu_ready   ), // Outputs are valid / instruction complete.
-.pipe_prog   (pipe_progress),// Pipeline is progressing this cycle.
+.pipe_prog   (instr_in    ),// Pipeline is progressing this cycle.
 .lsu_addr    (lsu_addr    ), // Memory address to access.
 .lsu_wdata   (lsu_wdata   ), // Data to write to memory.
 .lsu_load    (lsu_load    ), // Load instruction.
@@ -225,7 +245,7 @@ frv_pipeline_register #(
 .g_clk    (g_clk            ), // global clock
 .g_resetn (g_resetn         ), // synchronous reset
 .i_data   (pipe_reg_in      ), // Input data from stage N
-.i_valid  (p_valid          ), // Input data valid?
+.i_valid  (pipe_prog_out    ), // Input data valid?
 .o_busy   (p_busy           ), // Stage N+1 ready to continue?
 .mr_data  (                 ), // Most recent data into the stage.
 .flush    (flush            ), // Flush the contents of the pipeline
@@ -282,7 +302,7 @@ always @(posedge g_clk) begin
         rvfi_s4_rs1_addr  <= 0; // Source register address 1
         rvfi_s4_rs2_addr  <= 0; // Source register address 2
         rvfi_s4_aux       <= 0; // Auxiliary data
-    end else if(pipe_progress) begin
+    end else if(instr_out) begin
         rvfi_s4_rs1_rdata <= rvfi_s3_rs1_rdata;
         rvfi_s4_rs2_rdata <= rvfi_s3_rs2_rdata;
         rvfi_s4_rs1_addr  <= rvfi_s3_rs1_addr ;
@@ -296,9 +316,9 @@ reg [31:0] mem_wdata_store;
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         rvfi_s4_mem_wdata <= 0;
-    end else if(p_valid && !p_busy && (dmem_req && dmem_gnt)) begin
+    end else if(instr_out && !p_busy && (dmem_req && dmem_gnt)) begin
         rvfi_s4_mem_wdata <= dmem_wdata;
-    end else if(p_valid && !p_busy) begin
+    end else if(instr_out && !p_busy) begin
         rvfi_s4_mem_wdata <= mem_wdata_store;
     end
 end
