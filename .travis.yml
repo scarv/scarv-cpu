@@ -52,7 +52,7 @@ jobs:
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make build-embench-targets EMBENCH_GEN_TRACE=0
-    - make -j 2 run-embench-aha-mont64 run-embench-crc32 run-embench-cubic run-embench-edn run-embench-huffbench run-embench-matmult-int run-embench-minver run-embench-nbody run-embench-nettle-aes run-embench-nettle-sha256 run-embench-nsichneu run-embench-picojpeg run-embench-sglib-combined run-embench-slre run-embench-st run-embench-statemate run-embench-ud run-embench-wikisort
+    - make -j 2 run-embench-targets
 cache   :
   directories:
   - ~/tools/verilator

@@ -33,9 +33,13 @@ srec_file::srec_file (
             unsigned char rec_type = line[1] & 0xf;
 
             // Next two chars are the number of bytes in the record.
-            unsigned char rec_size = ((line[2] & 0xf) << 4) | (line[3] & 0xf);
+            unsigned char ch0      = line[2];
+            unsigned char ch1      = line[3];
+            if(ch0 > 'A') ch0 -= 55;
+            if(ch1 > 'A') ch1 -= 55;
+            unsigned int  rec_size = ((ch0 & 0xf) << 4) | (ch1 & 0xf);
 
-            unsigned char data_bytes = rec_size - 5;
+            unsigned int  data_bytes = rec_size - 5;
 
             unsigned long rec_addr = 0;
 
@@ -78,6 +82,7 @@ srec_file::srec_file (
                 // Mask and shift into a single byte.
                 unsigned char d = ((high_nibble & 0x0F) << 4) |
                                   ((low_nibble  & 0x0F) << 0) ;
+                
 
                 this -> data[rec_addr + i] = d;
             }
