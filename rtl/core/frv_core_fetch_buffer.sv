@@ -34,10 +34,13 @@ input              buf_ready      // Eat 2/4 bytes
 // Common core parameters and constants
 `include "frv_common.svh"
 
-parameter BWIDTH = 80;
-parameter BW     = BWIDTH-1;
-parameter HWS    = BWIDTH/16;   // halfwords in buffer.
-parameter BE     = HWS-1;
+parameter  BWIDTH = 80;
+localparam BW     = BWIDTH-1;
+localparam HWS    = BWIDTH/16;   // halfwords in buffer.
+localparam BE     = HWS-1;
+
+wire [BWIDTH-32-1:0] pad_0 = 0;
+wire [BE-2:0] pad_1 = 0;
 
 reg  [BW:0] buffer  ;
 wire [BW:0] n_buffer;
@@ -48,7 +51,7 @@ wire [BE:0] n_buffer_err;
 reg  [ 2:0] bdepth  ;
 wire [ 2:0] n_bdepth;
     
-wire   buf_overflow   = {4'b0,bdepth} > HWS;
+wire   buf_overflow   = bdepth > HWS[2:0];
 
 `ifdef DESIGNER_ASSERTION_FETCH_BUFFER
         
@@ -59,7 +62,7 @@ wire   buf_overflow   = {4'b0,bdepth} > HWS;
 `endif
 
 // Is the buffer ready for new data to be inserted.
-assign f_ready   = {4'b0,n_bdepth} <= HWS-2; 
+assign f_ready   = n_bdepth <= HWS[2:0]-2; 
 
 assign buf_out   =  buffer    [31:0];
 assign buf_err   = |buffer_err[ 1:0];
@@ -90,19 +93,19 @@ wire [ 2:0] bdepth_sub = {1'b0, eat_4  , eat_2  };
 wire [ 2:0] insert_at  = bdepth - bdepth_sub;
 
 // Buffer depth in the next cycle.
-assign      n_bdepth   = bdepth + bdepth_add - bdepth_sub;
+assign      n_bdepth   = (bdepth + bdepth_add) - bdepth_sub;
 
 wire [31:0] n_buffer_d      = f_2byte ? {16'b0, f_in[31:16]} :
                               f_4byte ?         f_in         :
                                                 32'b0        ;
 
-wire [BW:0] n_buffer_or_in  = {48'b0,n_buffer_d} << (16*insert_at );
+wire [BW:0] n_buffer_or_in  = {pad_0,n_buffer_d} << (16*insert_at );
 wire [BW:0] n_buffer_shf_out= buffer             >> (16*bdepth_sub);
 
 assign      n_buffer        = n_buffer_or_in | n_buffer_shf_out;
 
 wire        n_err_in        = f_err && (f_2byte || f_4byte);
-wire [BE:0] n_err_or_in     = {3'b0, {2{n_err_in}}} << insert_at;
+wire [BE:0] n_err_or_in     = {pad_1, {2{n_err_in}}} << insert_at;
 wire [BE:0] n_err_shf_out   = buffer_err            >> insert_at;
 
 assign      n_buffer_err    = n_err_or_in    | n_err_shf_out;
