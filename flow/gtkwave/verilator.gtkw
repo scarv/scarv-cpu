@@ -1,13 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Jul 27 12:27:40 2020
+[*] Wed Jul 29 09:22:37 2020
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.vcd"
+[dumpfile_mtime] "Wed Jul 29 08:50:52 2020"
+[dumpfile_size] 54670150
 [savefile] "/home/work/scarv/skywater/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 133369
+[timestart] 407891
 [size] 1920 1025
 [pos] -1 -1
-*-9.964523 133644 3286 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.321928 408261 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -88,7 +90,7 @@ TOP.frv_core.i_pipeline.dmem_error
 @800200
 -Trace
 @2022
-^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/nsichneu/nsichneu.gtkwl
+^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.gtkwl
 TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.trs_instr[31:0]
@@ -331,7 +333,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_valid
 @28
 TOP.frv_core.i_pipeline.s3_busy
 @2022
-^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/nsichneu/nsichneu.gtkwl
+^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
@@ -344,7 +346,7 @@ TOP.frv_core.i_pipeline.s3_size[1:0]
 TOP.frv_core.i_pipeline.s3_trap
 @22
 TOP.frv_core.i_pipeline.s3_uop[4:0]
-@29
+@28
 TOP.frv_core.i_pipeline.s3_valid
 @800200
 -Data Memory
@@ -365,9 +367,11 @@ TOP.frv_core.i_pipeline.dmem_rdata[31:0]
 TOP.frv_core.i_pipeline.dmem_error
 @1000200
 -Data Memory
-@c00200
+@800200
 -LSU
 @28
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_clk
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_resetn
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_req
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_gnt
 @22
@@ -378,11 +382,9 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wen
 @200
 -
--
-@28
+@29
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_txn_done
-TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_clk
-TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_resetn
+@28
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.hold_lsu_req
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_a_error
 @22
@@ -402,11 +404,10 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_word
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.n_lsu_finished
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
-@1401200
--LSU
 @1000200
+-LSU
 -Pipe - S3 Memory
-@c00200
+@800200
 -Pipe - S4 - Writeback
 @28
 TOP.frv_core.i_pipeline.s4_busy
@@ -429,6 +430,7 @@ TOP.frv_core.i_pipeline.s4_valid
 -
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.dmem_error
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.n_dmem_r_error
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.dmem_rdata[31:0]
 @200
@@ -451,7 +453,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_valid
-@1401200
+@1000200
 -Pipe - S4 - Writeback
 @c00200
 -CSR Bus
@@ -607,14 +609,6 @@ TOP.frv_core.i_interrupts.ti_pending
 TOP.frv_core.i_interrupts.ex_pending
 @1401200
 -Interrupts
-@c00200
--Counters
-@200
--
--
--
-@1401200
--Counters
 @c00200
 -GPRs
 @22

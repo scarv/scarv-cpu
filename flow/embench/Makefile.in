@@ -8,8 +8,9 @@ EMBENCH_BOOT    = $(FRV_HOME)/flow/embench/boot.S
 
 EMBENCH_EXP_TEMPLATE = $(FRV_HOME)/flow/embench/expect_template.sh
 
-EMBENCH_CFLAGS  = "-march=rv32imac -O3 -mabi=ilp32 -nostartfiles -c"
-EMBENCH_LDFLAGS = "-march=rv32imac -O3 -mabi=ilp32 -nostartfiles -T$(EMBENCH_LD)"
+EMBENCH_FLAGS   = -march=rv32imac -O3 -mabi=ilp32 -nostartfiles
+EMBENCH_CFLAGS  = "$(EMBENCH_FLAGS) -c"
+EMBENCH_LDFLAGS = "$(EMBENCH_FLAGS) -T$(EMBENCH_LD)"
 EMBENCH_ULIBS   = "$(EMBENCH_BOOT) -lm"
 
 EMBENCH_BMARKS  = aha-mont64        \
@@ -194,7 +195,7 @@ endef
 
 $(foreach BM,$(EMBENCH_BMARKS),$(eval $(call embench_add,${BM})))
 
-build-embench-targets: $(EMBENCH_BUILD_TARGETS)
+build-embench-targets: build-embench-binaries $(EMBENCH_BUILD_TARGETS)
 
 run-embench-targets  : $(EMBENCH_RUN_TARGETS)
 
