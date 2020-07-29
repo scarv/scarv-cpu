@@ -51,7 +51,7 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - echo "Flow not yet implemeted."
+    - make build-embench-targets
 cache   :
   directories:
   - ~/tools/verilator
