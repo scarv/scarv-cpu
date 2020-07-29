@@ -100,11 +100,12 @@ wire [XL:0] n_imem_addr         = imem_addr + 4;
 // We only hold half of a 32-bit instruction.
 wire        incomplete_instr    = buf_32 && buf_depth == 1;
 
+wire nc_0 = n_buf_depth == 0              ;
 wire nc_1 = n_buf_depth == 1              ;
 wire nc_2 = n_buf_depth <= 3 && !e_new_req;
 wire nc_3 = 1'b0;
 
-wire   n_imem_req = nc_1 || nc_2 || nc_3;
+wire   n_imem_req = nc_0 || nc_1 || nc_2 || nc_3;
 
 //
 // Update the fetch address in terms of control flow changes and natural
