@@ -109,7 +109,8 @@ wire        next_instr_32       = buf_16 && s1_data[17:16] == 2'b11;
     (n_buf_depth            ) +  
     (e_new_req ? 3'd2 : 3'd0) ;
 
-wire   n_imem_req = nn_buf_depth < FETCH_BUF_DEPTH-1;
+wire   n_imem_req = (nn_buf_depth < FETCH_BUF_DEPTH-1)  ||
+                    e_cf_change;
 
 //
 // Update the fetch address in terms of control flow changes and natural
