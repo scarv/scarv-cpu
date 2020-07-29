@@ -44,7 +44,8 @@ EMBENCH_OBJCOPY_FLAGS = --srec-forceS3
 EMBENCH_PASS_ADDR= 0x80000088
 EMBENCH_FAIL_ADDR= 0x80000080
 
-EMBENCH_WAVES    = 0
+EMBENCH_WAVES    =0
+EMBENCH_GEN_TRACE=0
 
 build-embench-binaries:
 	rm -rf $(EMBENCH_BUILD)/
@@ -186,9 +187,11 @@ $(call map_embench_grm_trace,${1}) : $(call map_embench_grm_log,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_objdump,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_gtkwl,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_srec,${1})
+ifeq ($(EMBENCH_GEN_TRACE),1)
 EMBENCH_BUILD_TARGETS += $(call map_embench_expect_script,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_grm_log,${1})
 EMBENCH_BUILD_TARGETS += $(call map_embench_grm_trace,${1})
+endif
 EMBENCH_RUN_TARGETS   += run-embench-${1}
 
 endef

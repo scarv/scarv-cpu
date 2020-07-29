@@ -51,7 +51,7 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - make build-embench-targets
+    - make build-embench-targets EMBENCH_GEN_TRACE=0
 cache   :
   directories:
   - ~/tools/verilator
