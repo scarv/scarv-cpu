@@ -8,20 +8,59 @@ WRAPPER = $(FRV_HOME)/verif/rvfi/rvfi_wrapper.sv
 NJOBS   = 1
 CHECKS  = 
 
+RISCV_FORMAL_PATCHES = 
+
+define map_sby
+$(FRV_WORK)/riscv-formal/${1}.sby
+endef
+
+define add_timeout_patch
+.PHONY:
+$(call map_sby,${1}):
+	sed -i 's/mode bmc/mode bmc\ntimeout 600/' $(call map_sby,${1})
+RISCV_FORMAL_PATCHES += $(call map_sby,${1})
+endef
+
+#
+# 1. Check depth
+# 2. Check depth + 1
+# 3. Timeout in seconds
+# 4. Check name
+define add_depth_and_timeout_patch
+.PHONY:
+$(call map_sby,${4}):
+	sed -i 's/mode bmc/mode bmc\ntimeout ${3}/' $(call map_sby,${4})
+	sed -i 's/depth ../depth ${2}/' $(call map_sby,${4})
+	sed -i 's/skip ../skip ${1}/' $(call map_sby,${4})
+	sed -i 's/CHECK_CYCLE ../CHECK_CYCLE ${1}/' $(call map_sby,${4})
+RISCV_FORMAL_PATCHES += $(call map_sby,${4})
+endef
+
 riscv-formal-clean:
 	rm -rf $(RVFML)
 	rm -rf $(FMLWORK)
+
+$(eval $(call add_depth_and_timeout_patch,45,46,600,reg_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_mul_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_mulh_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_mulhu_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_mulhsu_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_div_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_divu_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_rem_ch0))
+$(eval $(call add_depth_and_timeout_patch,45,46,300,insn_remu_ch0))
+
+riscv-formal-patches: $(RISCV_FORMAL_PATCHES)
 
 riscv-formal-prepare: $(CFG) $(WRAPPER) $(CPU_RTL_SRCS)
 	mkdir -p $(RVFML)
 	mkdir -p $(FMLWORK)
 	cp $(CFG) $(RVFML)/checks.cfg
-	cd $(RVFML) && \
-        python3 ../../checks/genchecks.py
+	cd $(RVFML) && python3 ../../checks/genchecks.py
 	mv $(RVFML)/checks/* $(FMLWORK)
-	sed -i 's/mode bmc/mode bmc\ntimeout 600/' $(FRV_WORK)/riscv-formal/reg_ch0.sby
+	$(MAKE) -B riscv-formal-patches
 
-riscv-formal-run:
+riscv-formal-run: riscv-formal-patches
 	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(CHECKS)
 	rm -rf $(RVFML)
 
