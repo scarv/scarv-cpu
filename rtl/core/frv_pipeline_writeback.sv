@@ -336,7 +336,7 @@ wire        lsu_gpr_wen     = lsu_load;
 
 wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
 
-wire        lsu_bus_error   = fu_lsu && dmem_r_error;
+wire        lsu_bus_error   = fu_lsu && n_dmem_r_error;
 
 wire        lsu_trap        = lsu_bus_error;
 
