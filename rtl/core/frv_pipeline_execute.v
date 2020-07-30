@@ -303,6 +303,8 @@ wire        msk_op_b_sub    = XC_CLASS_MASK && s2_uop == MSK_B_SUB   ;
 wire        msk_op_b_srli   = XC_CLASS_MASK && s2_uop == MSK_B_SRLI  ;
 wire        msk_op_b_slli   = XC_CLASS_MASK && s2_uop == MSK_B_SLLI  ;
 wire        msk_op_b_rori   = XC_CLASS_MASK && s2_uop == MSK_B_RORI  ;
+wire        msk_op_f_mul    = XC_CLASS_MASK && s2_uop == MSK_F_MUL   ;
+wire        msk_op_f_aff    = XC_CLASS_MASK && s2_uop == MSK_F_AFF   ;
 
 wire [XL:0] msk_rs1_s0      = s2_opr_a;
 wire [XL:0] msk_rs1_s1      ;
@@ -568,6 +570,8 @@ frv_masked_alu #(
 .op_b_srli   (msk_op_b_srli   ), // Masked shift right, shamt in msk_rs2_s0
 .op_b_slli   (msk_op_b_slli   ), // Masked shift left, shamt in msk_rs2_s0
 .op_b_rori   (msk_op_b_rori   ), // Masked shift right, shamt in msk_rs2_s0
+.op_f_mul    (msk_op_f_mul    ), // Finite field multiply
+.op_f_aff    (msk_op_f_aff    ), // Affine transform
 .prng_update (msk_prng_update ), // Force the PRNG to update.
 .rs1_s0      (msk_rs1_s0      ), // RS1 Share 0
 .rs1_s1      (msk_rs1_s1      ), // RS1 Share 1

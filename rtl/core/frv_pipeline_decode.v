@@ -209,7 +209,8 @@ assign n_s2_fu[P_FU_MSK] =
     dec_mask_a_remask || dec_mask_b_not     ||
     dec_mask_b_and     || dec_mask_b_ior    || dec_mask_b_xor     ||
     dec_mask_b_add     || dec_mask_b_sub    || dec_mask_b_slli    ||
-    dec_mask_b_srli    || dec_mask_b_rori;
+    dec_mask_b_srli    || dec_mask_b_rori   ||
+    dec_mask_f_mul     || dec_mask_f_aff    ;
 
 //
 // Encoding field extraction
@@ -458,7 +459,9 @@ wire [OP:0] uop_msk =
     {1+OP{dec_mask_b_sub      }} & MSK_B_SUB        |
     {1+OP{dec_mask_b_srli     }} & MSK_B_SRLI       |
     {1+OP{dec_mask_b_slli     }} & MSK_B_SLLI       |
-    {1+OP{dec_mask_b_rori     }} & MSK_B_RORI       ;
+    {1+OP{dec_mask_b_rori     }} & MSK_B_RORI       |
+    {1+OP{dec_mask_f_mul      }} & MSK_F_MUL        |
+    {1+OP{dec_mask_f_aff      }} & MSK_F_AFF        ;
 
 assign n_s2_uop =
     uop_alu |
@@ -797,7 +800,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
     dec_xc_scatter_h     ||
     dec_mask_b_not || dec_mask_b_and || dec_mask_b_ior || dec_mask_b_xor ||
-    dec_mask_b_add || dec_mask_b_sub ;
+    dec_mask_b_add || dec_mask_b_sub || dec_mask_f_mul ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
@@ -835,7 +838,8 @@ wire oprc_src_rs1_hi =
     dec_mask_b_remask   || dec_mask_a_remask   ||
     dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
     dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ||
-    dec_mask_b_slli     || dec_mask_b_srli     || dec_mask_b_rori     ;
+    dec_mask_b_slli     || dec_mask_b_srli     || dec_mask_b_rori     ||
+    dec_mask_f_mul      || dec_mask_f_aff      ;
 
 assign n_s2_opr_src[DIS_OPRC_RS3 ] = // Operand C sources RS3
     dec_xc_str_b   || dec_xc_str_h   || dec_xc_str_w   || dec_xc_mmul_3  ||
@@ -858,7 +862,8 @@ assign n_s2_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
 // Operand D sources rs2 high half of double-width read
 wire oprd_src_rs2_hi = 
     dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
-    dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ;
+    dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ||
+    dec_mask_f_mul      ;
 
 //
 // Trap catching

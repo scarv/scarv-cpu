@@ -63,6 +63,8 @@ input  wire        op_b_sub         , // Binary masked subtraction
 input  wire        op_b_srli        , // Shift right, shamt in msk_rs2_s0
 input  wire        op_b_slli        , // Shift left, shamt in msk_rs2_s0
 input  wire        op_b_rori        , // Shift right, shamt in msk_rs2_s0
+input  wire        op_f_mul         , // Finite field multiply
+input  wire        op_f_aff         , // Affine transform
 
 input  wire        prng_update      , // Force the PRNG to update.
 
@@ -351,7 +353,11 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_b2a  }} &  mb2a1 |
                {XLEN{op_msk  }} &  rmask1;
 
-assign ready = mnot_rdy || (dologic && mlogic_rdy) || madd_rdy || shr_rdy || msk_rdy ;
+wire    temp_mask_f_ready = op_f_mul || op_f_aff;
+
+assign ready = mnot_rdy || (dologic && mlogic_rdy) ||
+              madd_rdy || shr_rdy || msk_rdy       ||
+              temp_mask_f_ready;
 assign mask  = prng;
 
 endmodule
