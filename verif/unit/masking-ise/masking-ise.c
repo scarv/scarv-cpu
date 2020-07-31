@@ -5,8 +5,8 @@ extern uint32_t test_masked_not(uint32_t a);
 extern uint32_t test_masked_and(uint32_t a, uint32_t b);
 extern uint32_t test_masked_ior(uint32_t a, uint32_t b);
 extern uint32_t test_masked_xor(uint32_t a, uint32_t b);
-extern uint32_t test_masked_add(uint32_t a, uint32_t b);
-extern uint32_t test_masked_sub(uint32_t a, uint32_t b);
+extern uint32_t test_masked_b_add(uint32_t a, uint32_t b);
+extern uint32_t test_masked_b_sub(uint32_t a, uint32_t b);
 extern uint32_t test_masked_srli(uint32_t a);
 extern uint32_t test_masked_slli(uint32_t a);
 extern uint32_t test_masked_rori(uint32_t a);
@@ -15,6 +15,8 @@ extern uint32_t test_masked_brm(uint32_t a);   //boolean remask
 extern uint32_t test_masked_b2a(uint32_t a);
 extern uint32_t test_masked_arm(uint32_t a);   //arithmetic remask
 extern uint32_t test_masked_a2b(uint32_t a);
+extern uint32_t test_masked_a_add(uint32_t a, uint32_t b);
+extern uint32_t test_masked_a_sub(uint32_t a, uint32_t b);
 extern uint32_t test_masked_f_mul(uint32_t a, uint32_t b);
 extern uint32_t test_masked_f_aff(uint32_t a);
 extern uint32_t test_bit_reverse_representation(uint32_t a, uint32_t b);
@@ -75,21 +77,43 @@ int test_main() {
         fail = 1;
     }
 
-    uint32_t result_add = test_masked_add(lhs, rhs);
-    uint32_t expect_add = (lhs + rhs);
+    // Boolean masked add
+    uint32_t result_b_add = test_masked_b_add(lhs, rhs);
+    uint32_t expect_b_add = (lhs + rhs);
 
-    if(result_add != expect_add) {
-        __putstr("test_masked_add [FAIL]\n");
-        print_result_expectation(lhs,rhs,result_add,expect_add);
+    if(result_b_add != expect_b_add) {
+        __putstr("test_masked_b_add [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_b_add,expect_b_add);
         fail = 1;
     }
 
-    uint32_t result_sub = test_masked_sub(lhs, rhs);
-    uint32_t expect_sub = (lhs - rhs);
+    // Boolean masked sub
+    uint32_t result_b_sub = test_masked_b_sub(lhs, rhs);
+    uint32_t expect_b_sub = (lhs - rhs);
 
-    if(result_sub != expect_sub) {
-        __putstr("test_masked_sub [FAIL]\n");
-        print_result_expectation(lhs,rhs,result_sub,expect_sub);
+    if(result_b_sub != expect_b_sub) {
+        __putstr("test_masked_b_sub [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_b_sub,expect_b_sub);
+        fail = 1;
+    }
+    
+    // Arithmetic masked add
+    uint32_t result_a_add = test_masked_a_add(lhs, rhs);
+    uint32_t expect_a_add = (lhs + rhs);
+
+    if(result_a_add != expect_a_add) {
+        __putstr("test_masked_a_add [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_a_add,expect_a_add);
+        fail = 1;
+    }
+
+    // Arithmetic masked sub
+    uint32_t result_a_sub = test_masked_a_sub(lhs, rhs);
+    uint32_t expect_a_sub = (lhs - rhs);
+
+    if(result_a_sub != expect_a_sub) {
+        __putstr("test_masked_a_sub [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_a_sub,expect_a_sub);
         fail = 1;
     }
 
@@ -158,7 +182,7 @@ int test_main() {
 
 
     uint32_t result_f_mul = test_masked_f_mul(lhs,rhs);
-    uint32_t expect_f_mul = result_f_mul; // TODO : Expected result
+    uint32_t expect_f_mul = 0xFFFFFFFF; // TODO : Expected result
     if(result_f_mul != expect_f_mul) {
         __putstr("test_masked_f_mul [FAIL]\n");
         print_result_expectation(lhs,rhs,result_f_mul,expect_f_mul);
@@ -167,7 +191,7 @@ int test_main() {
     
     
     uint32_t result_f_aff = test_masked_f_aff(lhs);
-    uint32_t expect_f_aff = result_f_aff; // TODO : Expected result
+    uint32_t expect_f_aff = 0xFFFFFFFF; // TODO : Expected result
     if(result_f_aff != expect_f_aff) {
         __putstr("test_masked_f_aff [FAIL]\n");
         print_result_expectation(lhs,rhs,result_f_aff,expect_f_aff);

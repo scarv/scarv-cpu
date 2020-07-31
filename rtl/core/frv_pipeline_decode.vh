@@ -165,6 +165,8 @@ wire dec_mask_b_sub     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h200105
 wire dec_mask_b_slli    = XC_CLASS_MASK && (d_data & 32'hfc00f0ff) == 32'h800005b;
 wire dec_mask_b_srli    = XC_CLASS_MASK && (d_data & 32'hfc00f0ff) == 32'h800105b;
 wire dec_mask_b_rori    = XC_CLASS_MASK && (d_data & 32'hfc00f0ff) == 32'h800205b;
+wire dec_mask_a_add     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'ha00005b;
+wire dec_mask_a_sub     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'ha00105b;
 wire dec_mask_f_mul     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h600005b;
 wire dec_mask_f_aff     = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h600205b;
 
@@ -211,6 +213,6 @@ dec_mask_b_unmask  || dec_mask_b_remask  || dec_mask_a_mask    ||
 dec_mask_a_unmask  || dec_mask_a_remask  || dec_mask_b_not     ||
 dec_mask_b_and     || dec_mask_b_ior     || dec_mask_b_xor     ||
 dec_mask_b_add     || dec_mask_b_sub     || dec_mask_b_slli    ||
-dec_mask_b_srli    || dec_mask_b_rori    ||
-dec_mask_f_mul     || dec_mask_f_aff
+dec_mask_b_srli    || dec_mask_b_rori    || dec_mask_a_add     ||
+dec_mask_a_sub     || dec_mask_f_mul     || dec_mask_f_aff
 );
