@@ -18,7 +18,7 @@ extern uint32_t test_masked_a2b(uint32_t a);
 extern uint32_t test_masked_a_add(uint32_t a, uint32_t b);
 extern uint32_t test_masked_a_sub(uint32_t a, uint32_t b);
 extern uint32_t test_masked_f_mul(uint32_t a, uint32_t b);
-extern uint32_t test_masked_f_aff(uint32_t a);
+extern uint32_t test_masked_f_aff(uint32_t a, uint32_t b);
 extern uint32_t test_bit_reverse_representation(uint32_t a, uint32_t b);
 
 void print_result_expectation(
@@ -190,7 +190,7 @@ int test_main() {
     }
     
     
-    uint32_t result_f_aff = test_masked_f_aff(lhs);
+    uint32_t result_f_aff = test_masked_f_aff(lhs, rhs);
     uint32_t expect_f_aff = 0xFFFFFFFF; // TODO : Expected result
     if(result_f_aff != expect_f_aff) {
         __putstr("test_masked_f_aff [FAIL]\n");

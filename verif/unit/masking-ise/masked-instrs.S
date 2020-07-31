@@ -261,8 +261,8 @@ test_masked_a_sub:
 .func   test_masked_f_mul
 test_masked_f_mul:
 
-    mask.a.mask     (t2,t1), a0
-    mask.a.mask     (t4,t3), a1
+    mask.b.mask     (t2,t1), a0
+    mask.b.mask     (t4,t3), a1
     mask.f.mul      (a1,a0), (t2,t1), (t4,t3)
     mask.b.unmask    a0    , (a1,a0)
 
@@ -276,7 +276,8 @@ test_masked_f_mul:
 test_masked_f_aff:
 
     mask.b.mask     (t2,t1), a0
-    mask.f.aff      (a1,a0), (t2,t1)
+    mask.b.mask     (t4,t3), a1
+    mask.f.aff      (a1,a0), (t2,t1), (t4,t3)
     mask.b.unmask    a0    , (a1,a0)
 
 .test_masked_f_aff:
