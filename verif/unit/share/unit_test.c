@@ -77,3 +77,82 @@ void __puthex8(uint8_t w) {
     __putchar(lut[b_1]);
     __putchar(lut[b_0]);
 }
+
+
+//
+// Test trap handler code.
+// ------------------------------------------------------------
+
+extern void __asm_test_trap_handler();
+
+// The current trap handler config.
+static test_trap_handler_cfg th_cfg;
+
+void setup_test_trap_handler (test_trap_handler_cfg * cfg) {
+    th_cfg.expect_trap    = cfg -> expect_trap   ;
+    th_cfg.check_mcause   = cfg -> check_mcause  ;
+    th_cfg.expect_mcause  = cfg -> expect_mcause ;
+    th_cfg.check_mepc     = cfg -> check_mepc    ;
+    th_cfg.expect_mepc    = cfg -> expect_mepc   ;
+    th_cfg.check_mtval    = cfg -> check_mtval   ;
+    th_cfg.expect_mtval   = cfg -> expect_mtval  ;
+    th_cfg.step_over_mepc = cfg -> step_over_mepc;
+    th_cfg.trap_seen      = cfg -> trap_seen     ;
+
+    uint32_t handler_addr = (uint32_t)&__asm_test_trap_handler;
+    scarv_cpu_wr_mtvec(handler_addr);
+}
+
+
+void __attribute__ ((used)) test_trap_handler() {
+
+    if(th_cfg.trap_seen != NULL) {
+        th_cfg.trap_seen[0] = 1;
+    }
+
+    if(!th_cfg.expect_trap) {
+        __putstr("!A\n");
+        test_fail();
+    }
+
+    if(th_cfg.check_mcause) {
+        uint32_t mcause = scarv_cpu_rd_mcause();
+        uint32_t val    = 0x1 & (th_cfg.expect_mcause >> mcause);
+
+        if(val) {
+            // All okay.
+        } else {
+            __putstr("!B\n");
+            test_fail(); // Un-expected mcause value.
+        }
+    }
+
+    if(th_cfg.check_mepc) {
+        uint32_t mepc = scarv_cpu_rd_mepc();
+        if(mepc != th_cfg.expect_mepc) {
+            __putstr("!C\n");
+            test_fail(); // Un-expected mepc value.
+        }
+    }
+    
+    if(th_cfg.check_mtval) {
+        uint32_t mtval = scarv_cpu_rd_mtval();
+        if(mtval != th_cfg.expect_mtval) {
+            __putstr("!D\n");
+            test_fail(); // Un-expected mtval value.
+        }
+    }
+
+    if(th_cfg.step_over_mepc) {
+        uint32_t mepc = scarv_cpu_rd_mepc();
+        uint8_t  ib0  = ((uint8_t*)mepc)[0];
+        mepc += 2; // Always increment MEPC by two bytes.
+        if((ib0 & 0x3) == 0x3) {
+            // Faulting instr was 32-bits long, so increment by 2 bytes again.
+            mepc += 2;
+        }
+        scarv_cpu_wr_mepc(mepc);
+    }
+
+    return;
+}

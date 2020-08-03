@@ -1,5 +1,7 @@
 
+#include <stdlib.h>
 #include <stdint.h>
+#include "scarv_cpu_csp.h"
 
 #ifndef UNIT_TEST_H
 #define UNIT_TEST_H
@@ -90,6 +92,20 @@ void __puthex32(uint32_t w);
 
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w);
+
+typedef struct {
+uint8_t  expect_trap   ; // Expect a trap to occur. If false, mepc=test_fail
+uint8_t  check_mcause  ; // Should we check the value of mcause?
+uint32_t expect_mcause ; // Expected values of mcause as bit vector.
+uint8_t  check_mepc    ; // Should we check the value of mepc?
+uint32_t expect_mepc   ; // Expected value of mepc.
+uint8_t  check_mtval   ; // Should we check the value of mtval?
+uint32_t expect_mtval  ; // Expected value of mtval.
+uint8_t  step_over_mepc; // Should handler check value of mepc?
+volatile uint8_t *trap_seen     ; // Pointer to value set to 1 if trap handler seen.
+} test_trap_handler_cfg ;
+
+void setup_test_trap_handler (test_trap_handler_cfg * cfg);
 
 #endif
 

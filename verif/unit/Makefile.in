@@ -12,12 +12,14 @@ UNIT_FAIL       = 0x80000086
 UNIT_PASS       = 0x80000090
 
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
+UNIT_CFLAGS    += -I$(FRV_HOME)/src/csp
 UNIT_CFLAGS    += -march=rv32imcb_xcrypto -mabi=ilp32
 UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
 
 UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
                   $(UNIT_ROOT)/share/util.S \
-                  $(UNIT_ROOT)/share/unit_test.c
+                  $(UNIT_ROOT)/share/unit_test.c \
+                  $(FRV_HOME)/src/csp/scarv_cpu_csp.c
 
 define unit_test_elf
 $(UNIT_TEST_BUILD)/${1}/${1}.elf
@@ -98,6 +100,8 @@ endef
 
 include $(FRV_HOME)/verif/unit/example/Makefile.in
 include $(FRV_HOME)/verif/unit/mul-ld/Makefile.in
+include $(FRV_HOME)/verif/unit/ld-bus-error/Makefile.in
+include $(FRV_HOME)/verif/unit/st-bus-error/Makefile.in
 #include $(FRV_HOME)/verif/unit/mtime-read/Makefile.in
 #include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
 #include $(FRV_HOME)/verif/unit/counters/Makefile.in
