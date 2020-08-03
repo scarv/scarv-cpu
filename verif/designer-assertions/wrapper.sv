@@ -11,7 +11,6 @@
 module design_assertions_wrapper (
 	input         clock,
 	input         reset,
-	`RVFI_OUTPUTS
 );
 
 wire         trs_valid      ; // Trace output valid.
@@ -55,6 +54,32 @@ parameter XL   = XLEN - 1;
 (*keep*) reg         dmem_error   = $anyseq ; // Error
 (*keep*) reg  [XL:0] dmem_rdata   = $anyseq ; // Read data
 
+`RVFI_WIRES
+
+//
+// Custom RVFI checkers
+// --------------------------------------------------------------------
+
+`ifdef RISCV_FORMAL_INSN_MODEL
+
+reg [31:0] rvfi_check_counter;
+always @(posedge clock) if(reset) begin
+    rvfi_check_counter <= 0;
+end else begin
+    rvfi_check_counter <= rvfi_check_counter + 1;
+end
+
+wire rvfi_check = rvfi_check_counter >= `RISCV_FORMAL_CHECK_CYCLE-1;
+
+rvfi_insn_check i_checker (
+.clock(clock),
+.reset(reset),
+.check(rvfi_check),
+`RVFI_CONN
+);
+
+`endif
+
 //
 // Fairness Assumptions / Restrictions
 // --------------------------------------------------------------------
@@ -94,6 +119,7 @@ frv_core #(
 ) i_dut(
 .g_clk          (clock          ), // global clock
 .g_resetn       (g_resetn       ), // synchronous reset
+`ifdef RVFI
 .rvfi_valid     (rvfi_valid     ),
 .rvfi_order     (rvfi_order     ),
 .rvfi_insn      (rvfi_insn      ),
@@ -114,6 +140,7 @@ frv_core #(
 .rvfi_mem_wmask (rvfi_mem_wmask ),
 .rvfi_mem_rdata (rvfi_mem_rdata ),
 .rvfi_mem_wdata (rvfi_mem_wdata ),
+`endif
 .trs_pc         (trs_pc         ), // Trace program counter.
 .trs_instr      (trs_instr      ), // Trace instruction.
 .trs_valid      (trs_valid      ), // Trace output valid.
