@@ -389,6 +389,11 @@ always @(posedge g_clk) begin
     end
 end
 
+wire    trap_addr_align = s4_trap && (
+    {1'b0,s4_rd} == TRAP_LDALIGN   ||
+    {1'b0,s4_rd} == TRAP_STALIGN
+);
+
 // TODO
 assign int_trap_ack = 1'b0;
 
@@ -409,8 +414,10 @@ assign trap_cause = // Cause of the trap.
     trap_int                    ? int_trap_cause:
                                   {1'b0,s4_rd}  ;
 
-// TODO: Make this useful.
-assign trap_mtval = 32'b0   ; // Value associated with the trap.
+assign trap_mtval =
+    lsu_bus_error   ? s4_opr_b                  :
+    trap_addr_align ? s4_opr_b                  :
+                      32'b0                     ;
 
 assign trap_pc    = s4_pc   ; // PC value associated with the trap.
 
