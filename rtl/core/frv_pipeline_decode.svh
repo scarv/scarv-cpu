@@ -84,26 +84,37 @@ wire dec_c_add      = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:
 wire dec_c_swsp     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd6;
 
 // TODO: Correct decode of crypto extension instructions.
-wire dec_lut4lo        = 1'b0;
-wire dec_lut4hi        = 1'b0;
-wire dec_saes32_encs   = 1'b0;
-wire dec_saes32_encsm  = 1'b0;
-wire dec_saes32_decs   = 1'b0;
-wire dec_saes32_decsm  = 1'b0;
-wire dec_ssha256_sig0  = 1'b0;
-wire dec_ssha256_sig1  = 1'b0;
-wire dec_ssha256_sum0  = 1'b0;
-wire dec_ssha256_sum1  = 1'b0;
-wire dec_ssha512_sum0r = 1'b0;
-wire dec_ssha512_sum1r = 1'b0;
-wire dec_ssha512_sig0l = 1'b0;
-wire dec_ssha512_sig0h = 1'b0;
-wire dec_ssha512_sig1l = 1'b0;
-wire dec_ssha512_sig1h = 1'b0;
-wire dec_ssm3_p0       = 1'b0;
-wire dec_ssm3_p1       = 1'b0;
-wire dec_ssm4_ks       = 1'b0;
-wire dec_ssm4_ed       = 1'b0;
+wire dec_ssm4_ed        = (d_data & 32'h3e00707f) == 32'h800302b;
+wire dec_ssm4_ks        = (d_data & 32'h3e00707f) == 32'ha00302b;
+wire dec_saes32_encsm   = (d_data & 32'h3e00707f) == 32'h202b;
+wire dec_saes32_encs    = (d_data & 32'h3e00707f) == 32'h200202b;
+wire dec_saes32_decsm   = (d_data & 32'h3e00707f) == 32'h400202b;
+wire dec_saes32_decs    = (d_data & 32'h3e00707f) == 32'h600202b;
+wire dec_saes64_ks1     = (d_data & 32'hff00707f) == 32'h800202b;
+wire dec_saes64_ks2     = (d_data & 32'hfe00707f) == 32'ha00202b;
+wire dec_saes64_imix    = (d_data & 32'hfff0707f) == 32'hc10202b;
+wire dec_saes64_encsm   = (d_data & 32'hfe00707f) == 32'he00202b;
+wire dec_saes64_encs    = (d_data & 32'hfe00707f) == 32'h1000202b;
+wire dec_saes64_decsm   = (d_data & 32'hfe00707f) == 32'h1200202b;
+wire dec_saes64_decs    = (d_data & 32'hfe00707f) == 32'h1400202b;
+wire dec_ssha256_sig0   = (d_data & 32'hfff0707f) == 32'he00702b;
+wire dec_ssha256_sig1   = (d_data & 32'hfff0707f) == 32'he10702b;
+wire dec_ssha256_sum0   = (d_data & 32'hfff0707f) == 32'he20702b;
+wire dec_ssha256_sum1   = (d_data & 32'hfff0707f) == 32'he30702b;
+wire dec_ssm3_p0        = (d_data & 32'hfff0707f) == 32'he80702b;
+wire dec_ssm3_p1        = (d_data & 32'hfff0707f) == 32'he90702b;
+wire dec_ssha512_sig0l  = (d_data & 32'hfe00707f) == 32'h1000702b;
+wire dec_ssha512_sig0h  = (d_data & 32'hfe00707f) == 32'h1200702b;
+wire dec_ssha512_sig1l  = (d_data & 32'hfe00707f) == 32'h1400702b;
+wire dec_ssha512_sig1h  = (d_data & 32'hfe00707f) == 32'h1600702b;
+wire dec_ssha512_sum0r  = (d_data & 32'hfe00707f) == 32'h1800702b;
+wire dec_ssha512_sum1r  = (d_data & 32'hfe00707f) == 32'h1a00702b;
+wire dec_ssha512_sig0   = (d_data & 32'hfff0707f) == 32'he40702b;
+wire dec_ssha512_sig1   = (d_data & 32'hfff0707f) == 32'he50702b;
+wire dec_ssha512_sum0   = (d_data & 32'hfff0707f) == 32'he60702b;
+wire dec_ssha512_sum1   = (d_data & 32'hfff0707f) == 32'he70702b;
+wire dec_pollentropy    = (d_data & 32'hfe0ff07f) == 32'he05702b;
+
 
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
@@ -124,7 +135,7 @@ wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_c_or      ||dec_c_and     ||dec_c_j       ||dec_c_beqz    ||dec_c_bnez
 ||dec_c_slli    ||dec_c_lwsp    ||dec_c_jr      ||dec_c_mv
 ||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp    ||
-dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+dec_saes32_encs     ||
 dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
 dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
 dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||

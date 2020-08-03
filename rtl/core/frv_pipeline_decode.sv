@@ -126,7 +126,7 @@ assign n_s2_fu[P_FU_CSR] =
     dec_csrrw      || dec_csrrwi     ;
 
 assign n_s2_fu[P_FU_CRY] =
-    dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+    dec_saes32_encs     ||
     dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
     dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
     dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
@@ -268,8 +268,6 @@ wire [OP:0] uop_mul =
 
 
 wire [OP:0] uop_cry = 
-    {5{dec_lut4lo       }} & CRY_LUT4LO        |
-    {5{dec_lut4hi       }} & CRY_LUT4HI        |
     {5{dec_saes32_encs  }} & CRY_SAES32_ENCS   |
     {5{dec_saes32_encsm }} & CRY_SAES32_ENCSM  |
     {5{dec_saes32_decs  }} & CRY_SAES32_DECS   |
@@ -529,7 +527,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_csrrc      || dec_csrrs      || dec_csrrw      || dec_div        ||
     dec_divu       || dec_mul        || dec_mulh       || dec_mulhsu     ||
     dec_mulhu      || dec_rem        || dec_remu       ||
-    dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+    dec_saes32_encs     ||
     dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
     dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
     dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
@@ -557,7 +555,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_c_bnez     || dec_div        || dec_divu       || dec_mul        ||
     dec_mulh       || dec_mulhsu     || dec_mulhu      || dec_rem        ||
     dec_remu       || dec_c_mv       ||
-    dec_lut4lo          || dec_lut4hi          || dec_saes32_encs     ||
+    dec_saes32_encs     ||
     dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
     dec_ssha512_sum0r   || dec_ssha512_sum1r   || dec_ssha512_sig0l   ||
     dec_ssha512_sig0h   || dec_ssha512_sig1l   || dec_ssha512_sig1h   || 
