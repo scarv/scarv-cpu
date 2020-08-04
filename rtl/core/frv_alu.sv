@@ -139,22 +139,34 @@ wire [XL:0] shift_result=
     {XLEN{sr_right}} &  shift_out_r ;
 
 //
-// GREV and Shuffle
+// GREV
 // ------------------------------------------------------------
 
-wire [4:0]  ctrl       = opr_b[4:0];
+wire [ 4:0] ctrl       = opr_b[4:0];
 
-wire [XL:0] grev_s0 = 
-    ctrl[0] ? (opr_a & 32'h55555555) << 1 | (opr_a & 32'hAAAAAAAA) >> 1 :
-               opr_a                                                    ;
+reg  [XL:0] grev_result;
 
-wire [XL:0] grev_s1    ;
-wire [XL:0] grev_s2    ;
-wire [XL:0] grev_s3    ;
-wire [XL:0] grev_s4    ;
+`define GREV_STEP(M1, M2, CTRL, SHF)                                        \
+  grev_result =                                                             \
+    ctrl[CTRL] ? ((grev_result & M1) << SHF) | ((grev_result & M2) >> SHF) :\
+                   grev_result                                             ;
+
+always @(*) begin
+    grev_result = opr_a;
+    `GREV_STEP(32'h55555555, 32'hAAAAAAAA, 0,  1)
+    `GREV_STEP(32'h33333333, 32'hCCCCCCCC, 1,  2)
+    `GREV_STEP(32'h0F0F0F0F, 32'hF0F0F0F0, 2,  4)
+    `GREV_STEP(32'h00FF00FF, 32'hFF00FF00, 3,  8)
+    `GREV_STEP(32'h0000FFFF, 32'hFFFF0000, 4, 16)
+end
+
+`undef GREV_STEP
+
+//
+// SHFL and UNSHFL
+// ------------------------------------------------------------
 
 // TODO Implement grev, shfl, unshufl
-wire [XL:0] grev_result     = 32'b0;
 wire [XL:0] shfl_result     = 32'b0;
 wire [XL:0] unshfl_result   = 32'b0;
 
