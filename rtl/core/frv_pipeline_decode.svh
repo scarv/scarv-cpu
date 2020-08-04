@@ -104,6 +104,26 @@ wire dec_ssha512_sum0r  = (d_data & 32'hfe00707f) == 32'h1800702b;
 wire dec_ssha512_sum1r  = (d_data & 32'hfe00707f) == 32'h1a00702b;
 wire dec_pollentropy    = (d_data & 32'hfe0ff07f) == 32'he05702b;
 
+// TODO: Correct decode of borrowed bitmanip instructions.
+wire dec_rol         = (d_data & 32'hfe00707f) == 32'h60001033;
+wire dec_ror         = (d_data & 32'hfe00707f) == 32'h60005033;
+wire dec_rori        = (d_data & 32'hfc00707f) == 32'h60005013;
+wire dec_andn        = (d_data & 32'hfe00707f) == 32'h40007033;
+wire dec_orn         = (d_data & 32'hfe00707f) == 32'h40006033;
+wire dec_xnor        = (d_data & 32'hfe00707f) == 32'h40004033;
+wire dec_pack        = (d_data & 32'hfe00707f) == 32'h8004033;
+wire dec_packu       = (d_data & 32'hfe00707f) == 32'h48004033;
+wire dec_packh       = (d_data & 32'hfe00707f) == 32'h8007033;
+wire dec_grev        = (d_data & 32'hfe00707f) == 32'h68005033;
+wire dec_grevi       = (d_data & 32'hfc00707f) == 32'h68005013;
+wire dec_shfl        = (d_data & 32'hfe00707f) == 32'h8001033;
+wire dec_unshfl      = (d_data & 32'hfe00707f) == 32'h8005033;
+wire dec_shfli       = (d_data & 32'hfe00707f) == 32'h8001013;
+wire dec_unshfli     = (d_data & 32'hfe00707f) == 32'h8005013;
+wire dec_clmul       = (d_data & 32'hfe00707f) == 32'ha001033;
+wire dec_clmulr      = (d_data & 32'hfe00707f) == 32'ha002033;
+wire dec_clmulh      = (d_data & 32'hfe00707f) == 32'ha003033;
+wire dec_xperm   = 1'b0;
 
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
@@ -130,5 +150,9 @@ dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
 dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
 dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
 dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
-dec_ssm4_ks         || dec_ssm4_ed
+dec_ssm4_ks         || dec_ssm4_ed         ||
+dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
+dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
+dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||
+dec_clmul   || dec_clmulh  || dec_clmulr  
 );

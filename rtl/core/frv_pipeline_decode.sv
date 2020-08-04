@@ -103,11 +103,15 @@ assign n_s2_fu[P_FU_ALU] =
     dec_slt        || dec_slti       || dec_sltu       || dec_sltiu      ||
     dec_sra        || dec_srai       || dec_c_srai     || dec_c_srli     ||
     dec_srl        || dec_srli       || dec_sll        || dec_slli       ||
-    dec_c_slli     ;
+    dec_c_slli     || dec_ror        || dec_rol        || dec_rori       ||
+    dec_andn       || dec_orn        || dec_xnor       || dec_pack       ||
+    dec_packu      || dec_packh      || dec_grev       || dec_grevi      ||
+    dec_shfl       || dec_unshfl     || dec_shfli      || dec_unshfli    ;
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
-    dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ;
+    dec_mulhsu     || dec_mulhu      || dec_rem        || dec_remu       ||
+    dec_clmul      || dec_clmulh     || dec_clmulr     ;
 
 assign n_s2_fu[P_FU_CFU] = 
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
@@ -196,7 +200,22 @@ wire [OP:0] uop_alu =
     {OP+1{dec_srli      }} & ALU_SRL   |
     {OP+1{dec_sll       }} & ALU_SLL   |
     {OP+1{dec_slli      }} & ALU_SLL   |
-    {OP+1{dec_c_slli    }} & ALU_SLL   ;
+    {OP+1{dec_c_slli    }} & ALU_SLL   |
+    {OP+1{dec_ror       }} & ALU_ROR   | 
+    {OP+1{dec_rol       }} & ALU_ROL   | 
+    {OP+1{dec_rori      }} & ALU_ROR   |
+    {OP+1{dec_andn      }} & ALU_ANDN  | 
+    {OP+1{dec_orn       }} & ALU_ORN   | 
+    {OP+1{dec_xnor      }} & ALU_XNOR  | 
+    {OP+1{dec_pack      }} & ALU_PACK  | 
+    {OP+1{dec_packu     }} & ALU_PACKU | 
+    {OP+1{dec_packh     }} & ALU_PACKH | 
+    {OP+1{dec_grev      }} & ALU_GREV  | 
+    {OP+1{dec_grevi     }} & ALU_GREV  |
+    {OP+1{dec_shfl      }} & ALU_SHFL  | 
+    {OP+1{dec_unshfl    }} & ALU_UNSHFL| 
+    {OP+1{dec_shfli     }} & ALU_SHFL  |
+    {OP+1{dec_unshfli   }} & ALU_UNSHFL;
 
 wire [OP:0] uop_cfu =
     {OP+1{dec_beq       }} & CFU_BEQ   |
@@ -266,7 +285,10 @@ wire [OP:0] uop_mul =
     {OP+1{dec_mul          }} & MUL_MUL    |
     {OP+1{dec_mulh         }} & MUL_MULH   |
     {OP+1{dec_mulhsu       }} & MUL_MULHSU |
-    {OP+1{dec_mulhu        }} & MUL_MULHU  ;
+    {OP+1{dec_mulhu        }} & MUL_MULHU  |
+    {OP+1{dec_clmul        }} & MUL_CLMUL  |
+    {OP+1{dec_clmulh       }} & MUL_CLMULH |
+    {OP+1{dec_clmulr       }} & MUL_CLMULR ;
 
 wire [OP:0] uop_cry_bs  = {d_data[31:30], {OP-1{1'b0}}};
 
@@ -457,17 +479,18 @@ wire [31:0] imm_c_bz = {
     {24{s1_data[12]}},s1_data[6:5],s1_data[2],s1_data[11:10],s1_data[4:3],1'b0
 };
 
-wire use_imm32_i = dec_andi    || dec_slti    || dec_jalr     || dec_lb     ||
-                   dec_lbu     || dec_lh      || dec_lhu      || dec_lw     ||
-                   dec_ori     || dec_sltiu   || dec_xori     || dec_addi   ; 
+wire use_imm32_i = dec_andi    || dec_slti    || dec_jalr     || dec_lb    ||
+                   dec_lbu     || dec_lh      || dec_lhu      || dec_lw    ||
+                   dec_ori     || dec_sltiu   || dec_xori     || dec_addi  ; 
 wire use_imm32_j = dec_jal     ;
 wire use_imm32_s = dec_sb      || dec_sh      || dec_sw       ;
 wire use_imm32_u = dec_auipc   || dec_lui     ;
-wire use_imm32_b = dec_beq     || dec_bge     || dec_bgeu     || dec_blt    ||
+wire use_imm32_b = dec_beq     || dec_bge     || dec_bgeu     || dec_blt   ||
                    dec_bltu    || dec_bne     ;
 wire use_imm_csr = dec_csrrc   || dec_csrrs   || dec_csrrw    ;
 wire use_imm_csri= dec_csrrci  || dec_csrrsi  || dec_csrrwi   ;
-wire use_imm_shfi= dec_slli    || dec_srli    || dec_srai     ;
+wire use_imm_shfi= dec_slli    || dec_srli    || dec_srai     || dec_rori  ||
+                   dec_grevi   || dec_shfli   || dec_unshfli  ;;
 
 wire use_pc_imm  = use_imm32_b || use_imm32_j || dec_c_beqz   ||
                    dec_c_bnez  || dec_c_j     || dec_c_jal    ;
@@ -537,7 +560,11 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
     dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
     dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
-    dec_ssm4_ks         || dec_ssm4_ed          ;
+    dec_ssm4_ks         || dec_ssm4_ed         ||
+    dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
+    dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
+    dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||
+    dec_clmul   || dec_clmulh  || dec_clmulr  ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -563,7 +590,10 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
     dec_ssha512_sum0r   || dec_ssha512_sum1r   || dec_ssha512_sig0l   ||
     dec_ssha512_sig0h   || dec_ssha512_sig1l   || dec_ssha512_sig1h   || 
-    dec_ssm4_ks         || dec_ssm4_ed          ;
+    dec_ssm4_ks         || dec_ssm4_ed         ||
+    dec_ror    || dec_rol    || dec_andn   || dec_orn    || dec_xnor   ||
+    dec_pack   || dec_packu  || dec_packh  || dec_grev   || dec_shfl   ||
+    dec_unshfl || dec_clmul  || dec_clmulh || dec_clmulr ;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||
@@ -574,7 +604,8 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_lbu        || dec_lh         || dec_lhu        || dec_lw         ||
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
     dec_sb         || dec_sh         || dec_sw         || dec_c_addi16sp ||
-    dec_c_addi4spn ;
+    dec_c_addi4spn || dec_rori       || dec_grevi      || dec_shfli      ||
+    dec_unshfli     ;
 
 wire   oprb_src_zero =  // Operand B sources zero
     dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||

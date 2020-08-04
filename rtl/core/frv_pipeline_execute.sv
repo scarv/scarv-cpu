@@ -83,10 +83,23 @@ wire        alu_op_sub      = fu_alu && s2_uop == ALU_SUB   ;
 wire        alu_op_xor      = fu_alu && s2_uop == ALU_XOR   ;
 wire        alu_op_or       = fu_alu && s2_uop == ALU_OR    ;
 wire        alu_op_and      = fu_alu && s2_uop == ALU_AND   ;
+wire        alu_op_xnor     = fu_alu && s2_uop == ALU_XNOR  ;
+wire        alu_op_orn      = fu_alu && s2_uop == ALU_ORN   ;
+wire        alu_op_andn     = fu_alu && s2_uop == ALU_ANDN  ;
 
 wire        alu_op_sll      = fu_alu && s2_uop == ALU_SLL   ;
 wire        alu_op_srl      = fu_alu && s2_uop == ALU_SRL   ;
 wire        alu_op_sra      = fu_alu && s2_uop == ALU_SRA   ;
+wire        alu_op_ror      = fu_alu && s2_uop == ALU_ROR   ;
+wire        alu_op_rol      = fu_alu && s2_uop == ALU_ROL   ;
+                                                            ;
+wire        alu_op_pack     = fu_alu && s2_uop == ALU_PACK  ;
+wire        alu_op_packh    = fu_alu && s2_uop == ALU_PACKH ;
+wire        alu_op_packu    = fu_alu && s2_uop == ALU_PACKU ;
+                                                            ;
+wire        alu_op_grev     =  fu_alu && s2_uop == ALU_GREV  ;
+wire        alu_op_shfl     =  fu_alu && s2_uop == ALU_SHFL  ;
+wire        alu_op_unshfl   =  fu_alu && s2_uop == ALU_UNSHFL;
 
 wire        alu_op_slt      = fu_alu && s2_uop == ALU_SLT   ;
 wire        alu_op_sltu     = fu_alu && s2_uop == ALU_SLTU  ;
@@ -271,11 +284,22 @@ frv_alu i_alu (
 .op_xor     (alu_op_xor     ), // Select XOR operation result
 .op_or      (alu_op_or      ), // Select OR
 .op_and     (alu_op_and     ), //        AND
+.op_xnor    (alu_op_xnor    ), // XNOR
+.op_orn     (alu_op_orn     ), // OR-Not
+.op_andn    (alu_op_andn    ), // AND-Not
 .op_slt     (alu_op_slt     ), // Set less than
 .op_sltu    (alu_op_sltu    ), //                Unsigned
 .op_srl     (alu_op_srl     ), // Shift right logical
 .op_sll     (alu_op_sll     ), // Shift left logical
 .op_sra     (alu_op_sra     ), // Shift right arithmetic
+.op_ror     (alu_op_ror     ), // Rotate right
+.op_rol     (alu_op_rol     ), // "      Left
+.op_pack    (alu_op_pack    ), // Pack
+.op_packh   (alu_op_packh   ), // "
+.op_packu   (alu_op_packu   ), // "
+.op_grev    (alu_op_grev    ), // Generalized reverse
+.op_shfl    (alu_op_shfl    ), // Shuffle
+.op_unshfl  (alu_op_unshfl  ), // Unshuffle
 .add_out    (alu_add_out    ), // Result of adding opr_a and opr_b
 .cmp_eq     (alu_cmp_eq     ), // Result of opr_a == opr_b
 .cmp_lt     (alu_cmp_lt     ), // Result of opr_a <  opr_b
