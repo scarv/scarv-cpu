@@ -150,8 +150,8 @@ wire [XL:0] n_s3_opr_b_lsu = s2_opr_c       ;
 wire        cfu_valid   = fu_cfu        ; // Inputs are valid.
 wire        cfu_ready   = cfu_valid     ; // Instruction complete.
 
-wire        cfu_cond    = cfu_valid && s2_uop[4:3] == 2'b00;
-wire        cfu_uncond  = cfu_valid && s2_uop[4:3] == 2'b10;
+wire        cfu_cond    = cfu_valid && s2_uop[OP:OP-1] == 2'b00;
+wire        cfu_uncond  = cfu_valid && s2_uop[OP:OP-1] == 2'b10;
 wire        cfu_jmp     = cfu_valid && s2_uop      == CFU_JMP ;
 wire        cfu_jali    = cfu_valid && s2_uop      == CFU_JALI;
 wire        cfu_jalr    = cfu_valid && s2_uop      == CFU_JALR;
