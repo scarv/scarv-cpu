@@ -31,7 +31,7 @@ jobs:
     - source ./bin/install-symbiyosys.sh
     - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
-    - make -j 2 da-prove-all
+    - make -j $(nproc) da-prove-all
   - name: "riscv-formal"
     script:
     - source ./bin/install-yosys.sh
@@ -40,7 +40,7 @@ jobs:
     - source ./bin/conf.sh
     - make riscv-formal-clean
     - make riscv-formal-prepare
-    - make riscv-formal-run     NJOBS=2 CHECKS=insn_add_ch0
+    - make riscv-formal-run NJOBS=$(nproc) CHECKS=insn_add_ch0
   - name: "Synthesis - Core"
     script:
     - source ./bin/install-yosys.sh
@@ -52,7 +52,7 @@ jobs:
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make build-embench-targets EMBENCH_GEN_TRACE=0
-    - make -j 2 run-embench-targets
+    - make -j $(nproc) run-embench-targets
 cache   :
   directories:
   - ~/tools/verilator
