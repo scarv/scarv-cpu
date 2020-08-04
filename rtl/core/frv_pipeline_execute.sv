@@ -135,6 +135,10 @@ wire        imul_op_div     = fu_mul && s2_uop == MUL_DIV   ;
 wire        imul_op_divu    = fu_mul && s2_uop == MUL_DIVU  ;
 wire        imul_op_rem     = fu_mul && s2_uop == MUL_REM   ;
 wire        imul_op_remu    = fu_mul && s2_uop == MUL_REMU  ;
+wire        imul_op_clmul   = fu_mul && s2_uop == MUL_CLMUL ;
+wire        imul_op_clmulh  = fu_mul && s2_uop == MUL_CLMULH;
+wire        imul_op_clmulr  = fu_mul && s2_uop == MUL_CLMULR;
+
 wire [XL:0] imul_rs1        = s2_opr_a; // Source register 1
 wire [XL:0] imul_rs2        = s2_opr_b; // Source register 2
 
@@ -321,6 +325,9 @@ frv_mdu i_frv_mdu (
 .op_divu    (imul_op_divu   ), //
 .op_rem     (imul_op_rem    ), //
 .op_remu    (imul_op_remu   ), //
+.op_clmul   (imul_op_clmul  ), //
+.op_clmulh  (imul_op_clmulh ), //
+.op_clmulr  (imul_op_clmulr ), //
 .rs1        (imul_rs1       ), // Source register 1
 .rs2        (imul_rs2       ), // Source register 2
 .ready      (imul_ready     ), // Finished computing
