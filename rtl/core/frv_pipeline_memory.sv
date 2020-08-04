@@ -109,6 +109,7 @@ wire fu_mul = s3_fu[P_FU_MUL];
 wire fu_lsu = s3_fu[P_FU_LSU];
 wire fu_cfu = s3_fu[P_FU_CFU];
 wire fu_csr = s3_fu[P_FU_CSR];
+wire fu_cry = s3_fu[P_FU_CRY];
 
 //
 // Functional Unit Interfacing: LSU
@@ -151,7 +152,7 @@ wire[4:0] n_s4_rd     =     s3_trap  ? s3_rd         :
 // -------------------------------------------------------------------------
 
 wire opra_ld_en = instr_out && (
-    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr
+    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_cry
 ); 
 
 wire oprb_ld_en = instr_out && (

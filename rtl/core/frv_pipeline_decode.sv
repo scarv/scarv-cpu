@@ -160,63 +160,63 @@ end endgenerate
 // -------------------------------------------------------------------------
 
 wire [OP:0] uop_alu = 
-    {5{dec_add       }} & ALU_ADD   |
-    {5{dec_addi      }} & ALU_ADD   |
-    {5{dec_c_add     }} & ALU_ADD   |
-    {5{dec_c_addi    }} & ALU_ADD   |
-    {5{dec_c_addi16sp}} & ALU_ADD   |
-    {5{dec_c_addi4spn}} & ALU_ADD   |
-    {5{dec_c_mv      }} & ALU_ADD   |
-    {5{dec_auipc     }} & ALU_ADD   |
-    {5{dec_c_sub     }} & ALU_SUB   |
-    {5{dec_sub       }} & ALU_SUB   |
-    {5{dec_and       }} & ALU_AND   |
-    {5{dec_andi      }} & ALU_AND   |
-    {5{dec_c_and     }} & ALU_AND   |
-    {5{dec_c_andi    }} & ALU_AND   |
-    {5{dec_lui       }} & ALU_OR    |
-    {5{dec_c_li      }} & ALU_OR    |
-    {5{dec_c_lui     }} & ALU_OR    |
-    {5{dec_c_nop     }} & ALU_OR    |
-    {5{dec_or        }} & ALU_OR    |
-    {5{dec_ori       }} & ALU_OR    |
-    {5{dec_c_or      }} & ALU_OR    |
-    {5{dec_c_xor     }} & ALU_XOR   |
-    {5{dec_xor       }} & ALU_XOR   |
-    {5{dec_xori      }} & ALU_XOR   |
-    {5{dec_slt       }} & ALU_SLT   |
-    {5{dec_slti      }} & ALU_SLT   |
-    {5{dec_sltu      }} & ALU_SLTU  |
-    {5{dec_sltiu     }} & ALU_SLTU  |
-    {5{dec_sra       }} & ALU_SRA   |
-    {5{dec_srai      }} & ALU_SRA   |
-    {5{dec_c_srai    }} & ALU_SRA   |
-    {5{dec_c_srli    }} & ALU_SRL   |
-    {5{dec_srl       }} & ALU_SRL   |
-    {5{dec_srli      }} & ALU_SRL   |
-    {5{dec_sll       }} & ALU_SLL   |
-    {5{dec_slli      }} & ALU_SLL   |
-    {5{dec_c_slli    }} & ALU_SLL   ;
+    {OP+1{dec_add       }} & ALU_ADD   |
+    {OP+1{dec_addi      }} & ALU_ADD   |
+    {OP+1{dec_c_add     }} & ALU_ADD   |
+    {OP+1{dec_c_addi    }} & ALU_ADD   |
+    {OP+1{dec_c_addi16sp}} & ALU_ADD   |
+    {OP+1{dec_c_addi4spn}} & ALU_ADD   |
+    {OP+1{dec_c_mv      }} & ALU_ADD   |
+    {OP+1{dec_auipc     }} & ALU_ADD   |
+    {OP+1{dec_c_sub     }} & ALU_SUB   |
+    {OP+1{dec_sub       }} & ALU_SUB   |
+    {OP+1{dec_and       }} & ALU_AND   |
+    {OP+1{dec_andi      }} & ALU_AND   |
+    {OP+1{dec_c_and     }} & ALU_AND   |
+    {OP+1{dec_c_andi    }} & ALU_AND   |
+    {OP+1{dec_lui       }} & ALU_OR    |
+    {OP+1{dec_c_li      }} & ALU_OR    |
+    {OP+1{dec_c_lui     }} & ALU_OR    |
+    {OP+1{dec_c_nop     }} & ALU_OR    |
+    {OP+1{dec_or        }} & ALU_OR    |
+    {OP+1{dec_ori       }} & ALU_OR    |
+    {OP+1{dec_c_or      }} & ALU_OR    |
+    {OP+1{dec_c_xor     }} & ALU_XOR   |
+    {OP+1{dec_xor       }} & ALU_XOR   |
+    {OP+1{dec_xori      }} & ALU_XOR   |
+    {OP+1{dec_slt       }} & ALU_SLT   |
+    {OP+1{dec_slti      }} & ALU_SLT   |
+    {OP+1{dec_sltu      }} & ALU_SLTU  |
+    {OP+1{dec_sltiu     }} & ALU_SLTU  |
+    {OP+1{dec_sra       }} & ALU_SRA   |
+    {OP+1{dec_srai      }} & ALU_SRA   |
+    {OP+1{dec_c_srai    }} & ALU_SRA   |
+    {OP+1{dec_c_srli    }} & ALU_SRL   |
+    {OP+1{dec_srl       }} & ALU_SRL   |
+    {OP+1{dec_srli      }} & ALU_SRL   |
+    {OP+1{dec_sll       }} & ALU_SLL   |
+    {OP+1{dec_slli      }} & ALU_SLL   |
+    {OP+1{dec_c_slli    }} & ALU_SLL   ;
 
 wire [OP:0] uop_cfu =
-    {5{dec_beq       }} & CFU_BEQ   |
-    {5{dec_c_beqz    }} & CFU_BEQ   |
-    {5{dec_bge       }} & CFU_BGE   |
-    {5{dec_bgeu      }} & CFU_BGEU  |
-    {5{dec_blt       }} & CFU_BLT   |
-    {5{dec_bltu      }} & CFU_BLTU  |
-    {5{dec_bne       }} & CFU_BNE   |
-    {5{dec_c_bnez    }} & CFU_BNE   |
-    {5{dec_c_ebreak  }} & CFU_EBREAK|
-    {5{dec_ebreak    }} & CFU_EBREAK|
-    {5{dec_ecall     }} & CFU_ECALL |
-    {5{dec_c_j       }} & CFU_JALI  |
-    {5{dec_c_jr      }} & CFU_JALR  |
-    {5{dec_c_jal     }} & CFU_JALI  |
-    {5{dec_jal       }} & CFU_JALI  |
-    {5{dec_c_jalr    }} & CFU_JALR  |
-    {5{dec_jalr      }} & CFU_JALR  |
-    {5{dec_mret      }} & CFU_MRET  ;
+    {OP+1{dec_beq       }} & CFU_BEQ   |
+    {OP+1{dec_c_beqz    }} & CFU_BEQ   |
+    {OP+1{dec_bge       }} & CFU_BGE   |
+    {OP+1{dec_bgeu      }} & CFU_BGEU  |
+    {OP+1{dec_blt       }} & CFU_BLT   |
+    {OP+1{dec_bltu      }} & CFU_BLTU  |
+    {OP+1{dec_bne       }} & CFU_BNE   |
+    {OP+1{dec_c_bnez    }} & CFU_BNE   |
+    {OP+1{dec_c_ebreak  }} & CFU_EBREAK|
+    {OP+1{dec_ebreak    }} & CFU_EBREAK|
+    {OP+1{dec_ecall     }} & CFU_ECALL |
+    {OP+1{dec_c_j       }} & CFU_JALI  |
+    {OP+1{dec_c_jr      }} & CFU_JALR  |
+    {OP+1{dec_c_jal     }} & CFU_JALI  |
+    {OP+1{dec_jal       }} & CFU_JALI  |
+    {OP+1{dec_c_jalr    }} & CFU_JALR  |
+    {OP+1{dec_jalr      }} & CFU_JALR  |
+    {OP+1{dec_mret      }} & CFU_MRET  ;
 
 wire [1:0] lsu_width = 
     {2{dec_lb        }} & LSU_BYTE |
@@ -233,6 +233,8 @@ wire [1:0] lsu_width =
     {2{dec_sw        }} & LSU_WORD ;
 
 wire [OP:0] uop_lsu;
+
+assign uop_lsu[OP ]      = 1'b0;
 
 assign uop_lsu[2:1]      = lsu_width;
 
@@ -257,35 +259,36 @@ assign uop_lsu[LSU_SIGNED] =
     dec_lh          ;
 
 wire [OP:0] uop_mul = 
-    {5{dec_div          }} & MUL_DIV    |
-    {5{dec_divu         }} & MUL_DIVU   |
-    {5{dec_rem          }} & MUL_REM    |
-    {5{dec_remu         }} & MUL_REMU   |
-    {5{dec_mul          }} & MUL_MUL    |
-    {5{dec_mulh         }} & MUL_MULH   |
-    {5{dec_mulhsu       }} & MUL_MULHSU |
-    {5{dec_mulhu        }} & MUL_MULHU  ;
+    {OP+1{dec_div          }} & MUL_DIV    |
+    {OP+1{dec_divu         }} & MUL_DIVU   |
+    {OP+1{dec_rem          }} & MUL_REM    |
+    {OP+1{dec_remu         }} & MUL_REMU   |
+    {OP+1{dec_mul          }} & MUL_MUL    |
+    {OP+1{dec_mulh         }} & MUL_MULH   |
+    {OP+1{dec_mulhsu       }} & MUL_MULHSU |
+    {OP+1{dec_mulhu        }} & MUL_MULHU  ;
 
+wire [OP:0] uop_cry_bs  = {d_data[31:30], {OP-1{1'b0}}};
 
-wire [OP:0] uop_cry = 
-    {5{dec_saes32_encs  }} & CRY_SAES32_ENCS   |
-    {5{dec_saes32_encsm }} & CRY_SAES32_ENCSM  |
-    {5{dec_saes32_decs  }} & CRY_SAES32_DECS   |
-    {5{dec_saes32_decsm }} & CRY_SAES32_DECSM  |
-    {5{dec_ssha256_sig0 }} & CRY_SSHA256_SIG0  |
-    {5{dec_ssha256_sig1 }} & CRY_SSHA256_SIG1  |
-    {5{dec_ssha256_sum0 }} & CRY_SSHA256_SUM0  |
-    {5{dec_ssha256_sum1 }} & CRY_SSHA256_SUM1  |
-    {5{dec_ssha512_sum0r}} & CRY_SSHA512_SUM0R |
-    {5{dec_ssha512_sum1r}} & CRY_SSHA512_SUM1R |
-    {5{dec_ssha512_sig0l}} & CRY_SSHA512_SIG0L |
-    {5{dec_ssha512_sig0h}} & CRY_SSHA512_SIG0H |
-    {5{dec_ssha512_sig1l}} & CRY_SSHA512_SIG1L |
-    {5{dec_ssha512_sig1h}} & CRY_SSHA512_SIG1H |
-    {5{dec_ssm3_p0      }} & CRY_SSM3_P0       |
-    {5{dec_ssm3_p1      }} & CRY_SSM3_P1       |
-    {5{dec_ssm4_ks      }} & CRY_SSM4_KS       |
-    {5{dec_ssm4_ed      }} & CRY_SSM4_ED       ;
+wire [OP:0] uop_cry     = 
+    {OP+1{dec_saes32_encs  }} & (CRY_SAES32_ENCS   | uop_cry_bs) |
+    {OP+1{dec_saes32_encsm }} & (CRY_SAES32_ENCSM  | uop_cry_bs) |
+    {OP+1{dec_saes32_decs  }} & (CRY_SAES32_DECS   | uop_cry_bs) |
+    {OP+1{dec_saes32_decsm }} & (CRY_SAES32_DECSM  | uop_cry_bs) |
+    {OP+1{dec_ssm4_ks      }} & (CRY_SSM4_KS       | uop_cry_bs) |
+    {OP+1{dec_ssm4_ed      }} & (CRY_SSM4_ED       | uop_cry_bs) |
+    {OP+1{dec_ssha256_sig0 }} & (CRY_SSHA256_SIG0              ) |
+    {OP+1{dec_ssha256_sig1 }} & (CRY_SSHA256_SIG1              ) |
+    {OP+1{dec_ssha256_sum0 }} & (CRY_SSHA256_SUM0              ) |
+    {OP+1{dec_ssha256_sum1 }} & (CRY_SSHA256_SUM1              ) |
+    {OP+1{dec_ssha512_sum0r}} & (CRY_SSHA512_SUM0R             ) |
+    {OP+1{dec_ssha512_sum1r}} & (CRY_SSHA512_SUM1R             ) |
+    {OP+1{dec_ssha512_sig0l}} & (CRY_SSHA512_SIG0L             ) |
+    {OP+1{dec_ssha512_sig0h}} & (CRY_SSHA512_SIG0H             ) |
+    {OP+1{dec_ssha512_sig1l}} & (CRY_SSHA512_SIG1L             ) |
+    {OP+1{dec_ssha512_sig1h}} & (CRY_SSHA512_SIG1H             ) |
+    {OP+1{dec_ssm3_p0      }} & (CRY_SSM3_P0                   ) |
+    {OP+1{dec_ssm3_p1      }} & (CRY_SSM3_P1                   ) ;
 
 wire [OP:0] uop_csr;
 
@@ -298,6 +301,7 @@ wire csr_no_write = ((dec_csrrs  || dec_csrrc ) && dec_rs1_32 == 0) ||
 
 wire csr_no_read  = (dec_csrrw || dec_csrrwi) && dec_rd_32 == 0;
 
+assign uop_csr[OP       ] = 1'b0;
 assign uop_csr[CSR_READ ] = csr_op && !csr_no_read ;
 assign uop_csr[CSR_WRITE] = csr_op && !csr_no_write;
 assign uop_csr[CSR_SET  ] = dec_csrrs || dec_csrrsi ;

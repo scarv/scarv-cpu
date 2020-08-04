@@ -153,6 +153,7 @@ wire fu_mul = s4_fu[P_FU_MUL];
 wire fu_lsu = s4_fu[P_FU_LSU];
 wire fu_cfu = s4_fu[P_FU_CFU];
 wire fu_csr = s4_fu[P_FU_CSR];
+wire fu_cry = s4_fu[P_FU_CRY];
 
 //
 // Functional Unit: ALU
@@ -167,6 +168,13 @@ wire [XL:0] alu_gpr_wdata   = s4_opr_a;
 
 wire        mul_gpr_wen     = fu_mul;
 wire [XL:0] mul_gpr_wdata   = s4_opr_a;
+
+//
+// Functional Unit: Crypto
+// -------------------------------------------------------------------------
+
+wire        cry_gpr_wen     = fu_cry;
+wire [XL:0] cry_gpr_wdata   = s4_opr_a;
 
 //
 // Functional Unit: CSR
@@ -359,13 +367,14 @@ assign gpr_rd   = s4_rd;
 
 assign gpr_wen  = !s4_trap && !trap_int && !gpr_write_done &&
     (csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen ||
-     cfu_gpr_wen || mul_gpr_wen );
+     cfu_gpr_wen || mul_gpr_wen || cry_gpr_wen );
 
 assign gpr_wdata= {32{csr_gpr_wen}} & csr_gpr_wdata |
                   {32{alu_gpr_wen}} & alu_gpr_wdata |
                   {32{lsu_gpr_wen}} & lsu_gpr_wdata |
                   {32{cfu_gpr_wen}} & cfu_gpr_wdata |
-                  {32{mul_gpr_wen}} & mul_gpr_wdata ;
+                  {32{mul_gpr_wen}} & mul_gpr_wdata |
+                  {32{cry_gpr_wen}} & cry_gpr_wdata ;
 
 assign fwd_s4_rd    = |s4_size ? gpr_rd : 5'b0;
 assign fwd_s4_wdata = gpr_wdata;

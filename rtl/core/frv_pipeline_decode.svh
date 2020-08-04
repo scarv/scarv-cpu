@@ -90,13 +90,6 @@ wire dec_saes32_encsm   = (d_data & 32'h3e00707f) == 32'h202b;
 wire dec_saes32_encs    = (d_data & 32'h3e00707f) == 32'h200202b;
 wire dec_saes32_decsm   = (d_data & 32'h3e00707f) == 32'h400202b;
 wire dec_saes32_decs    = (d_data & 32'h3e00707f) == 32'h600202b;
-wire dec_saes64_ks1     = (d_data & 32'hff00707f) == 32'h800202b;
-wire dec_saes64_ks2     = (d_data & 32'hfe00707f) == 32'ha00202b;
-wire dec_saes64_imix    = (d_data & 32'hfff0707f) == 32'hc10202b;
-wire dec_saes64_encsm   = (d_data & 32'hfe00707f) == 32'he00202b;
-wire dec_saes64_encs    = (d_data & 32'hfe00707f) == 32'h1000202b;
-wire dec_saes64_decsm   = (d_data & 32'hfe00707f) == 32'h1200202b;
-wire dec_saes64_decs    = (d_data & 32'hfe00707f) == 32'h1400202b;
 wire dec_ssha256_sig0   = (d_data & 32'hfff0707f) == 32'he00702b;
 wire dec_ssha256_sig1   = (d_data & 32'hfff0707f) == 32'he10702b;
 wire dec_ssha256_sum0   = (d_data & 32'hfff0707f) == 32'he20702b;
@@ -109,10 +102,6 @@ wire dec_ssha512_sig1l  = (d_data & 32'hfe00707f) == 32'h1400702b;
 wire dec_ssha512_sig1h  = (d_data & 32'hfe00707f) == 32'h1600702b;
 wire dec_ssha512_sum0r  = (d_data & 32'hfe00707f) == 32'h1800702b;
 wire dec_ssha512_sum1r  = (d_data & 32'hfe00707f) == 32'h1a00702b;
-wire dec_ssha512_sig0   = (d_data & 32'hfff0707f) == 32'he40702b;
-wire dec_ssha512_sig1   = (d_data & 32'hfff0707f) == 32'he50702b;
-wire dec_ssha512_sum0   = (d_data & 32'hfff0707f) == 32'he60702b;
-wire dec_ssha512_sum1   = (d_data & 32'hfff0707f) == 32'he70702b;
 wire dec_pollentropy    = (d_data & 32'hfe0ff07f) == 32'he05702b;
 
 

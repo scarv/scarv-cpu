@@ -174,7 +174,7 @@ wire        cfu_cond_taken =
 
 wire        cfu_always_take= cfu_jalr || cfu_jali || cfu_jalr;
 
-wire [4:0]  n_s3_uop_cfu   =
+wire [OP:0]  n_s3_uop_cfu   =
     cfu_cond        ? (cfu_cond_taken ? CFU_TAKEN : CFU_NOT_TAKEN)  :
     cfu_always_take ? s2_uop                                        :
                       s2_uop                                        ;
@@ -202,28 +202,29 @@ localparam LOGIC_GATING    = 1; // Gate sub-module inputs to save toggling
 wire        cry_valid      = fu_cry         ; // Inputs valid.
 wire [XL:0] cry_rs1        = s2_opr_a       ; // Source register 1
 wire [XL:0] cry_rs2        = s2_opr_b       ; // Source register 2
-wire [ 3:0] cry_imm        = s2_opr_c[3:0]  ; // enc_rcon for aes32/64.
+wire [ 3:0] cry_bs         = {2'b00,s2_uop[OP:OP-1]}; // bs for saes32.
+wire [OP:0] cry_uop        = {2'b00, s2_uop[OP-2:0]};
 
-wire        cry_op_lut4lo        = fu_cry && s2_uop == CRY_LUT4LO       ;
-wire        cry_op_lut4hi        = fu_cry && s2_uop == CRY_LUT4HI       ;
-wire        cry_op_saes32_encs   = fu_cry && s2_uop == CRY_SAES32_ENCS  ;
-wire        cry_op_saes32_encsm  = fu_cry && s2_uop == CRY_SAES32_ENCSM ;
-wire        cry_op_saes32_decs   = fu_cry && s2_uop == CRY_SAES32_DECS  ;
-wire        cry_op_saes32_decsm  = fu_cry && s2_uop == CRY_SAES32_DECSM ;
-wire        cry_op_ssha256_sig0  = fu_cry && s2_uop == CRY_SSM3_P0      ;
-wire        cry_op_ssha256_sig1  = fu_cry && s2_uop == CRY_SSM3_P1      ;
-wire        cry_op_ssha256_sum0  = fu_cry && s2_uop == CRY_SSM4_KS      ;
-wire        cry_op_ssha256_sum1  = fu_cry && s2_uop == CRY_SSM4_ED      ;
-wire        cry_op_ssha512_sum0r = fu_cry && s2_uop == CRY_SSHA256_SIG0 ;
-wire        cry_op_ssha512_sum1r = fu_cry && s2_uop == CRY_SSHA256_SIG1 ;
-wire        cry_op_ssha512_sig0l = fu_cry && s2_uop == CRY_SSHA256_SUM0 ;
-wire        cry_op_ssha512_sig0h = fu_cry && s2_uop == CRY_SSHA256_SUM1 ;
-wire        cry_op_ssha512_sig1l = fu_cry && s2_uop == CRY_SSHA512_SUM0R;
-wire        cry_op_ssha512_sig1h = fu_cry && s2_uop == CRY_SSHA512_SUM1R;
-wire        cry_op_ssm3_p0       = fu_cry && s2_uop == CRY_SSHA512_SIG0L;
-wire        cry_op_ssm3_p1       = fu_cry && s2_uop == CRY_SSHA512_SIG0H;
-wire        cry_op_ssm4_ks       = fu_cry && s2_uop == CRY_SSHA512_SIG1L;
-wire        cry_op_ssm4_ed       = fu_cry && s2_uop == CRY_SSHA512_SIG1H;
+wire        cry_op_lut4lo        = 1'b0                                 ;
+wire        cry_op_lut4hi        = 1'b0                                 ;
+wire        cry_op_saes32_encs   = fu_cry && cry_uop == CRY_SAES32_ENCS  ;
+wire        cry_op_saes32_encsm  = fu_cry && cry_uop == CRY_SAES32_ENCSM ;
+wire        cry_op_saes32_decs   = fu_cry && cry_uop == CRY_SAES32_DECS  ;
+wire        cry_op_saes32_decsm  = fu_cry && cry_uop == CRY_SAES32_DECSM ;
+wire        cry_op_ssm4_ks       = fu_cry && cry_uop == CRY_SSM4_KS      ;
+wire        cry_op_ssm4_ed       = fu_cry && cry_uop == CRY_SSM4_ED      ;
+wire        cry_op_ssha256_sig0  = fu_cry && s2_uop == CRY_SSHA256_SIG0 ;
+wire        cry_op_ssha256_sig1  = fu_cry && s2_uop == CRY_SSHA256_SIG1 ;
+wire        cry_op_ssha256_sum0  = fu_cry && s2_uop == CRY_SSHA256_SUM0 ;
+wire        cry_op_ssha256_sum1  = fu_cry && s2_uop == CRY_SSHA256_SUM1 ;
+wire        cry_op_ssha512_sum0r = fu_cry && s2_uop == CRY_SSHA512_SUM0R;
+wire        cry_op_ssha512_sum1r = fu_cry && s2_uop == CRY_SSHA512_SUM1R;
+wire        cry_op_ssha512_sig0l = fu_cry && s2_uop == CRY_SSHA512_SIG0L;
+wire        cry_op_ssha512_sig0h = fu_cry && s2_uop == CRY_SSHA512_SIG0H;
+wire        cry_op_ssha512_sig1l = fu_cry && s2_uop == CRY_SSHA512_SIG1L;
+wire        cry_op_ssha512_sig1h = fu_cry && s2_uop == CRY_SSHA512_SIG1H;
+wire        cry_op_ssm3_p0       = fu_cry && s2_uop == CRY_SSM3_P0      ;
+wire        cry_op_ssm3_p1       = fu_cry && s2_uop == CRY_SSM3_P1      ;
 
 wire        cry_ready            ; // Outputs ready.
 wire [XL:0] cry_rd               ;
@@ -320,7 +321,7 @@ riscv_crypto_fu #(
 .valid           (cry_valid           ), // Inputs valid.
 .rs1             (cry_rs1             ), // Source register 1
 .rs2             (cry_rs2             ), // Source register 2
-.imm             (cry_imm             ), // bs, enc_rcon for aes32/64.
+.imm             (cry_bs              ), // bs, enc_rcon for aes32/64.
 .op_lut4lo       (cry_op_lut4lo       ), // RV32 lut4-lo instruction
 .op_lut4hi       (cry_op_lut4hi       ), // RV32 lut4-hi instruction
 .op_saes32_encs  (cry_op_saes32_encs  ), // RV32 AES Encrypt SBox
@@ -357,7 +358,7 @@ wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit
 wire [ 1:0] n_s3_size  = s2_size ; // Size of the instruction.
 wire [31:0] n_s3_instr = s2_instr; // The instruction word
 
-wire [ 4:0] n_s3_uop   = cfu_valid ? n_s3_uop_cfu : s2_uop  ; // Micro-op code
+wire [OP:0] n_s3_uop   = cfu_valid ? n_s3_uop_cfu : s2_uop  ; // Micro-op code
 
 wire        n_s3_trap  = s2_trap || 
                          fu_lsu && (lsu_a_error);
