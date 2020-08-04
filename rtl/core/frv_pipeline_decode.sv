@@ -490,7 +490,7 @@ wire use_imm32_b = dec_beq     || dec_bge     || dec_bgeu     || dec_blt   ||
 wire use_imm_csr = dec_csrrc   || dec_csrrs   || dec_csrrw    ;
 wire use_imm_csri= dec_csrrci  || dec_csrrsi  || dec_csrrwi   ;
 wire use_imm_shfi= dec_slli    || dec_srli    || dec_srai     || dec_rori  ||
-                   dec_grevi   || dec_shfli   || dec_unshfli  ;;
+                   dec_grevi   || dec_shfli   || dec_unshfli  ;
 
 wire use_pc_imm  = use_imm32_b || use_imm32_j || dec_c_beqz   ||
                    dec_c_bnez  || dec_c_j     || dec_c_jal    ;

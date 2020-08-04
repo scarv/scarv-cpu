@@ -142,6 +142,17 @@ wire [XL:0] shift_result=
 // GREV and Shuffle
 // ------------------------------------------------------------
 
+wire [4:0]  ctrl       = opr_b[4:0];
+
+wire [XL:0] grev_s0 = 
+    ctrl[0] ? (opr_a & 32'h55555555) << 1 | (opr_a & 32'hAAAAAAAA) >> 1 :
+               opr_a                                                    ;
+
+wire [XL:0] grev_s1    ;
+wire [XL:0] grev_s2    ;
+wire [XL:0] grev_s3    ;
+wire [XL:0] grev_s4    ;
+
 // TODO Implement grev, shfl, unshufl
 wire [XL:0] grev_result     = 32'b0;
 wire [XL:0] shfl_result     = 32'b0;

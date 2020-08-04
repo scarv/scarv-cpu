@@ -92,11 +92,11 @@ wire        alu_op_srl      = fu_alu && s2_uop == ALU_SRL   ;
 wire        alu_op_sra      = fu_alu && s2_uop == ALU_SRA   ;
 wire        alu_op_ror      = fu_alu && s2_uop == ALU_ROR   ;
 wire        alu_op_rol      = fu_alu && s2_uop == ALU_ROL   ;
-                                                            ;
+
 wire        alu_op_pack     = fu_alu && s2_uop == ALU_PACK  ;
 wire        alu_op_packh    = fu_alu && s2_uop == ALU_PACKH ;
 wire        alu_op_packu    = fu_alu && s2_uop == ALU_PACKU ;
-                                                            ;
+
 wire        alu_op_grev     =  fu_alu && s2_uop == ALU_GREV  ;
 wire        alu_op_shfl     =  fu_alu && s2_uop == ALU_SHFL  ;
 wire        alu_op_unshfl   =  fu_alu && s2_uop == ALU_UNSHFL;
