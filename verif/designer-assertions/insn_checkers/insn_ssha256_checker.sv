@@ -6,7 +6,7 @@
 //
 // module: insn_ssha256_checker
 //
-//  Checker for the scalar sm4 instructions.
+//  Checker for the scalar sha256 instructions.
 //
 module insn_ssha256_checker (
 input                                 rvfi_valid,
@@ -33,7 +33,7 @@ output [`RISCV_FORMAL_XLEN   - 1 : 0] spec_mem_wdata
 );
 
 //
-// Macro is a 2-bit one-hot signal, which masks the individual instrucitons
+// Macro is a 4-bit one-hot signal, which masks the individual instrucitons
 // which are checked when the design is run through pre-proof synthesis.
 // This is just an easy way to control the proof from symbiyosys without
 // duplicating lots of files per instruction.
