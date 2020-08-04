@@ -78,6 +78,27 @@ rvfi_insn_check i_checker (
 `RVFI_CONN
 );
 
+//
+// module: fi_fairness
+//
+//  A set of trackers and assumptions/restrictions which make sure that
+//  any formal stimulus engine "plays fair".
+//
+fi_fairness i_fairness (
+.clock           (clock           ),
+.reset           (reset           ),
+.int_nmi         (int_nmi         ),
+.int_mtime       (int_mtime       ),
+.int_external    (int_external    ),
+.int_software    (int_software    ),
+.imem_req        (imem_req        ),
+.imem_gnt        (imem_gnt        ),
+.imem_error      (imem_error      ),
+.dmem_req        (dmem_req        ),
+.dmem_gnt        (dmem_gnt        ),
+.dmem_error      (dmem_error      ) 
+);
+
 `endif
 
 //

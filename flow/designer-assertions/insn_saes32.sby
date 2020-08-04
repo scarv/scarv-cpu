@@ -1,0 +1,55 @@
+
+[tasks]
+encs_cover     encs    cover
+encsm_cover    encsm   cover
+decs_cover     decs    cover
+decsm_cover    decsm   cover
+encs_prove     encs    prove
+encsm_prove    encsm   prove
+decs_prove     decs    prove
+decsm_prove    decsm   prove
+
+[options]
+depth   16
+skip    15
+
+prove: mode bmc
+cover: mode cover
+
+[engines]
+smtbmc  boolector
+
+[script]
+echo on
+verilog_defaults -add -ISCARV_CPU/rtl/core/
+verilog_defaults -add -ISCARV_CPU/verif/designer-assertions/insn_checkers
+read_verilog -sv -formal SCARV_CPU/verif/rvfi/fi_fairness.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/insn_checkers/insn_saes32_model.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/insn_checkers/insn_saes32_checker.sv
+read_verilog -sv -formal SCARV_CPU/external/riscv-formal/checks/rvfi_insn_check.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/fairness.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/wrapper.sv
+read_verilog -formal SCARV_CPU/rtl/core/*.sv
+prep -flatten -nordff -top design_assertions_wrapper 
+chformal -early
+
+[files]
+SCARV_CPU/external/riscv-formal/checks/rvfi_macros.vh
+
+[file defines.svh]
+encsm: `define INSN_SAES32_CHECKER_EN (4'b0001)
+encs:  `define INSN_SAES32_CHECKER_EN (4'b0010)
+decsm: `define INSN_SAES32_CHECKER_EN (4'b0100)
+decs:  `define INSN_SAES32_CHECKER_EN (4'b1000)
+`define RISCV_FORMAL_INSN_MODEL insn_saes32_checker
+`define RISCV_FORMAL_CHECK_CYCLE 15
+`define RISCV_FORMAL_RESET_CYCLES 1
+`define RISCV_FORMAL_CHANNEL_IDX  0
+`define RISCV_FORMAL_COMPRESSED
+`define RISCV_FORMAL_ALIGNED_MEM
+`define RISCV_FORMAL_NRET 1
+`define RISCV_FORMAL_ILEN 32
+`define RISCV_FORMAL_XLEN 32
+`define RISCV_FORMAL
+`define RVFI
+`define DEBUGNETS
