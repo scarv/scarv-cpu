@@ -142,6 +142,7 @@ wire [XL:0] shift_result=
 // GREV
 // ------------------------------------------------------------
 
+// Control bits for grev and [un]shfl
 wire [ 4:0] ctrl       = opr_b[4:0];
 
 reg  [XL:0] grev_result;
@@ -166,9 +167,30 @@ end
 // SHFL and UNSHFL
 // ------------------------------------------------------------
 
-// TODO Implement grev, shfl, unshufl
-wire [XL:0] shfl_result     = 32'b0;
-wire [XL:0] unshfl_result   = 32'b0;
+`define SHFL_STEP(CTRL,SRC, ML, MR, N)                                      \
+  SRC    =                                                                  \
+    ctrl[CTRL] ? ((SRC  & ~(ML|MR)) | ((SRC << N) & ML) | ((SRC>>N) & MR)) :\
+                   SRC
+
+reg  [XL:0] shfl_result  ;
+reg  [XL:0] unshfl_result;
+
+always @(*) begin
+    shfl_result = opr_a;
+    `SHFL_STEP(3, shfl_result, 32'h00FF0000, 32'h0000FF00, 8);
+    `SHFL_STEP(2, shfl_result, 32'h0F000F00, 32'h00F000F0, 4);
+    `SHFL_STEP(1, shfl_result, 32'h30303030, 32'h0C0C0C0C, 2);
+    `SHFL_STEP(0, shfl_result, 32'h44444444, 32'h22222222, 1);
+    
+    unshfl_result = opr_a;
+    `SHFL_STEP(0, unshfl_result, 32'h44444444, 32'h22222222, 1);
+    `SHFL_STEP(1, unshfl_result, 32'h30303030, 32'h0C0C0C0C, 2);
+    `SHFL_STEP(2, unshfl_result, 32'h0F000F00, 32'h00F000F0, 4);
+    `SHFL_STEP(3, unshfl_result, 32'h00FF0000, 32'h0000FF00, 8);
+end
+
+
+`undef SHFL_STEP
 
 //
 // Result multiplexing
