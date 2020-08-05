@@ -332,6 +332,20 @@ generate
     end
 endgenerate
 
+// ARITH ADD/SUB: arithmetic masked add and subtraction 
+wire [XL:0]  amadd0, amadd1;
+wire [XL:0]  amsub0, amsub1;
+
+assign amadd0 = rs1_s0 + rs2_s0;   //[BUG]: rs2_s0 get wrong value at LSB byte
+assign amadd1 = rs1_s1 + rs2_s1;
+assign amsub0 = rs1_s0 - rs2_s0;
+assign amsub1 = rs1_s1 - rs2_s1;
+
+wire         am_rdy = op_a_add || op_a_sub;
+// FAFF: Boolean masked affine transformation in field gf(2^8) for AES
+
+// FMUL: Boolean masked multiplication in field gf(2^8) for AES
+
 // OUTPUT MUX: gather and multiplexing results
 assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
                {XLEN{op_b_xor}} &  (n_prng ^ mxor0) |
@@ -342,7 +356,9 @@ assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
                {XLEN{op_b_sub}} &  madd0 |
                {XLEN{op_a2b  }} &  madd0 |
                {XLEN{op_b2a  }} &  mb2a0 | 
-               {XLEN{op_msk  }} &  rmask0;
+               {XLEN{op_msk  }} &  rmask0|
+               {XLEN{op_a_add}} &  amadd0|
+               {XLEN{op_a_sub}} &  amsub0;
 
 assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_b_xor}} &  (n_prng ^ mxor1) |
@@ -353,13 +369,14 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_b_sub}} &  madd1 |
                {XLEN{op_a2b  }} &  madd1 |
                {XLEN{op_b2a  }} &  mb2a1 |
-               {XLEN{op_msk  }} &  rmask1;
+               {XLEN{op_msk  }} &  rmask1|
+               {XLEN{op_a_add}} &  amadd1|
+               {XLEN{op_a_sub}} &  amsub1;
 
-wire    temp_mask_f_ready = op_f_mul || op_f_aff || op_a_add || op_a_sub;
 
 assign ready = mnot_rdy || (dologic && mlogic_rdy) ||
-              madd_rdy || shr_rdy || msk_rdy       ||
-              temp_mask_f_ready;
+               madd_rdy || shr_rdy || msk_rdy      ||
+               am_rdy   || op_f_mul|| op_f_aff ;
 assign mask  = prng;
 
 endmodule
