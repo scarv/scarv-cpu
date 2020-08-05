@@ -343,8 +343,27 @@ assign amsub1 = rs1_s1 - rs2_s1;
 
 wire         am_rdy = op_a_add || op_a_sub;
 // FAFF: Boolean masked affine transformation in field gf(2^8) for AES
+wire [XL:0]  mfaff0, mfaff1;
+mskfaff makfaff_ins(	
+    .i_a0(rs1_s0),
+    .i_a1(rs1_s1),
+    .i_mt({rs2_s1, rs2_s0}),
+    .i_gs(prng),
+    .o_r0(mfaff0),
+    .o_r1(mfaff1)
+);
 
 // FMUL: Boolean masked multiplication in field gf(2^8) for AES
+wire [XL:0]  mfmul0, mfmul1;
+mskfmul mskfmul_ins(	
+    .i_a0(rs1_s0),
+    .i_a1(rs1_s1),
+    .i_b0(rs2_s0),
+    .i_b1(rs2_s1),
+    .i_gs(prng),
+    .o_r0(mfmul0),
+    .o_r1(mfmul1)
+);
 
 // OUTPUT MUX: gather and multiplexing results
 assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
@@ -358,7 +377,9 @@ assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
                {XLEN{op_b2a  }} &  mb2a0 | 
                {XLEN{op_msk  }} &  rmask0|
                {XLEN{op_a_add}} &  amadd0|
-               {XLEN{op_a_sub}} &  amsub0;
+               {XLEN{op_a_sub}} &  amsub0|
+               {XLEN{op_f_mul}} &  mfmul0|
+               {XLEN{op_f_aff}} &  mfaff0;
 
 assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_b_xor}} &  (n_prng ^ mxor1) |
@@ -371,7 +392,9 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_b2a  }} &  mb2a1 |
                {XLEN{op_msk  }} &  rmask1|
                {XLEN{op_a_add}} &  amadd1|
-               {XLEN{op_a_sub}} &  amsub1;
+               {XLEN{op_a_sub}} &  amsub1|
+               {XLEN{op_f_mul}} &  mfmul1|
+               {XLEN{op_f_aff}} &  mfaff1;
 
 
 assign ready = mnot_rdy || (dologic && mlogic_rdy) ||
@@ -420,6 +443,80 @@ assign    addsub_ena =  doaddsub_valid && ((mlogic_rdy && (ctl_state == S_IDL)) 
 
 endmodule
 
+//Boolean masked multiplication in field gf(2^8) for AES
+module mskfmul(	
+input  [31:0] i_a0,
+input  [31:0] i_a1,
+input  [31:0] i_b0,
+input  [31:0] i_b1,
+input  [31:0] i_gs,
+output [31:0] o_r0,
+output [31:0] o_r1
+);
+
+wire [31:0] m00, m11, m01, m10;
+
+gf256_mul mult0_b0 (.i_a(i_a0[ 7: 0]), .i_b(i_b0[ 7: 0]), .o_r(m00[ 7: 0]));
+gf256_mul mult1_b0 (.i_a(i_a1[ 7: 0]), .i_b(i_b1[ 7: 0]), .o_r(m11[ 7: 0]));
+gf256_mul mult2_b0 (.i_a(i_a0[ 7: 0]), .i_b(i_b1[ 7: 0]), .o_r(m01[ 7: 0]));
+gf256_mul mult3_b0 (.i_a(i_a1[ 7: 0]), .i_b(i_b0[ 7: 0]), .o_r(m10[ 7: 0]));
+
+gf256_mul mult0_b1 (.i_a(i_a0[15: 8]), .i_b(i_b0[15: 8]), .o_r(m00[15: 8]));
+gf256_mul mult1_b1 (.i_a(i_a1[15: 8]), .i_b(i_b1[15: 8]), .o_r(m11[15: 8]));
+gf256_mul mult2_b1 (.i_a(i_a0[15: 8]), .i_b(i_b1[15: 8]), .o_r(m01[15: 8]));
+gf256_mul mult3_b1 (.i_a(i_a1[15: 8]), .i_b(i_b0[15: 8]), .o_r(m10[15: 8]));
+
+gf256_mul mult0_b2 (.i_a(i_a0[23:16]), .i_b(i_b0[23:16]), .o_r(m00[23:16]));
+gf256_mul mult1_b2 (.i_a(i_a1[23:16]), .i_b(i_b1[23:16]), .o_r(m11[23:16]));
+gf256_mul mult2_b2 (.i_a(i_a0[23:16]), .i_b(i_b1[23:16]), .o_r(m01[23:16]));
+gf256_mul mult3_b2 (.i_a(i_a1[23:16]), .i_b(i_b0[23:16]), .o_r(m10[23:16]));
+
+gf256_mul mult0_b3 (.i_a(i_a0[31:24]), .i_b(i_b0[31:24]), .o_r(m00[31:24]));
+gf256_mul mult1_b3 (.i_a(i_a1[31:24]), .i_b(i_b1[31:24]), .o_r(m11[31:24]));
+gf256_mul mult2_b3 (.i_a(i_a0[31:24]), .i_b(i_b1[31:24]), .o_r(m01[31:24]));
+gf256_mul mult3_b3 (.i_a(i_a1[31:24]), .i_b(i_b0[31:24]), .o_r(m10[31:24]));
+
+(* keep="true" *)
+wire [31:0] refresh = i_gs ^ m01 ^ m10;
+ 
+assign o_r0 = m00 ^ i_gs;
+assign o_r1 = m11 ^ refresh;
+
+endmodule
+
+//Boolean masked affine transformation in field gf(2^8) for AES
+/* 
+   i_a0, i_a1: 2 shares of 4-byte input
+   i_mt      : 8 8-bit rows of 64-bit affine matrix. 
+   i_gs      : guard share for refreshing
+   o_r0, o_r1: 2 shares of 4-byte output
+*/
+module mskfaff(	
+input  [31:0] i_a0,
+input  [31:0] i_a1,
+input  [63:0] i_mt,
+input  [31:0] i_gs,
+output [31:0] o_r0,
+output [31:0] o_r1
+);
+
+wire [31:0] r0, r1;
+gf256_aff atr0_b0 (.i_a(i_a0[ 7: 0]), .i_m(i_mt), .o_r(r0[ 7: 0]));
+gf256_aff atr1_b0 (.i_a(i_a1[ 7: 0]), .i_m(i_mt), .o_r(r1[ 7: 0]));
+
+gf256_aff atr0_b1 (.i_a(i_a0[15: 8]), .i_m(i_mt), .o_r(r0[15: 8]));
+gf256_aff atr1_b1 (.i_a(i_a1[15: 8]), .i_m(i_mt), .o_r(r1[15: 8]));
+
+gf256_aff atr0_b2 (.i_a(i_a0[23:16]), .i_m(i_mt), .o_r(r0[23:16]));
+gf256_aff atr1_b2 (.i_a(i_a1[23:16]), .i_m(i_mt), .o_r(r1[23:16]));
+
+gf256_aff atr0_b3 (.i_a(i_a0[31:24]), .i_m(i_mt), .o_r(r0[31:24]));
+gf256_aff atr1_b3 (.i_a(i_a1[31:24]), .i_m(i_mt), .o_r(r1[31:24]));
+ 
+assign o_r0 = i_gs ^ r0;
+assign o_r1 = i_gs ^ r1;
+
+endmodule
 // Shift/rotate module to operate on each sharing with random pading
 module shfrot(
 input  [31:0] s    , // input share
@@ -763,6 +860,200 @@ assign o_s0 = i_pk0 ^ {i_gk0[30:0],1'b0};
 assign o_s1 = i_pk1 ^ {i_gk1[30:0],sub};
 endmodule
 
+/* multiplication in GF(2^8)/p[x] = x^8 + x^4 + x^3 + x + 1
+  based on circuit minimization: http://cs-www.cs.yale.edu/homes/peralta/CircuitStuff/CMT.html 
+  i_a : 8-bit input
+  i_b : 8-bit input 
+  o_r : 8-bit output = i_a * i_b mod p[x]
+*/
+module gf256_mul(i_a,i_b,o_r);
+input[7:0] i_a;
+input[7:0] i_b;
+output[7:0] o_r;
+
+wire A0 = i_a[0];
+wire A1 = i_a[1];
+wire A2 = i_a[2];
+wire A3 = i_a[3];
+wire A4 = i_a[4];
+wire A5 = i_a[5];
+wire A6 = i_a[6];
+wire A7 = i_a[7];
+wire B0 = i_b[0];
+wire B1 = i_b[1];
+wire B2 = i_b[2];
+wire B3 = i_b[3];
+wire B4 = i_b[4];
+wire B5 = i_b[5];
+wire B6 = i_b[6];
+wire B7 = i_b[7];
+wire T1 = A0 && B0;
+wire T2 = A0 && B1;
+wire T3 = A1 && B0;
+wire T4 = A0 && B2;
+wire T5 = A1 && B1;
+wire T6 = A2 && B0;
+wire T7 = A0 && B3;
+wire T8 = A1 && B2;
+wire T9 = A2 && B1;
+wire T10 = A3 && B0;
+wire T11 = A1 && B3;
+wire T12 = A2 && B2;
+wire T13 = A3 && B1;
+wire T14 = A2 && B3;
+wire T15 = A3 && B2;
+wire T16 = A3 && B3;
+wire T17 = A4 && B4;
+wire T18 = A4 && B5;
+wire T19 = A5 && B4;
+wire T20 = A4 && B6;
+wire T21 = A5 && B5;
+wire T22 = A6 && B4;
+wire T23 = A4 && B7;
+wire T24 = A5 && B6;
+wire T25 = A6 && B5;
+wire T26 = A7 && B4;
+wire T27 = A5 && B7;
+wire T28 = A6 && B6;
+wire T29 = A7 && B5;
+wire T30 = A6 && B7;
+wire T31 = A7 && B6;
+wire T32 = A7 && B7;
+wire T33 = A0 ^ A4;
+wire T34 = A1 ^ A5;
+wire T35 = A2 ^ A6;
+wire T36 = A3 ^ A7;
+wire T37 = B0 ^ B4;
+wire T38 = B1 ^ B5;
+wire T39 = B2 ^ B6;
+wire T40 = B3 ^ B7;
+wire T41 = T40 && T36;
+wire T42 = T40 && T35;
+wire T43 = T40 && T34;
+wire T44 = T40 && T33;
+wire T45 = T39 && T36;
+wire T46 = T39 && T35;
+wire T47 = T39 && T34;
+wire T48 = T39 && T33;
+wire T49 = T38 && T36;
+wire T50 = T38 && T35;
+wire T51 = T38 && T34;
+wire T52 = T38 && T33;
+wire T53 = T37 && T36;
+wire T54 = T37 && T35;
+wire T55 = T37 && T34;
+wire T56 = T37 && T33;
+wire T57 = T2 ^ T3;
+wire T58 = T4 ^ T5;
+wire T59 = T6 ^ T32;
+wire T60 = T7 ^ T8;
+wire T61 = T9 ^ T10;
+wire T62 = T60 ^ T61;
+wire T63 = T11 ^ T12;
+wire T64 = T13 ^ T63;
+wire T65 = T14 ^ T15;
+wire T66 = T18 ^ T19;
+wire T67 = T20 ^ T21;
+wire T68 = T22 ^ T67;
+wire T69 = T23 ^ T24;
+wire T70 = T25 ^ T26;
+wire T71 = T69 ^ T70;
+wire T72 = T27 ^ T28;
+wire T73 = T29 ^ T32;
+wire T74 = T30 ^ T31;
+wire T75 = T52 ^ T55;
+wire T76 = T48 ^ T51;
+wire T77 = T54 ^ T76;
+wire T78 = T44 ^ T47;
+wire T79 = T50 ^ T53;
+wire T80 = T78 ^ T79;
+wire T81 = T43 ^ T46;
+wire T82 = T49 ^ T81;
+wire T83 = T42 ^ T45;
+wire T84 = T71 ^ T74;
+wire T85 = T41 ^ T16;
+wire T86 = T85 ^ T68;
+wire T87 = T66 ^ T65;
+wire T88 = T83 ^ T87;
+wire T89 = T58 ^ T59;
+wire T90 = T72 ^ T73;
+wire T91 = T74 ^ T17;
+wire T92 = T64 ^ T91;
+wire T93 = T82 ^ T92;
+wire T94 = T80 ^ T62;
+wire T95 = T94 ^ T90;
+wire T96 = T41 ^ T77;
+wire T97 = T84 ^ T89;
+wire T98 = T96 ^ T97;
+wire T99 = T57 ^ T74;
+wire T100 = T83 ^ T75;
+wire T101 = T86 ^ T90;
+wire T102 = T99 ^ T100;
+wire T103 = T101 ^ T102;
+wire T104 = T1 ^ T56;
+wire T105 = T90 ^ T104;
+wire T106 = T82 ^ T84;
+wire T107 = T88 ^ T105;
+wire T108 = T106 ^ T107;
+wire T109 = T71 ^ T62;
+wire T110 = T86 ^ T109;
+wire T111 = T110 ^ T93;
+wire T112 = T86 ^ T88;
+wire T113 = T89 ^ T112;
+wire T114 = T57 ^ T32;
+wire T115 = T114 ^ T88;
+wire T116 = T115 ^ T93;
+wire T117 = T93 ^ T1;
+
+assign o_r[0] = T117;
+assign o_r[1] = T116;
+assign o_r[2] = T113;
+assign o_r[3] = T111;
+assign o_r[4] = T108;
+assign o_r[5] = T103;
+assign o_r[6] = T98;
+assign o_r[7] = T95;
+
+endmodule
+
+/* affine transformation in GF(2^8)
+  i_a : 8-bit input
+  i_b : 8 8-bit rows of 64-bit affine matrix. 
+  o_r : 8-bit output
+*/
+module gf256_aff(i_a,i_m,o_r);
+input[ 7:0] i_a;
+input[63:0] i_m;
+output[7:0] o_r;
+
+wire [7:0] r7 = i_m[63:56];
+wire [7:0] r6 = i_m[55:48];
+wire [7:0] r5 = i_m[47:40];
+wire [7:0] r4 = i_m[39:32];
+wire [7:0] r3 = i_m[31:24];
+wire [7:0] r2 = i_m[23:16];
+wire [7:0] r1 = i_m[15: 8];
+wire [7:0] r0 = i_m[ 7: 0];
+
+wire [7:0] m7 = i_a & r7;
+wire [7:0] m6 = i_a & r6;
+wire [7:0] m5 = i_a & r5;
+wire [7:0] m4 = i_a & r4;
+wire [7:0] m3 = i_a & r3;
+wire [7:0] m2 = i_a & r2;
+wire [7:0] m1 = i_a & r1;
+wire [7:0] m0 = i_a & r0;
+
+assign o_r[0] = ^m0;
+assign o_r[1] = ^m1;
+assign o_r[2] = ^m2;
+assign o_r[3] = ^m3;
+assign o_r[4] = ^m4;
+assign o_r[5] = ^m5;
+assign o_r[6] = ^m6;
+assign o_r[7] = ^m7;
+
+endmodule
 
 module FF_Nb #(parameter Nb=1) (
   input wire  g_resetn, g_clk,
