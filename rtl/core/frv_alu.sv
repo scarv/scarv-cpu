@@ -118,11 +118,13 @@ wire        rotate      = op_rol || op_ror ;
 
 localparam SW = (XLEN*2) - 1;
 
-wire [XL:0] shift_in_hi = rotate ? (sr_left ? shift_in_l : shift_in_r)  :
-                          op_sra ? {XLEN{shift_abit}}                   :
-                                    32'b0                               ;
+wire [XL:0] shift_in_lo = sr_left ? shift_in_l : shift_in_r;
 
-wire [SW:0] shift_in    = {shift_in_hi, op_sll ? shift_in_l : shift_in_r};
+wire [XL:0] shift_in_hi = rotate  ? (shift_in_lo     )  :
+                          op_sra  ? {XLEN{shift_abit}}  :
+                                     32'b0              ;
+
+wire [SW:0] shift_in    = {shift_in_hi, shift_in_lo     };
 
 wire [SW:0] shift_out   = shift_in    >> shamt          ;
 wire [XL:0] shift_out_r = shift_out[XL:0]               ;
@@ -198,7 +200,7 @@ end
 
 wire sel_addsub = op_add || op_sub  ;
 wire sel_slt    = op_slt || op_sltu ;
-wire sel_shift  = op_sll || op_sra  || op_srl;
+wire sel_shift  = op_sll || op_sra  || op_srl || rotate;
 
 assign result =
                          bitwise_result             |
