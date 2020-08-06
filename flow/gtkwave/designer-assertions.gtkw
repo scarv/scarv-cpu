@@ -1,13 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Tue Aug  4 10:40:11 2020
+[*] Thu Aug  6 09:31:17 2020
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/designer-assertions/insn_andn_andn_prove/engine_0/trace.vcd"
+[dumpfile_mtime] "Thu Aug  6 09:26:32 2020"
+[dumpfile_size] 662545
 [savefile] "/home/work/scarv/skywater/scarv-cpu/flow/gtkwave/designer-assertions.gtkw"
-[timestart] 47
+[timestart] 37
 [size] 1920 1025
 [pos] -1 -1
-*-4.363748 146 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.360063 153 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] design_assertions_wrapper.
 [treeopen] design_assertions_wrapper.i_checker.
 [treeopen] design_assertions_wrapper.i_dut.
@@ -19,8 +21,8 @@
 [treeopen] design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.
 [treeopen] design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.
 [treeopen] design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_implemented.
-[sst_width] 270
-[signals_width] 454
+[sst_width] 335
+[signals_width] 355
 [sst_expanded] 1
 [sst_vpaned_height] 314
 @28
@@ -308,7 +310,7 @@ design_assertions_wrapper.i_dut.i_pipeline.s2_rd[4:0]
 @28
 design_assertions_wrapper.i_dut.i_pipeline.s2_size[1:0]
 design_assertions_wrapper.i_dut.i_pipeline.s2_trap
-@c00200
+@800200
 -ALI
 @28
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_flush
@@ -321,7 +323,16 @@ design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_or
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_sub
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_xor
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_valid
-@1401200
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.op_andn
+@23
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_a[31:0]
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_b[31:0]
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_b_n[31:0]
+@22
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.and_output[31:0]
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.or_output[31:0]
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.xor_output[31:0]
+@1000200
 -ALI
 @c00200
 -AES
@@ -346,7 +357,7 @@ design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.sa
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_valid
 @1401200
 -AES
-@800200
+@c00200
 -SM3
 @28
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.op_ssm3_p0
@@ -363,11 +374,11 @@ design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ss
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_implemented.i_riscv_crypto_fu_ssm3.ssm3_low32[31:0]
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_implemented.i_riscv_crypto_fu_ssm3.ssm3_p0[31:0]
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_implemented.i_riscv_crypto_fu_ssm3.ssm3_p1[31:0]
-@23
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.rs1[31:0]
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.rs2[31:0]
-@1000200
+@1401200
 -SM3
+@1000200
 -Pipe - S2 Execute
 @c00200
 -Pipe - S3 Memory
