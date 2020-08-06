@@ -25,13 +25,20 @@ jobs:
     - source ./bin/conf.sh
     - make unit-tests-build
     - make unit-tests-run
-  - name: "Designer Assertions"
+  - name: "Designer Assertions 1"
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/install-symbiyosys.sh
     - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
-    - make -j $(nproc) da-prove-all
+    - make -j $(nproc) da-prove-s
+  - name: "Designer Assertions 2"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/install-symbiyosys.sh
+    - source ./bin/install-boolector.sh
+    - source ./bin/conf.sh
+    - make -j $(nproc) da-prove-n
   - name: "riscv-formal"
     script:
     - source ./bin/install-yosys.sh
