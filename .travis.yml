@@ -23,7 +23,6 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - make unit-tests-build
     - make run-unit-example
     - make run-unit-ld-bus-error
     - make run-unit-mul-ld
