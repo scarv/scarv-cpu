@@ -96,8 +96,8 @@ wire [XL:0] bitwise_result  = {XLEN{op_xor || op_xnor}} &  xor_output |
 // ------------------------------------------------------------
 
 wire [XL:0] pack_output     = {       opr_b[15: 0], opr_a[15: 0]};
-wire [XL:0] packh_output    = {       opr_b[31:16], opr_a[31:16]};
-wire [XL:0] packu_output    = {16'b0, opr_b[ 7: 0], opr_a[ 7: 0]};
+wire [XL:0] packu_output    = {       opr_b[31:16], opr_a[31:16]};
+wire [XL:0] packh_output    = {16'b0, opr_b[ 7: 0], opr_a[ 7: 0]};
 
 wire [XL:0] pack_result     = {XLEN{op_pack }} & pack_output    |
                               {XLEN{op_packh}} & packh_output   |
