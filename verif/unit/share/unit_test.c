@@ -117,7 +117,7 @@ void __attribute__ ((used)) test_trap_handler() {
 
     if(th_cfg.check_mcause) {
         uint32_t mcause = scarv_cpu_rd_mcause();
-        uint32_t val    = 0x1 & (th_cfg.expect_mcause >> mcause);
+        uint32_t val    = 0x1 << mcause & (th_cfg.expect_mcause);
 
         if(val) {
             // All okay.

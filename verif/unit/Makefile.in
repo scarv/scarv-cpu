@@ -7,7 +7,7 @@ UNIT_TESTS_RUN  =
 
 UNIT_TESTS_CLEAN=
 
-UNIT_TIMEOUT    = 20000
+UNIT_TIMEOUT    = 60000
 UNIT_FAIL       = 0x80000086
 UNIT_PASS       = 0x80000090
 
@@ -102,6 +102,7 @@ include $(FRV_HOME)/verif/unit/example/Makefile.in
 include $(FRV_HOME)/verif/unit/mul-ld/Makefile.in
 include $(FRV_HOME)/verif/unit/ld-bus-error/Makefile.in
 include $(FRV_HOME)/verif/unit/st-bus-error/Makefile.in
+include $(FRV_HOME)/verif/unit/clmul/Makefile.in
 #include $(FRV_HOME)/verif/unit/mtime-read/Makefile.in
 #include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
 #include $(FRV_HOME)/verif/unit/counters/Makefile.in
