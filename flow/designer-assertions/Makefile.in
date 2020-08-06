@@ -40,9 +40,7 @@ $(foreach ASS,$(ASSERT_SBY_SRC),$(eval $(call add_assert_target,$(ASS))))
 da-prove-all: $(DESIGN_ASSERTIONS)
 
 # Prove all assertions     starting with "insn_s"
-da-prove-s  :
-	@echo $(filter     da-prove-insn_s%,$(DESIGN_ASSERTIONS))
+da-prove-s  : $(filter     da-prove-insn_s%,$(DESIGN_ASSERTIONS))
 
 # Prove all assertions not starting with "insn_s"
-da-prove-n  :
-	@echo $(filter-out da-prove-insn_s%,$(DESIGN_ASSERTIONS))
+da-prove-n  : $(filter-out da-prove-insn_s%,$(DESIGN_ASSERTIONS))
