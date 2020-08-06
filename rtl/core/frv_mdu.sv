@@ -85,7 +85,7 @@ always @(posedge g_clk) begin
         s_rs1       <= n_rs1_div;
         s_rs2       <= n_rs2_div;
         mdu_state   <= n_divisor;
-    end else if(mul_start) begin
+    end else if(mul_start || clmul_start) begin
         s_rs1       <= rs1;
         s_rs2       <= rs2;
         mdu_state   <= {2*XLEN{1'b0}};
@@ -94,6 +94,12 @@ always @(posedge g_clk) begin
         s_rs2       <= n_rs2_mul;
         if(!n_mul_done || MUL_UNROLL == 1) begin
             mdu_state   <= n_mul_state;
+        end
+    end else if(clmul_run) begin
+        s_rs1       <= n_rs1_clmul;
+        s_rs2       <= n_rs2_clmul;
+        if(!n_clmul_done || CLMUL_UNROLL == 1) begin
+            mdu_state   <= n_clmul_state;
         end
     end
 end
@@ -104,10 +110,10 @@ end
 
 reg  [ 6:0 ]    mdu_ctr ;
 reg             mdu_done;
-wire          n_mdu_done = n_mul_done || n_div_done;
+wire          n_mdu_done = n_mul_done || n_div_done || n_clmul_done;
 reg             mdu_run ;
 
-wire            mdu_start = mul_start || div_start;
+wire            mdu_start = mul_start || div_start || clmul_start;
 
 always @(posedge g_clk) begin
     if (!g_resetn || flush) begin
@@ -119,12 +125,14 @@ always @(posedge g_clk) begin
         mdu_done    <= 1'b0;
         mdu_ctr     <= 'd32;
     end else if(mdu_run) begin
-        if(any_mul && mdu_ctr == MUL_END    ||
-           any_div && mdu_ctr ==       0    ) begin
+        if(any_mul   && mdu_ctr == MUL_END    ||
+           any_clmul && mdu_ctr == CLMUL_END  ||
+           any_div   && mdu_ctr ==       0    ) begin
             mdu_done    <= n_mdu_done;
             mdu_run     <= 1'b0;
         end else begin
-            mdu_ctr     <= mdu_ctr - (any_mul ? MUL_UNROLL : 7'd1);
+            mdu_ctr     <= mdu_ctr - (any_mul   ? MUL_UNROLL   :
+                                      any_clmul ? CLMUL_UNROLL :'d1);
         end
     end
 end
@@ -209,7 +217,7 @@ end
 // ------------------------------------------------------------
 
 parameter  CLMUL_UNROLL = 8;
-localparam CLMUL_END    = XLEN / CLMUL_UNROLL;
+localparam CLMUL_END    = 0;
 
 wire       clmul_start  = valid && any_clmul && !clmul_run && !clmul_done;
 reg        clmul_run    ; // Is the carry-less multiplier currently running?
@@ -217,11 +225,14 @@ reg        clmul_done   ; // Is the carry-less multiplier complete.
 wire     n_clmul_done   = mdu_ctr == CLMUL_END && clmul_run;
 
 // This is what we write back to GPR[rd].
-assign result_clmul = 32'b0;
+assign result_clmul = op_clmulh   ? mdu_state[MW  :XLEN  ] :
+                      op_clmulr   ? mdu_state[MW-1:XLEN-1] :
+                                    mdu_state[XL  :     0] ;
 
 reg [MW:0] n_clmul_state;
-reg [XL:0] n_rs1_clmul;
-reg [XL:0] n_rs2_clmul;
+reg [XL:0] n_rs1_clmul  ;
+reg [XL:0] n_rs2_clmul  ;
+reg [XL:0] clmul_rhs    ;
 
 integer j;
 always @(*) begin
@@ -230,9 +241,12 @@ always @(*) begin
     n_rs2_clmul = s_rs2 >> CLMUL_UNROLL;
 
     for(j = 0; j < CLMUL_UNROLL; j = j + 1) begin
-        if(s_rs2[j]) begin
-            // TODO: implement inner CLMUL operation.
-        end
+        clmul_rhs = s_rs2[j] ? s_rs1 : 32'b0;
+        n_clmul_state = {
+            1'b0                                ,
+            n_clmul_state[MW:XLEN] ^ clmul_rhs  ,
+            n_clmul_state[XL:1]            
+        };
     end
 end
 
