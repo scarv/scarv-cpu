@@ -1,9 +1,13 @@
 
 [tasks]
-grev_cover      grev    cover
-grev_prove      grev    prove
-grevi_cover     grevi   cover
-grevi_prove     grevi   prove
+shfl_cover      shfl      cover
+shfl_prove      shfl      prove
+shfli_cover     shfli     cover
+shfli_prove     shfli     prove
+unshfl_cover    unshfl    cover
+unshfl_prove    unshfl    prove
+unshfli_cover   unshfli   cover
+unshfli_prove   unshfli   prove
 
 [options]
 depth   16
@@ -20,7 +24,7 @@ echo on
 verilog_defaults -add -ISCARV_CPU/rtl/core/
 verilog_defaults -add -ISCARV_CPU/verif/designer-assertions/insn_checkers
 read_verilog -sv -formal SCARV_CPU/verif/rvfi/fi_fairness.sv
-read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/insn_checkers/insn_grev_checker.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/insn_checkers/insn_shfl_checker.sv
 read_verilog -sv -formal SCARV_CPU/external/riscv-formal/checks/rvfi_insn_check.sv
 read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/fairness.sv
 read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/wrapper.sv
@@ -32,9 +36,11 @@ chformal -early
 SCARV_CPU/external/riscv-formal/checks/rvfi_macros.vh
 
 [file defines.svh]
-grev:  `define INSN_GREV_CHECKER_EN (2'b01)
-grevi: `define INSN_GREV_CHECKER_EN (2'b10)
-`define RISCV_FORMAL_INSN_MODEL insn_grev_checker
+shfl:    `define INSN_SHFL_CHECKER_EN (4'b0001)
+shfli:   `define INSN_SHFL_CHECKER_EN (4'b0010)
+unshfl:  `define INSN_SHFL_CHECKER_EN (4'b0100)
+unshfli: `define INSN_SHFL_CHECKER_EN (4'b1000)
+`define RISCV_FORMAL_INSN_MODEL insn_shfl_checker
 `define RISCV_FORMAL_CHECK_CYCLE 15
 `define RISCV_FORMAL_RESET_CYCLES 1
 `define RISCV_FORMAL_CHANNEL_IDX  0
