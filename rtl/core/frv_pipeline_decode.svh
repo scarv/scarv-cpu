@@ -150,7 +150,7 @@ dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
 dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
 dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
 dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
-dec_ssm4_ks         || dec_ssm4_ed         ||
+dec_ssm4_ks         || dec_ssm4_ed         || dec_pollentropy     ||
 dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
 dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
 dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||

@@ -54,6 +54,11 @@ output wire [31:0] s2_instr        // The instruction word
 // Value taken by the PC on a reset.
 parameter FRV_PC_RESET_VALUE = 32'h8000_0000;
 
+//
+// When translating the pollentropy instruction into a load-word instruction,
+// this is the address that it loads from.
+parameter [31:0] POLLENTROPY_PADDR = 32'h0000_0000;
+
 // If set, trace the instruction word through the pipeline. Otherwise,
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
@@ -123,7 +128,8 @@ assign n_s2_fu[P_FU_CFU] =
 assign n_s2_fu[P_FU_LSU] = 
     dec_lb         || dec_lbu       || dec_lh          || dec_lhu        ||
     dec_lw         || dec_c_lw      || dec_c_lwsp      || dec_c_sw       ||
-    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ;
+    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ||
+    dec_pollentropy;
 
 assign n_s2_fu[P_FU_CSR] =
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
@@ -249,7 +255,8 @@ wire [1:0] lsu_width =
     {2{dec_c_lwsp    }} & LSU_WORD |
     {2{dec_c_sw      }} & LSU_WORD |
     {2{dec_c_swsp    }} & LSU_WORD |
-    {2{dec_sw        }} & LSU_WORD ;
+    {2{dec_sw        }} & LSU_WORD |
+    {2{dec_pollentropy}}& LSU_WORD ;
 
 wire [OP:0] uop_lsu;
 
@@ -264,7 +271,8 @@ assign uop_lsu[LSU_LOAD] =
     dec_lhu         ||
     dec_lw          ||
     dec_c_lw        ||
-    dec_c_lwsp      ;
+    dec_c_lwsp      ||
+    dec_pollentropy ;
 
 assign uop_lsu[LSU_STORE] = 
     dec_sb          ||
@@ -574,7 +582,7 @@ assign n_s2_opr_src[DIS_OPRA_CSRI] = // Operand A sources CSR mask immediate
     dec_csrrci     || dec_csrrsi     || dec_csrrwi     ;
 
 wire opra_src_zero = 
-    dec_lui || dec_c_li || dec_c_lui ;
+    dec_lui || dec_c_li || dec_c_lui || dec_pollentropy;
 
 assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_add        || dec_c_add      || 
@@ -605,7 +613,7 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_c_lw       || dec_c_lwsp     || dec_c_sw       || dec_c_swsp     ||
     dec_sb         || dec_sh         || dec_sw         || dec_c_addi16sp ||
     dec_c_addi4spn || dec_rori       || dec_grevi      || dec_shfli      ||
-    dec_unshfli     ;
+    dec_unshfli    ;
 
 wire   oprb_src_zero =  // Operand B sources zero
     dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||
@@ -696,13 +704,14 @@ wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
 wire oprb_ld_en    = n_s2_valid && (
-    oprb_src_rs2 || oprb_src_imm || oprb_src_zero
+    oprb_src_rs2 || oprb_src_imm || oprb_src_zero || dec_pollentropy
 );
 
 assign n_s2_opr_b =
-    {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}   |
-    {XLEN{oprb_src_rs2    }} & s1_rs2_rdata   |
-    {XLEN{oprb_src_imm    }} & n_s2_imm       ;
+    {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}     |
+    {XLEN{oprb_src_rs2    }} & s1_rs2_rdata     |
+    {XLEN{oprb_src_imm    }} & n_s2_imm         |
+    {XLEN{dec_pollentropy }} & POLLENTROPY_PADDR;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];

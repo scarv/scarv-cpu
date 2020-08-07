@@ -85,6 +85,11 @@ parameter BRAM_REGFILE = 0;
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
 
+//
+// When translating the pollentropy instruction into a load-word instruction,
+// this is the address that it loads from.
+parameter [31:0] POLLENTROPY_PADDR = 32'h7000_0000;
+
 
 //
 // Value of the M-mode implementation id register
@@ -124,6 +129,7 @@ frv_pipeline #(
 .FRV_PC_RESET_VALUE (FRV_PC_RESET_VALUE ),
 .BRAM_REGFILE       (BRAM_REGFILE       ),
 .TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
+.POLLENTROPY_PADDR  (POLLENTROPY_PADDR  ),
 .CSR_MIMPID         (CSR_MIMPID         )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
