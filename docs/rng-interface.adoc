@@ -1,0 +1,65 @@
+PollEntropy Instruction.
+=========================
+:author: Ben Marshall
+:email: ben.marshall@bristol.ac.uk
+:toc:
+:lang: en
+
+*This document describes the logic interface between the CPU and
+an entropy source.*
+
+== Overview
+
+The core implements the `pollentropy` instruction from the (draft)
+RISC-V cryptography extension <<rvcrypto>>.
+It implements it by translating it into a load word (`lw`) instruction
+to a parameterised address.
+The address may be changed at synthesis time only.
+
+== Core Modifications
+
+=== Address parameter
+
+The memory address the instruction accesses is selected using a
+single parameter at the core top level:
+
+----
+parameter [31:0] POLLENTROPY_PADDR = 32'hXXXX_XXXX;
+----
+
+This should be read as "Poll Entropy Physical Address".
+
+=== Core Interfaces
+
+No modifications to the core top-level or internal interfaces are needed.
+
+
+=== Decoder
+
+The decode module handles the translation into a load word instruction.
+When a `pollentropy` instruction is decoded, the following fields
+are set:
+
+- The execute stage functional unit (`fu`) is set to the `LSU`.
+- The micro-op is set to "Load Word".
+- The destination register is set as usual.
+- Execute stage `opr_a` is set to `32'h0`.
+- Execute stage `opr_b` is set to `POLLENTROPY_PADDR`.
+- All other execute stage operands are left un-modified.
+- The 5-bit `pollentropy` immediate must be `0`.
+  Any other value results in an invalid opcode exception.
+
+=== Misc issues.
+
+- The `pollentropy` instruction may *only* be executed in machine mode,
+  as per the specification.
+  Execution in any other mode causes an invalid opcode exception.
+
+- If the user programs (for example) the PMP registers to forbid
+  access to `POLLENTROPY_PADDR`, then this will break the `pollentropy`
+  instruction.
+
+== References
+
+[bibliography]
+-- [[[rvcrypto]]] "Draft RISC-V Cryptography Extensions" https://github.com/scarv/riscv-crypto
