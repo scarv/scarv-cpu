@@ -275,9 +275,10 @@ test_masked_f_mul:
 .func   test_masked_f_aff
 test_masked_f_aff:
 
+    mv  t4, a1
+    mv  t3, a2
     mask.b.mask     (t2,t1), a0
-    mask.b.mask     (t4,t3), a1
-    mask.f.aff      (a1,a0), (t2,t1), (t4,t3)
+    mask.f.aff      (a1,a0), (t2,t1), (t4,t3) 
     mask.b.unmask    a0    , (a1,a0)
 
 .test_masked_f_aff:
