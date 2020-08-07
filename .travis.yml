@@ -8,7 +8,7 @@ env     :
   - YOSYS_ROOT: ~/tools/yosys
   - RISCV: ~/tools/riscv64-unknown-elf
 before_install :
-- sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev expect
+- sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev expect python3 pip3
 jobs:
   include:
   - name: "riscv-compliance"
