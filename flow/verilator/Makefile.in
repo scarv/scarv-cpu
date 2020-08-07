@@ -50,3 +50,11 @@ FLG_CORE =
 
 $(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE),$(FLG_CORE)))
 
+
+CMD_CCX  = $(SCARV_CPU)/flow/verilator/cmd-ccx-tb.txt
+TOP_CCX  = scarv_ccx_top_v
+EXE_CCX  = $(call map_vl_exe,$(TOP_CCX))
+FLG_CCX  =
+
+$(eval $(call add_vl_target,$(TOP_CCX),$(CMD_CCX),$(FLG_CCX)))
+

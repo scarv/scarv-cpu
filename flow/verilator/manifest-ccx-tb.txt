@@ -1,0 +1,10 @@
+$SCARV_CPU/verif/verilator/ccx/main.cpp
+$SCARV_CPU/verif/verilator/ccx/dut_wrapper.cpp
+$SCARV_CPU/verif/verilator/ccx/testbench.cpp
+$SCARV_CPU/verif/verilator/share/sram_agent.cpp
+$SCARV_CPU/verif/verilator/share/memory_bus.cpp
+$SCARV_CPU/verif/verilator/share/memory_device.cpp
+$SCARV_CPU/verif/verilator/share/memory_device_ram.cpp
+$SCARV_CPU/verif/verilator/share/memory_device_uart.cpp
+$SCARV_CPU/verif/verilator/share/srec.cpp
+
