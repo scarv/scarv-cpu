@@ -1,0 +1,43 @@
+CAPI=2:
+
+name : scarv.org:ip:scarv-cpu:2.0
+description: "The scarv-cpu, a RISC-V core used for cryptographic ISE research."
+
+filesets:
+  rtl:
+    files:
+    - frv_alu.sv
+    - frv_common.svh: {is_include_file: true}
+    - frv_core_fetch_buffer.sv
+    - frv_core.sv
+    - frv_counters.sv
+    - frv_csrs.sv
+    - frv_gprs.sv
+    - frv_interrupts.sv
+    - frv_lsu.sv
+    - frv_mdu.sv
+    - frv_pipeline_decode.sv
+    - frv_pipeline_decode.svh: {is_include_file: true}
+    - frv_pipeline_execute.sv
+    - frv_pipeline_fetch.sv
+    - frv_pipeline_memory.sv
+    - frv_pipeline_register.sv
+    - frv_pipeline.sv
+    - frv_pipeline_writeback.sv
+    - riscv_crypto_fu_aes_mix_columns.sv
+    - riscv_crypto_fu_lut4.sv
+    - riscv_crypto_fu_saes32_ssm4.sv
+    - riscv_crypto_fu_saes32.sv
+    - riscv_crypto_fu_sboxes.sv
+    - riscv_crypto_fu_ssha256.sv
+    - riscv_crypto_fu_ssha512.sv
+    - riscv_crypto_fu_ssm3.sv
+    - riscv_crypto_fu_ssm4.sv
+    - riscv_crypto_fu.sv
+    file_type: SystemVerilog
+
+targets:
+    default:
+        description: "The default target contains all of the RTL source files."
+        filesets: [rtl]
+
