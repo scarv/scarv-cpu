@@ -58,9 +58,6 @@ localparam ROM_DEPTH = ROM_SIZE / 4;
 //
 // CPU trace interface
 
-wire [31: 0] cpu_trs_pc          ; // Trace program counter.
-wire [31: 0] cpu_trs_instr       ; // Trace instruction.
-wire         cpu_trs_valid       ; // Trace output valid.
 wire         cpu_instr_ret       ; // Instruction retired
 
 //
