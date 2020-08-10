@@ -1,5 +1,6 @@
 
 #include "unit_test.h"
+#include "scarv_cpu_csp.h"
 
 /*!
 @brief Test reading of the standard performance counters/timers.
@@ -8,11 +9,11 @@ the test.
 */
 int test_main() {
 
-    uint64_t fst_mtime      = __rd_mtime();
-    uint64_t fst_mtimecmp   = __rd_mtimecmp();
+    uint64_t fst_mtime      = scarv_cpu_get_mtime();
+    uint64_t fst_mtimecmp   = scarv_cpu_get_mtimecmp();
 
-    uint64_t snd_mtime      = __rd_mtime();
-    uint64_t snd_mtimecmp   = __rd_mtimecmp();
+    uint64_t snd_mtime      = scarv_cpu_get_mtime();
+    uint64_t snd_mtimecmp   = scarv_cpu_get_mtimecmp();
 
     if(fst_mtime > snd_mtime) {
         // Second reading of mtime should be a larger value.
@@ -24,12 +25,6 @@ int test_main() {
         return 2;
     }
     
-    if(*__mtimecmp != __rd_mtimecmp()) {
-        // Shouldn't matter how we access mtimecmp
-        return 2;
-    }
-
-
     return 0;
 
 }
