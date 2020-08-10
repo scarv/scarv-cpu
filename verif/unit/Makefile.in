@@ -101,7 +101,7 @@ endef
 define add_core_unit_test
 
 # Build the test executable elf file.
-$(call add_unit_elf,${1},${2} $(UNIT_SRCS),$(CORE_LINK_LD))
+$(call add_unit_elf,${1},$(UNIT_SRCS) ${2},$(CORE_LINK_LD))
 
 # Dump disassembly.
 $(call add_unit_dis,${1})
