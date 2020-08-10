@@ -85,6 +85,12 @@ scarv_ccx_memif #() cpu_imem();
 scarv_ccx_memif #() cpu_dmem();
 
 //
+// TRNG wires
+// TODO: Implement CCX level TRNG.
+wire [31: 0] trng_pollentropy   ; // Value read by pollentropy instruciton.
+wire         trng_read          ; // pollentropy access just happened.
+
+//
 // Interconnect interfaces and wires
 // ------------------------------------------------------------
 
@@ -192,6 +198,8 @@ scarv_ccx_mmio #(
 .ctr_instret        (cpu_ctr_instret    ), // The instret counter value.
 .inhibit_cy         (cpu_ctr_inhibit_cy ), // Stop cycle counter incrementing.
 .inhibit_ir         (cpu_ctr_inhibit_ir ), // Stop instret incrementing.
+.trng_pollentropy   (trng_pollentropy   ), // Value read by pollentropy instr.
+.trng_read          (trng_read          ), // pollentropy just happened.
 .mmio               (if_mmio            )  // MMIO memory request interface.
 );
 
