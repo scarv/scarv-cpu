@@ -23,7 +23,11 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - make unit-tests-run
+    - make run-unit-core-example
+    - make run-unit-core-ld-bus-error
+    - make run-unit-core-mul-ld
+    - make run-unit-core-st-bus-error
+    - make run-unit-ccx-example
   - name: "Designer Assertions 1"
     script:
     - source ./bin/install-yosys.sh
