@@ -1,7 +1,0 @@
-
-
-TEST_NAME = st-bus-error
-TEST_SRC  = $(UNIT_ROOT)/st-bus-error/st-bus-error.c
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

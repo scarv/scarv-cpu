@@ -1,0 +1,7 @@
+
+
+TEST_NAME = core-ld-bus-error
+TEST_SRC  = $(UNIT_ROOT)/core-ld-bus-error/ld-bus-error.c
+
+$(eval $(call add_core_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

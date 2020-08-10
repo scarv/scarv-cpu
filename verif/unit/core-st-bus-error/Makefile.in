@@ -1,0 +1,7 @@
+
+
+TEST_NAME = core-st-bus-error
+TEST_SRC  = $(UNIT_ROOT)/core-st-bus-error/st-bus-error.c
+
+$(eval $(call add_core_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

@@ -7,107 +7,199 @@ UNIT_TESTS_RUN  =
 
 UNIT_TESTS_CLEAN=
 
-UNIT_TIMEOUT    = 60000
-UNIT_FAIL       = 0x80000086
-UNIT_PASS       = 0x80000090
+CORE_UNIT_TIMEOUT    = 60000
+CORE_UNIT_FAIL       = 0x80000086
+CORE_UNIT_PASS       = 0x80000090
+
+CCX_UNIT_TIMEOUT     = 60000
+CCX_UNIT_FAIL        = 0x00010086
+CCX_UNIT_PASS        = 0x00010090
 
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
 UNIT_CFLAGS    += -I$(FRV_HOME)/src/csp
+UNIT_CFLAGS    += -L$(FRV_HOME)/src/share/
 UNIT_CFLAGS    += -march=rv32imcb_xcrypto -mabi=ilp32
-UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
+CORE_LINK_LD   += $(UNIT_ROOT)/share/core-link.ld
+CCX_LINK_LD    += $(FRV_HOME)/src/share/ccx-link-app.ld
 
 UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
                   $(UNIT_ROOT)/share/util.S \
                   $(UNIT_ROOT)/share/unit_test.c \
                   $(FRV_HOME)/src/csp/scarv_cpu_csp.c
 
-define unit_test_elf
-$(UNIT_TEST_BUILD)/${1}/${1}.elf
+# 1. Test name
+define unit_test_dir
+$(UNIT_TEST_BUILD)/${1}
 endef
 
-define unit_test_objdump
-$(UNIT_TEST_BUILD)/${1}/${1}.objdump
+define ccx_unit_test_sim
+$(call unit_test_dir,${1})/model
 endef
 
-define unit_test_srec
-$(UNIT_TEST_BUILD)/${1}/${1}.srec
+define ccx_unit_test_rom_hex
+$(call unit_test_dir,${1})/rom.hex
 endef
 
-define unit_test_waves
-$(UNIT_TEST_BUILD)/${1}/${1}.vcd
+define ccx_unit_test_ram_hex
+$(call unit_test_dir,${1})/ram.hex
 endef
 
-define unit_test_gtkwave
-$(UNIT_TEST_BUILD)/${1}/${1}.gtkwl
+define core_unit_test_elf
+$(call unit_test_dir,${1})/${1}.elf
 endef
 
-define unit_test_log
-$(UNIT_TEST_BUILD)/${1}/${1}.log
+define core_unit_test_objdump
+$(call unit_test_dir,${1})/${1}.objdump
 endef
 
-define add_unit_test
-$(call unit_test_elf,${1}) : ${2} $(UNIT_SRCS) ;
-	@mkdir -p $(dir $(call unit_test_elf,${1}))
-	$(CC) -Wall $(UNIT_CFLAGS) -o $(call unit_test_elf,${1}) $(UNIT_SRCS) ${2}
+define core_unit_test_srec
+$(call unit_test_dir,${1})/${1}.srec
+endef
 
-$(call unit_test_objdump,${1}) : $(call unit_test_elf,${1}) ;
-	$(OBJDUMP) -D $(call unit_test_elf,${1}) > $(call unit_test_objdump,${1})
+define core_unit_test_waves
+$(call unit_test_dir,${1})/${1}.vcd
+endef
 
-$(call unit_test_srec,${1}) : $(call unit_test_elf,${1}) ;
-	$(OBJCOPY) -O srec --srec-forceS3 --srec-len=4 $(call unit_test_elf,${1})  $(call unit_test_srec,${1})
-        
-$(call unit_test_gtkwave,${1}) : $(call unit_test_objdump,${1})
-	grep "80.*:" $(call unit_test_objdump,${1}) \
+define core_unit_test_gtkwave
+$(call unit_test_dir,${1})/${1}.gtkwl
+endef
+
+define core_unit_test_log
+$(call unit_test_dir,${1})/${1}.log
+endef
+
+#
+# Build the test executable elf file.
+# 1. Test name
+# 2. Source Files
+# 3. Linker Script
+define add_unit_elf
+$(call core_unit_test_elf,${1}) : ${2} ;
+	@mkdir -p $(dir $(call core_unit_test_elf,${1}))
+	$(CC) -Wall $(UNIT_CFLAGS) -T ${3} -o $${@} $${^}
+endef        
+
+#
+# Dump disassembly.
+# 1. Test name
+define add_unit_dis
+$(call core_unit_test_objdump,${1}) : $(call core_unit_test_elf,${1}) 
+	$(OBJDUMP) -D $${<} > $${@}
+endef
+
+#
+# Create an SREC file from the ELF file.
+# 1. Test name
+define add_unit_srec
+$(call core_unit_test_srec,${1}) : $(call core_unit_test_elf,${1})
+	$(OBJCOPY) -O srec --srec-forceS3 --srec-len=4 $${<} $${@}
+endef
+
+#
+# 1. Test name
+# 2. Test source files.
+define add_core_unit_test
+
+# Build the test executable elf file.
+$(call add_unit_elf,${1},${2} $(UNIT_SRCS),$(CORE_LINK_LD))
+
+# Dump disassembly.
+$(call add_unit_dis,${1})
+
+# Create an SREC file from the ELF file.
+$(call add_unit_srec,${1})
+
+#
+# GTKWave annotations
+$(call core_unit_test_gtkwave,${1}) : $(call core_unit_test_objdump,${1})
+	grep "80.*:" $(call core_unit_test_objdump,${1}) \
 	    | grep -v ">:" | cut -c 11- | sed 's/\t//' \
 	    | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
 	    | sed 's/\(^....    \)    /0000\1/' \
-	    > $(call unit_test_gtkwave,${1})
+	    > $(call core_unit_test_gtkwave,${1})
 
-run-unit-${1} : $(call unit_test_srec,${1}) $(EXE_CORE) ;
+#
+# Per-test run target
+run-unit-${1} : $(call core_unit_test_srec,${1}) $(EXE_CORE) ;
 	$(EXE_CORE) \
-        +IMEM=$(call unit_test_srec,${1}) \
-        +WAVES=$(call unit_test_waves,${1}) \
-        +TIMEOUT=$(UNIT_TIMEOUT) \
-        +PASS_ADDR=$(UNIT_PASS) \
-        +FAIL_ADDR=$(UNIT_FAIL) 
+        +IMEM=$(call core_unit_test_srec,${1}) \
+        +WAVES=$(call core_unit_test_waves,${1}) \
+        +TIMEOUT=$(CORE_UNIT_TIMEOUT) \
+        +PASS_ADDR=$(CORE_UNIT_PASS) \
+        +FAIL_ADDR=$(CORE_UNIT_FAIL) 
 
-$(call unit_test_waves,${1}) : run-unit-${1}
-$(call unit_test_log,${1}) : run-unit-${1}
+$(call core_unit_test_waves,${1}) : run-unit-${1}
+$(call core_unit_test_log,${1}) : run-unit-${1}
 
-UNIT_TESTS += $(call unit_test_srec,${1}) \
-              $(call unit_test_objdump,${1}) \
-              $(call unit_test_elf,${1}) \
-              $(call unit_test_gtkwave,${1})
+UNIT_TESTS += $(call core_unit_test_srec,${1}) \
+    $(call core_unit_test_objdump,${1}) $(call core_unit_test_elf,${1}) \
+    $(call core_unit_test_gtkwave,${1})
 
-build-unit-${1} : $(call unit_test_srec,${1}) \
-                  $(call unit_test_objdump,${1}) \
-                  $(call unit_test_elf,${1}) \
-                  $(call unit_test_gtkwave,${1})
+build-unit-${1} : $(call core_unit_test_srec,${1}) \
+    $(call core_unit_test_objdump,${1}) \
+    $(call core_unit_test_elf,${1}) $(call core_unit_test_gtkwave,${1})
 
-UNIT_TESTS_RUN += $(call unit_test_waves,${1}) \
-                  $(call unit_test_objdump,${1}) \
-                  $(call unit_test_log,${1}) \
-                  $(call unit_test_gtkwave,${1})
+UNIT_TESTS_RUN += $(call core_unit_test_waves,${1}) \
+    $(call core_unit_test_objdump,${1}) \
+    $(call core_unit_test_log,${1}) $(call core_unit_test_gtkwave,${1})
 
-UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
-                    $(call unit_test_objdump,${1}) \
-                    $(call unit_test_srec,${1}) \
-                    $(call unit_test_elf,${1}) \
-                    $(call unit_test_log,${1}) \
-                    $(call unit_test_gtkwave,${1})
+UNIT_TESTS_CLEAN += $(call core_unit_test_waves,${1}) \
+    $(call core_unit_test_objdump,${1}) $(call core_unit_test_srec,${1}) \
+    $(call core_unit_test_elf,${1}) $(call core_unit_test_log,${1}) \
+    $(call core_unit_test_gtkwave,${1})
 
 endef
 
-include $(FRV_HOME)/verif/unit/example/Makefile.in
-include $(FRV_HOME)/verif/unit/mul-ld/Makefile.in
-include $(FRV_HOME)/verif/unit/ld-bus-error/Makefile.in
-include $(FRV_HOME)/verif/unit/st-bus-error/Makefile.in
-include $(FRV_HOME)/verif/unit/clmul/Makefile.in
-#include $(FRV_HOME)/verif/unit/mtime-read/Makefile.in
-#include $(FRV_HOME)/verif/unit/mtime-write/Makefile.in
-#include $(FRV_HOME)/verif/unit/counters/Makefile.in
-#include $(FRV_HOME)/verif/unit/interrupts/Makefile.in
-#include $(FRV_HOME)/verif/unit/timer/Makefile.in
+#
+# 1. Test name
+# 2. Source files.
+define add_ccx_unit_test
+
+# Build the test executable elf file.
+$(call add_unit_elf,${1},$(UNIT_SRCS) ${2},$(CCX_LINK_LD))
+
+# Dump disassembly.
+$(call add_unit_dis,${1})
+
+# Create a hex file from the ELF file.
+$(call ccx_unit_test_rom_hex,${1}) : $(FSBL_CCX_TEST_HEX)
+	@mkdir -p $(dir $(call ccx_unit_test_rom_hex,${1}))
+	cp $${<} $${@}
+
+$(call ccx_unit_test_ram_hex,${1}) : $(call core_unit_test_elf,${1})
+	@mkdir -p $(dir $(call ccx_unit_test_ram_hex,${1}))
+	$(OBJCOPY) --change-addresses=0xFFFF0000 --gap-fill=0 -O verilog $${<} $${@}
+
+build-unit-${1} :  $(call core_unit_test_objdump,${1}) \
+    $(call core_unit_test_elf,${1})
+
+run-unit-${1}: $(call ccx_unit_test_rom_hex,${1}) $(call ccx_unit_test_ram_hex,${1}) $(EXE_CCX)
+	cp $(EXE_CCX) $(call ccx_unit_test_sim,${1})
+	cd $(dir $(call ccx_unit_test_sim,${1})) && \
+	$(call ccx_unit_test_sim,${1}) \
+        +WAVES=$(call core_unit_test_waves,${1}) \
+        +TIMEOUT=$(CCX_UNIT_TIMEOUT) \
+        +PASS_ADDR=$(CCX_UNIT_PASS) \
+        +FAIL_ADDR=$(CCX_UNIT_FAIL) 
+
+endef
+
+#
+# Core level testbench.
+include $(FRV_HOME)/verif/unit/core-example/Makefile.in
+include $(FRV_HOME)/verif/unit/core-mul-ld/Makefile.in
+include $(FRV_HOME)/verif/unit/core-ld-bus-error/Makefile.in
+include $(FRV_HOME)/verif/unit/core-st-bus-error/Makefile.in
+include $(FRV_HOME)/verif/unit/core-clmul/Makefile.in
+
+#
+# Core-Complex level testbench.
+include $(FRV_HOME)/verif/unit/ccx-example/Makefile.in
+#include $(FRV_HOME)/verif/unit/ccx-mtime-read/Makefile.in
+#include $(FRV_HOME)/verif/unit/ccx-mtime-write/Makefile.in
+#include $(FRV_HOME)/verif/unit/ccx-counters/Makefile.in
+#include $(FRV_HOME)/verif/unit/ccx-interrupts/Makefile.in
+#include $(FRV_HOME)/verif/unit/ccx-timer/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)

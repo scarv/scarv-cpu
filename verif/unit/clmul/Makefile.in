@@ -1,6 +1,0 @@
-
-TEST_NAME = clmul
-TEST_SRC  = $(UNIT_ROOT)/clmul/test_clmul.c
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

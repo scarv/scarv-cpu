@@ -1,0 +1,6 @@
+
+TEST_NAME = core-clmul
+TEST_SRC  = $(UNIT_ROOT)/core-clmul/test_clmul.c
+
+$(eval $(call add_core_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

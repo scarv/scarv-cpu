@@ -1,0 +1,6 @@
+
+TEST_NAME = ccx-example
+TEST_SRC  = $(UNIT_ROOT)/ccx-example/test_example.c
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

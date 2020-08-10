@@ -1,7 +1,0 @@
-
-
-TEST_NAME = ld-bus-error
-TEST_SRC  = $(UNIT_ROOT)/ld-bus-error/ld-bus-error.c
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-
