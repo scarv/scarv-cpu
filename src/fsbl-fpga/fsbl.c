@@ -95,19 +95,6 @@ void fsbl_uart_setup() {
 @brief Print the simple welcome message to show we are ready.
 */
 inline void fsbl_print_welcome() {
-    uint32_t misa       = scarv_cpu_get_misa     ();
-    uint32_t mvendorid  = scarv_cpu_get_mvendorid();
-    uint32_t marchid    = scarv_cpu_get_marchid  ();
-    uint32_t mimpid     = scarv_cpu_get_mimpid   ();
-    uint64_t mtime      = scarv_cpu_get_mtime    ();
-    uint64_t mtimecmp   = scarv_cpu_get_mtimecmp ();
-    __putstr("misa     : "); __puthex32(misa     ); __putstr("\n");
-    __putstr("mvendorid: "); __puthex32(mvendorid); __putstr("\n");
-    __putstr("marchid  : "); __puthex32(marchid  ); __putstr("\n");
-    __putstr("mimpid   : "); __puthex32(mimpid   ); __putstr("\n");
-    __putstr("mtime    : "); __puthex64(mtime    ); __putstr("\n");
-    __putstr("mtimecmp : "); __puthex64(mtimecmp ); __putstr("\n");
-
     char * welcome = "scarv-cpu fsbl\n";
     __putstr(welcome);
 }
