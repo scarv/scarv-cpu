@@ -44,7 +44,7 @@ localparam  MMIO_MTIMECMP_ADDR_HI = MMIO_MTIMECMP_ADDR+4;
 parameter   MMIO_MTIMECMP_RESET   = -1;
 
 // Base address of the TRNG MMIO register.
-localparam  MMIO_TRNG_ADDR        = MMIO_BASE_ADDR + 12;
+localparam  MMIO_TRNG_ADDR        = MMIO_BASE_ADDR + 16;
 
 // Always accept requests instantly.
 assign mmio.gnt = 1'b1;
