@@ -182,6 +182,8 @@ run-unit-${1}: $(call ccx_unit_test_rom_hex,${1}) $(call ccx_unit_test_ram_hex,$
         +PASS_ADDR=$(CCX_UNIT_PASS) \
         +FAIL_ADDR=$(CCX_UNIT_FAIL) 
 
+UNIT_TESTS_RUN += run-unit-${1}
+
 endef
 
 #
