@@ -30,7 +30,7 @@ scarv_ccx_memif.RSP mmio              // MMIO memory request interface.
 // Base address of the memory mapped IO region.
 parameter   MMIO_BASE_ADDR        = 32'h0000_1000;
 parameter   MMIO_SIZE             = 32'h0000_0100;
-localparam  MMIO_BASE_MASK        = ~MMIO_SIZE   ;
+localparam  MMIO_BASE_MASK        = MMIO_SIZE - 1;
 
 // Base address of the MTIME memory mapped register.
 localparam  MMIO_MTIME_ADDR       = MMIO_BASE_ADDR;
@@ -52,19 +52,19 @@ assign mmio.gnt = 1'b1;
 // ---------------------- Memory mapped registers -----------------------
 
 wire    addr_mtime_lo    = mmio.req &&
-    (mmio.addr& ~MMIO_BASE_MASK)==(MMIO_MTIME_ADDR & ~MMIO_BASE_MASK);
+    (mmio.addr& MMIO_BASE_MASK)==(MMIO_MTIME_ADDR & MMIO_BASE_MASK);
 
 wire    addr_mtime_hi    = mmio.req &&
-    (mmio.addr& ~MMIO_BASE_MASK)==(MMIO_MTIME_ADDR_HI & ~MMIO_BASE_MASK);
+    (mmio.addr& MMIO_BASE_MASK)==(MMIO_MTIME_ADDR_HI & MMIO_BASE_MASK);
 
 wire    addr_mtimecmp_lo = mmio.req &&
-    (mmio.addr& ~MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR & ~MMIO_BASE_MASK);
+    (mmio.addr& MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR & MMIO_BASE_MASK);
 
 wire    addr_mtimecmp_hi = mmio.req &&
-    (mmio.addr& ~MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR_HI & ~MMIO_BASE_MASK);
+    (mmio.addr& MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR_HI & MMIO_BASE_MASK);
 
 wire    addr_trng_poll   = mmio.req &&
-    (mmio.addr& ~MMIO_BASE_MASK)==(MMIO_TRNG_ADDR        & ~MMIO_BASE_MASK);
+    (mmio.addr& MMIO_BASE_MASK)==(MMIO_TRNG_ADDR        & MMIO_BASE_MASK);
 
 reg  [63:0] mapped_mtime;
 reg  [63:0] mapped_mtimecmp;
