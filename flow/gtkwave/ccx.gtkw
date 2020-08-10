@@ -1,0 +1,644 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Mon Aug 10 10:50:33 2020
+[*]
+[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/unit/ccx-example/ccx-example.vcd"
+[dumpfile_mtime] "Mon Aug 10 10:49:59 2020"
+[dumpfile_size] 321637
+[savefile] "/home/work/scarv/skywater/scarv-cpu/flow/gtkwave/ccx.gtkw"
+[timestart] 1
+[size] 1920 1025
+[pos] -1 -1
+*-8.321928 827 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.scarv_ccx_top_v.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.
+[treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
+[sst_width] 270
+[signals_width] 454
+[sst_expanded] 1
+[sst_vpaned_height] 292
+@c00201
+-CCX Router IMEM
+@23
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.ROM_BASE[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.ROM_MASK[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.ROM_SIZE[31:0]
+@29
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.cpu_imem.req
+@23
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.cpu_imem.addr[31:0]
+@29
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.cpu_imem.gnt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.cpu_imem.error
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.map_core_ext
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.map_core_mmio
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.map_core_none
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.map_core_ram
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.map_core_rom
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.rsp_route_ext
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.rsp_route_mmio
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.rsp_route_none
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.rsp_route_ram
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_interconnect.i_router_imem.rsp_route_rom
+@1401201
+-CCX Router IMEM
+@c00200
+-i_scarv_cpu
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.g_clk
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.g_resetn
+@c00200
+-RVFI
+@1401200
+-RVFI
+@c00200
+-Instruction Memory
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.imem_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.imem_gnt
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.imem_addr[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.imem_error
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.imem_rdata[31:0]
+@1401200
+-Instruction Memory
+@c00200
+-Data Memory
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_gnt
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_addr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_strb[3:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_wdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_wen
+@200
+-
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_rdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_error
+@1401200
+-Data Memory
+@800200
+-Trace
+@2022
+^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.gtkwl
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.trs_instr[31:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.trs_instr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.trs_pc[31:0]
+@8022
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.trs_pc[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.trs_valid
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.cf_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.cf_ack
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.cf_target[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.trap_cause[5:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.trap_cpu
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.trap_int
+@1000200
+-Trace
+@c00200
+-GPR
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.gpr_rd[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.gpr_wdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.gpr_wen
+@1401200
+-GPR
+@c00200
+-Interrupts
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.int_external
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.int_software
+@1401200
+-Interrupts
+@c00200
+-Pipe Valid/Busy
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s0_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s1_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s1_valid
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_valid
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_valid
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_valid
+@1401200
+-Pipe Valid/Busy
+@c00200
+-Forwarding
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s1_bubble
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.hzd_rs1_s2
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_rs1_rdata[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_rs2_rdata[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_s2_rd[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_s2_wdata[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_s3_rd[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_s3_wdata[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_s4_rd[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.fwd_s4_wdata[31:0]
+@1401200
+-Forwarding
+@c00200
+-Pipe - S0 - Fetch
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.g_clk
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.g_resetn
+@200
+-
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.drop_response
+@24
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.buf_depth[2:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.n_buf_depth[2:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.e_new_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.e_new_rsp
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.buf_out_2
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.buf_out_4
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.s1_data[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.s1_error
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.s1_valid
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.i_core_fetch_buffer.buf_overflow
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.incomplete_instr
+@c00200
+-Control Flow Bus
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.cf_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.cf_ack
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.cf_target[31:0]
+@1401200
+-Control Flow Bus
+@800200
+-Instruction Memory Bus
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.n_imem_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.imem_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.imem_gnt
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.imem_addr[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.imem_error
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s0_fetch.imem_rdata[31:0]
+@1000200
+-Instruction Memory Bus
+@1401200
+-Pipe - S0 - Fetch
+@c00200
+-Pipe - S1 Decode
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.program_counter[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s1_data[31:0]
+@2022
+^3 /home/work/scarv/skywater/scarv-cpu/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_bubble
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_busy
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_data[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_error
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_flush
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_rs1_addr[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_rs1_rdata[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_rs2_addr[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_rs2_rdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.s1_valid
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.n_program_counter[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.n_s2_opr_a[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.n_s2_opr_b[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.n_s2_opr_c[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.flush
+@800200
+-Leakage Instructions
+@1000200
+-Leakage Instructions
+@1401200
+-Pipe - S1 Decode
+@c00200
+-Pipe - S2 Execute
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_valid
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_instr[31:0]
+@c00022
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+@28
+(0)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(1)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(2)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(3)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(4)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(5)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(6)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(7)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(8)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(9)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(10)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(11)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(12)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(13)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(14)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(15)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(16)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(17)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(18)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(19)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(20)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(21)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(22)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(23)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(24)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(25)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(26)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(27)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(28)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(29)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(30)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+(31)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_a[31:0]
+@1401200
+-group_end
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_b[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_c[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_rd[4:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_size[1:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_trap
+@c00200
+-ALI
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_flush
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_result[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_op_add
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_op_and
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_op_or
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_op_sub
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_op_xor
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_ready
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_valid
+@1401200
+-ALI
+-Pipe - S2 Execute
+@c00200
+-Pipe - S3 Memory
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_busy
+@2022
+^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.gtkwl
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_instr[31:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_opr_a[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_opr_b[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_rd[4:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_size[1:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_trap
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s3_valid
+@800200
+-Data Memory
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_gnt
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_addr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_strb[3:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_wdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_wen
+@200
+-
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_rdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.dmem_error
+@1000200
+-Data Memory
+@800200
+-LSU
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.g_clk
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.g_resetn
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_gnt
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_addr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_strb[3:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wen
+@200
+-
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_txn_done
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.hold_lsu_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_a_error
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_addr[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_byte
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_finished
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_half
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_load
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_ready
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_signed
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_store
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_valid
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_wdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_word
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.n_lsu_finished
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
+@1000200
+-LSU
+@1401200
+-Pipe - S3 Memory
+@c00200
+-Pipe - S4 - Writeback
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_busy
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_flush
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_instr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_opr_a[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_opr_b[31:0]
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_rd[4:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_size[1:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_trap
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s4_valid
+@200
+-
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.dmem_error
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.n_dmem_r_error
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.dmem_rdata[31:0]
+@200
+-
+-
+@2024
+^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.gpr_rd[4:0]
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.gpr_wen
+@200
+-
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.trs_valid
+@1401200
+-Pipe - S4 - Writeback
+@c00200
+-CSR Bus
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_addr[11:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_en
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_mepc[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_mtvec[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_rdata[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_error
+@c00022
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+@28
+(0)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(1)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(2)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(3)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(4)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(5)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(6)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(7)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(8)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(9)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(10)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(11)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(12)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(13)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(14)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(15)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(16)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(17)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(18)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(19)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(20)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(21)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(22)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(23)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(24)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(25)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(26)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(27)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(28)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(29)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(30)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+(31)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wdata[31:0]
+@1401200
+-group_end
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wr
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wr_clr
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.csr_wr_set
+@1401200
+-CSR Bus
+@c00200
+-MTVEC
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.csr_mtvec[31:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.mtvec_bad_write
+@c00022
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+@28
+(0)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(1)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(2)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(3)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(4)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(5)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(6)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(7)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(8)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(9)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(10)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(11)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(12)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(13)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(14)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(15)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(16)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(17)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(18)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(19)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(20)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(21)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(22)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(23)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(24)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(25)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(26)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(27)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(28)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+(29)TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_base[29:0]
+@1401200
+-group_end
+@24
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.n_mtvec_mode[1:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.read_mtvec
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.reg_mtvec[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.reg_mtvec_base[29:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.reg_mtvec_mode[1:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.wen_mtvec
+@200
+-
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.cfu_trap
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.csr_trap
+@200
+-
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.vector_intrs
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.trap_target_addr[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.trap_vector_offset[7:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s4_writeback.int_trap_cause[5:0]
+@24
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.trap_cause[5:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.trap_cpu
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.trap_int
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.trap_mtval[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_csrs.trap_pc[31:0]
+@1401200
+-MTVEC
+@c00200
+-Interrupts
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.g_clk
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.g_resetn
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.int_trap_ack
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.int_trap_cause[5:0]
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.int_trap_req
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mie_meie
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mie_msie
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mie_mtie
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mip_meip
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mip_msip
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mip_mtip
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.mstatus_mie
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.raise_mei
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.raise_msi
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.raise_mti
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.sw_pending
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.ti_pending
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_interrupts.ex_pending
+@1401200
+-Interrupts
+@c00200
+-GPRs
+@22
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(0)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(1)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(2)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(3)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(4)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(5)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(6)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(7)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(8)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(9)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(10)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(11)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(12)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(13)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(14)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(15)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(16)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(17)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(18)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(19)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(20)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(21)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(22)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(23)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(24)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(25)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(26)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(27)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(28)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(29)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(30)[31:0]
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_gprs.gprs(31)[31:0]
+@1401200
+-GPRs
+-i_scarv_cpu
+[pattern_trace] 1
+[pattern_trace] 0

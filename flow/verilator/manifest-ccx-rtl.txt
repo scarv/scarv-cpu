@@ -1,10 +1,11 @@
 -F $(SCARV_CPU)/flow/verilator/manifest-core-rtl.txt
 $(SCARV_CPU)/rtl/mem/scarv_dual_ram.sv
-$(SCARV_CPU)/rtl/mem/scarv_single_rom.v
+$(SCARV_CPU)/rtl/mem/scarv_single_rom.sv
+$(SCARV_CPU)/rtl/ccx/scarv_ccx_memif.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_ic_stub.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_ic_arbiter.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_ic_router.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_ic.sv
-$(SCARV_CPU)/rtl/ccx/scarv_ccx_memif.sv
+$(SCARV_CPU)/rtl/ccx/scarv_ccx_mmio.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_top.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_top_v.v

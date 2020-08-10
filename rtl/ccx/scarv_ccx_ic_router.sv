@@ -34,13 +34,13 @@ scarv_ccx_memif.REQ if_mmio
 // Parameters
 // ------------------------------------------------------------
 
-localparam  ROM_MASK  = ~ROM_SIZE;
+localparam  ROM_MASK  = ROM_SIZE  - 1;
 
-localparam  RAM_MASK  = ~RAM_SIZE;
+localparam  RAM_MASK  = RAM_SIZE  - 1;
 
-localparam  EXT_MASK  = ~EXT_SIZE;
+localparam  EXT_MASK  = EXT_SIZE  - 1;
 
-localparam  MMIO_MASK = ~MMIO_SIZE;
+localparam  MMIO_MASK = MMIO_SIZE - 1;
 
 //
 // Utility functions
@@ -55,8 +55,8 @@ input [AW-1:0] mask     ,   // Mask bits to match top addr bits with
 input [AW-1:0] base     ,   // Base address of the range
 input [AW-1:0] range        // Size of the range.
 );
-    address_match = (address &  mask) == (            base   ) &&
-                    (address & ~mask) == (address & (range-1))  ;
+    address_match = (address |  base) == (address            ) &&
+                    (address & ~mask) == (base               )  ;
 endfunction
 
 

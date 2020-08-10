@@ -32,16 +32,23 @@ parameter   MMIO_SIZE   = 32'h0000_0100; //! Size in bytes of MMIO
 parameter   EXT_BASE    = 32'h1000_0000; //! Base address of EXT Mem.
 parameter   EXT_SIZE    = 32'h1000_0000; //! Size in bytes of EXT Mem.
 
+// Reset value for the mtimecmp memory mapped register.
+parameter   MTIMECMP_RESET = 64'hFFFF_FFFF_FFFF_FFFF;
+
+// Reset value for the program counter.
+parameter   PC_RESET       = 32'b0;
+
+/* verilator lint_off WIDTH */
+//! Memory initialisation file for the ROM.
+parameter [255*8-1:0] ROM_INIT_FILE = "rom.hex";
+parameter [255*8-1:0] RAM_INIT_FILE = "ram.hex";
+/* verilator lint_on WIDTH */
+
 // Depth of the RAM in 32-bit words.
 localparam RAM_DEPTH = RAM_SIZE / 4;
 
 // Depth of the RAM in 32-bit words.
 localparam ROM_DEPTH = ROM_SIZE / 4;
-
-/* verilator lint_off WIDTH */
-//! Memory initialisation file for the ROM.
-parameter [255*8-1:0] ROM_INIT_FILE = "";
-/* verilator lint_on WIDTH */
 
 
 //
@@ -100,7 +107,9 @@ assign if_rom.gnt   = 1'b1;
 // CPU Instance
 // ------------------------------------------------------------
 
-frv_core i_scarv_cpu (
+frv_core #(
+.FRV_PC_RESET_VALUE(PC_RESET        )
+) i_scarv_cpu (
 .g_clk            (f_clk                  ), // global clock
 .g_resetn         (g_resetn               ), // synchronous reset
 .trs_pc           (cpu_trs_pc             ), // Trace program counter.
@@ -160,6 +169,35 @@ scarv_ccx_ic #(
 .if_mmio        (if_mmio        )
 );
 
+
+//
+// Peripheral instances
+// ------------------------------------------------------------
+
+
+//
+// instance: scarv_ccx_mmio
+//
+//  Memory mapped registers for the core complex.
+//  Includes counters mtime and mtimecmp
+//
+scarv_ccx_mmio #(
+.MMIO_BASE_ADDR     (MMIO_BASE      ),
+.MMIO_SIZE          (MMIO_SIZE      ),
+.MMIO_MTIMECMP_RESET(MTIMECMP_RESET )
+) i_mmio (
+.f_clk              (f_clk              ), // global clock
+.g_resetn           (g_resetn           ), // synchronous reset
+.instr_ret          (cpu_instr_ret      ), // Instruction retired.
+.timer_interrupt    (cpu_int_mtime      ), // Raise a timer interrupt
+.ctr_time           (cpu_ctr_time       ), // The time counter value.
+.ctr_cycle          (cpu_ctr_cycle      ), // The cycle counter value.
+.ctr_instret        (cpu_ctr_instret    ), // The instret counter value.
+.inhibit_cy         (cpu_ctr_inhibit_cy ), // Stop cycle counter incrementing.
+.inhibit_ir         (cpu_ctr_inhibit_ir ), // Stop instret incrementing.
+.mmio               (if_mmio            )  // MMIO memory request interface.
+);
+
 //
 // Memory instances
 // ------------------------------------------------------------
@@ -168,8 +206,9 @@ localparam RAM_AH = $clog2(RAM_DEPTH)+1;
 localparam ROM_AH = $clog2(ROM_DEPTH)+1;
 
 scarv_dual_ram #(
-.DEPTH (RAM_DEPTH),   // Depth of RAM in words
-.WIDTH (32       )    // Width of a RAM word.
+.DEPTH      (RAM_DEPTH      ),   // Depth of RAM in words
+.WIDTH      (32             ),   // Width of a RAM word.
+.INIT_FILE  (RAM_INIT_FILE  )
 ) i_ram (
 .g_clk       (f_clk             ),
 .g_resetn    (g_resetn          ),
