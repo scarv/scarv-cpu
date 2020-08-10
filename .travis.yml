@@ -28,6 +28,7 @@ jobs:
     - make run-unit-core-mul-ld
     - make run-unit-core-st-bus-error
     - make run-unit-ccx-example
+    - make run-unit-ccx-counters
   - name: "Designer Assertions 1"
     script:
     - source ./bin/install-yosys.sh
