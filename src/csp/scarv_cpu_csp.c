@@ -30,6 +30,17 @@ inline uint64_t scarv_cpu_get_mtime(){
 
 /*!
 */
+inline void     scarv_cpu_set_mtime(uint64_t nv){
+    (&__mmio_mtime_lo)[0] = (uint32_t)(nv >>  0);
+    (&__mmio_mtime_lo)[1] = (uint32_t)(nv >> 32);
+    if((uint32_t)(&__mmio_mtimecmp_lo)[1] != nv >> 32) {
+        (&__mmio_mtime_lo)[0] = (uint32_t)(nv >>  0);
+        (&__mmio_mtime_lo)[1] = (uint32_t)(nv >> 32);
+    }
+}
+
+/*!
+*/
 inline uint32_t scarv_cpu_get_mtime_lo(){
     return (uint32_t)(&__mmio_mtime_lo)[0];
 }
@@ -46,6 +57,6 @@ inline uint64_t scarv_cpu_get_mtimecmp(){
 /*!
 */
 inline void     scarv_cpu_set_mtimecmp(uint64_t nv){
-    (__mmio_mtimecmp_lo)[0] = (uint32_t)(nv >> 32);
-    (__mmio_mtimecmp_lo)[1] = (uint32_t)(nv >>  0);
+    (&__mmio_mtimecmp_lo)[0] = (uint32_t)(nv >>  0);
+    (&__mmio_mtimecmp_lo)[1] = (uint32_t)(nv >> 32);
 }

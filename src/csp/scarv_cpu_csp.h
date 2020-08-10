@@ -23,6 +23,11 @@ const uint32_t scarv_cpu_freq;
 uint64_t scarv_cpu_get_mtime();
 
 /*!
+@brief Set the new value of mtime
+*/
+void     scarv_cpu_set_mtime(uint64_t nv);
+
+/*!
 @brief Read the low 32 bits of the mtime register.
 @returns The low 32 bits of mtime.
 */
