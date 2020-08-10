@@ -1,5 +1,6 @@
 
 #include "unit_test.h"
+#include "scarv_cpu_csp.h"
 
 /*!
 @brief Test reading of the standard performance counters/timers.
@@ -9,20 +10,20 @@ the test.
 int test_main() {
 
     // The counters are enabled
-    uint32_t enabled = __rdmcountinhibit();
+    uint32_t enabled = scarv_cpu_get_mcountinhibit();
     
     if((enabled&0x7) != 0x0) {
-        __wrmcountinhibit(0x0);
+        scarv_cpu_wr_mcountinhibit(0x0);
     }
 
 
-    uint64_t a_cycle      = __rdcycle();
-    uint64_t a_time       = __rdtime();
-    uint64_t a_instret    = __rdinstret();
+    uint64_t a_cycle      = scarv_cpu_rdcycle();
+    uint64_t a_time       = scarv_cpu_get_mtime();
+    uint64_t a_instret    = scarv_cpu_rdinstret();
 
-    uint64_t b_cycle      = __rdcycle();
-    uint64_t b_time       = __rdtime();
-    uint64_t b_instret    = __rdinstret();
+    uint64_t b_cycle      = scarv_cpu_rdcycle();
+    uint64_t b_time       = scarv_cpu_get_mtime();
+    uint64_t b_instret    = scarv_cpu_rdinstret();
 
 
     if(a_cycle >= b_cycle) {
@@ -41,16 +42,15 @@ int test_main() {
     }
 
     // Disable the cycle counter register
-    __wrmcountinhibit(0x1);
+    scarv_cpu_wr_mcountinhibit(0x1);
     
-    
-    a_cycle      = __rdcycle();
-    a_time       = __rdtime();
-    a_instret    = __rdinstret();
+    a_cycle      = scarv_cpu_rdcycle();
+    a_time       = scarv_cpu_get_mtime();
+    a_instret    = scarv_cpu_rdinstret();
 
-    b_cycle      = __rdcycle();
-    b_time       = __rdtime();
-    b_instret    = __rdinstret();
+    b_cycle      = scarv_cpu_rdcycle();
+    b_time       = scarv_cpu_get_mtime();
+    b_instret    = scarv_cpu_rdinstret();
 
 
     if(a_cycle != b_cycle) {
@@ -69,23 +69,23 @@ int test_main() {
     }
     
     // Disable the time counter register, re-enable the cycle register.
-    __wrmcountinhibit(0x2);
+    scarv_cpu_wr_mcountinhibit(0x2);
     
-    a_cycle      = __rdcycle();
-    a_time       = __rdtime();
-    a_instret    = __rdinstret();
+    a_cycle      = scarv_cpu_rdcycle();
+    a_time       = scarv_cpu_get_mtime();
+    a_instret    = scarv_cpu_rdinstret();
 
-    b_cycle      = __rdcycle();
-    b_time       = __rdtime();
-    b_instret    = __rdinstret();
+    b_cycle      = scarv_cpu_rdcycle();
+    b_time       = scarv_cpu_get_mtime();
+    b_instret    = scarv_cpu_rdinstret();
 
     if(a_cycle >= b_cycle) {
         // Cycle enabled, first reading should be smaller.
         return 7;
     }
 
-    if(a_time != b_time) {
-        // time register disabled. Should stay the same.
+    if(a_time == b_time) {
+        // time register cannot be disabled.
         return 8;
     }
 
@@ -95,15 +95,15 @@ int test_main() {
     }
     
     // Disable the instr ret register, re-enable the time register.
-    __wrmcountinhibit(0x4);
+    scarv_cpu_wr_mcountinhibit(0x4);
     
-    a_cycle      = __rdcycle();
-    a_time       = __rdtime();
-    a_instret    = __rdinstret();
+    a_cycle      = scarv_cpu_rdcycle();
+    a_time       = scarv_cpu_get_mtime();
+    a_instret    = scarv_cpu_rdinstret();
 
-    b_cycle      = __rdcycle();
-    b_time       = __rdtime();
-    b_instret    = __rdinstret();
+    b_cycle      = scarv_cpu_rdcycle();
+    b_time       = scarv_cpu_get_mtime();
+    b_instret    = scarv_cpu_rdinstret();
 
     if(a_cycle >= b_cycle) {
         // Cycle enabled, first reading should be smaller.
@@ -120,7 +120,7 @@ int test_main() {
         return 12;
     }
     
-    __wrmcountinhibit(0x0);
+    scarv_cpu_wr_mcountinhibit(0x0);
 
     return 0;
 

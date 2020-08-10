@@ -116,7 +116,7 @@ void __attribute__ ((used)) test_trap_handler() {
     }
 
     if(th_cfg.check_mcause) {
-        uint32_t mcause = scarv_cpu_rd_mcause();
+        uint32_t mcause = scarv_cpu_get_mcause();
         uint32_t val    = 0x1 << mcause & (th_cfg.expect_mcause);
 
         if(val) {
@@ -128,7 +128,7 @@ void __attribute__ ((used)) test_trap_handler() {
     }
 
     if(th_cfg.check_mepc) {
-        uint32_t mepc = scarv_cpu_rd_mepc();
+        uint32_t mepc = scarv_cpu_get_mepc();
         if(mepc != th_cfg.expect_mepc) {
             __putstr("!C\n");
             test_fail(); // Un-expected mepc value.
@@ -136,7 +136,7 @@ void __attribute__ ((used)) test_trap_handler() {
     }
     
     if(th_cfg.check_mtval) {
-        uint32_t mtval = scarv_cpu_rd_mtval();
+        uint32_t mtval = scarv_cpu_get_mtval();
         if(mtval != th_cfg.expect_mtval) {
             __putstr("!D\n");
             test_fail(); // Un-expected mtval value.
@@ -144,7 +144,7 @@ void __attribute__ ((used)) test_trap_handler() {
     }
 
     if(th_cfg.step_over_mepc) {
-        uint32_t mepc = scarv_cpu_rd_mepc();
+        uint32_t mepc = scarv_cpu_get_mepc();
         uint8_t  ib0  = ((uint8_t*)mepc)[0];
         mepc += 2; // Always increment MEPC by two bytes.
         if((ib0 & 0x3) == 0x3) {
