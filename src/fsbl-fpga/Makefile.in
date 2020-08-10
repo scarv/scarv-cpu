@@ -3,8 +3,9 @@
 # Relies on $(FRV_HOME)/src/share/fsbl.mk
 
 FSBL_FPGA_SRC    = $(FRV_HOME)/src/fsbl-fpga/boot.S \
-                   $(FRV_HOME)/src/fsbl-fpga/fsbl.c
+                   $(FRV_HOME)/src/fsbl-fpga/fsbl.c \
+                   $(FRV_HOME)/src/csp/scarv_cpu_csp.c
 
 
-$(eval $(call add_fsbl_target,fpga,$(FSBL_FPGA_SRC)))
+$(eval $(call add_fsbl_target,fpga,$(FSBL_FPGA_SRC),-I$(FRV_HOME)/src/csp))
 

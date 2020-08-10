@@ -1,5 +1,5 @@
 
-.text
+.section .text.fsbl
 .global __fsbl_start
 __fsbl_start:
 

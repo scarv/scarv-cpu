@@ -2,6 +2,8 @@
 FSBL_CFLAGS  = -nostartfiles -Os -O2 -Wall -fpic -fPIC
 FSBL_CFLAGS += -L$(FRV_HOME)/src/share/
 FSBL_CFLAGS += -e __fsbl_start
+FSBL_CFLAGS += -fdata-sections -ffunction-sections
+FSBL_CFLAGS += -Wl,--gc-sections
 FSBL_CFLAGS += -T$(FRV_HOME)/src/share/ccx-link-fsbl.ld
 FSBL_CFLAGS += -march=rv32imc_xcrypto -mabi=ilp32
 
@@ -34,10 +36,11 @@ endef
 #
 # 1. FSBL name
 # 2. FSBL srcs
+# 3. Extra CFLAGS
 define add_fsbl_elf
 $(call map_fsbl_elf,${1}) : ${2}
 	@mkdir -p $(call map_fsbl_dir,${1})
-	$(CC) $(FSBL_CFLAGS) -o $${@} $${^}
+	$(CC) $(FSBL_CFLAGS) ${3} -o $${@} $${^}
 endef
 
 #
@@ -61,8 +64,9 @@ endef
 #
 # 1. FSBL Name
 # 2. FSBL srcs
+# 3. Extra CFLAGS
 define add_fsbl_target
-$(call add_fsbl_elf,${1},${2})
+$(call add_fsbl_elf,${1},${2},${3})
 $(call add_fsbl_objdump,${1},${2})
 $(call add_fsbl_hex,${1},${2})
 

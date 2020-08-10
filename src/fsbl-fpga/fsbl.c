@@ -1,5 +1,6 @@
 
 #include <stdint.h>
+#include <scarv_cpu_csp.h>
 
 #ifndef UART_BASE
     #define UART_BASE 0x40600000
@@ -28,12 +29,51 @@ const uint32_t UART_CTRL_INT_ENA     = 0x00000010;
 const uint32_t UART_STATUS_RX_VALID  = 0x00000001;
 const uint32_t UART_STATUS_TX_FULL   = 0x00000008;
 
+// For printing out hex numbers.
+const char * lut = "0123456789ABCDEF";
+
+//! Write a character to the uart.
+void uart_putc(char c) {
+    while(uart[UART_ST] & UART_STATUS_TX_FULL) {
+        // Do nothing.
+    }   
+    uart[UART_TX] = c;
+}
+
 //! Read a single character from the UART.
-uint8_t uart_rd_char(){
+uint8_t uart_getc(){
     while(!(uart[UART_ST] & UART_STATUS_RX_VALID)) {
         // Do nothing.
     }
     return (uint8_t)uart[UART_RX];
+}
+
+//! Write a null terminated string to the uart.
+void __putstr(char *s) {
+    int i = 0;
+    if(s[0] == 0) {
+        return;
+    }
+    do {
+        uart_putc(s[i]);
+        i++;
+    } while(s[i] != 0) ;
+}
+
+//! Print a 32-bit number as hex
+void __puthex32(uint32_t w) {
+    for(int i =  3; i >= 0; i --) {
+        uint8_t b_0 = (w >> (8*i    )) & 0xF;
+        uint8_t b_1 = (w >> (8*i + 4)) & 0xF;
+        uart_putc(lut[b_1]);
+        uart_putc(lut[b_0]);
+    }
+}
+
+//! Print a 64-bit number as hex
+void __puthex64(uint64_t w) {
+    __puthex32(w>>32);
+    __puthex32(w    );
 }
 
 //! Jump to the main function
@@ -54,19 +94,22 @@ void fsbl_uart_setup() {
 /*!
 @brief Print the simple welcome message to show we are ready.
 */
-void fsbl_print_welcome() {
+inline void fsbl_print_welcome() {
+    uint32_t misa       = scarv_cpu_get_misa     ();
+    uint32_t mvendorid  = scarv_cpu_get_mvendorid();
+    uint32_t marchid    = scarv_cpu_get_marchid  ();
+    uint32_t mimpid     = scarv_cpu_get_mimpid   ();
+    uint64_t mtime      = scarv_cpu_get_mtime    ();
+    uint64_t mtimecmp   = scarv_cpu_get_mtimecmp ();
+    __putstr("misa     : "); __puthex32(misa     ); __putstr("\n");
+    __putstr("mvendorid: "); __puthex32(mvendorid); __putstr("\n");
+    __putstr("marchid  : "); __puthex32(marchid  ); __putstr("\n");
+    __putstr("mimpid   : "); __puthex32(mimpid   ); __putstr("\n");
+    __putstr("mtime    : "); __puthex64(mtime    ); __putstr("\n");
+    __putstr("mtimecmp : "); __puthex64(mtimecmp ); __putstr("\n");
 
-    // Welcome message
     char * welcome = "scarv-cpu fsbl\n";
-
-    for(int i = 0; welcome[i]; i ++) {
-        
-        while(uart[UART_ST] & UART_STATUS_TX_FULL) {
-            // Do nothing.
-        }   
-        uart[UART_TX] = welcome[i];
-
-    }
+    __putstr(welcome);
 }
 
 /*!
@@ -86,19 +129,19 @@ void fsbl() {
     
     // First 4 bytes are the size of the program (in bytes).
     uint32_t    program_size =
-        ((uint32_t)uart_rd_char() << 24) |
-        ((uint32_t)uart_rd_char() << 16) |
-        ((uint32_t)uart_rd_char() <<  8) |
-        ((uint32_t)uart_rd_char() <<  0) ;
+        ((uint32_t)uart_getc() << 24) |
+        ((uint32_t)uart_getc() << 16) |
+        ((uint32_t)uart_getc() <<  8) |
+        ((uint32_t)uart_getc() <<  0) ;
     
     gpio[GPIO_LEDS] = 0x8;
     
     // Next 4 bytes are a 32-bit destination address.
     uint32_t    program_dest =
-        ((uint32_t)uart_rd_char() << 24) |
-        ((uint32_t)uart_rd_char() << 16) |
-        ((uint32_t)uart_rd_char() <<  8) |
-        ((uint32_t)uart_rd_char() <<  0) ;
+        ((uint32_t)uart_getc() << 24) |
+        ((uint32_t)uart_getc() << 16) |
+        ((uint32_t)uart_getc() <<  8) |
+        ((uint32_t)uart_getc() <<  0) ;
     
     gpio[GPIO_LEDS] = -1;
 
@@ -112,7 +155,7 @@ void fsbl() {
 
         led_count += 1;
         
-        dest_ptr[i] = uart_rd_char();
+        dest_ptr[i] = uart_getc();
 
         if(led_count >= bytes_per_led) {
             led_count = 0;

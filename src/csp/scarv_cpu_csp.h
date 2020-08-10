@@ -11,26 +11,6 @@
 #ifndef __SCARV_CPU_CSP_H__
 #define __SCARV_CPU_CSP_H__
 
-// ----------- Memory Mapped IO Addresses ----------
-
-//! Constant Pointer to a volatile memory mapped IO word.
-typedef uint32_t volatile * const scarv_cpu_mmio_t;
-
-//! Bits 31:0 of the memory mapped mtime register.
-scarv_cpu_mmio_t scarv_cpu_mtime_lo       ;
-
-//! Bits 63:32 of the memory mapped mtime register.
-scarv_cpu_mmio_t scarv_cpu_mtime_hi       ;
-
-//! Bits 31:0 of the memory mapped mtimecmp register.
-scarv_cpu_mmio_t scarv_cpu_mtimecmp_lo    ;
-
-//! Bits 63:32 of the memory mapped mtimecmp register.
-scarv_cpu_mmio_t scarv_cpu_mtimecmp_hi    ;
-
-//! Address which pollentropy instructions access.
-scarv_cpu_mmio_t scarv_cpu_trng           ;
-
 // ----------- Timer Access Functions --------------
 
 //! System clock frequency
@@ -40,23 +20,23 @@ const uint32_t scarv_cpu_freq;
 @brief Read the 64-bit value of the mtime register.
 @returns The full 64-bit value of mtime.
 */
-inline uint64_t scarv_cpu_get_mtime();
+uint64_t scarv_cpu_get_mtime();
 
 /*!
 @brief Read the low 32 bits of the mtime register.
 @returns The low 32 bits of mtime.
 */
-inline uint32_t scarv_cpu_get_mtime_lo();
+uint32_t scarv_cpu_get_mtime_lo();
 
 /*!
 @brief Read the current value of mtimecmp
 */
-inline uint64_t scarv_cpu_set_mtimecmp();
+uint64_t scarv_cpu_get_mtimecmp();
 
 /*!
 @brief Set the new value of mtimecmp
 */
-inline void     scarv_cpu_get_mtimecmp(uint64_t nv);
+void     scarv_cpu_set_mtimecmp(uint64_t nv);
 
 /*!
 @brief Wait for an interrupt to be pending.
@@ -109,6 +89,11 @@ inline void     scarv_cpu_wait_for_interrupt() {
     DECL_CLR_CSR(CSR)        \
     DECL_SET_CSR(CSR) 
 
+DECL_RD_CSR(misa)
+DECL_RD_CSR(mvendorid)
+DECL_RD_CSR(marchid)
+DECL_RD_CSR(mimpid)
+
 DECL_CSR_ACCESS(mepc)
 DECL_CSR_ACCESS(mcause)
 DECL_CSR_ACCESS(mtvec)
@@ -116,6 +101,9 @@ DECL_CSR_ACCESS(mtval)
 DECL_CSR_ACCESS(mstatus)
 DECL_CSR_ACCESS(mie)
 DECL_CSR_ACCESS(mip)
+DECL_CSR_ACCESS(mcounteren)
+DECL_CSR_ACCESS(mcountinhibit)
+DECL_CSR_ACCESS(mscratch)
 
 #endif
 
