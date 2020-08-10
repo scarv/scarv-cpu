@@ -1,7 +1,7 @@
 
+#include "scarv_cpu_csp.h"
 
 #include "unit_test.h"
-
 #include "test_timer.h"
 
 // Interrupt handler table.
@@ -15,21 +15,21 @@ const           int interrupt_period    = 400;
 //! Called when a machine timer interrupt occurs.
 void handler_machine_timer() {
 
-    uint64_t mtime      = __rd_mtime()      ;
-    uint64_t mtime_cmp  = __rd_mtimecmp()   ;
+    uint64_t mtime      = scarv_cpu_get_mtime()   ;
+    uint64_t mtime_cmp  = scarv_cpu_get_mtimecmp();
 
     interrupt_count ++;
 
      __puthex64(mtime);
      __putchar(' '); __puthex64(mtime_cmp); __putchar('\n');
     
-    uint64_t mtime_cmpn = __rd_mtime() + interrupt_period;
+    uint64_t mtime_cmpn = scarv_cpu_get_mtime() + interrupt_period;
 
-    __wr_mtimecmp(mtime_cmpn);
+    scarv_cpu_set_mtimecmp(mtime_cmpn);
 
     // Disable the machine timer interrupt.
     if(interrupt_count >= max_interrupt_count) {
-        __clr_mie(MIE_MTIE);
+        scarv_cpu_clr_mie(MIE_MTIE);
     }
 
     return;
@@ -40,13 +40,13 @@ void start_machine_timer() {
 
     mtvec(&vector_interrupt_table, 1);
 
-    uint64_t mtime      = __rd_mtime();
+    uint64_t mtime      = scarv_cpu_get_mtime();
     uint64_t mtime_cmpn = mtime + interrupt_period;
 
-    __wr_mtimecmp(mtime_cmpn);
+    scarv_cpu_set_mtimecmp(mtime_cmpn);
 
-    __set_mie(MIE_MTIE);
-    __set_mstatus(MSTATUS_MIE);
+    scarv_cpu_set_mie(MIE_MTIE);
+    scarv_cpu_set_mstatus(MSTATUS_MIE);
 
 }
 
@@ -64,8 +64,8 @@ int test_main() {
 
     while(interrupt_count < max_interrupt_count) {
         counter ++;
-        if(counter & 0xFFF == 0) {
-            __putchar("#");
+        if((counter & 0xFFF) == 0) {
+            __putchar('#');
         }
     }
 

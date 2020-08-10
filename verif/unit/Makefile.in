@@ -200,8 +200,8 @@ include $(FRV_HOME)/verif/unit/ccx-example/Makefile.in
 include $(FRV_HOME)/verif/unit/ccx-counters/Makefile.in
 include $(FRV_HOME)/verif/unit/ccx-mtime-read/Makefile.in
 include $(FRV_HOME)/verif/unit/ccx-mtime-write/Makefile.in
+include $(FRV_HOME)/verif/unit/ccx-timer/Makefile.in
 #include $(FRV_HOME)/verif/unit/ccx-interrupts/Makefile.in
-#include $(FRV_HOME)/verif/unit/ccx-timer/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)
