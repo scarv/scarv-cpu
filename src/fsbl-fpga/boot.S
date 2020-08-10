@@ -1,7 +1,7 @@
 
 .text
-.global _start
-_start:
+.global __fsbl_start
+__fsbl_start:
 
     li x1 , 0
     li x2 , 0

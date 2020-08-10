@@ -27,7 +27,11 @@ include $(FRV_HOME)/flow/designer-assertions/Makefile.in
 #include $(FRV_HOME)/flow/xcfi-formal/Makefile.in
 include $(FRV_HOME)/flow/yosys/Makefile.in
 include $(FRV_HOME)/flow/embench/Makefile.in
-include $(FRV_HOME)/src/fsbl/Makefile.in
+
+include $(FRV_HOME)/src/share/fsbl.mk
+include $(FRV_HOME)/src/fsbl-ccx-test/Makefile.in
+include $(FRV_HOME)/src/fsbl-fpga/Makefile.in
+
 include $(FRV_HOME)/verif/unit/Makefile.in
 
 clean:

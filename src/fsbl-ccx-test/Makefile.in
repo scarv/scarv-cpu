@@ -1,0 +1,10 @@
+
+#
+# Relies on $(FRV_HOME)/src/share/fsbl.mk
+
+FSBL_CCX_TEST_SRC   = $(SCARV_CPU)/src/fsbl-ccx-test/boot.S
+
+$(eval $(call add_fsbl_target,ccx-test,$(FSBL_CCX_TEST_SRC)))
+
+FSBL_CCX_TEST_HEX   = $(call map_fsbl_hex,ccx-test)
+
