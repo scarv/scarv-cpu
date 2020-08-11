@@ -147,8 +147,8 @@ wire [XL:0] pack_result     = {XLEN{op_pack }} & pack_output    |
 
 wire [31:0] pcnt_in = opr_a;
 wire [ 1:0] pcnt_s1 [15:0];
-wire [ 3:0] pcnt_s2 [ 7:0];
-wire [ 4:0] pcnt_s3 [ 3:0];
+wire [ 2:0] pcnt_s2 [ 7:0];
+wire [ 3:0] pcnt_s3 [ 3:0];
 
 genvar p1; // Count set bits in each adjacent bit pair.
 generate for(p1 = 0; p1 < 16; p1 = p1 +1 ) begin
