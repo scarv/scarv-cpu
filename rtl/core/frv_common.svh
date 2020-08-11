@@ -33,22 +33,37 @@ localparam ALU_ADD      = {2'b00, 4'b0000};
 localparam ALU_SUB      = {2'b00, 4'b0001};
 localparam ALU_SLT      = {2'b00, 4'b0101};
 localparam ALU_SLTU     = {2'b00, 4'b0111};
+localparam ALU_MIN      = {2'b00, 4'b1000};
+localparam ALU_MINU     = {2'b00, 4'b1010};
+localparam ALU_MAX      = {2'b00, 4'b1001};
+localparam ALU_MAXU     = {2'b00, 4'b1011};
+
 localparam ALU_AND      = {2'b01, 4'b0001};
 localparam ALU_OR       = {2'b01, 4'b0010};
-localparam ALU_XOR      = {2'b01, 4'b0100};
-localparam ALU_ANDN     = {2'b01, 4'b1001};
-localparam ALU_ORN      = {2'b01, 4'b1010};
-localparam ALU_XNOR     = {2'b01, 4'b1100};
+localparam ALU_XOR      = {2'b01, 4'b0011};
+localparam ALU_ANDN     = {2'b01, 4'b0101};
+localparam ALU_ORN      = {2'b01, 4'b0110};
+localparam ALU_XNOR     = {2'b01, 4'b0111};
+localparam ALU_CLZ      = {2'b01, 4'b1000};
+localparam ALU_CTZ      = {2'b01, 4'b1001};
+localparam ALU_PCNT     = {2'b01, 4'b1010};
+
 localparam ALU_PACK     = {2'b10, 4'b0001};
 localparam ALU_PACKU    = {2'b10, 4'b0010};
 localparam ALU_PACKH    = {2'b10, 4'b0100};
+localparam ALU_SEXTH    = {2'b10, 4'b0101};
+localparam ALU_SEXTB    = {2'b10, 4'b0110};
 localparam ALU_GREV     = {2'b10, 4'b1001};
 localparam ALU_SHFL     = {2'b10, 4'b1010};
 localparam ALU_UNSHFL   = {2'b10, 4'b1100};
+localparam ALU_GORC     = {2'b10, 4'b1111};
+
 localparam ALU_SRA      = {2'b11, 4'b0001};
-localparam ALU_SRL      = {2'b11, 4'b0010};
+localparam ALU_SRL      = {2'b11, 4'b0000};
+localparam ALU_SRO      = {2'b11, 4'b0010};
 localparam ALU_SLL      = {2'b11, 4'b0100};
-localparam ALU_ROR      = {2'b11, 4'b1010};
+localparam ALU_SLO      = {2'b11, 4'b0110};
+localparam ALU_ROR      = {2'b11, 4'b1000};
 localparam ALU_ROL      = {2'b11, 4'b1100};
 
 localparam CFU_BEQ      = {2'b00, 4'b0001};

@@ -123,7 +123,22 @@ wire dec_unshfli     = (d_data & 32'hfe00707f) == 32'h8005013;
 wire dec_clmul       = (d_data & 32'hfe00707f) == 32'ha001033;
 wire dec_clmulr      = (d_data & 32'hfe00707f) == 32'ha002033;
 wire dec_clmulh      = (d_data & 32'hfe00707f) == 32'ha003033;
-wire dec_xperm   = 1'b0;
+wire dec_xperm       = 1'b0;
+wire dec_clz         = (d_data & 32'hfff0707f) == 32'h60001013;
+wire dec_ctz         = (d_data & 32'hfff0707f) == 32'h60101013;
+wire dec_gorc        = (d_data & 32'hfe00707f) == 32'h28005033;
+wire dec_gorci       = (d_data & 32'hfc00707f) == 32'h28005013;
+wire dec_max         = (d_data & 32'hfe00707f) == 32'ha005033;
+wire dec_maxu        = (d_data & 32'hfe00707f) == 32'ha007033;
+wire dec_min         = (d_data & 32'hfe00707f) == 32'ha004033;
+wire dec_minu        = (d_data & 32'hfe00707f) == 32'ha006033;
+wire dec_pcnt        = (d_data & 32'hfff0707f) == 32'h60201013;
+wire dec_sext_b      = (d_data & 32'hfff0707f) == 32'h60401013;
+wire dec_sext_h      = (d_data & 32'hfff0707f) == 32'h60501013;
+wire dec_slo         = (d_data & 32'hfe00707f) == 32'h20001033;
+wire dec_sloi        = (d_data & 32'hfc00707f) == 32'h20001013;
+wire dec_sro         = (d_data & 32'hfe00707f) == 32'h20005033;
+wire dec_sroi        = (d_data & 32'hfc00707f) == 32'h20005013;
 
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
@@ -154,5 +169,8 @@ dec_ssm4_ks         || dec_ssm4_ed         || dec_pollentropy     ||
 dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
 dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
 dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||
-dec_clmul   || dec_clmulh  || dec_clmulr  
+dec_clmul   || dec_clmulh  || dec_clmulr  ||
+dec_clz     || dec_ctz     || dec_gorc    || dec_gorci   || dec_max     ||
+dec_maxu    || dec_min     || dec_minu    || dec_pcnt    || dec_sext_b  ||
+dec_sext_h  || dec_slo     || dec_sloi    || dec_sro     || dec_sroi
 );

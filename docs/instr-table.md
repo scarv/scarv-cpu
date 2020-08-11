@@ -42,6 +42,21 @@ Instruction  | Action
 `sll        `| rd <= rs1 << rs2         
 `slli       `| rd <= rs1 << rs2         
 `c_slli     `| rd <= rs1 <<  imm        
+`clz        `| rd <= f(rs1)
+`ctz        `| rd <= f(rs1)
+`gorc       `| rd <= f(rs1,rs2)
+`gorci      `| rd <= f(rs1,rs2)
+`max        `| rd <= f(rs1,rs2)
+`maxu       `| rd <= f(rs1,rs2)
+`min        `| rd <= f(rs1,rs2)
+`minu       `| rd <= f(rs1,rs2)
+`pcnt       `| rd <= f(rs1)
+`sext_b     `| rd <= f(rs1)
+`sext_h     `| rd <= f(rs1)
+`slo        `| rd <= f(rs1, rs2)
+`sloi       `| rd <= f(rs1, imm)
+`sro        `| rd <= f(rs1, rs2)
+`sroi       `| rd <= f(rs1, imm)
 
 
 **Control Flow Instructions:**
@@ -204,6 +219,21 @@ Instruction  | `opr_a`      | `opr_b`       | `opr_c`
 `sll        `|  rs1         |  rs2          |  0
 `slli       `|  rs1         |  imm          |  0
 `c_slli     `|  rs1         |  imm          |  0
+`clz        `|  rs1         |  0            |  0
+`ctz        `|  rs1         |  0            |  0
+`gorc       `|  rs1         |  rs2          |  0
+`gorci      `|  rs1         |  rs2          |  0
+`max        `|  rs1         |  rs2          |  0
+`maxu       `|  rs1         |  rs2          |  0
+`min        `|  rs1         |  rs2          |  0
+`minu       `|  rs1         |  rs2          |  0
+`pcnt       `|  rs1         |  0            |  0
+`sext_b     `|  rs1         |  0            |  0
+`sext_h     `|  rs1         |  0            |  0
+`slo        `|  rs1         |  rs2          |  0
+`sloi       `|  rs1         |  imm          |  0
+`sro        `|  rs1         |  rs2          |  0
+`sroi       `|  rs1         |  imm          |  0
 
 
 **Control Flow Instructions:**
