@@ -92,17 +92,30 @@ wire        alu_op_srl      = fu_alu && s2_uop == ALU_SRL   ;
 wire        alu_op_sra      = fu_alu && s2_uop == ALU_SRA   ;
 wire        alu_op_ror      = fu_alu && s2_uop == ALU_ROR   ;
 wire        alu_op_rol      = fu_alu && s2_uop == ALU_ROL   ;
+wire        alu_op_slo      = fu_alu && s2_uop == ALU_SLO   ;
+wire        alu_op_sro      = fu_alu && s2_uop == ALU_SRO   ;
 
 wire        alu_op_pack     = fu_alu && s2_uop == ALU_PACK  ;
 wire        alu_op_packh    = fu_alu && s2_uop == ALU_PACKH ;
 wire        alu_op_packu    = fu_alu && s2_uop == ALU_PACKU ;
 
-wire        alu_op_grev     =  fu_alu && s2_uop == ALU_GREV  ;
-wire        alu_op_shfl     =  fu_alu && s2_uop == ALU_SHFL  ;
-wire        alu_op_unshfl   =  fu_alu && s2_uop == ALU_UNSHFL;
+wire        alu_op_grev     = fu_alu && s2_uop == ALU_GREV  ;
+wire        alu_op_shfl     = fu_alu && s2_uop == ALU_SHFL  ;
+wire        alu_op_unshfl   = fu_alu && s2_uop == ALU_UNSHFL;
+wire        alu_op_gorc     = fu_alu && s2_uop == ALU_GORC  ;
 
 wire        alu_op_slt      = fu_alu && s2_uop == ALU_SLT   ;
 wire        alu_op_sltu     = fu_alu && s2_uop == ALU_SLTU  ;
+wire        alu_op_max      = fu_alu && s2_uop == ALU_MAX   ;
+wire        alu_op_maxu     = fu_alu && s2_uop == ALU_MAXU  ;
+wire        alu_op_min      = fu_alu && s2_uop == ALU_MIN   ;
+wire        alu_op_minu     = fu_alu && s2_uop == ALU_MINU  ;
+
+wire        alu_op_clz      = fu_alu && s2_uop == ALU_CLZ   ;
+wire        alu_op_ctz      = fu_alu && s2_uop == ALU_CTZ   ;
+wire        alu_op_pcnt     = fu_alu && s2_uop == ALU_PCNT  ;
+wire        alu_op_sextb    = fu_alu && s2_uop == ALU_SEXTB ;
+wire        alu_op_sexth    = fu_alu && s2_uop == ALU_SEXTH ;
 
 wire        alu_cmp_lt      ; // Is LHS < RHS?
 wire        alu_cmp_ltu     ; // Is LHS < RHS?
@@ -304,6 +317,18 @@ frv_alu i_alu (
 .op_grev    (alu_op_grev    ), // Generalized reverse
 .op_shfl    (alu_op_shfl    ), // Shuffle
 .op_unshfl  (alu_op_unshfl  ), // Unshuffle
+.op_clz     (alu_op_clz     ), // Count leading zeros
+.op_ctz     (alu_op_ctz     ), // Count trailing zeros
+.op_gorc    (alu_op_gorc    ), // Generalised OR combine
+.op_max     (alu_op_max     ), // Max
+.op_maxu    (alu_op_maxu    ), // Max (unsigned)
+.op_min     (alu_op_min     ), // Min
+.op_minu    (alu_op_minu    ), // Min (unsigned)
+.op_pcnt    (alu_op_pcnt    ), // Popcount
+.op_sextb   (alu_op_sextb   ), // Sign extend byte
+.op_sexth   (alu_op_sexth   ), // Sign extend halfword
+.op_slo     (alu_op_slo     ), // Shift left ones
+.op_sro     (alu_op_sro     ), // Shift right ones.
 .add_out    (alu_add_out    ), // Result of adding opr_a and opr_b
 .cmp_eq     (alu_cmp_eq     ), // Result of opr_a == opr_b
 .cmp_lt     (alu_cmp_lt     ), // Result of opr_a <  opr_b

@@ -32,6 +32,18 @@ input  wire             op_unshfl,// Unshuffle
 input  wire             op_xnor  ,// 
 input  wire             op_orn   ,// 
 input  wire             op_andn  ,// 
+input  wire             op_clz   , // Count leading zeros
+input  wire             op_ctz   , // Count trailing zeros
+input  wire             op_gorc  , // Generalised OR combine
+input  wire             op_max   , // Max
+input  wire             op_maxu  , // Max (unsigned)
+input  wire             op_min   , // Min
+input  wire             op_minu  , // Min (unsigned)
+input  wire             op_pcnt  , // Popcount
+input  wire             op_sextb , // Sign extend byte
+input  wire             op_sexth , // Sign extend halfword
+input  wire             op_slo   , // Shift left ones
+input  wire             op_sro   , // Shift right ones.
 
 output wire [   XL:0]   add_out , // Result of adding opr_a and opr_b
 output wire             cmp_eq  , // Result of opr_a == opr_b
@@ -61,8 +73,8 @@ wire [XL:0] addsub_result   = opr_a + addsub_rhs + {{XL{1'b0}},op_sub};
 assign      add_out         = addsub_result                         ;
 
 //
-// SLT / SLTU
-// TODO: Re-use addsub for SLT comparison.
+// SLT / SLTU / MIN[u] / MAX[u]
+// TODO: Gate inputs to comparators when not in use.
 // ------------------------------------------------------------
 
 wire        slt_signed      = $signed(opr_a) < $signed(opr_b);
@@ -77,6 +89,32 @@ assign      cmp_ltu         = slt_lsbu;
 assign      cmp_lt          = slt_lsb;
 
 wire [XL:0] slt_result      = {{XL{1'b0}}, op_slt ? slt_lsb : slt_lsbu};
+
+wire        min_any         = op_minu || op_min  ;
+wire        max_any         = op_maxu || op_max  ;
+
+wire        minmax_selbit   = op_maxu || op_minu ? slt_unsigned : 
+                                                   slt_signed   ;
+
+wire [XL:0] result_min      =  minmax_selbit ? opr_a : opr_b;
+wire [XL:0] result_max      = !minmax_selbit ? opr_a : opr_b;
+
+//
+// Sign Extension: sextb, sexth
+// ------------------------------------------------------------
+
+// Gate sign bits by their operation to prevent extra toggling.
+wire        signbit_b       = opr_a[7] && op_sextb;
+wire        signbit_h       = opr_a[7] && op_sexth;
+
+wire [15:0] sign_upperhalf  = {16{signbit_b || signbit_h}};
+wire [ 7:0] sign_byte1      = { 8{signbit_b             }};
+
+wire [XL:0] sign_result     = {sign_upperhalf,
+                               op_sextb ? opr_a[15:8] : sign_byte1,
+                               opr_a[7:0]};
+
+wire        sign_any        = op_sextb || op_sexth;
 
 //
 // Bitwise Operations
@@ -110,10 +148,11 @@ wire [XL:0] pack_result     = {XLEN{op_pack }} & pack_output    |
 wire [XL:0] shift_in_r  = opr_a;
 wire [XL:0] shift_in_l  ;
 
-wire        shift_abit  = opr_a[XL];
+wire        shift_abit  = opr_a[XL] || op_slo || op_sro;
 
-wire        sr_left     = op_sll || op_rol ;
-wire        sr_right    = op_srl || op_ror || op_sra;
+wire        sr_ones     = op_slo || op_slo || op_sra ;
+wire        sr_left     = op_sll || op_rol || op_slo ;
+wire        sr_right    = op_srl || op_ror || op_sro || op_sra;
 wire        rotate      = op_rol || op_ror ;
 
 localparam SW = (XLEN*2) - 1;
@@ -121,7 +160,7 @@ localparam SW = (XLEN*2) - 1;
 wire [XL:0] shift_in_lo = sr_left ? shift_in_l : shift_in_r;
 
 wire [XL:0] shift_in_hi = rotate  ? (shift_in_lo     )  :
-                          op_sra  ? {XLEN{shift_abit}}  :
+                          sr_ones ? {XLEN{shift_abit}}  :
                                      32'b0              ;
 
 wire [SW:0] shift_in    = {shift_in_hi, shift_in_lo     };
@@ -200,11 +239,14 @@ end
 
 wire sel_addsub = op_add || op_sub  ;
 wire sel_slt    = op_slt || op_sltu ;
-wire sel_shift  = op_sll || op_sra  || op_srl || rotate;
+wire sel_shift  = op_sll || op_sra  || op_srl || rotate || op_slo || op_sro;
 
 assign result =
                          bitwise_result             |
                          pack_result                |
+    {XLEN{sign_any  }} & sign_result                |
+    {XLEN{max_any   }} & result_max                 |
+    {XLEN{min_any   }} & result_min                 |
     {XLEN{op_grev   }} & grev_result                |
     {XLEN{op_shfl   }} & shfl_result                |
     {XLEN{op_unshfl }} & unshfl_result              |
