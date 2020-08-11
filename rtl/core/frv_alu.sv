@@ -142,6 +142,42 @@ wire [XL:0] pack_result     = {XLEN{op_pack }} & pack_output    |
                               {XLEN{op_packu}} & packu_output   ;
 
 //
+// Popcount
+// ------------------------------------------------------------
+
+wire [31:0] pcnt_in = opr_a;
+wire [ 1:0] pcnt_s1 [15:0];
+wire [ 3:0] pcnt_s2 [ 7:0];
+wire [ 4:0] pcnt_s3 [ 3:0];
+
+genvar p1; // Count set bits in each adjacent bit pair.
+generate for(p1 = 0; p1 < 16; p1 = p1 +1 ) begin
+    wire [1:0] bits = pcnt_in[p1*2+:2];
+    assign pcnt_s1[p1] = {
+        bits[0] && bits[1],
+        bits[0]  ^ bits[1]
+    };
+end endgenerate
+
+genvar p2; // Sum bit pair counts into 8 3-bit elements.
+generate for(p2 = 0; p2 < 8; p2 = p2 + 1) begin
+    wire [1:0] bl = pcnt_s1[2*p2 + 0];
+    wire [1:0] br = pcnt_s1[2*p2 + 1];
+    assign pcnt_s2[p2][0] = bl[0] ^  br[0];
+    assign pcnt_s2[p2][1] =(bl[0] && br[0]) || (bl[1] ^ br[1]);
+    assign pcnt_s2[p2][2] = bl[1] && br[1];
+end endgenerate
+
+genvar p3; // Sum adjacent 3-bit elements into 4 4-bit elements.
+generate for(p3 = 0; p3 < 4; p3 = p3 + 1) begin
+    assign pcnt_s3[p3] = pcnt_s2[2*p3 + 0] + pcnt_s2[2*p3 + 1];
+end endgenerate
+
+// Sum the 4 4-bit elements together.
+wire [ 4:0] pcnt_count  = pcnt_s3[0] + pcnt_s3[1] + pcnt_s3[2] + pcnt_s3[3];
+wire [XL:0] pcnt_result = {27'b0, pcnt_count};
+
+//
 // Shifts and rotates
 // ------------------------------------------------------------
 
@@ -244,6 +280,7 @@ wire sel_shift  = op_sll || op_sra  || op_srl || rotate || op_slo || op_sro;
 assign result =
                          bitwise_result             |
                          pack_result                |
+    {XLEN{op_pcnt   }} & pcnt_result                |
     {XLEN{sign_any  }} & sign_result                |
     {XLEN{max_any   }} & result_max                 |
     {XLEN{min_any   }} & result_min                 |
