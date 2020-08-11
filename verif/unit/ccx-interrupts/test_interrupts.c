@@ -10,9 +10,9 @@ volatile int interrupt_seen = 0;
 int test_global_interrupt_enable() {
 
     // Make sure mtimecmp is at it's maximum value.
-    __mtimecmp[0] = 0xFFFFFFFFFFFFFFFF;
+    scarv_cpu_set_mtimecmp(0xFFFFFFFFFFFFFFFF);
     
-    uint32_t mstatus    = __rd_mstatus();
+    uint32_t mstatus    = scarv_cpu_get_mstatus();
 
     uint32_t mie= mstatus & MSTATUS_MIE;
     uint32_t sie= mstatus & MSTATUS_SIE;
@@ -23,9 +23,9 @@ int test_global_interrupt_enable() {
     if(uie) {return 2;}
 
     // Writes should be ignored to UIE / SIE
-    __set_mstatus(MSTATUS_SIE | MSTATUS_UIE);
+    scarv_cpu_set_mstatus(MSTATUS_SIE | MSTATUS_UIE);
     
-    mstatus     = __rd_mstatus();
+    mstatus     = scarv_cpu_get_mstatus();
     sie         = mstatus & MSTATUS_SIE;
     uie         = mstatus & MSTATUS_UIE;
 
@@ -33,25 +33,25 @@ int test_global_interrupt_enable() {
     if(uie) {return 4; }
     
     // Clear MIE bit. No interrupts enabled.
-    __clr_mstatus(MSTATUS_MIE);
+    scarv_cpu_clr_mstatus(MSTATUS_MIE);
 
-    mstatus     = __rd_mstatus();
+    mstatus     = scarv_cpu_get_mstatus();
     mie         = mstatus & MSTATUS_MIE;
 
     // MIE should be zero now.
     if(mie) {return 5;}
 
     // Set MIE bit.
-    __set_mstatus(MSTATUS_MIE);
+    scarv_cpu_set_mstatus(MSTATUS_MIE);
 
-    mstatus     = __rd_mstatus();
+    mstatus     = scarv_cpu_get_mstatus();
     mie         = mstatus & MSTATUS_MIE;
 
     // MIE should be set now.
     if(!mie){return 6;}
 
     // Leave interrupts disabled.
-    __clr_mstatus(MSTATUS_MIE);
+    scarv_cpu_clr_mstatus(MSTATUS_MIE);
 
     return 0;
 }
@@ -60,12 +60,12 @@ int test_global_interrupt_enable() {
 int test_individual_interrupt_enable() {
     
     // Start by clearing all interrupt enable bits.
-    __clr_mstatus(MSTATUS_MIE | MSTATUS_SIE | MSTATUS_UIE);
-    __clr_mie(MIE_MEIE | MIE_MTIE | MIE_MSIE);
+    scarv_cpu_clr_mstatus(MSTATUS_MIE | MSTATUS_SIE | MSTATUS_UIE);
+    scarv_cpu_clr_mie(MIE_MEIE | MIE_MTIE | MIE_MSIE);
 
     // Check they are all zeroe'd appropriately
-    uint32_t mstatus = __rd_mstatus();
-    uint32_t mie     = __rd_mie();
+    uint32_t mstatus = scarv_cpu_get_mstatus();
+    uint32_t mie     = scarv_cpu_get_mie();
 
     if(mstatus & MSTATUS_MIE){return 7;}
     if(mstatus & MSTATUS_SIE){return 8;}
@@ -78,22 +78,22 @@ int test_individual_interrupt_enable() {
     // Check we can enable them one by one.
 
     // External interrupts
-    __set_mie(MIE_MEIE);
-    mie     = __rd_mie();
+    scarv_cpu_set_mie(MIE_MEIE);
+    mie     = scarv_cpu_get_mie();
     if(!(mie & MIE_MEIE)){return 13;}
-    __clr_mie(MIE_MEIE);
+    scarv_cpu_clr_mie(MIE_MEIE);
 
     // Software interrupts
-    __set_mie(MIE_MSIE);
-    mie     = __rd_mie();
+    scarv_cpu_set_mie(MIE_MSIE);
+    mie     = scarv_cpu_get_mie();
     if(!(mie & MIE_MSIE)){return 14;}
-    __clr_mie(MIE_MSIE);
+    scarv_cpu_clr_mie(MIE_MSIE);
 
     // Timer interrupts
-    __set_mie(MIE_MTIE);
-    mie     = __rd_mie();
+    scarv_cpu_set_mie(MIE_MTIE);
+    mie     = scarv_cpu_get_mie();
     if(!(mie & MIE_MTIE)){return 15;}
-    __clr_mie(MIE_MTIE);
+    scarv_cpu_clr_mie(MIE_MTIE);
 
     return 0;
 
@@ -102,10 +102,10 @@ int test_individual_interrupt_enable() {
 int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
 
     // Add a big value to mtime and set mtimecmp to this.
-    __mtimecmp[0] = __mtime[0] + delay;
+    scarv_cpu_set_mtimecmp(scarv_cpu_get_mtime() + delay);
 
     // Re-enable interrupts.
-    __set_mstatus(MSTATUS_MIE);
+    scarv_cpu_set_mstatus(MSTATUS_MIE);
 
     int spins = 0;
 
@@ -118,10 +118,10 @@ int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
     }
 
     // Disable timer interrupts.
-    __clr_mie(MIE_MTIE);
+    scarv_cpu_clr_mie(MIE_MTIE);
     
     // Globally Disable interrupts again.
-    __clr_mstatus(MSTATUS_MIE);
+    scarv_cpu_clr_mstatus(MSTATUS_MIE);
 
     return spins;
 }
@@ -130,13 +130,13 @@ int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
 int test_timer_interupt() {
 
     // Globally Disable interrupts
-    __clr_mstatus(MSTATUS_MIE);
+    scarv_cpu_clr_mstatus(MSTATUS_MIE);
 
     // Disable all other interrupt sources.
-    __clr_mie(MIE_MEIE | MIE_MSIE);
+    scarv_cpu_clr_mie(MIE_MEIE | MIE_MSIE);
 
     // Enable timer interrupts.
-    __set_mie(MIE_MTIE);
+    scarv_cpu_set_mie(MIE_MTIE);
 
     // Setup the interrupt handler vector.
     setup_timer_interrupt_handler(
@@ -212,18 +212,18 @@ int test_vectored_timer_interrupt() {
     save = mtvec(&vector_interrupt_table, 1);
     
     // Globally Disable interrupts
-    __clr_mstatus(MSTATUS_MIE);
+    scarv_cpu_clr_mstatus(MSTATUS_MIE);
 
     // Disable all other interrupt sources.
-    __clr_mie(MIE_MEIE | MIE_MSIE);
+    scarv_cpu_clr_mie(MIE_MEIE | MIE_MSIE);
 
     // Enable timer interrupts.
-    __set_mie(MIE_MTIE);
+    scarv_cpu_set_mie(MIE_MTIE);
 
     // Enable timer interrupts.
-    __set_mie(MIE_MTIE);
+    scarv_cpu_set_mie(MIE_MTIE);
 
-    int spins = trigger_timer_interrupt(&interrupt_seen, 400);
+    trigger_timer_interrupt(&interrupt_seen, 400);
 
     // Restore the original trap handler before returning.
     mtvec((void*)save, 0);

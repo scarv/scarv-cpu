@@ -32,6 +32,7 @@ jobs:
     - make run-unit-ccx-mtime-read
     - make run-unit-ccx-mtime-write
     - make run-unit-ccx-timer
+    - make run-unit-ccx-interrupts
   - name: "Designer Assertions 1"
     script:
     - source ./bin/install-yosys.sh
