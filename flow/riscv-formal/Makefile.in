@@ -8,6 +8,10 @@ WRAPPER = $(FRV_HOME)/verif/rvfi/rvfi_wrapper.sv
 NJOBS   = 1
 CHECKS  = 
 
+RVF_SUBSET_SIZE ?= 12
+RVF_MK      = $(FRV_HOME)/work/riscv-formal/makefile
+RVF_SUBSET = $(shell head -n 1 $(RVF_MK) | cut -c 6- | sed 's/ /\n/g' | shuf -n $(RVF_SUBSET_SIZE))
+
 RISCV_FORMAL_PATCHES = 
 
 define map_sby
@@ -63,6 +67,9 @@ riscv-formal-prepare: $(CFG) $(WRAPPER) $(CPU_RTL_SRCS)
 riscv-formal-run: riscv-formal-patches
 	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(CHECKS)
 	rm -rf $(RVFML)
+
+riscv-formal-run-random-subset: riscv-formal-patches
+	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(RVF_SUBSET)
 
 riscv-formal-report:
 	grep "Status: " `find work/riscv-formal/ -path *engine_0/logfile.txt` \

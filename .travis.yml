@@ -33,29 +33,24 @@ jobs:
     - make run-unit-ccx-mtime-write
     - make run-unit-ccx-timer
     - make run-unit-ccx-interrupts
-  - name: "Designer Assertions 1"
+  - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/install-symbiyosys.sh
     - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
-    - make -j $(nproc) da-prove-s
-  - name: "Designer Assertions 2"
-    script:
-    - source ./bin/install-yosys.sh
-    - source ./bin/install-symbiyosys.sh
-    - source ./bin/install-boolector.sh
-    - source ./bin/conf.sh
-    - make -j $(nproc) da-prove-n
+    - export DA_SUBSET_SIZE=8
+    - make -j $(nproc) da-prove-random-subset
   - name: "riscv-formal"
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/install-symbiyosys.sh
     - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
+    - export RVF_SUBSET_SIZE=15
     - make riscv-formal-clean
     - make riscv-formal-prepare
-    - make riscv-formal-run NJOBS=$(nproc) CHECKS=insn_add_ch0
+    - make riscv-formal-run-random-subset NJOBS=$(nproc)
   - name: "Synthesis - Core"
     script:
     - source ./bin/install-yosys.sh
