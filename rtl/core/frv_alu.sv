@@ -241,7 +241,7 @@ wire [XL:0] shift_in_l  ;
 
 wire        shift_abit  = opr_a[XL] || op_slo || op_sro;
 
-wire        sr_ones     = op_slo || op_slo || op_sra ;
+wire        sr_ones     = op_slo || op_sro || op_sra ;
 wire        sr_left     = op_sll || op_rol || op_slo ;
 wire        sr_right    = op_srl || op_ror || op_sro || op_sra;
 wire        rotate      = op_rol || op_ror ;
