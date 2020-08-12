@@ -280,7 +280,7 @@ wire [ 4:0] ctrl       = opr_b[4:0];
 // Result for GREV or GORC
 reg  [XL:0] grev_result;
 
-wire        grev_gorc = op_grev || op_grev;
+wire        grev_gorc = op_grev || op_gorc;
 
 `define GREV_STEP(M1, M2, CTRL, SHF)                                        \
   grev_result = (op_gorc ? grev_result : {XLEN{1'b0}}) | (                  \
