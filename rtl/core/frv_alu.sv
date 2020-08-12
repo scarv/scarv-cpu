@@ -104,14 +104,14 @@ wire [XL:0] result_max      = !minmax_selbit ? opr_a : opr_b;
 // ------------------------------------------------------------
 
 // Gate sign bits by their operation to prevent extra toggling.
-wire        signbit_b       = opr_a[7] && op_sextb;
-wire        signbit_h       = opr_a[7] && op_sexth;
+wire        signbit_b       = opr_a[ 7] && op_sextb;
+wire        signbit_h       = opr_a[15] && op_sexth;
 
 wire [15:0] sign_upperhalf  = {16{signbit_b || signbit_h}};
 wire [ 7:0] sign_byte1      = { 8{signbit_b             }};
 
 wire [XL:0] sign_result     = {sign_upperhalf,
-                               op_sextb ? opr_a[15:8] : sign_byte1,
+                               op_sextb ? sign_byte1 : opr_a[15:8],
                                opr_a[7:0]};
 
 wire        sign_any        = op_sextb || op_sexth;
