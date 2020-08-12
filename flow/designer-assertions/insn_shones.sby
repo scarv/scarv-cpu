@@ -1,0 +1,54 @@
+
+[tasks]
+slo_cover   slo   cover
+sloi_cover  sloi  cover
+sro_cover   sro   cover
+sroi_cover  sroi  cover
+slo_prove   slo   prove
+sloi_prove  sloi  prove
+sro_prove   sro   prove
+sroi_prove  sroi  prove
+
+[options]
+depth   16
+skip    15
+
+prove: mode bmc
+cover: mode cover
+
+[engines]
+smtbmc  boolector
+
+[script]
+echo on
+verilog_defaults -add -ISCARV_CPU/rtl/core/
+verilog_defaults -add -ISCARV_CPU/verif/designer-assertions/insn_checkers
+read_verilog -sv -formal SCARV_CPU/verif/rvfi/fi_fairness.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/insn_checkers/insn_shiftones_checker.sv
+read_verilog -sv -formal SCARV_CPU/external/riscv-formal/checks/rvfi_insn_check.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/fairness.sv
+read_verilog -sv -formal SCARV_CPU/verif/designer-assertions/wrapper.sv
+read_verilog -formal SCARV_CPU/rtl/core/*.sv
+prep -flatten -nordff -top design_assertions_wrapper 
+chformal -early
+
+[files]
+SCARV_CPU/external/riscv-formal/checks/rvfi_macros.vh
+
+[file defines.svh]
+slo:  `define INSN_SHONES_CHECKER_EN (4'b0001)
+sloi: `define INSN_SHONES_CHECKER_EN (4'b0010)
+sro:  `define INSN_SHONES_CHECKER_EN (4'b0100)
+sroi: `define INSN_SHONES_CHECKER_EN (4'b1000)
+`define RISCV_FORMAL_INSN_MODEL insn_shiftones_checker
+`define RISCV_FORMAL_CHECK_CYCLE 15
+`define RISCV_FORMAL_RESET_CYCLES 1
+`define RISCV_FORMAL_CHANNEL_IDX  0
+`define RISCV_FORMAL_COMPRESSED
+`define RISCV_FORMAL_ALIGNED_MEM
+`define RISCV_FORMAL_NRET 1
+`define RISCV_FORMAL_ILEN 32
+`define RISCV_FORMAL_XLEN 32
+`define RISCV_FORMAL
+`define RVFI
+`define DEBUGNETS
