@@ -271,18 +271,21 @@ wire [XL:0] shift_result=
     {XLEN{sr_right}} &  shift_out_r ;
 
 //
-// GREV
+// GREV / GORC
 // ------------------------------------------------------------
 
 // Control bits for grev and [un]shfl
 wire [ 4:0] ctrl       = opr_b[4:0];
 
+// Result for GREV or GORC
 reg  [XL:0] grev_result;
 
+wire        grev_gorc = op_grev || op_grev;
+
 `define GREV_STEP(M1, M2, CTRL, SHF)                                        \
-  grev_result =                                                             \
+  grev_result = (op_gorc ? grev_result : {XLEN{1'b0}}) | (                  \
     ctrl[CTRL] ? ((grev_result & M1) << SHF) | ((grev_result & M2) >> SHF) :\
-                   grev_result                                             ;
+                   grev_result                                            );
 
 always @(*) begin
     grev_result = opr_a;
@@ -340,7 +343,7 @@ assign result =
     {XLEN{sign_any  }} & sign_result                |
     {XLEN{max_any   }} & result_max                 |
     {XLEN{min_any   }} & result_min                 |
-    {XLEN{op_grev   }} & grev_result                |
+    {XLEN{grev_gorc }} & grev_result                |
     {XLEN{op_shfl   }} & shfl_result                |
     {XLEN{op_unshfl }} & unshfl_result              |
     {XLEN{sel_addsub}} & addsub_result              |
