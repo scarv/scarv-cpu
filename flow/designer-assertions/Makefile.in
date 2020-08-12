@@ -1,6 +1,6 @@
 
 DESIGN_ASSERTIONS   =
-DA_SUBSET_SIZE     ?= 8
+DA_SUBSET_SIZE     ?= 6
 DA_SUBSET           = $(shell echo $(DESIGN_ASSERTIONS) | sed 's/ /\n/g' | shuf -n $(DA_SUBSET_SIZE))
 
 ASSERT_SBY_SRC = $(shell find $(SCARV_CPU)/flow/designer-assertions -name *.sby)
