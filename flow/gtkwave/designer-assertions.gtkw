@@ -1,12 +1,12 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu Aug  6 09:31:17 2020
+[*] Wed Aug 12 12:05:58 2020
 [*]
-[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/designer-assertions/insn_andn_andn_prove/engine_0/trace.vcd"
-[dumpfile_mtime] "Thu Aug  6 09:26:32 2020"
-[dumpfile_size] 662545
+[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/designer-assertions/insn_gorc_gorc_prove/engine_0/trace.vcd"
+[dumpfile_mtime] "Wed Aug 12 12:01:27 2020"
+[dumpfile_size] 685319
 [savefile] "/home/work/scarv/skywater/scarv-cpu/flow/gtkwave/designer-assertions.gtkw"
-[timestart] 37
+[timestart] 43
 [size] 1920 1025
 [pos] -1 -1
 *-4.360063 153 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -322,16 +322,13 @@ design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_and
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_or
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_sub
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_xor
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_op_gorc
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.alu_valid
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.op_andn
-@23
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_a[31:0]
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_b[31:0]
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_b_n[31:0]
 @22
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.and_output[31:0]
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.or_output[31:0]
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.xor_output[31:0]
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_a[31:0]
+@23
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s2_execute.i_alu.opr_b[31:0]
 @1000200
 -ALI
 @c00200
@@ -467,10 +464,8 @@ design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.gpr_wen
 @200
 -
-@2022
-^3 /home/work/scarv/skywater/scarv-cpu/work/unit/mtime-write/mtime-write.gtkwl
-design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @22
+design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 design_assertions_wrapper.i_dut.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
 @28
