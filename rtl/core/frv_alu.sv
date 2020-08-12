@@ -178,6 +178,61 @@ wire [ 4:0] pcnt_count  = pcnt_s3[0] + pcnt_s3[1] + pcnt_s3[2] + pcnt_s3[3];
 wire [XL:0] pcnt_result = {27'b0, pcnt_count};
 
 //
+// Count leading/trailing zeros
+// ------------------------------------------------------------
+
+function [2:0] clz4;
+    input [3:0] bits;
+    casez(bits)
+        4'b1???: clz4 = 3'd0;
+        4'b01??: clz4 = 3'd1;
+        4'b001?: clz4 = 3'd2;
+        4'b0001: clz4 = 3'd3;
+        4'b0000: clz4 = 3'd4;
+    endcase
+endfunction
+
+function [3:0] clz8;
+    input [7:0] bits;
+    reg [2:0] hn, ln;
+    hn = clz4(bits[7:4]);
+    ln = clz4(bits[3:0]);
+    clz8 = hn == 3'd4 ? 4'd4 + ln : {1'b0,hn};
+endfunction
+
+function [4:0] clz16;
+    input [15:0] bits;
+    reg [3:0] hn, ln;
+    hn = clz8(bits[15: 8]);
+    ln = clz8(bits[ 7: 0]);
+    clz16 = hn == 4'd8 ? 4'd8 + ln : {1'b0,hn};
+endfunction
+
+function [5:0] clz32;
+    input [31:0] bits;
+    reg [4:0] hn, ln;
+    hn = clz16(bits[31:16]);
+    ln = clz16(bits[15: 0]);
+    clz32 = hn == 5'd16 ? 5'd16 + ln : {1'b0,hn};
+endfunction
+
+wire [XL:0] ctz_in;
+genvar c;
+generate for(c = 0; c < XLEN; c = c+1) begin
+assign ctz_in[c] = opr_a[XL-c];
+end endgenerate
+
+wire        cz_any    = op_clz || op_ctz;
+
+wire [XL:0] clz_in    = op_clz ? opr_a         :
+                        op_ctz ? ctz_in        :
+                                 {XLEN{1'b0}}  ;
+
+wire [XL:0] result_cz ;
+
+assign      result_cz = {26'b0,clz32(clz_in)};
+
+//
 // Shifts and rotates
 // ------------------------------------------------------------
 
@@ -280,6 +335,7 @@ wire sel_shift  = op_sll || op_sra  || op_srl || rotate || op_slo || op_sro;
 assign result =
                          bitwise_result             |
                          pack_result                |
+    {XLEN{cz_any    }} & result_cz                  |
     {XLEN{op_pcnt   }} & pcnt_result                |
     {XLEN{sign_any  }} & sign_result                |
     {XLEN{max_any   }} & result_max                 |
