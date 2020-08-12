@@ -174,8 +174,12 @@ generate for(p3 = 0; p3 < 4; p3 = p3 + 1) begin
 end endgenerate
 
 // Sum the 4 4-bit elements together.
-wire [ 4:0] pcnt_count  = pcnt_s3[0] + pcnt_s3[1] + pcnt_s3[2] + pcnt_s3[3];
-wire [XL:0] pcnt_result = {27'b0, pcnt_count};
+wire [ 5:0] pcnt_count  = {2'b00,pcnt_s3[0]}  + 
+                          {2'b00,pcnt_s3[1]}  +
+                          {2'b00,pcnt_s3[2]}  +
+                          {2'b00,pcnt_s3[3]}  ;
+
+wire [XL:0] pcnt_result = {26'b0, pcnt_count};
 
 //
 // Count leading/trailing zeros
