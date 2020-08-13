@@ -10,7 +10,8 @@ CHECKS  =
 
 RVF_SUBSET_SIZE ?= 12
 RVF_MK      = $(FRV_HOME)/work/riscv-formal/makefile
-RVF_SUBSET = $(shell head -n 1 $(RVF_MK) | cut -c 6- | sed 's/ /\n/g' | shuf -n $(RVF_SUBSET_SIZE))
+RVF_TARGETS= $(filter-out insn_rem% insn_mul% insn_div% reg_ch0,$(shell head -n 1 $(RVF_MK) | cut -c 6-))
+RVF_SUBSET = $(shell echo "$(RVF_TARGETS)" | sed 's/ /\n/g' | shuf -n $(RVF_SUBSET_SIZE))
 
 RISCV_FORMAL_PATCHES = 
 
@@ -69,7 +70,7 @@ riscv-formal-run: riscv-formal-patches
 	rm -rf $(RVFML)
 
 riscv-formal-run-random-subset: riscv-formal-patches
-	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(RVF_SUBSET)
+	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(RVF_TARGETS)
 
 riscv-formal-report:
 	grep "Status: " `find work/riscv-formal/ -path *engine_0/logfile.txt` \
