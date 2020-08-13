@@ -5,22 +5,20 @@
 //  SystemVerilog interface representing the memory request/response
 //  bus used by the scarv-cpu and ccx.
 //
-interface scarv_ccx_memif ();
+interface scarv_ccx_memif #(
+parameter AW = 32, DW=32
+)();
 
-localparam ADDR_W   =  32           ;
-localparam AW       =  ADDR_W    - 1;
-localparam DATA_W   =  32           ;
-localparam DW       =  DATA_W    - 1;
-localparam SW       = (DATA_W/8) - 1;
+localparam SW       = (DW/8) - 1;
 
-logic         req   ; // Start memory request
-logic         wen   ; // Write enable
-logic [SW:0]  strb  ; // Write strobe
-logic [DW:0]  wdata ; // Write data
-logic [AW:0]  addr  ; // Read/Write address
-logic         gnt   ; // request accepted
-logic         error ; // Error
-logic [DW:0]  rdata ; // Read data
+logic           req   ; // Start memory request
+logic           wen   ; // Write enable
+logic [SW  :0]  strb  ; // Write strobe
+logic [DW-1:0]  wdata ; // Write data
+logic [AW-1:0]  addr  ; // Read/Write address
+logic           gnt   ; // request accepted
+logic           error ; // Error
+logic [DW-1:0]  rdata ; // Read data
 
 modport REQ (
 output req   , // Start memory request

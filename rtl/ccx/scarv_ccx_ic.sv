@@ -57,43 +57,43 @@ scarv_ccx_memif #() cpu_dmem_ext ();
 //
 // Instruction Memory Request Router.
 scarv_ccx_ic_router #(
-.ROM_BASE   (ROM_BASE   ),
-.ROM_SIZE   (ROM_SIZE   ),
-.RAM_BASE   (RAM_BASE   ),
-.RAM_SIZE   (RAM_SIZE   ),
-.MMIO_BASE  (MMIO_BASE  ),
-.MMIO_SIZE  (MMIO_SIZE  ),
-.EXT_BASE   (EXT_BASE   ),
-.EXT_SIZE   (EXT_SIZE   ) 
+.D0_BASE   (ROM_BASE   ),
+.D0_SIZE   (ROM_SIZE   ),
+.D1_BASE   (RAM_BASE   ),
+.D1_SIZE   (RAM_SIZE   ),
+.D2_BASE   (MMIO_BASE  ),
+.D2_SIZE   (MMIO_SIZE  ),
+.D3_BASE   (EXT_BASE   ),
+.D3_SIZE   (EXT_SIZE   ) 
 ) i_router_imem (
 .g_clk      (g_clk          ),
 .g_resetn   (g_resetn       ),
 .if_core    (cpu_imem       ),
-.if_rom     (cpu_imem_rom   ),
-.if_ram     (if_ram_a       ),
-.if_ext     (cpu_imem_ext   ),
-.if_mmio    (cpu_imem_mmio  )
+.if_d0      (cpu_imem_rom   ),
+.if_d1      (if_ram_a       ),
+.if_d2      (cpu_imem_mmio  ),
+.if_d3      (cpu_imem_ext   )
 );
 
 //
 // Data Memory Request Router.
 scarv_ccx_ic_router #(
-.ROM_BASE   (ROM_BASE   ),
-.ROM_SIZE   (ROM_SIZE   ),
-.RAM_BASE   (RAM_BASE   ),
-.RAM_SIZE   (RAM_SIZE   ),
-.MMIO_BASE  (MMIO_BASE  ),
-.MMIO_SIZE  (MMIO_SIZE  ),
-.EXT_BASE   (EXT_BASE   ),
-.EXT_SIZE   (EXT_SIZE   ) 
+.D0_BASE   (ROM_BASE   ),
+.D0_SIZE   (ROM_SIZE   ),
+.D1_BASE   (RAM_BASE   ),
+.D1_SIZE   (RAM_SIZE   ),
+.D2_BASE   (MMIO_BASE  ),
+.D2_SIZE   (MMIO_SIZE  ),
+.D3_BASE   (EXT_BASE   ),
+.D3_SIZE   (EXT_SIZE   ) 
 ) i_router_dmem (
 .g_clk      (g_clk          ),
 .g_resetn   (g_resetn       ),
 .if_core    (cpu_dmem       ),
-.if_rom     (cpu_dmem_rom   ),
-.if_ram     (if_ram_b       ),
-.if_ext     (cpu_dmem_ext   ),
-.if_mmio    (if_mmio        )
+.if_d0      (cpu_dmem_rom   ),
+.if_d1      (if_ram_b       ),
+.if_d2      (if_mmio        ),
+.if_d3      (cpu_dmem_ext   )
 );
 
 //
