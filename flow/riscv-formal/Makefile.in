@@ -70,7 +70,7 @@ riscv-formal-run: riscv-formal-patches
 	rm -rf $(RVFML)
 
 riscv-formal-run-random-subset: riscv-formal-patches
-	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(RVF_TARGETS)
+	$(MAKE) -C $(FMLWORK) -j$(NJOBS) $(RVF_SUBSET)
 
 riscv-formal-report:
 	grep "Status: " `find work/riscv-formal/ -path *engine_0/logfile.txt` \
