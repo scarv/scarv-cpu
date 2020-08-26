@@ -27,9 +27,9 @@ def main():
         
         variant  = cols[0]
         measures = cols[1:]
-        measures = [str(int(m,base=16)) for m in measures]
+        measures = ["%13s"%str(int(m,base=16)) for m in measures]
         
-        print(",".join([variant]+measures))
+        print(" &".join([variant]+measures))
 
 
 if(__name__ == "__main__"):

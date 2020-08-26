@@ -12,7 +12,7 @@ function build_variant {
     make -B build-unit-aes-${1} \
         AES_WORD_ALIGNED=${4}
 
-    make run-unit-aes-${1} \
+    make -B run-unit-aes-${1} \
         VL_DIR=$FRV_WORK/verilator-aes-${1} \
         VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=$2 -GXC_CLASS_AES=1\'b1" \
         UNIT_TIMEOUT=200000 \
