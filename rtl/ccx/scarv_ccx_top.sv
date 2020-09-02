@@ -106,6 +106,10 @@ assign if_ram_a.gnt = 1'b1;
 assign if_ram_b.gnt = 1'b1;
 assign if_rom.gnt   = 1'b1;
 
+assign if_rom.error = 1'b0;
+assign if_ram_a.error = 1'b0;
+assign if_ram_b.error = 1'b0;
+
 //
 // CPU Instance
 // ------------------------------------------------------------
