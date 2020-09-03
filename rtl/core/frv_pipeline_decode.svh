@@ -102,7 +102,7 @@ wire dec_ssha512_sig1l  = (d_data & 32'hfe00707f) == 32'h1400702b;
 wire dec_ssha512_sig1h  = (d_data & 32'hfe00707f) == 32'h1600702b;
 wire dec_ssha512_sum0r  = (d_data & 32'hfe00707f) == 32'h1800702b;
 wire dec_ssha512_sum1r  = (d_data & 32'hfe00707f) == 32'h1a00702b;
-wire dec_pollentropy    = (d_data & 32'hfe0ff07f) == 32'he05702b;
+wire dec_pollentropy    = (d_data & 32'hfe0ff07f) == 32'h1e05702b;
 
 // TODO: Correct decode of borrowed bitmanip instructions.
 wire dec_rol         = (d_data & 32'hfe00707f) == 32'h60001033;
