@@ -1,4 +1,5 @@
 
+
 yosys -import
 
 # Read in the design
@@ -7,11 +8,8 @@ read_verilog -sv -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/*.sv
 # Synthesise processes ready for SCC check.
 procs
 
-# Check that there are no logic loops in the design early on.
-tee -o $::env(FRV_WORK)/synth/logic-loops.rpt check -assert
-
 # Generic yosys synthesis command
-synth -top frv_core
+synth -top frv_mdu
 
 # Map to CMOS cells
 abc -g cmos4
@@ -23,7 +21,7 @@ flatten
 opt -full
 
 # Write out the synthesised verilog
-write_verilog $::env(FRV_WORK)/synth/frv_core_synth.sv
+write_verilog $::env(FRV_WORK)/synth/synth-mdu.sv
 
-tee -o $::env(FRV_WORK)/synth/synth-cmos.rpt stat
-tee -a $::env(FRV_WORK)/synth/synth-cmos.rpt ltp  -noff
+tee -o $::env(FRV_WORK)/synth/synth-mdu.rpt stat -tech cmos
+tee -a $::env(FRV_WORK)/synth/synth-mdu.rpt ltp  -noff

@@ -55,7 +55,7 @@ jobs:
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/conf.sh
-    - make synthesise
+    - make synth-core
   - name: "Benchmarks - Embench IoT"
     script:
     - source ./bin/install-verilator.sh

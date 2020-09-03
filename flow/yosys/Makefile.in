@@ -1,15 +1,57 @@
 
-SYNTH_SCRIPT        = $(FRV_HOME)/flow/yosys/synth-cmos.tcl
+# 1. Verilog output file
+# 2. Synthesis Script
+# 3. Log Output
+define add_synth_target
+${1} : ${2}
+	@mkdir -p $(dir ${1})
+	$(YOSYS_ROOT)/yosys -QT -l ${3} ${2}
+endef
 
-SYNTH_LOG_OUT       = $(FRV_WORK)/synth/synth.log
-SYNTH_CELLS_RPT     = $(FRV_WORK)/synth/synth-cells.rpt
-SYNTH_LOOPS_RPT     = $(FRV_WORK)/synth/logic-loops.rpt
-SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-gates.v
+#
+# Entire CPU Core
+# ------------------------------------------------------------
 
-$(SYNTH_VERILOG_OUT) : $(SYNTH_SCRIPT) $(CPU_RTL_SRCS)
-	@mkdir -p $(dir $(SYNTH_VERILOG_OUT))
-	yosys -QT \
-        -l $(SYNTH_LOG_OUT) \
-        $(SYNTH_SCRIPT)
+SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-core.v
+SYNTH_SCRIPT        = $(FRV_HOME)/flow/yosys/synth-core.tcl
+SYNTH_LOG_OUT       = $(FRV_WORK)/synth/synth-core.log
 
-synthesise: $(SYNTH_VERILOG_OUT)
+$(eval $(call add_synth_target,$(SYNTH_VERILOG_OUT),$(SYNTH_SCRIPT),$(SYNTH_LOG_OUT)))
+
+synth-core: $(SYNTH_VERILOG_OUT)
+
+#
+# ALU
+# ------------------------------------------------------------
+
+SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-alu.v
+SYNTH_SCRIPT        = $(FRV_HOME)/flow/yosys/synth-alu.tcl
+SYNTH_LOG_OUT       = $(FRV_WORK)/synth/synth-alu.log
+
+$(eval $(call add_synth_target,$(SYNTH_VERILOG_OUT),$(SYNTH_SCRIPT),$(SYNTH_LOG_OUT)))
+
+synth-alu: $(SYNTH_VERILOG_OUT)
+
+#
+# MDU
+# ------------------------------------------------------------
+
+SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-mdu.v
+SYNTH_SCRIPT        = $(FRV_HOME)/flow/yosys/synth-mdu.tcl
+SYNTH_LOG_OUT       = $(FRV_WORK)/synth/synth-mdu.log
+
+$(eval $(call add_synth_target,$(SYNTH_VERILOG_OUT),$(SYNTH_SCRIPT),$(SYNTH_LOG_OUT)))
+
+synth-mdu: $(SYNTH_VERILOG_OUT)
+
+#
+# Crypto FU
+# ------------------------------------------------------------
+
+SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-crypto.v
+SYNTH_SCRIPT        = $(FRV_HOME)/flow/yosys/synth-crypto.tcl
+SYNTH_LOG_OUT       = $(FRV_WORK)/synth/synth-crypto.log
+
+$(eval $(call add_synth_target,$(SYNTH_VERILOG_OUT),$(SYNTH_SCRIPT),$(SYNTH_LOG_OUT)))
+
+synth-crypto: $(SYNTH_VERILOG_OUT)
