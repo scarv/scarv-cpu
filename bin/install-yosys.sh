@@ -29,7 +29,7 @@ if [ ! -e  $YOSYS_BIN ]; then
 
     cd $YOSYS_ROOT
 
-    git checkout yosys-0.9
+    git checkout c66d1dfad17b03f60375b478d15d4eff1c3d8cb8
 
     make config-gcc
 
