@@ -12,7 +12,7 @@ procs
 synth -top frv_mdu
 
 # Map to CMOS cells
-abc -g cmos4
+abc -g cmos
 
 # Statistics: size and latency
 flatten
