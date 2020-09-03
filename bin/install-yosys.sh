@@ -18,6 +18,7 @@ set -e
 
 mkdir -p $TOOLS_DIR
 
+if [ ! -e  $YOSYS_BIN ]; then
 
     echo "Building Yosys..."
     echo
@@ -44,6 +45,11 @@ mkdir -p $TOOLS_DIR
 
     cd -
 
+else
+
+    echo "Using cached Yosys build..."
+
+fi
 
 
 
