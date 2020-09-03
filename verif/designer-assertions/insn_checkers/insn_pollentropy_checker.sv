@@ -36,7 +36,7 @@ output [`RISCV_FORMAL_XLEN   - 1 : 0] spec_mem_wdata
 // specific address, chosen at synthesis time.
 parameter [31:0] POLLENTROPY_PADDR = 32'h7000_0000;
 
-wire   dec_pollentropy = rvfi_valid && (rvfi_insn&32'hfe0ff07f) == 32'he05702b;
+wire   dec_pollentropy = rvfi_valid && (rvfi_insn&32'hfe0ff07f) == 32'h1e05702b;
 
 assign spec_valid      = dec_pollentropy;
 
