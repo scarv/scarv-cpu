@@ -1,0 +1,13 @@
+
+
+BM_NAME    = ccx-bmark-sha256-ise
+BM_SRC     = $(BMARK_ROOT)/sha256/benchmark_sha256.c \
+             $(BMARK_ROOT)/sha256/sha256_ise.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))
+
+BM_NAME    = ccx-bmark-sha256-base
+BM_SRC     = $(BMARK_ROOT)/sha256/benchmark_sha256.c \
+             $(BMARK_ROOT)/sha256/sha256_baseline.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))

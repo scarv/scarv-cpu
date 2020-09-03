@@ -50,5 +50,19 @@ volatile uint8_t *trap_seen     ; // Pointer to value set to 1 if trap handler s
 
 void setup_test_trap_handler (test_trap_handler_cfg * cfg);
 
+#define MEASURE_PERF_BEGIN(NAME)     {                    \
+    uint32_t instr_start, instr_end                     ; \
+    uint32_t cycle_start, cycle_end                     ; \
+    asm volatile("rdcycle   %0" : "=r"(cycle_start))    ; \
+    asm volatile("rdinstret %0" : "=r"(instr_start))    ;
+    
+
+#define MEASURE_PERF_END(NAME, I, C)                      \
+    asm volatile("rdcycle   %0" : "=r"(cycle_end))      ; \
+    asm volatile("rdinstret %0" : "=r"(instr_end))      ; \
+    I = instr_end - instr_start                         ; \
+    C = cycle_end - cycle_start                         ; \
+}
+
 #endif
 

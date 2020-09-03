@@ -1,0 +1,18 @@
+
+BM_NAME    = ccx-bmark-aes-ise
+BM_AES_SRC = $(BMARK_ROOT)/aes/benchmark_aes.c  \
+             $(BMARK_ROOT)/aes/aes_128_ks.S     \
+             $(BMARK_ROOT)/aes/aes_192_ks.S     \
+             $(BMARK_ROOT)/aes/aes_256_ks.S     \
+             $(BMARK_ROOT)/aes/aes_dec.S        \
+             $(BMARK_ROOT)/aes/aes_enc.S
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_AES_SRC)))
+
+
+BM_NAME    = ccx-bmark-aes-sw-ttable
+BM_AES_SRC = $(BMARK_ROOT)/aes/benchmark_aes.c      \
+             $(BMARK_ROOT)/aes/aes_sw_ttable_dec.c  \
+             $(BMARK_ROOT)/aes/aes_sw_ttable_enc.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_AES_SRC)))

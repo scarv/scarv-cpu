@@ -1,0 +1,13 @@
+
+
+BM_NAME    = ccx-bmark-sm4-ise
+BM_SRC     = $(BMARK_ROOT)/sm4/benchmark_sm4.c \
+             $(BMARK_ROOT)/sm4/sm4_ise.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))
+
+BM_NAME    = ccx-bmark-sm4-base
+BM_SRC     = $(BMARK_ROOT)/sm4/benchmark_sm4.c \
+             $(BMARK_ROOT)/sm4/sm4_baseline.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))

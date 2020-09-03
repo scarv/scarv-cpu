@@ -35,5 +35,8 @@ include $(FRV_HOME)/src/csp/Makefile.in
 
 include $(FRV_HOME)/verif/unit/Makefile.in
 
+# depends on verif/unit/Makefile.in
+include $(FRV_HOME)/src/benchmarks/Makefile.in
+
 clean:
 	rm -rf work/*
