@@ -25,5 +25,5 @@ opt -full
 # Write out the synthesised verilog
 write_verilog $::env(FRV_WORK)/synth/synth-core.sv
 
-tee -o $::env(FRV_WORK)/synth/synth-cmos.rpt stat -tech cmos
-tee -a $::env(FRV_WORK)/synth/synth-cmos.rpt ltp  -noff
+tee -o $::env(FRV_WORK)/synth/synth-core.rpt stat -tech cmos
+tee -a $::env(FRV_WORK)/synth/synth-core.rpt ltp  -noff
