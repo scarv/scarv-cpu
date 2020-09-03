@@ -338,8 +338,22 @@ end
 // Crossbar permutations: xperm.*
 // ------------------------------------------------------------
 
+function [31:0] xperm_n;
+    input [31:0] rs1, rs2;
+    integer i;
+    reg [ 3:0] pos;
+    reg [31:0] sel;
+    xperm_n = 32'b0;
+    for(i = 0; i < 32; i = i + 4) begin
+        pos = rs2[i+:4];
+        sel = rs1 >> {pos[3:0],2'b00};
+        xperm_n[i+:4] = pos < 8 ? sel[3:0] : 4'b0000;
+    end
+endfunction
+
 wire xperm_any          = op_xpermn || op_xpermb || op_xpermh;
-wire [31:0] xperm_result= 32'b0;
+wire [31:0] xperm_result= 
+    {32{op_xpermn}} & xperm_n(opr_a, opr_b) ;
 
 //
 // Result multiplexing
