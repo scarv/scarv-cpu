@@ -71,8 +71,8 @@
 //    valid is de-asserted.
 //
 module riscv_crypto_fu #(
-parameter XLEN              = 64, // Must be one of: 32, 64.
-parameter LUT4_EN           = 1 , // Enable the lut4 instructions.
+parameter XLEN              = 32, // Must be one of: 32, 64.
+parameter LUT4_EN           = 0 , // Enable the lut4 instructions.
 parameter SAES_EN           = 1 , // Enable the saes32/64 instructions.
 parameter SAES_DEC_EN       = 1 , // Enable saes32/64 decrypt instructions.
 parameter SSHA256_EN        = 1 , // Enable the ssha256.* instructions.

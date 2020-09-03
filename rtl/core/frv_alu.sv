@@ -44,6 +44,9 @@ input  wire             op_sextb , // Sign extend byte
 input  wire             op_sexth , // Sign extend halfword
 input  wire             op_slo   , // Shift left ones
 input  wire             op_sro   , // Shift right ones.
+input  wire             op_xpermn, // Crossbar permutation: Nibbles
+input  wire             op_xpermb, // Crossbar permutation: Bytes
+input  wire             op_xpermh, // Crossbar permutation: Halfwords
 
 output wire [   XL:0]   add_out , // Result of adding opr_a and opr_b
 output wire             cmp_eq  , // Result of opr_a == opr_b
@@ -332,6 +335,13 @@ end
 `undef SHFL_STEP
 
 //
+// Crossbar permutations: xperm.*
+// ------------------------------------------------------------
+
+wire xperm_any          = op_xpermn || op_xpermb || op_xpermh;
+wire [31:0] xperm_result= 32'b0;
+
+//
 // Result multiplexing
 // ------------------------------------------------------------
 
@@ -352,7 +362,8 @@ assign result =
     {XLEN{op_unshfl }} & unshfl_result              |
     {XLEN{sel_addsub}} & addsub_result              |
     {XLEN{sel_slt   }} & slt_result                 |
-    {XLEN{sel_shift }} & shift_result               ;
+    {XLEN{sel_shift }} & shift_result               |
+    {XLEN{xperm_any }} & xperm_result               ;
 
 endmodule
 

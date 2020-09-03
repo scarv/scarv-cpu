@@ -408,7 +408,7 @@ frv_pipeline_execute #(
 .ZBB       (ZBB       ), // Support the ZBB Bitmanip Base instructions.
 .ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
 .ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
-.COMBINE_AES_SM4(COMBINE_AES_SM4),
+.COMBINE_AES_SM4(COMBINE_AES_SM4) 
 ) i_pipeline_s2_execute (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset

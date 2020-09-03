@@ -39,7 +39,7 @@
 //   ssha512.sum1   |         |    x
 //
 module riscv_crypto_fu_ssha512 #(
-parameter XLEN          = 64  // Must be one of: 32, 64.
+parameter XLEN          = 32  // Must be one of: 32, 64.
 )(
 
 input  wire             g_clk           , // Global clock
