@@ -99,6 +99,18 @@ parameter TRACE_INSTR_WORD = 1'b1;
 // this is the address that it loads from.
 parameter [31:0] POLLENTROPY_PADDR = 32'h0000_0000;
 
+parameter ZKAES     = 1; // Support the Crypto AES instructions?
+parameter ZKSHA256  = 1; // Support the Crypto SHA256 instructions?
+parameter ZKSHA512  = 1; // Support the Crypto SHA512 instructions?
+parameter ZKSM3     = 1; // Support the Crypto SM3 instructions?
+parameter ZKSM4     = 1; // Support the Crypto SM4 instructions?
+parameter ZKBIT     = 1; // Support the Crypto Bitmanip instructions?
+parameter ZKPOLL    = 1; // Support the Crypto poll entropy instruction?
+parameter ZBB       = 1; // Support the ZBB Bitmanip Base instructions.
+parameter ZBP       = 1; // Support the ZBP Bitmanip permutation instructions.
+parameter ZBC       = 1; // Support the ZBC Bitmanip CLMUL instrs.
+parameter  COMBINE_AES_SM4 =0 ; // Enable combined RV32 AES/SM4 module.
+
 //
 // Value of the M-mode implementation id register
 parameter  CSR_MIMPID           = 32'b0;
@@ -334,6 +346,16 @@ frv_pipeline_fetch #(
 frv_pipeline_decode #(
 .FRV_PC_RESET_VALUE (FRV_PC_RESET_VALUE ),
 .POLLENTROPY_PADDR  (POLLENTROPY_PADDR  ),
+.ZKAES     (ZKAES     ), // Support the Crypto AES instructions?
+.ZKSHA256  (ZKSHA256  ), // Support the Crypto SHA256 instructions?
+.ZKSHA512  (ZKSHA512  ), // Support the Crypto SHA512 instructions?
+.ZKSM3     (ZKSM3     ), // Support the Crypto SM3 instructions?
+.ZKSM4     (ZKSM4     ), // Support the Crypto SM4 instructions?
+.ZKBIT     (ZKBIT     ), // Support the Crypto Bitmanip instructions?
+.ZKPOLL    (ZKPOLL    ), // Support the Crypto pollentropy instruction?
+.ZBB       (ZBB       ), // Support the ZBB Bitmanip Base instructions.
+.ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
+.ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
 .TRACE_INSTR_WORD   (TRACE_INSTR_WORD   )
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
@@ -376,6 +398,17 @@ frv_pipeline_decode #(
 //  Execute stage of the pipeline, responsible for ALU / LSU / Branch compare.
 //
 frv_pipeline_execute #(
+.ZKAES     (ZKAES     ), // Support the Crypto AES instructions?
+.ZKSHA256  (ZKSHA256  ), // Support the Crypto SHA256 instructions?
+.ZKSHA512  (ZKSHA512  ), // Support the Crypto SHA512 instructions?
+.ZKSM3     (ZKSM3     ), // Support the Crypto SM3 instructions?
+.ZKSM4     (ZKSM4     ), // Support the Crypto SM4 instructions?
+.ZKBIT     (ZKBIT     ), // Support the Crypto Bitmanip instructions?
+.ZKPOLL    (ZKPOLL    ), // Support the Crypto pollentropy instruction?
+.ZBB       (ZBB       ), // Support the ZBB Bitmanip Base instructions.
+.ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
+.ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
+.COMBINE_AES_SM4(COMBINE_AES_SM4),
 ) i_pipeline_s2_execute (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset

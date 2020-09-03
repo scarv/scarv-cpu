@@ -57,6 +57,18 @@ output wire        s3_valid          // Is this input valid?
 // Common core parameters and constants
 `include "frv_common.svh"
 
+parameter ZKAES     = 1; // Support the Crypto AES instructions?
+parameter ZKSHA256  = 1; // Support the Crypto SHA256 instructions?
+parameter ZKSHA512  = 1; // Support the Crypto SHA512 instructions?
+parameter ZKSM3     = 1; // Support the Crypto SM3 instructions?
+parameter ZKSM4     = 1; // Support the Crypto SM4 instructions?
+parameter ZKBIT     = 1; // Support the Crypto Bitmanip instructions?
+parameter ZKPOLL    = 1; // Support the Crypto poll entropy instruction?
+parameter ZBB       = 1; // Support the ZBB Bitmanip Base instructions.
+parameter ZBP       = 1; // Support the ZBP Bitmanip permutation instructions.
+parameter ZBC       = 1; // Support the ZBC Bitmanip CLMUL instrs.
+parameter  COMBINE_AES_SM4 =0 ; // Enable combined RV32 AES/SM4 module.
+
 wire pipe_progress = !s2_busy && s2_valid;
 
 //
@@ -83,39 +95,39 @@ wire        alu_op_sub      = fu_alu && s2_uop == ALU_SUB   ;
 wire        alu_op_xor      = fu_alu && s2_uop == ALU_XOR   ;
 wire        alu_op_or       = fu_alu && s2_uop == ALU_OR    ;
 wire        alu_op_and      = fu_alu && s2_uop == ALU_AND   ;
-wire        alu_op_xnor     = fu_alu && s2_uop == ALU_XNOR  ;
-wire        alu_op_orn      = fu_alu && s2_uop == ALU_ORN   ;
-wire        alu_op_andn     = fu_alu && s2_uop == ALU_ANDN  ;
+wire        alu_op_xnor     = fu_alu && s2_uop == ALU_XNOR&&(ZBP||ZKBIT||ZBB);
+wire        alu_op_orn      = fu_alu && s2_uop == ALU_ORN &&(ZBP||ZKBIT||ZBB);
+wire        alu_op_andn     = fu_alu && s2_uop == ALU_ANDN&&(ZBP||ZKBIT||ZBB);
 
 wire        alu_op_sll      = fu_alu && s2_uop == ALU_SLL   ;
 wire        alu_op_srl      = fu_alu && s2_uop == ALU_SRL   ;
 wire        alu_op_sra      = fu_alu && s2_uop == ALU_SRA   ;
-wire        alu_op_ror      = fu_alu && s2_uop == ALU_ROR   ;
-wire        alu_op_rol      = fu_alu && s2_uop == ALU_ROL   ;
-wire        alu_op_slo      = fu_alu && s2_uop == ALU_SLO   ;
-wire        alu_op_sro      = fu_alu && s2_uop == ALU_SRO   ;
+wire        alu_op_ror      = fu_alu && s2_uop == ALU_ROR &&(ZBP||ZKBIT||ZBB);
+wire        alu_op_rol      = fu_alu && s2_uop == ALU_ROL &&(ZBP||ZKBIT||ZBB);
+wire        alu_op_slo      = fu_alu && s2_uop == ALU_SLO && ZBP;
+wire        alu_op_sro      = fu_alu && s2_uop == ALU_SRO && ZBP;
 
-wire        alu_op_pack     = fu_alu && s2_uop == ALU_PACK  ;
-wire        alu_op_packh    = fu_alu && s2_uop == ALU_PACKH ;
-wire        alu_op_packu    = fu_alu && s2_uop == ALU_PACKU ;
+wire        alu_op_pack     = fu_alu && s2_uop == ALU_PACK &&(ZBB||ZKBIT||ZBB);
+wire        alu_op_packh    = fu_alu && s2_uop == ALU_PACKH&&(ZBB||ZKBIT||ZBB);
+wire        alu_op_packu    = fu_alu && s2_uop == ALU_PACKU&&(ZBB||ZKBIT||ZBB);
 
-wire        alu_op_grev     = fu_alu && s2_uop == ALU_GREV  ;
-wire        alu_op_shfl     = fu_alu && s2_uop == ALU_SHFL  ;
-wire        alu_op_unshfl   = fu_alu && s2_uop == ALU_UNSHFL;
-wire        alu_op_gorc     = fu_alu && s2_uop == ALU_GORC  ;
+wire        alu_op_grev     = fu_alu && s2_uop == ALU_GREV  &&(ZBP||ZKBIT);
+wire        alu_op_shfl     = fu_alu && s2_uop == ALU_SHFL  &&(ZBP||ZKBIT);
+wire        alu_op_unshfl   = fu_alu && s2_uop == ALU_UNSHFL&&(ZBP||ZKBIT);
+wire        alu_op_gorc     = fu_alu && s2_uop == ALU_GORC  &&(ZBP||ZKBIT);
 
 wire        alu_op_slt      = fu_alu && s2_uop == ALU_SLT   ;
 wire        alu_op_sltu     = fu_alu && s2_uop == ALU_SLTU  ;
-wire        alu_op_max      = fu_alu && s2_uop == ALU_MAX   ;
-wire        alu_op_maxu     = fu_alu && s2_uop == ALU_MAXU  ;
-wire        alu_op_min      = fu_alu && s2_uop == ALU_MIN   ;
-wire        alu_op_minu     = fu_alu && s2_uop == ALU_MINU  ;
+wire        alu_op_max      = fu_alu && s2_uop == ALU_MAX   && ZBB;
+wire        alu_op_maxu     = fu_alu && s2_uop == ALU_MAXU  && ZBB;
+wire        alu_op_min      = fu_alu && s2_uop == ALU_MIN   && ZBB;
+wire        alu_op_minu     = fu_alu && s2_uop == ALU_MINU  && ZBB;
 
-wire        alu_op_clz      = fu_alu && s2_uop == ALU_CLZ   ;
-wire        alu_op_ctz      = fu_alu && s2_uop == ALU_CTZ   ;
-wire        alu_op_pcnt     = fu_alu && s2_uop == ALU_PCNT  ;
-wire        alu_op_sextb    = fu_alu && s2_uop == ALU_SEXTB ;
-wire        alu_op_sexth    = fu_alu && s2_uop == ALU_SEXTH ;
+wire        alu_op_clz      = fu_alu && s2_uop == ALU_CLZ   && ZBB;
+wire        alu_op_ctz      = fu_alu && s2_uop == ALU_CTZ   && ZBB;
+wire        alu_op_pcnt     = fu_alu && s2_uop == ALU_PCNT  && ZBB;
+wire        alu_op_sextb    = fu_alu && s2_uop == ALU_SEXTB && ZBB;
+wire        alu_op_sexth    = fu_alu && s2_uop == ALU_SEXTH && ZBB;
 
 wire        alu_cmp_lt      ; // Is LHS < RHS?
 wire        alu_cmp_ltu     ; // Is LHS < RHS?
@@ -148,9 +160,9 @@ wire        imul_op_div     = fu_mul && s2_uop == MUL_DIV   ;
 wire        imul_op_divu    = fu_mul && s2_uop == MUL_DIVU  ;
 wire        imul_op_rem     = fu_mul && s2_uop == MUL_REM   ;
 wire        imul_op_remu    = fu_mul && s2_uop == MUL_REMU  ;
-wire        imul_op_clmul   = fu_mul && s2_uop == MUL_CLMUL ;
-wire        imul_op_clmulh  = fu_mul && s2_uop == MUL_CLMULH;
-wire        imul_op_clmulr  = fu_mul && s2_uop == MUL_CLMULR;
+wire        imul_op_clmul   = fu_mul && s2_uop == MUL_CLMUL  && (ZKBIT||ZBC);
+wire        imul_op_clmulh  = fu_mul && s2_uop == MUL_CLMULH && (ZKBIT||ZBC);
+wire        imul_op_clmulr  = fu_mul && s2_uop == MUL_CLMULR && (ZKBIT||ZBC);
 
 wire [XL:0] imul_rs1        = s2_opr_a; // Source register 1
 wire [XL:0] imul_rs2        = s2_opr_b; // Source register 2
@@ -220,13 +232,12 @@ wire [XL:0] n_s3_opr_b_cfu = 32'b0;
 // -------------------------------------------------------------------------
 
 localparam LUT4_EN         = 1; // Enable lut4 instructions.
-localparam SAES_EN         = 1; // Enable saes32/64 instructions.
-localparam SAES_DEC_EN     = 1; // Enable saes32/64 decrypt instructions.
-localparam SSHA256_EN      = 1; // Enable ssha256.* instructions.
-localparam SSHA512_EN      = 1; // Enable ssha256.* instructions.
-localparam SSM3_EN         = 1; // Enable ssm3.* instructions.
-localparam SSM4_EN         = 1; // Enable ssm4.* instructions.
-localparam COMBINE_AES_SM4 = 1; // Enable combined RV32 AES/SM4 module.
+localparam SAES_EN         = ZKAES; // Enable saes32/64 instructions.
+localparam SAES_DEC_EN     = ZKAES; // Enable saes32/64 decrypt instructions.
+localparam SSHA256_EN      = ZKSHA256; // Enable ssha256.* instructions.
+localparam SSHA512_EN      = ZKSHA512; // Enable ssha256.* instructions.
+localparam SSM3_EN         = ZKSM3; // Enable ssm3.* instructions.
+localparam SSM4_EN         = ZKSM4; // Enable ssm4.* instructions.
 localparam LOGIC_GATING    = 1; // Gate sub-module inputs to save toggling
 
 wire        cry_valid      = fu_cry         ; // Inputs valid.
@@ -235,26 +246,26 @@ wire [XL:0] cry_rs2        = s2_opr_b       ; // Source register 2
 wire [ 3:0] cry_bs         = {2'b00,s2_uop[OP:OP-1]}; // bs for saes32.
 wire [OP:0] cry_uop        = {2'b00, s2_uop[OP-2:0]};
 
-wire        cry_op_lut4lo        = 1'b0                                 ;
-wire        cry_op_lut4hi        = 1'b0                                 ;
-wire        cry_op_saes32_encs   = fu_cry && cry_uop == CRY_SAES32_ENCS  ;
-wire        cry_op_saes32_encsm  = fu_cry && cry_uop == CRY_SAES32_ENCSM ;
-wire        cry_op_saes32_decs   = fu_cry && cry_uop == CRY_SAES32_DECS  ;
-wire        cry_op_saes32_decsm  = fu_cry && cry_uop == CRY_SAES32_DECSM ;
-wire        cry_op_ssm4_ks       = fu_cry && cry_uop == CRY_SSM4_KS      ;
-wire        cry_op_ssm4_ed       = fu_cry && cry_uop == CRY_SSM4_ED      ;
-wire        cry_op_ssha256_sig0  = fu_cry && s2_uop == CRY_SSHA256_SIG0 ;
-wire        cry_op_ssha256_sig1  = fu_cry && s2_uop == CRY_SSHA256_SIG1 ;
-wire        cry_op_ssha256_sum0  = fu_cry && s2_uop == CRY_SSHA256_SUM0 ;
-wire        cry_op_ssha256_sum1  = fu_cry && s2_uop == CRY_SSHA256_SUM1 ;
-wire        cry_op_ssha512_sum0r = fu_cry && s2_uop == CRY_SSHA512_SUM0R;
-wire        cry_op_ssha512_sum1r = fu_cry && s2_uop == CRY_SSHA512_SUM1R;
-wire        cry_op_ssha512_sig0l = fu_cry && s2_uop == CRY_SSHA512_SIG0L;
-wire        cry_op_ssha512_sig0h = fu_cry && s2_uop == CRY_SSHA512_SIG0H;
-wire        cry_op_ssha512_sig1l = fu_cry && s2_uop == CRY_SSHA512_SIG1L;
-wire        cry_op_ssha512_sig1h = fu_cry && s2_uop == CRY_SSHA512_SIG1H;
-wire        cry_op_ssm3_p0       = fu_cry && s2_uop == CRY_SSM3_P0      ;
-wire        cry_op_ssm3_p1       = fu_cry && s2_uop == CRY_SSM3_P1      ;
+wire cry_op_lut4lo        = 1'b0                                 ;
+wire cry_op_lut4hi        = 1'b0                                 ;
+wire cry_op_saes32_encs   = fu_cry && cry_uop == CRY_SAES32_ENCS  && ZKAES;
+wire cry_op_saes32_encsm  = fu_cry && cry_uop == CRY_SAES32_ENCSM && ZKAES;
+wire cry_op_saes32_decs   = fu_cry && cry_uop == CRY_SAES32_DECS  && ZKAES;
+wire cry_op_saes32_decsm  = fu_cry && cry_uop == CRY_SAES32_DECSM && ZKAES;
+wire cry_op_ssm4_ks       = fu_cry && cry_uop == CRY_SSM4_KS      && ZKSM4;
+wire cry_op_ssm4_ed       = fu_cry && cry_uop == CRY_SSM4_ED      && ZKSM4;
+wire cry_op_ssha256_sig0  = fu_cry && s2_uop == CRY_SSHA256_SIG0  && ZKSHA256;
+wire cry_op_ssha256_sig1  = fu_cry && s2_uop == CRY_SSHA256_SIG1  && ZKSHA256;
+wire cry_op_ssha256_sum0  = fu_cry && s2_uop == CRY_SSHA256_SUM0  && ZKSHA256;
+wire cry_op_ssha256_sum1  = fu_cry && s2_uop == CRY_SSHA256_SUM1  && ZKSHA256;
+wire cry_op_ssha512_sum0r = fu_cry && s2_uop == CRY_SSHA512_SUM0R && ZKSHA512;
+wire cry_op_ssha512_sum1r = fu_cry && s2_uop == CRY_SSHA512_SUM1R && ZKSHA512;
+wire cry_op_ssha512_sig0l = fu_cry && s2_uop == CRY_SSHA512_SIG0L && ZKSHA512;
+wire cry_op_ssha512_sig0h = fu_cry && s2_uop == CRY_SSHA512_SIG0H && ZKSHA512;
+wire cry_op_ssha512_sig1l = fu_cry && s2_uop == CRY_SSHA512_SIG1L && ZKSHA512;
+wire cry_op_ssha512_sig1h = fu_cry && s2_uop == CRY_SSHA512_SIG1H && ZKSHA512;
+wire cry_op_ssm3_p0       = fu_cry && s2_uop == CRY_SSM3_P0       && ZKSM3;
+wire cry_op_ssm3_p1       = fu_cry && s2_uop == CRY_SSM3_P1       && ZKSM3;
 
 wire        cry_ready            ; // Outputs ready.
 wire [XL:0] cry_rd               ;

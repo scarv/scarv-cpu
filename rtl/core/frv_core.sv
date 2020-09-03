@@ -90,6 +90,17 @@ parameter TRACE_INSTR_WORD = 1'b1;
 // this is the address that it loads from.
 parameter [31:0] POLLENTROPY_PADDR = 32'h7000_0000;
 
+parameter ZKAES     = 1; // Support the Crypto AES instructions?
+parameter ZKSHA256  = 1; // Support the Crypto SHA256 instructions?
+parameter ZKSHA512  = 1; // Support the Crypto SHA512 instructions?
+parameter ZKSM3     = 1; // Support the Crypto SM3 instructions?
+parameter ZKSM4     = 1; // Support the Crypto SM4 instructions?
+parameter ZKBIT     = 1; // Support the Crypto Bitmanip instructions?
+parameter ZKPOLL    = 1; // Support the Crypto poll entropy instruction?
+parameter ZBB       = 1; // Support the ZBB Bitmanip Base instructions.
+parameter ZBP       = 1; // Support the ZBP Bitmanip permutation instructions.
+parameter ZBC       = 1; // Support the ZBC Bitmanip CLMUL instrs.
+parameter  COMBINE_AES_SM4 =1 ; // Enable combined RV32 AES/SM4 module.
 
 //
 // Value of the M-mode implementation id register
@@ -130,6 +141,17 @@ frv_pipeline #(
 .BRAM_REGFILE       (BRAM_REGFILE       ),
 .TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
 .POLLENTROPY_PADDR  (POLLENTROPY_PADDR  ),
+.ZKAES     (ZKAES     ), // Support the Crypto AES instructions?
+.ZKSHA256  (ZKSHA256  ), // Support the Crypto SHA256 instructions?
+.ZKSHA512  (ZKSHA512  ), // Support the Crypto SHA512 instructions?
+.ZKSM3     (ZKSM3     ), // Support the Crypto SM3 instructions?
+.ZKSM4     (ZKSM4     ), // Support the Crypto SM4 instructions?
+.ZKBIT     (ZKBIT     ), // Support the Crypto Bitmanip instructions?
+.ZKPOLL    (ZKPOLL    ), // Support the Crypto pollentropy instruction?
+.ZBB       (ZBB       ), // Support the ZBB Bitmanip Base instructions.
+.ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
+.ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
+.COMBINE_AES_SM4(COMBINE_AES_SM4),
 .CSR_MIMPID         (CSR_MIMPID         )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock

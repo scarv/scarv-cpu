@@ -63,6 +63,17 @@ parameter [31:0] POLLENTROPY_PADDR = 32'h0000_0000;
 // set it to zeros and let it be optimised away.
 parameter TRACE_INSTR_WORD = 1'b1;
 
+parameter ZKAES     = 1; // Support the Crypto AES instructions?
+parameter ZKSHA256  = 1; // Support the Crypto SHA256 instructions?
+parameter ZKSHA512  = 1; // Support the Crypto SHA512 instructions?
+parameter ZKSM3     = 1; // Support the Crypto SM3 instructions?
+parameter ZKSM4     = 1; // Support the Crypto SM4 instructions?
+parameter ZKBIT     = 1; // Support the Crypto Bitmanip instructions?
+parameter ZKPOLL    = 1; // Support the Crypto poll entropy instruction?
+parameter ZBB       = 1; // Support the ZBB Bitmanip Base instructions.
+parameter ZBP       = 1; // Support the ZBP Bitmanip permutation instructions.
+parameter ZBC       = 1; // Support the ZBC Bitmanip CLMUL instrs.
+
 
 // From (buffered) pipeline register of next stage.
 wire   p_s2_busy;
