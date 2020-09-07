@@ -1,0 +1,13 @@
+
+
+BM_NAME    = ccx-bmark-ghash-ise
+BM_SRC     = $(BMARK_ROOT)/ghash/benchmark_ghash.c \
+             $(BMARK_ROOT)/ghash/ghash_ise.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))
+
+BM_NAME    = ccx-bmark-ghash-base
+BM_SRC     = $(BMARK_ROOT)/ghash/benchmark_ghash.c \
+             $(BMARK_ROOT)/ghash/ghash_baseline.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))

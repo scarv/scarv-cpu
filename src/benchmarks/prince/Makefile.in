@@ -1,0 +1,14 @@
+
+
+BM_NAME    = ccx-bmark-prince-ise
+BM_SRC     = $(BMARK_ROOT)/prince/benchmark_prince.c \
+             $(BMARK_ROOT)/prince/prince_ise.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))
+
+BM_NAME    = ccx-bmark-prince-base
+BM_SRC     = $(BMARK_ROOT)/prince/benchmark_prince.c \
+             $(BMARK_ROOT)/prince/prince_baseline.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))
+

@@ -4,4 +4,7 @@ BMARK_ROOT=$(FRV_HOME)/src/benchmarks
 include $(FRV_HOME)/src/benchmarks/aes/Makefile.in
 include $(FRV_HOME)/src/benchmarks/sha256/Makefile.in
 include $(FRV_HOME)/src/benchmarks/sm4/Makefile.in
+include $(FRV_HOME)/src/benchmarks/sm3/Makefile.in
+include $(FRV_HOME)/src/benchmarks/ghash/Makefile.in
+include $(FRV_HOME)/src/benchmarks/prince/Makefile.in
 
