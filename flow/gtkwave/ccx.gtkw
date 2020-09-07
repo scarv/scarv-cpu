@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu Sep  3 12:09:46 2020
+[*] Fri Sep  4 13:01:53 2020
 [*]
-[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/unit/ccx-bmark-sha256-ise/ccx-bmark-sha256-ise.vcd"
-[dumpfile_mtime] "Thu Sep  3 12:04:44 2020"
-[dumpfile_size] 15650712
+[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/unit/ccx-bmark-ghash-ise/ccx-bmark-ghash-ise.vcd"
+[dumpfile_mtime] "Fri Sep  4 13:01:24 2020"
+[dumpfile_size] 3678108
 [savefile] "/home/work/scarv/skywater/scarv-cpu/flow/gtkwave/ccx.gtkw"
-[timestart] 16083
+[timestart] 6220
 [size] 1920 1025
 [pos] -1 -1
-*-6.964524 16486 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-11.012024 -1 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.scarv_ccx_top_v.
 [treeopen] TOP.scarv_ccx_top_v.i_scarv_ccx_top.
@@ -296,8 +296,9 @@ TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_opr_c[31:0]
 @2024
 ^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_rd[4:0]
-@28
+@29
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_size[1:0]
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.s2_trap
 @c00200
 -ALI
@@ -315,20 +316,23 @@ TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.alu_valid
 @1401200
 -ALI
-@800201
+@28
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.imul_op_clmul
+TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.imul_op_clmulh
+@800200
 -Crypto ISE
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.g_clk
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.g_resetn
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.imm[3:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.lut4_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.lut4_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.lut4_rs1[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.lut4_rs2[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.lut4_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.op_lut4hi
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.op_lut4lo
@@ -350,61 +354,60 @@ TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.op_ssm3_p1
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.op_ssm4_ed
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.op_ssm4_ks
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.rd[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.rs1[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.rs2[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_bs[1:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_rs1[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_rs2[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ssm4_bs[1:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ssm4_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ssm4_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ssm4_rs1[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ssm4_rs2[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_ssm4_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.saes32_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha256_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha256_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha256_rs1[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha256_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha512_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha512_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha512_rs1[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha512_rs2[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssha512_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_rs1[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm3_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm4_bs[1:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm4_ready
-@23
+@22
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm4_result[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm4_rs1[31:0]
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm4_rs2[31:0]
-@29
+@28
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.ssm4_valid
 TOP.scarv_ccx_top_v.i_scarv_ccx_top.i_scarv_cpu.i_pipeline.i_pipeline_s2_execute.i_frv_crypto.valid
-@1000201
--Crypto ISE
 @1000200
+-Crypto ISE
 -Pipe - S2 Execute
 @c00200
 -Pipe - S3 Memory
