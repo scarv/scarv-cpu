@@ -1,0 +1,12 @@
+
+BM_NAME    = ccx-bmark-chacha20-ise
+BM_SRC     = $(BMARK_ROOT)/chacha20/benchmark_chacha20.c \
+             $(BMARK_ROOT)/chacha20/chacha20_ise.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))
+
+BM_NAME    = ccx-bmark-chacha20-base
+BM_SRC     = $(BMARK_ROOT)/chacha20/benchmark_chacha20.c \
+             $(BMARK_ROOT)/chacha20/chacha20_baseline.c
+
+$(eval $(call add_ccx_unit_test,$(BM_NAME),$(BM_SRC)))

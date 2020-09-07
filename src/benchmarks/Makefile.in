@@ -7,4 +7,5 @@ include $(FRV_HOME)/src/benchmarks/sm4/Makefile.in
 include $(FRV_HOME)/src/benchmarks/sm3/Makefile.in
 include $(FRV_HOME)/src/benchmarks/ghash/Makefile.in
 include $(FRV_HOME)/src/benchmarks/prince/Makefile.in
+include $(FRV_HOME)/src/benchmarks/chacha20/Makefile.in
 
