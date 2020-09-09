@@ -30,7 +30,7 @@ $(call map_sby,${1}) : ${1}
 	sed -i "s+SCARV_CPU+$(SCARV_CPU)+g" $${@}
 
 $(call map_da_target,${1}) : $(call map_sby,${1})
-	sby -f $${<}
+	$(SYMBIYOSYS_BIN) -f $${<}
 
 DESIGN_ASSERTIONS += $(call map_da_target,${1})
 
