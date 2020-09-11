@@ -9,8 +9,17 @@
 
 #include "api_sm3.h"
 
-#define rv32b_ror(x,y) ((x>>y)|(x<<(32-y)))
-#define rv32b_andn(x,y) (x&~y)
+static inline uint32_t rv32b_ror(uint32_t x, int y) {
+    uint32_t rd;
+    asm ("rori %0,%1,%2":"=r"(rd):"r"(x),"i"(y));
+    return rd;
+}
+
+static inline uint32_t rv32b_andn(uint32_t x, uint32_t y) {
+    uint32_t rd;
+    asm ("andn %0,%1,%2":"=r"(rd):"r"(x),"r"(y));
+    return rd;
+}
 
 static inline uint32_t sm3_p0(uint32_t rs1)
 {

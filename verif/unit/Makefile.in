@@ -15,7 +15,7 @@ CCX_UNIT_TIMEOUT     = 100000
 CCX_UNIT_FAIL        = 0x00010086
 CCX_UNIT_PASS        = 0x00010090
 
-UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O3
+UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O2
 UNIT_CFLAGS    += -I$(FRV_HOME)/src/csp
 UNIT_CFLAGS    += -L$(FRV_HOME)/src/share/
 UNIT_CFLAGS    += -march=rv32imc_xcrypto -mabi=ilp32
@@ -172,6 +172,8 @@ $(call ccx_unit_test_ram_hex,${1}) : $(call core_unit_test_elf,${1})
 
 build-unit-${1} :  $(call core_unit_test_objdump,${1}) \
     $(call core_unit_test_elf,${1})
+
+UNIT_TESTS += $(call core_unit_test_objdump,${1}) $(call core_unit_test_elf,${1})
 
 run-unit-${1}: $(call ccx_unit_test_rom_hex,${1}) $(call ccx_unit_test_ram_hex,${1}) $(EXE_CCX)
 	cp $(EXE_CCX) $(call ccx_unit_test_sim,${1})

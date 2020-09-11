@@ -9,3 +9,5 @@ include $(FRV_HOME)/src/benchmarks/ghash/Makefile.in
 include $(FRV_HOME)/src/benchmarks/prince/Makefile.in
 include $(FRV_HOME)/src/benchmarks/chacha20/Makefile.in
 
+build-benchmarks: $(UNIT_TESTS)
+run-benchmarks: $(UNIT_TESTS_RUN)
