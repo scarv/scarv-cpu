@@ -11,6 +11,8 @@ TEST_V1_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v1/aes_dec.c \
                $(AES_SRC_DIR)/v1/aes.S
 
+run-unit-aes-v1: VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=32'd1"
+
 $(eval $(call add_unit_test,$(TEST_V1_NAME),$(TEST_V1_SRC),$(TEST_FLAGS)))
 
 TEST_V2_NAME = aes-v2
@@ -18,6 +20,8 @@ TEST_V2_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v2/aes_enc.c \
                $(AES_SRC_DIR)/v2/aes_dec.c \
                $(AES_SRC_DIR)/v2/aes.S
+
+run-unit-aes-v2: VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=32'd2"
 
 $(eval $(call add_unit_test,$(TEST_V2_NAME),$(TEST_V2_SRC),$(TEST_FLAGS)))
 
@@ -27,6 +31,8 @@ TEST_V3_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/v3/aes_dec.S \
                $(AES_SRC_DIR)/v3/aes_128_ks.S
 
+run-unit-aes-v3: VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=32'd3"
+
 $(eval $(call add_unit_test,$(TEST_V3_NAME),$(TEST_V3_SRC),$(TEST_FLAGS)))
 
 TEST_V5_NAME = aes-v5
@@ -34,6 +40,8 @@ TEST_V5_SRC  = $(UNIT_ROOT)/aes/test_aes.c \
                $(AES_SRC_DIR)/tiled/aes_enc.c \
                $(AES_SRC_DIR)/tiled/aes_dec.c \
                $(AES_SRC_DIR)/tiled/aes.S
+
+run-unit-aes-v5: VL_VERILOG_PARAMETERS="-GXC_AES_VARIANT=32'd4"
 
 $(eval $(call add_unit_test,$(TEST_V5_NAME),$(TEST_V5_SRC),$(TEST_FLAGS)))
 
