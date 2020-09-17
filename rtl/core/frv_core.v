@@ -113,7 +113,7 @@ parameter XC_CLASS_BIT        = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_PACKED     = 1'b0 && XC_CLASS_BASELINE;
 parameter XC_CLASS_MULTIARITH = 1'b0 && XC_CLASS_BASELINE;
 `ifndef D_XC_CLASS_AES
-parameter XC_CLASS_AES        = 1'b1                     ;
+parameter XC_CLASS_AES        = XC_AES_VARIANT!=0        ;
 `else
 parameter XC_CLASS_AES        = `D_XC_CLASS_AES          ;
 `endif
