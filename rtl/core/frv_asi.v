@@ -46,7 +46,7 @@ parameter XC_CLASS_SHA3       = 1'b1;
 // 4. Tiled
 //
 parameter XC_AES_VARIANT      = 1;
-parameter XC_AES_DECRPYT      = 1'b1;
+parameter XC_AES_DECRYPT      = 1'b1;
 
 localparam XC_AES_VARIANT_V1  = XC_AES_VARIANT == 1;
 localparam XC_AES_VARIANT_TG  = XC_AES_VARIANT == 2;
@@ -138,15 +138,15 @@ xc_sha256 i_xc_sha256 (
 generate if(XC_AES_VARIANT_V1) begin // Simple Sub/Mix
 
 wire   insn_sub_enc = asi_valid && asi_uop == ASI_SAES_V1_ENCS;
-wire   insn_sub_dec = asi_valid && asi_uop == ASI_SAES_V1_DECS && XC_AES_DECRPYT;
+wire   insn_sub_dec = asi_valid && asi_uop == ASI_SAES_V1_DECS && XC_AES_DECRYPT;
 wire   insn_mix_enc = asi_valid && asi_uop == ASI_SAES_V1_ENCM;
-wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V1_DECM && XC_AES_DECRPYT;
+wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V1_DECM && XC_AES_DECRYPT;
 
 wire   aes_dec      = insn_sub_dec || insn_mix_dec;
 wire   aes_mix      = insn_mix_dec || insn_mix_enc;
 
 aes_v1 #(
-.DECRYPT_EN(XC_AES_DECRPYT)
+.DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_v1 (
 .g_clk      (g_clk      ),
 .g_resetn   (g_resetn   ),
@@ -161,15 +161,15 @@ aes_v1 #(
 end else if(XC_AES_VARIANT_TG) begin // Tillich/Grochadl
 
 wire   insn_sub_enc = asi_valid && asi_uop == ASI_SAES_V2_SUB_ENC;
-wire   insn_sub_dec = asi_valid && asi_uop == ASI_SAES_V2_SUB_DEC && XC_AES_DECRPYT;
+wire   insn_sub_dec = asi_valid && asi_uop == ASI_SAES_V2_SUB_DEC && XC_AES_DECRYPT;
 wire   insn_mix_enc = asi_valid && asi_uop == ASI_SAES_V2_MIX_ENC;
-wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V2_MIX_DEC && XC_AES_DECRPYT;
+wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V2_MIX_DEC && XC_AES_DECRYPT;
 
 wire   aes_sub      = insn_sub_enc || insn_sub_dec;
 wire   aes_enc      = insn_sub_enc || insn_mix_enc;
 
 aes_v2 #(
-.DECRYPT_EN(XC_AES_DECRPYT)
+.DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_v2 (
 .g_clk    (g_clk        ),
 .g_resetn (g_resetn     ),
@@ -185,15 +185,15 @@ aes_v2 #(
 end else if(XC_AES_VARIANT_TT) begin // TTable
 
 wire   insn_encs  = asi_valid && asi_uop == ASI_SAES_V3_ENCS ;
-wire   insn_decs  = asi_valid && asi_uop == ASI_SAES_V3_DECS  && XC_AES_DECRPYT;
+wire   insn_decs  = asi_valid && asi_uop == ASI_SAES_V3_DECS  && XC_AES_DECRYPT;
 wire   insn_encsm = asi_valid && asi_uop == ASI_SAES_V3_ENCSM;
-wire   insn_decsm = asi_valid && asi_uop == ASI_SAES_V3_DECSM && XC_AES_DECRPYT;
+wire   insn_decsm = asi_valid && asi_uop == ASI_SAES_V3_DECSM && XC_AES_DECRYPT;
 
 wire   aes_dec    = insn_decs   || insn_decsm;
 wire   aes_mix    = insn_encsm  || insn_decsm;
 
 aes_v3_1 #(
-.DECRYPT_EN(XC_AES_DECRPYT)
+.DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_v3_1 (
 .valid  (insn_aes   ), // Are the inputs valid? Used for logic gating.
 .dec    (aes_dec    ), // Encrypt (clear) or decrypt (set)
@@ -209,10 +209,10 @@ end else if(XC_AES_VARIANT_TI) begin // Tiles
 
 wire    insn_esrsub_lo = asi_valid && asi_uop == ASI_SAES_V5_ESRSUB_LO ;
 wire    insn_esrsub_hi = asi_valid && asi_uop == ASI_SAES_V5_ESRSUB_HI ;
-wire    insn_dsrsub_lo = asi_valid && asi_uop == ASI_SAES_V5_DSRSUB_LO  && XC_AES_DECRPYT;
-wire    insn_dsrsub_hi = asi_valid && asi_uop == ASI_SAES_V5_DSRSUB_HI  && XC_AES_DECRPYT;
+wire    insn_dsrsub_lo = asi_valid && asi_uop == ASI_SAES_V5_DSRSUB_LO  && XC_AES_DECRYPT;
+wire    insn_dsrsub_hi = asi_valid && asi_uop == ASI_SAES_V5_DSRSUB_HI  && XC_AES_DECRYPT;
 wire    insn_emix      = asi_valid && asi_uop == ASI_SAES_V5_EMIX      ;
-wire    insn_dmix      = asi_valid && asi_uop == ASI_SAES_V5_DMIX       && XC_AES_DECRPYT;
+wire    insn_dmix      = asi_valid && asi_uop == ASI_SAES_V5_DMIX       && XC_AES_DECRYPT;
 wire    insn_sub       = asi_valid && asi_uop == ASI_SAES_V5_SUB       ;
 
 wire    op_hi          = insn_esrsub_hi || insn_dsrsub_hi   ;
@@ -223,7 +223,7 @@ wire    op_dec         = insn_dsrsub_lo || insn_dsrsub_hi  ||
                          insn_dmix                          ;
 
 aes_tiled #(
-.DECRYPT_EN(XC_AES_DECRPYT)
+.DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_tiled(
 .g_clk      (g_clk      ),
 .g_resetn   (g_resetn   ),

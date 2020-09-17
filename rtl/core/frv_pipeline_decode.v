@@ -95,7 +95,7 @@ localparam XC_AES_VARIANT_TG   = XC_AES_VARIANT == 2;
 localparam XC_AES_VARIANT_TT   = XC_AES_VARIANT == 3;
 localparam XC_AES_VARIANT_TI   = XC_AES_VARIANT == 4;
 
-parameter XC_AES_DECRPYT = 1; // Enable AES decryption instructions.
+parameter XC_AES_DECRYPT = 1; // Enable AES decryption instructions.
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;

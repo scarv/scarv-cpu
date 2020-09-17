@@ -7,6 +7,12 @@ verilog_defines -DD_XC_CLASS_AES=$::env(XC_CLASS_AES)
 verilog_defines -DD_XC_AES_VARIANT=$::env(XC_AES_VARIANT)
 
 # Read in the design
+read_verilog $::env(FRV_HOME)/../../rtl/aes/share/aes_sbox_shared.v 
+read_verilog $::env(FRV_HOME)/../../rtl/aes/share/aes_mixcolumn.v 
+read_verilog $::env(FRV_HOME)/../../rtl/aes/v1/aes_v1_latency.v 
+read_verilog $::env(FRV_HOME)/../../rtl/aes/v2/aes_v2_latency.v
+read_verilog $::env(FRV_HOME)/../../rtl/aes/v3/aes_v3_1.v
+read_verilog $::env(FRV_HOME)/../../rtl/aes/tiled/aes_tiled.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_core_fetch_buffer.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_core.v
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_counters.v
@@ -42,14 +48,10 @@ read_verilog $::env(XCRYPTO_RTL)/xc_aessub/xc_aessub_sbox.v
 read_verilog $::env(XCRYPTO_RTL)/xc_aesmix/xc_aesmix.v
 read_verilog $::env(XCRYPTO_RTL)/b_bop/b_bop.v
 read_verilog $::env(XCRYPTO_RTL)/b_lut/b_lut.v
-read_verilog $::env(FRV_HOME)/../../rtl/aes/share/aes_sbox_shared.v 
-read_verilog $::env(FRV_HOME)/../../rtl/aes/share/aes_mixcolumn.v 
-read_verilog $::env(FRV_HOME)/../../rtl/aes/v1/aes_v1_latency.v 
-read_verilog $::env(FRV_HOME)/../../rtl/aes/v2/aes_v2_latency.v
-read_verilog $::env(FRV_HOME)/../../rtl/aes/v3/aes_v3_1.v
-read_verilog $::env(FRV_HOME)/../../rtl/aes/tiled/aes_tiled.v
 
 hierarchy
+
+chparam -set XC_AES_DECRYPT $::env(XC_AES_DECRYPT) frv_core
 
 # Synthesise processes ready for SCC check.
 procs

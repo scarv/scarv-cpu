@@ -146,7 +146,11 @@ parameter XC_CLASS_LEAK_BUBBLE= 1'b0 && XC_CLASS_LEAK;
 parameter XC_AES_FAST         = 1'b0;
 
 // Enable AES decryption instructions?
-parameter XC_AES_DECRPYT      = 1'b1;
+`ifndef D_XC_AES_DECRYPT
+parameter XC_AES_DECRYPT      = 1'b1;
+`else
+parameter XC_AES_DECRYPT      = `D_XC_AES_DECRYPT;
+`endif
 
 //
 // Partial Bitmanip Extension Support
@@ -220,7 +224,7 @@ frv_pipeline #(
 .XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_AES_VARIANT     (XC_AES_VARIANT     ),
-.XC_AES_DECRPYT     (XC_AES_DECRPYT     ),
+.XC_AES_DECRYPT     (XC_AES_DECRYPT     ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
