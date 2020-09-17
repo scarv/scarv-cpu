@@ -150,6 +150,7 @@ parameter XC_CLASS_LEAK       = 1'b1 && XC_CLASS_BASELINE;
 // 4. Tiled
 //
 parameter XC_AES_VARIANT      = 2;
+parameter XC_AES_DECRPYT      = 1'b1;
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
@@ -470,6 +471,7 @@ frv_pipeline_decode #(
 .XC_CLASS_MULTIARITH(XC_CLASS_MULTIARITH),
 .XC_CLASS_AES       (XC_CLASS_AES       ),
 .XC_AES_VARIANT     (XC_AES_VARIANT     ),
+.XC_AES_DECRPYT     (XC_AES_DECRPYT     ),
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
@@ -535,6 +537,7 @@ frv_pipeline_execute #(
 .XC_CLASS_SHA2      (XC_CLASS_SHA2      ),
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_AES_VARIANT     (XC_AES_VARIANT     ),
+.XC_AES_DECRPYT     (XC_AES_DECRPYT     ),
 .XC_AES_FAST        (XC_AES_FAST        ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ) 
 ) i_pipeline_s2_execute (

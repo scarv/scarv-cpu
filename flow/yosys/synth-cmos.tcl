@@ -70,5 +70,7 @@ flatten
 # Statistics: size and latency
 tee -o $::env(FRV_WORK)/synth/synth-cells.rpt stat -tech cmos
 
+tee -a $::env(FRV_WORK)/synth/synth-cells.rpt ltp -noff
+
 write_verilog $::env(FRV_WORK)/synth-gates.v
 

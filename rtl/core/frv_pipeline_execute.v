@@ -104,6 +104,7 @@ parameter XC_CLASS_SHA3       = 1'b1;
 // 4. Tiled
 //
 parameter XC_AES_VARIANT      = 2;
+parameter XC_AES_DECRPYT      = 1'b1;
 
 // Single cycle implementations of AES instructions?
 parameter XC_AES_FAST  = 1'b1;
@@ -395,6 +396,7 @@ wire   p_busy    ;
 frv_asi #(
 .XC_AES_FAST  (XC_AES_FAST  ),
 .XC_AES_VARIANT(XC_AES_VARIANT),
+.XC_AES_DECRPYT(XC_AES_DECRPYT),
 .XC_CLASS_AES (XC_CLASS_AES ),
 .XC_CLASS_SHA2(XC_CLASS_SHA2),
 .XC_CLASS_SHA3(XC_CLASS_SHA3)
