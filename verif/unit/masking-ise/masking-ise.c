@@ -189,8 +189,8 @@ int test_main() {
         fail = 1;
     }
     
-    uint32_t mt1=0xF87C3E1F;
-    uint32_t mt0=0x8FC7E3F1;
+    uint32_t mt0=0xF87C3E1F;
+    uint32_t mt1=0x8FC7E3F1;
     uint32_t result_f_aff = test_masked_f_aff(lhs,mt1,mt0);
     uint32_t expect_f_aff = 0xB5D31FC2; 
     if(result_f_aff != expect_f_aff) {

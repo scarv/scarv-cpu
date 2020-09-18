@@ -285,9 +285,8 @@ shfrot shfrpt_ins1(
 );
 
 // MASK	/ REMASK: Boolean masking and remasking
-wire opmask = (!flush) & (op_b_mask   || op_a_mask  );   //masking operation
-wire remask = (!flush) & (op_b_remask || op_a_remask);
-wire b_mask = (!flush) & (op_b_mask   || op_b_remask);
+wire opmask = (!flush) &  op_b_mask;   //masking operation
+wire remask = (!flush) &  op_b_remask;
 
 wire op_msk = opmask | remask;
 wire [XL:0] rmask0, rmask1;
@@ -296,20 +295,18 @@ wire        msk_rdy;
 generate 
     if (MASKING_ISE_TI == 1'b1) begin : masking_TI
 
-        wire [XL:0] am_a0 = rs1_s0 + prng;
-        wire [XL:0] bm_a0 = rs1_s0 ^ prng; 
+        wire [XL:0] bm_a0 = rs1_s0 ^ prng;
 
         reg  [XL:0] m_a0_reg;
         always @(posedge g_clk) 
             if (!g_resetn)          m_a0_reg <= {XLEN{1'b0}};
-            else if (opmask|remask) m_a0_reg <= (b_mask)? bm_a0 : am_a0;
+            else if (opmask|remask) m_a0_reg <= bm_a0;
 
         wire [XL:0] xm_a0 = m_a0_reg;
 
-        wire [XL:0] arm_a0 = xm_a0 - rs1_s1;
         wire [XL:0] brm_a0 = xm_a0 ^ rs1_s1;
 
-        assign      rmask0 = (opmask)? m_a0_reg: (b_mask)? brm_a0 : arm_a0; 
+        assign      rmask0 = (opmask)? m_a0_reg: brm_a0;
         assign      rmask1 = (opmask | remask)? prng : {XLEN{1'b0}};
 
         reg  mask_done;
@@ -321,27 +318,30 @@ generate
 
     end else begin                    : masking_non_TI
 
-        wire [XL:0] am_s0 =             rs1_s0 + prng;
-        wire [XL:0] am_s1 = (remask) ? (rs1_s1 + prng): prng;
-        wire [XL:0] bm_s0 =             rs1_s0 ^ prng;
-        wire [XL:0] bm_s1 = (remask) ? (rs1_s1 ^ prng): prng;
-
-        assign rmask0  = b_mask ? bm_s0 : am_s0 ;
-        assign rmask1  = b_mask ? bm_s1 : am_s1 ;
+        assign rmask0  =            rs1_s0 ^ prng;
+        assign rmask1  = (remask)? (rs1_s1 ^ prng):
+                         /* mask*/           prng;
         assign msk_rdy = op_msk;
     end
 endgenerate
 
 // ARITH ADD/SUB: arithmetic masked add and subtraction 
-wire [XL:0]  amadd0, amadd1;
-wire [XL:0]  amsub0, amsub1;
-
-assign amadd0 = rs1_s0 + rs2_s0;   //[BUG]: rs2_s0 get wrong value at LSB byte
-assign amadd1 = rs1_s1 + rs2_s1;
-assign amsub0 = rs1_s0 - rs2_s0;
-assign amsub1 = rs1_s1 - rs2_s1;
-
-wire         am_rdy = op_a_add || op_a_sub;
+wire [XL:0]  amsk0, amsk1;
+arithmask arithmask_ins(
+    .i_a0(rs1_s0),
+    .i_a1(rs1_s1),
+    .i_b0(rs2_s0),
+    .i_b1(rs2_s1),
+    .i_gs(  prng),
+    .mask(      op_a_mask  ),
+    .remask(    op_a_remask),
+    .doadd(     op_a_add   ),
+    .dosub(     op_a_sub   ),
+    .o_r0( amsk0),
+    .o_r1( amsk1)
+);
+wire         op_amsk  = op_a_mask || op_a_remask ||op_a_add || op_a_sub;
+wire         amsk_rdy = op_amsk;
 // FAFF: Boolean masked affine transformation in field gf(2^8) for AES
 wire [XL:0]  mfaff0, mfaff1;
 mskfaff makfaff_ins(	
@@ -376,8 +376,7 @@ assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
                {XLEN{op_a2b  }} &  madd0 |
                {XLEN{op_b2a  }} &  mb2a0 | 
                {XLEN{op_msk  }} &  rmask0|
-               {XLEN{op_a_add}} &  amadd0|
-               {XLEN{op_a_sub}} &  amsub0|
+               {XLEN{op_amsk }} &  amsk0 |
                {XLEN{op_f_mul}} &  mfmul0|
                {XLEN{op_f_aff}} &  mfaff0;
 
@@ -391,15 +390,14 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_a2b  }} &  madd1 |
                {XLEN{op_b2a  }} &  mb2a1 |
                {XLEN{op_msk  }} &  rmask1|
-               {XLEN{op_a_add}} &  amadd1|
-               {XLEN{op_a_sub}} &  amsub1|
+               {XLEN{op_amsk }} &  amsk1 |
                {XLEN{op_f_mul}} &  mfmul1|
                {XLEN{op_f_aff}} &  mfaff1;
 
 
 assign ready = mnot_rdy || (dologic && mlogic_rdy) ||
                madd_rdy || shr_rdy || msk_rdy      ||
-               am_rdy   || op_f_mul|| op_f_aff ;
+               amsk_rdy || op_f_mul|| op_f_aff ;
 assign mask  = prng;
 
 endmodule
@@ -442,6 +440,48 @@ assign    mlogic_ena =  dologic_valid  && (ctl_state == S_IDL);
 assign    addsub_ena =  doaddsub_valid && ((mlogic_rdy && (ctl_state == S_IDL)) | (ctl_state != S_IDL));
 
 endmodule
+
+
+//Arithmetic masking operations
+module arithmask(
+input  [31:0] i_a0,
+input  [31:0] i_a1,
+input  [31:0] i_b0,
+input  [31:0] i_b1,
+input  [31:0] i_gs,
+input         mask,
+input         remask,
+input         doadd,
+input         dosub,
+output [31:0] o_r0,
+output [31:0] o_r1
+);
+
+wire [32:0]  amadd0, amadd1;
+wire [31:0]  opr_lhs_0, opr_rhs_0;
+wire [31:0]  opr_lhs_1, opr_rhs_1;
+wire         ci;
+
+assign opr_lhs_0 =             i_a0 ;
+assign opr_rhs_0 =  ( doadd)?  i_b0 :
+                    ( dosub)? ~i_b0 :
+              /*mask|remask*/  i_gs ;
+assign opr_lhs_1 =  ( ~mask)?  i_a1 :
+                     /*mask*/  i_gs ;
+assign opr_rhs_1 =  ( doadd)?  i_b1 :
+                    ( dosub)? ~i_b1 :
+                    (remask)?  i_gs :
+                     /*mask*/ 32'd0 ;
+assign ci = dosub;
+
+assign amadd0 = {opr_lhs_0,1'b1} + {opr_rhs_0,ci};
+assign amadd1 = {opr_lhs_1,1'b1} + {opr_rhs_1,ci};
+
+assign o_r0 = amadd0[32:1];
+assign o_r1 = amadd1[32:1];
+
+endmodule
+
 
 //Boolean masked multiplication in field gf(2^8) for AES
 module mskfmul(	
@@ -860,6 +900,7 @@ assign o_s0 = i_pk0 ^ {i_gk0[30:0],1'b0};
 assign o_s1 = i_pk1 ^ {i_gk1[30:0],sub};
 endmodule
 
+
 /* multiplication in GF(2^8)/p[x] = x^8 + x^4 + x^3 + x + 1
   based on circuit minimization: http://cs-www.cs.yale.edu/homes/peralta/CircuitStuff/CMT.html 
   i_a : 8-bit input
@@ -1025,7 +1066,7 @@ module gf256_aff(i_a,i_m,o_r);
 input[ 7:0] i_a;
 input[63:0] i_m;
 output[7:0] o_r;
-
+/*
 wire [7:0] r7 = i_m[63:56];
 wire [7:0] r6 = i_m[55:48];
 wire [7:0] r5 = i_m[47:40];
@@ -1052,6 +1093,27 @@ assign o_r[4] = ^m4;
 assign o_r[5] = ^m5;
 assign o_r[6] = ^m6;
 assign o_r[7] = ^m7;
+*/
+
+wire [7:0] c7 = i_m[63:56];
+wire [7:0] c6 = i_m[55:48];
+wire [7:0] c5 = i_m[47:40];
+wire [7:0] c4 = i_m[39:32];
+wire [7:0] c3 = i_m[31:24];
+wire [7:0] c2 = i_m[23:16];
+wire [7:0] c1 = i_m[15: 8];
+wire [7:0] c0 = i_m[ 7: 0];
+
+wire [7:0] m7 = {8{i_a[7]}} & c7;
+wire [7:0] m6 = {8{i_a[6]}} & c6;
+wire [7:0] m5 = {8{i_a[5]}} & c5;
+wire [7:0] m4 = {8{i_a[4]}} & c4;
+wire [7:0] m3 = {8{i_a[3]}} & c3;
+wire [7:0] m2 = {8{i_a[2]}} & c2;
+wire [7:0] m1 = {8{i_a[1]}} & c1;
+wire [7:0] m0 = {8{i_a[0]}} & c0;
+
+assign o_r = m0^m1^m2^m3^m4^m5^m6^m7;
 
 endmodule
 
