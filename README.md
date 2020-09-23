@@ -1,9 +1,5 @@
 # [SCARV](https://github.com/scarv/scarv): processor core implementation 
 
-`master`    |  `scarv/skywater/main` | `scarv/skywater/dev`
-------------|------------------------|---------------------
-[![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=master)](https://travis-ci.org/scarv/scarv-cpu) | [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fskywater%2Fmain)](https://travis-ci.org/scarv/scarv-cpu) | [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fskywater%2Fdev)](https://travis-ci.org/scarv/scarv-cpu)
-
 <!--- -------------------------------------------------------------------- --->
 
 *Acting as a component part of the wider
@@ -27,10 +23,22 @@ implementation.*
 
 <!--- -------------------------------------------------------------------- --->
 
-**Note:** This is the `scarv/skywater/main` branch. It is used for substantial
-work on the core, related to a possible future tapeout. You can see
-open issues related to Project Skywater 
-[here](https://github.com/scarv/scarv-cpu/issues?q=is%3Aissue+is%3Aopen+label%3Askywater).
+**Branches:**
+- [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=master)](https://travis-ci.org/scarv/scarv-cpu)
+  [`master`](https://github.com/scarv/scarv-cpu/) - 
+  Main branch for XCrypto related work.
+- [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=riscv%2Fcrypto-ise)](https://travis-ci.org/scarv/scarv-cpu/branches)
+  [`riscv/crypto-ise`](https://github.com/scarv/scarv-cpu/tree/riscv/crypto-ise) - 
+  Main branch for RISC-V Crypto ISE implementation.
+- [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fskywater%2Fmain)](https://travis-ci.org/scarv/scarv-cpu/branches)
+  [`scarv/skywater/main`](https://github.com/scarv/scarv-cpu/tree/scarv/skywater/main) - 
+  Main branch for Skywater tapeout project.
+- [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=dev%2Fpaper%2Faes-n-ways)](https://travis-ci.org/scarv/scarv-cpu/branches)
+  [`dev/paper/aes-n-ways`](https://github.com/scarv/scarv-cpu/tree/dev/paper/aes-n-ways) - 
+  Development branch for RISC-V AES ISE Evaluation.
+- [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fxcrypto%2Fmasking-ise)](https://travis-ci.org/scarv/scarv-cpu/branches)
+  [`scarv/xcrypto/masking-ise`](https://github.com/scarv/scarv-cpu/tree/scarv/xcrypto/masking-ise) - 
+  Development branch for Software masking ISE.
 
 <!--- -------------------------------------------------------------------- --->
 
