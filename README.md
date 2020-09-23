@@ -42,6 +42,7 @@ implementation.*
 
 <!--- -------------------------------------------------------------------- --->
 
+**Contents:**
 - [Overview](#Overview)
 - [Documentation](#Documentation)
 - [Quickstart](#Quickstart)
