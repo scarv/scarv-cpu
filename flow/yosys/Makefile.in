@@ -8,7 +8,7 @@ SYNTH_VERILOG_OUT   = $(FRV_WORK)/synth/synth-gates.v
 
 $(SYNTH_VERILOG_OUT) : $(SYNTH_SCRIPT) $(CPU_RTL_SRCS)
 	@mkdir -p $(dir $(SYNTH_VERILOG_OUT))
-	yosys -QT \
+	$(YOSYS_ROOT)/yosys \
         -l $(SYNTH_LOG_OUT) \
         $(SYNTH_SCRIPT)
 

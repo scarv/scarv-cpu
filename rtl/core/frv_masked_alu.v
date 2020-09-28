@@ -95,6 +95,10 @@ parameter MASKING_ISE_TI      = 1'b1;
 // Use a fast implementaiton of the masking ISE instructions.
 parameter MASKING_ISE_FAST    = 1'b1;
 
+// Enable finite-field instructions (or not).
+parameter ENABLE_FAFF = 1;
+parameter ENABLE_FMUL = 1;
+
 // PRNG for masking, mask refreshing
 wire          prng_req;
 reg  [31:0]   prng;
@@ -344,6 +348,9 @@ wire         op_amsk  = op_a_mask || op_a_remask ||op_a_add || op_a_sub;
 wire         amsk_rdy = op_amsk;
 // FAFF: Boolean masked affine transformation in field gf(2^8) for AES
 wire [XL:0]  mfaff0, mfaff1;
+wire [XL:0]  mfmul0, mfmul1;
+
+generate if (ENABLE_FAFF) begin : FAFF_ENABLED
 mskfaff makfaff_ins(	
     .i_a0(rs1_s0),
     .i_a1(rs1_s1),
@@ -351,10 +358,14 @@ mskfaff makfaff_ins(
     .i_gs(prng),
     .o_r0(mfaff0),
     .o_r1(mfaff1)
-);
+); 
+end else begin : FAFF_DISABLED
+    assign mfaff0 = 32'b0;
+    assign mfaff1 = 32'b0;
+end endgenerate
 
 // FMUL: Boolean masked multiplication in field gf(2^8) for AES
-wire [XL:0]  mfmul0, mfmul1;
+generate if(ENABLE_FMUL) begin: FMUL_ENABLED
 mskfmul mskfmul_ins(	
     .i_a0(rs1_s0),
     .i_a1(rs1_s1),
@@ -364,6 +375,10 @@ mskfmul mskfmul_ins(
     .o_r0(mfmul0),
     .o_r1(mfmul1)
 );
+end else begin : FMUL_DISABLED
+    assign mfmul0 = 32'b0;
+    assign mfmul1 = 32'b0;
+end endgenerate
 
 // OUTPUT MUX: gather and multiplexing results
 assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
