@@ -25,6 +25,10 @@ if [[ -z "$BOOLECTOR_PATH" ]]; then
     export BOOLECTOR_PATH=/opt/eda/boolector/build/bin
 fi
 
+if [[ -z "$YOSYS_ROOT" ]]; then
+    export YOSYS_ROOT=/opt/eda/Yosys
+fi
+
 export PATH=$RISCV:$BOOLECTOR_PATH:$PATH
 
 echo "------------------------[CPU Project Setup]--------------------------"
