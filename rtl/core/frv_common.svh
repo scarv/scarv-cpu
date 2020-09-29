@@ -55,7 +55,6 @@ localparam ALU_SEXTH    = {2'b10, 4'b0101};
 localparam ALU_SEXTB    = {2'b10, 4'b0110};
 localparam ALU_XPERMN   = {2'b10, 4'b0111};
 localparam ALU_XPERMB   = {2'b10, 4'b1110};
-localparam ALU_XPERMH   = {2'b10, 4'b1101};
 localparam ALU_GREV     = {2'b10, 4'b1001};
 localparam ALU_SHFL     = {2'b10, 4'b1010};
 localparam ALU_UNSHFL   = {2'b10, 4'b1100};

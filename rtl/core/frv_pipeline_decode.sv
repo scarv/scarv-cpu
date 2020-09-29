@@ -127,7 +127,7 @@ assign n_s2_fu[P_FU_ALU] =
     dec_max        || dec_maxu       || dec_min        || dec_minu       ||
     dec_pcnt       || dec_sext_b     || dec_sext_h     || dec_slo        ||
     dec_sloi       || dec_sro        || dec_sroi       || dec_xperm_n    ||
-    dec_xperm_b    || dec_xperm_h    ;
+    dec_xperm_b    ; 
 
 assign n_s2_fu[P_FU_MUL] = 
     dec_div        || dec_divu       || dec_mul        || dec_mulh       ||
@@ -254,8 +254,7 @@ wire [OP:0] uop_alu =
     {OP+1{dec_sro       }} & ALU_SRO   |
     {OP+1{dec_sroi      }} & ALU_SRO   |
     {OP+1{dec_xperm_n   }} & ALU_XPERMN|
-    {OP+1{dec_xperm_b   }} & ALU_XPERMB|
-    {OP+1{dec_xperm_h   }} & ALU_XPERMH;
+    {OP+1{dec_xperm_b   }} & ALU_XPERMB;
 
 wire [OP:0] uop_cfu =
     {OP+1{dec_beq       }} & CFU_BEQ   |
@@ -611,7 +610,7 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_clz     || dec_ctz     || dec_gorc    || dec_gorci   || dec_max     ||
     dec_maxu    || dec_min     || dec_minu    || dec_pcnt    || dec_sext_b  ||
     dec_sext_h  || dec_slo     || dec_sloi    || dec_sro     || dec_sroi    ||
-    dec_xperm_n || dec_xperm_b || dec_xperm_h ;
+    dec_xperm_n || dec_xperm_b ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate
@@ -642,7 +641,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_pack   || dec_packu  || dec_packh  || dec_grev   || dec_shfl   ||
     dec_unshfl || dec_clmul  || dec_clmulh || dec_clmulr ||
     dec_gorc    || dec_max   || dec_maxu   || dec_min    || dec_minu   ||
-    dec_slo     || dec_sro   || dec_xperm_n|| dec_xperm_b|| dec_xperm_h ;
+    dec_slo     || dec_sro   || dec_xperm_n|| dec_xperm_b;
 
 assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
     dec_addi       || dec_c_addi     || dec_andi       || dec_c_andi     ||

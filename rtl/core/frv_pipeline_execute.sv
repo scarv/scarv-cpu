@@ -131,7 +131,6 @@ wire        alu_op_sexth    = fu_alu && s2_uop == ALU_SEXTH && ZBB;
 
 wire        alu_op_xpermn   = fu_alu && s2_uop == ALU_XPERMN && (ZBP||ZKBIT);
 wire        alu_op_xpermb   = fu_alu && s2_uop == ALU_XPERMB && (ZBP||ZKBIT);
-wire        alu_op_xpermh   = fu_alu && s2_uop == ALU_XPERMH && (ZBP||ZKBIT);
 
 wire        alu_cmp_lt      ; // Is LHS < RHS?
 wire        alu_cmp_ltu     ; // Is LHS < RHS?
@@ -346,7 +345,6 @@ frv_alu i_alu (
 .op_sro     (alu_op_sro     ), // Shift right ones.
 .op_xpermn  (alu_op_xpermn  ), // Crossbar permutation: Nibbles
 .op_xpermb  (alu_op_xpermb  ), // Crossbar permutation: Bytes
-.op_xpermh  (alu_op_xpermh  ), // Crossbar permutation: Halfwords
 .add_out    (alu_add_out    ), // Result of adding opr_a and opr_b
 .cmp_eq     (alu_cmp_eq     ), // Result of opr_a == opr_b
 .cmp_lt     (alu_cmp_lt     ), // Result of opr_a <  opr_b

@@ -46,7 +46,6 @@ input  wire             op_slo   , // Shift left ones
 input  wire             op_sro   , // Shift right ones.
 input  wire             op_xpermn, // Crossbar permutation: Nibbles
 input  wire             op_xpermb, // Crossbar permutation: Bytes
-input  wire             op_xpermh, // Crossbar permutation: Halfwords
 
 output wire [   XL:0]   add_out , // Result of adding opr_a and opr_b
 output wire             cmp_eq  , // Result of opr_a == opr_b
@@ -351,9 +350,23 @@ function [31:0] xperm_n;
     end
 endfunction
 
-wire xperm_any          = op_xpermn || op_xpermb || op_xpermh;
+function [31:0] xperm_b;
+    input [31:0] rs1, rs2;
+    integer i;
+    reg [ 7:0] pos;
+    reg [31:0] sel;
+    xperm_b = 32'b0;
+    for(i = 0; i < 32; i = i + 8) begin
+        pos = rs2[i+:8];
+        sel = rs1 >> {pos[1:0],3'b000};
+        xperm_b[i+:8] = pos < 4 ? sel[7:0] : 8'b0000;
+    end
+endfunction
+
+wire xperm_any          = op_xpermn || op_xpermb ;
 wire [31:0] xperm_result= 
-    {32{op_xpermn}} & xperm_n(opr_a, opr_b) ;
+    {32{op_xpermn}} & xperm_n(opr_a, opr_b) |
+    {32{op_xpermb}} & xperm_b(opr_a, opr_b) ;
 
 //
 // Result multiplexing

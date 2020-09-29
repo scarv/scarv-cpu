@@ -125,7 +125,6 @@ wire dec_clmulr = (ZBC ||        ZKBIT) && (d_data&32'hfe00707f)==32'ha002033;
 wire dec_clmulh = (ZBC ||        ZKBIT) && (d_data&32'hfe00707f)==32'ha003033;
 wire dec_xperm_n= (       ZBP || ZKBIT) && 1'b0;
 wire dec_xperm_b= (       ZBP || ZKBIT) && 1'b0;
-wire dec_xperm_h= (       ZBP || ZKBIT) && 1'b0;
 wire dec_clz    = ZBB && (d_data & 32'hfff0707f) == 32'h60001013;
 wire dec_ctz    = ZBB && (d_data & 32'hfff0707f) == 32'h60101013;
 wire dec_gorc   = ZBB && (d_data & 32'hfe00707f) == 32'h28005033;
