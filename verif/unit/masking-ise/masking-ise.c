@@ -19,6 +19,7 @@ extern uint32_t test_masked_a_add(uint32_t a, uint32_t b);
 extern uint32_t test_masked_a_sub(uint32_t a, uint32_t b);
 extern uint32_t test_masked_f_mul(uint32_t a, uint32_t b);
 extern uint32_t test_masked_f_aff(uint32_t mt0,uint32_t mt1, uint32_t a);
+extern uint32_t test_masked_f_sqr(uint32_t a);
 extern uint32_t test_bit_reverse_representation(uint32_t a, uint32_t b);
 
 void print_result_expectation(
@@ -47,6 +48,15 @@ int test_main() {
     if(result_not != expect_not) {
         __putstr("test_masked_not [FAIL]\n");
         print_result_expectation(lhs,rhs,result_not,expect_not);
+        fail = 1;
+    }
+    
+    uint32_t result_f_sqr = test_masked_f_sqr(lhs);
+    uint32_t expect_f_sqr = (~lhs); // TODO: Change me to correct value.
+
+    if(result_f_sqr != expect_f_sqr) {
+        __putstr("test_masked_f_sqr [FAIL]\n");
+        print_result_expectation(lhs,rhs,result_f_sqr,expect_f_sqr);
         fail = 1;
     }
 

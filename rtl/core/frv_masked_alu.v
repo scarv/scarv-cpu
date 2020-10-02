@@ -67,6 +67,7 @@ input  wire        op_a_add         , // Masked arithmetic add
 input  wire        op_a_sub         , // Masked arithmetic subtract.
 input  wire        op_f_mul         , // Finite field multiply
 input  wire        op_f_aff         , // Affine transform
+input  wire        op_f_sqr         , // Squaring
 
 input  wire        prng_update      , // Force the PRNG to update.
 
@@ -412,7 +413,7 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
 
 assign ready = mnot_rdy || (dologic && mlogic_rdy) ||
                madd_rdy || shr_rdy || msk_rdy      ||
-               amsk_rdy || op_f_mul|| op_f_aff ;
+               amsk_rdy || op_f_mul|| op_f_aff || op_f_sqr;
 assign mask  = prng;
 
 endmodule

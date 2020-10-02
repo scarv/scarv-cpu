@@ -307,6 +307,7 @@ wire        msk_op_a_add    = XC_CLASS_MASK && s2_uop == MSK_A_ADD   ;
 wire        msk_op_a_sub    = XC_CLASS_MASK && s2_uop == MSK_A_SUB   ;
 wire        msk_op_f_mul    = XC_CLASS_MASK && s2_uop == MSK_F_MUL   ;
 wire        msk_op_f_aff    = XC_CLASS_MASK && s2_uop == MSK_F_AFF   ;
+wire        msk_op_f_sqr    = XC_CLASS_MASK && s2_uop == MSK_F_SQR   ;
 
 wire [XL:0] msk_rs1_s0      = s2_opr_a;
 wire [XL:0] msk_rs1_s1      ;
@@ -576,6 +577,7 @@ frv_masked_alu #(
 .op_a_sub    (msk_op_a_sub    ), // Masked arithmetic sub
 .op_f_mul    (msk_op_f_mul    ), // Finite field multiply
 .op_f_aff    (msk_op_f_aff    ), // Affine transform
+.op_f_sqr    (msk_op_f_sqr    ), // Squaring
 .prng_update (msk_prng_update ), // Force the PRNG to update.
 .rs1_s0      (msk_rs1_s0      ), // RS1 Share 0
 .rs1_s1      (msk_rs1_s1      ), // RS1 Share 1

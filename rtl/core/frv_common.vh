@@ -116,6 +116,7 @@ localparam MSK_B_SRLI   = {2'b01, 3'b010};
 localparam MSK_B_RORI   = {2'b01, 3'b100};
 localparam MSK_F_MUL    = {2'b01, 3'b101};
 localparam MSK_F_AFF    = {2'b01, 3'b110};
+localparam MSK_F_SQR    = {2'b01, 3'b111};
 
 localparam CSR_READ     = 4;
 localparam CSR_WRITE    = 3;
