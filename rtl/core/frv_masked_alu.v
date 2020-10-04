@@ -372,6 +372,7 @@ mskfmul mskfmul_ins(
     .i_a1(rs1_s1),
     .i_b0(rs2_s0),
     .i_b1(rs2_s1),
+    .i_sqr(op_f_sqr),
     .i_gs(prng),
     .o_r0(mfmul0),
     .o_r1(mfmul1)
@@ -394,6 +395,7 @@ assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
                {XLEN{op_msk  }} &  rmask0|
                {XLEN{op_amsk }} &  amsk0 |
                {XLEN{op_f_mul}} &  mfmul0|
+               {XLEN{op_f_sqr}} &  mfmul0|
                {XLEN{op_f_aff}} &  mfaff0;
 
 assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
@@ -408,6 +410,7 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_msk  }} &  rmask1|
                {XLEN{op_amsk }} &  amsk1 |
                {XLEN{op_f_mul}} &  mfmul1|
+               {XLEN{op_f_sqr}} &  mfmul1|
                {XLEN{op_f_aff}} &  mfaff1;
 
 
@@ -505,32 +508,43 @@ input  [31:0] i_a0,
 input  [31:0] i_a1,
 input  [31:0] i_b0,
 input  [31:0] i_b1,
+input         i_sqr,
 input  [31:0] i_gs,
 output [31:0] o_r0,
 output [31:0] o_r1
 );
 
+wire [31:0] c_b0a0, c_b1a1, c_b100,c_b000; // controlled for selecting squaring or multiplying operation
+assign c_b0a0 =   (i_sqr)?  i_a0:        //do square 
+             /*multiply*/   i_b0;
+assign c_b1a1 =   (i_sqr)?  i_a1:        //do square 
+             /*multiply*/   i_b1;
+assign c_b100 =   (i_sqr)? 32'd0:        //do square 
+             /*multiply*/   i_b1;
+assign c_b000 =   (i_sqr)? 32'd0:        //do square 
+             /*multiply*/   i_b0;
+
 wire [31:0] m00, m11, m01, m10;
 
-gf256_mul mult0_b0 (.i_a(i_a0[ 7: 0]), .i_b(i_b0[ 7: 0]), .o_r(m00[ 7: 0]));
-gf256_mul mult1_b0 (.i_a(i_a1[ 7: 0]), .i_b(i_b1[ 7: 0]), .o_r(m11[ 7: 0]));
-gf256_mul mult2_b0 (.i_a(i_a0[ 7: 0]), .i_b(i_b1[ 7: 0]), .o_r(m01[ 7: 0]));
-gf256_mul mult3_b0 (.i_a(i_a1[ 7: 0]), .i_b(i_b0[ 7: 0]), .o_r(m10[ 7: 0]));
+gf256_mul mult0_b0 (.i_a(i_a0[ 7: 0]), .i_b(c_b0a0[ 7: 0]), .o_r(m00[ 7: 0]));
+gf256_mul mult1_b0 (.i_a(i_a1[ 7: 0]), .i_b(c_b1a1[ 7: 0]), .o_r(m11[ 7: 0]));
+gf256_mul mult2_b0 (.i_a(i_a0[ 7: 0]), .i_b(c_b100[ 7: 0]), .o_r(m01[ 7: 0]));
+gf256_mul mult3_b0 (.i_a(i_a1[ 7: 0]), .i_b(c_b000[ 7: 0]), .o_r(m10[ 7: 0]));
 
-gf256_mul mult0_b1 (.i_a(i_a0[15: 8]), .i_b(i_b0[15: 8]), .o_r(m00[15: 8]));
-gf256_mul mult1_b1 (.i_a(i_a1[15: 8]), .i_b(i_b1[15: 8]), .o_r(m11[15: 8]));
-gf256_mul mult2_b1 (.i_a(i_a0[15: 8]), .i_b(i_b1[15: 8]), .o_r(m01[15: 8]));
-gf256_mul mult3_b1 (.i_a(i_a1[15: 8]), .i_b(i_b0[15: 8]), .o_r(m10[15: 8]));
+gf256_mul mult0_b1 (.i_a(i_a0[15: 8]), .i_b(c_b0a0[15: 8]), .o_r(m00[15: 8]));
+gf256_mul mult1_b1 (.i_a(i_a1[15: 8]), .i_b(c_b1a1[15: 8]), .o_r(m11[15: 8]));
+gf256_mul mult2_b1 (.i_a(i_a0[15: 8]), .i_b(c_b100[15: 8]), .o_r(m01[15: 8]));
+gf256_mul mult3_b1 (.i_a(i_a1[15: 8]), .i_b(c_b000[15: 8]), .o_r(m10[15: 8]));
 
-gf256_mul mult0_b2 (.i_a(i_a0[23:16]), .i_b(i_b0[23:16]), .o_r(m00[23:16]));
-gf256_mul mult1_b2 (.i_a(i_a1[23:16]), .i_b(i_b1[23:16]), .o_r(m11[23:16]));
-gf256_mul mult2_b2 (.i_a(i_a0[23:16]), .i_b(i_b1[23:16]), .o_r(m01[23:16]));
-gf256_mul mult3_b2 (.i_a(i_a1[23:16]), .i_b(i_b0[23:16]), .o_r(m10[23:16]));
+gf256_mul mult0_b2 (.i_a(i_a0[23:16]), .i_b(c_b0a0[23:16]), .o_r(m00[23:16]));
+gf256_mul mult1_b2 (.i_a(i_a1[23:16]), .i_b(c_b1a1[23:16]), .o_r(m11[23:16]));
+gf256_mul mult2_b2 (.i_a(i_a0[23:16]), .i_b(c_b100[23:16]), .o_r(m01[23:16]));
+gf256_mul mult3_b2 (.i_a(i_a1[23:16]), .i_b(c_b000[23:16]), .o_r(m10[23:16]));
 
-gf256_mul mult0_b3 (.i_a(i_a0[31:24]), .i_b(i_b0[31:24]), .o_r(m00[31:24]));
-gf256_mul mult1_b3 (.i_a(i_a1[31:24]), .i_b(i_b1[31:24]), .o_r(m11[31:24]));
-gf256_mul mult2_b3 (.i_a(i_a0[31:24]), .i_b(i_b1[31:24]), .o_r(m01[31:24]));
-gf256_mul mult3_b3 (.i_a(i_a1[31:24]), .i_b(i_b0[31:24]), .o_r(m10[31:24]));
+gf256_mul mult0_b3 (.i_a(i_a0[31:24]), .i_b(c_b0a0[31:24]), .o_r(m00[31:24]));
+gf256_mul mult1_b3 (.i_a(i_a1[31:24]), .i_b(c_b1a1[31:24]), .o_r(m11[31:24]));
+gf256_mul mult2_b3 (.i_a(i_a0[31:24]), .i_b(c_b100[31:24]), .o_r(m01[31:24]));
+gf256_mul mult3_b3 (.i_a(i_a1[31:24]), .i_b(c_b000[31:24]), .o_r(m10[31:24]));
 
 (* keep="true" *)
 wire [31:0] refresh = i_gs ^ m01 ^ m10;

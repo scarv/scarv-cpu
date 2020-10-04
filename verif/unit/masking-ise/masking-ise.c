@@ -52,7 +52,7 @@ int test_main() {
     }
     
     uint32_t result_f_sqr = test_masked_f_sqr(lhs);
-    uint32_t expect_f_sqr = (~lhs); // TODO: Change me to correct value.
+    uint32_t expect_f_sqr = 0xB3600169; // TODO: Change me to correct value.
 
     if(result_f_sqr != expect_f_sqr) {
         __putstr("test_masked_f_sqr [FAIL]\n");
