@@ -169,7 +169,7 @@ wire dec_mask_a_add     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h400000
 wire dec_mask_a_sub     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'h4000105b;
 wire dec_mask_f_mul     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'he000005b;
 wire dec_mask_f_aff     = XC_CLASS_MASK && (d_data & 32'hfe10f0ff) == 32'he000205b;
-wire dec_mask_f_sqr     = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'h8020205b;
+wire dec_mask_f_sqr     = XC_CLASS_MASK && (d_data & 32'hfff0f0ff) == 32'hf000205b;
 
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal

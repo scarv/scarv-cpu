@@ -63,12 +63,13 @@ test_masked_not:
     ret
 .endfunc
 
+.balign 4
 .global test_masked_f_sqr
 .func   test_masked_f_sqr
 test_masked_f_sqr:
 
-    mask.b.mask     (t2,t1), a0
-    mask.f.sqr      (a1,a0), (t2,t1)
+    mask.b.mask     (a3,a2), a0
+    mask.f.sqr      (a1,a0), (a3,a2)
     mask.b.unmask    a0    , (a1,a0)
 
 .test_masked_f_sqr_finish:

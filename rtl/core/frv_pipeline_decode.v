@@ -803,7 +803,7 @@ assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_xc_macc_1        || dec_xc_mror          ||
     dec_xc_gather_b      || dec_xc_scatter_b     || dec_xc_gather_h      ||
     dec_xc_scatter_h     ||
-    dec_mask_b_not || dec_mask_b_and || dec_mask_b_ior || dec_mask_b_xor ||
+    dec_mask_b_and || dec_mask_b_ior || dec_mask_b_xor ||
     dec_mask_b_add || dec_mask_b_sub || dec_mask_f_mul || dec_mask_a_add ||
     dec_mask_a_sub || dec_mask_f_aff ;
 
@@ -867,7 +867,7 @@ assign n_s2_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
 //
 // Operand D sources rs2 high half of double-width read
 wire oprd_src_rs2_hi = 
-    dec_mask_b_not      || dec_mask_b_and      || dec_mask_b_ior      ||
+    dec_mask_b_and      || dec_mask_b_ior      ||
     dec_mask_b_xor      || dec_mask_b_add      || dec_mask_b_sub      ||
     dec_mask_f_mul      || dec_mask_a_add      || dec_mask_a_sub      ||
     dec_mask_f_aff      ;

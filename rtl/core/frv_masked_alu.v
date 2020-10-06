@@ -701,7 +701,7 @@ assign      gs = i_gs;
 assign    o_gs = i_a1; 
 
 generate 
-    if (MASKING_ISE_TI == 1'b1) begin : masking_TI
+    if (MASKING_ISE_TI == 1'b1) begin : masking_TI_comb
         wire [31:0] p0 = i_a0 ^ i_b0;
         wire [31:0] p1 = i_a1 ^ i_b1;
 
@@ -722,7 +722,7 @@ generate
 
         assign o_and0 = t0 ^ t2;
         assign o_and1 = t1 ^ t3;
-    end else begin                    : masking_non_TI
+    end else begin                    : masking_non_TI_comb
         assign o_xor0 = i_a0 ^ i_b0;
         assign o_xor1 = i_a1 ^ i_b1;  
     
@@ -732,9 +732,9 @@ generate
 endgenerate
 
 generate 
-    if (MASKING_ISE_TI == 1'b1) begin: masking_TI
+    if (MASKING_ISE_TI == 1'b1) begin: masking_TI_ff
         FF_Nb  ff_msklogic_rdy(.g_resetn(g_resetn), .g_clk(g_clk), .ena(1'b1), .din(ena), .dout(rdy));
-    end else begin                   : masking_non_TI
+    end else begin                   : masking_non_TI_ff
         assign rdy = ena;
     end
 endgenerate
