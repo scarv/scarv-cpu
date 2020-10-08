@@ -11,8 +11,10 @@ compatible SCARV micro-controller
 (comprising a processor core and SoC)
 is the eponymous, capstone output,
 e.g., representing a demonstrator for the
+research oriented
 [XCrypto](https://github.com/scarv/xcrypto)
-ISE.
+ISE
+and the industry oriented [RISC-V Scalar Cryptography ISE](https://github.com/riscv/riscv-crypto).
 The main
 [repository](https://github.com/scarv/scarv)
 acts as a general container for associated resources;
