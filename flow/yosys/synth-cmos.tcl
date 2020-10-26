@@ -5,6 +5,7 @@ echo on
 
 verilog_defines -DD_XC_CLASS_AES=$::env(XC_CLASS_AES)
 verilog_defines -DD_XC_AES_VARIANT=$::env(XC_AES_VARIANT)
+verilog_defines -DXC_AES_OPT_GOAL=$::env(XC_AES_OPT_GOAL)
 
 # Read in the design
 read_verilog -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/frv_core.v
@@ -45,9 +46,12 @@ read_verilog $::env(XCRYPTO_RTL)/b_lut/b_lut.v
 read_verilog $::env(FRV_HOME)/../../rtl/aes/share/aes_sbox_shared.v 
 read_verilog $::env(FRV_HOME)/../../rtl/aes/share/aes_mixcolumn.v 
 read_verilog $::env(FRV_HOME)/../../rtl/aes/v1/aes_v1_latency.v 
+read_verilog $::env(FRV_HOME)/../../rtl/aes/v1/aes_v1_size.v 
 read_verilog $::env(FRV_HOME)/../../rtl/aes/v2/aes_v2_latency.v
+read_verilog $::env(FRV_HOME)/../../rtl/aes/v2/aes_v2_size.v
 read_verilog $::env(FRV_HOME)/../../rtl/aes/v3/aes_v3_1.v
-read_verilog $::env(FRV_HOME)/../../rtl/aes/tiled/aes_tiled.v
+read_verilog $::env(FRV_HOME)/../../rtl/aes/tiled/aes_tiled_latency.v
+read_verilog $::env(FRV_HOME)/../../rtl/aes/tiled/aes_tiled_size.v
 
 chparam -set XC_AES_DECRYPT $::env(XC_AES_DECRYPT) frv_core
 

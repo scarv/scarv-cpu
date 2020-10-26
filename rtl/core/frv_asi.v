@@ -145,7 +145,7 @@ wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V1_DECM && XC_AES_DECRYPT
 wire   aes_dec      = insn_sub_dec || insn_mix_dec;
 wire   aes_mix      = insn_mix_dec || insn_mix_enc;
 
-aes_v1 #(
+aes_v1_`XC_AES_OPT_GOAL #(
 .DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_v1 (
 .g_clk      (g_clk      ),
@@ -168,7 +168,7 @@ wire   insn_mix_dec = asi_valid && asi_uop == ASI_SAES_V2_MIX_DEC && XC_AES_DECR
 wire   aes_sub      = insn_sub_enc || insn_sub_dec;
 wire   aes_enc      = insn_sub_enc || insn_mix_enc;
 
-aes_v2 #(
+aes_v2_`XC_AES_OPT_GOAL #(
 .DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_v2 (
 .g_clk    (g_clk        ),
@@ -222,7 +222,7 @@ wire    op_mix         = insn_emix      || insn_dmix        ;
 wire    op_dec         = insn_dsrsub_lo || insn_dsrsub_hi  ||
                          insn_dmix                          ;
 
-aes_tiled #(
+aes_tiled_`XC_AES_OPT_GOAL #(
 .DECRYPT_EN(XC_AES_DECRYPT)
 ) i_aes_tiled(
 .g_clk      (g_clk      ),
