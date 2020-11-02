@@ -102,7 +102,6 @@ wire dec_ssha512_sig1l  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1400702b;
 wire dec_ssha512_sig1h  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1600702b;
 wire dec_ssha512_sum0r  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1800702b;
 wire dec_ssha512_sum1r  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1a00702b;
-wire dec_pollentropy    = ZKPOLL   && (d_data & 32'hfe0ff07f) == 32'h1e05702b;
 
 // TODO: Correct decode of borrowed bitmanip instructions.
 wire dec_rol    = (ZBB || ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h60001033;
@@ -166,7 +165,7 @@ dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
 dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
 dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
 dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
-dec_ssm4_ks         || dec_ssm4_ed         || dec_pollentropy     ||
+dec_ssm4_ks         || dec_ssm4_ed         || 
 dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
 dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
 dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||

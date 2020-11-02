@@ -1,4 +1,4 @@
-PollEntropy Instruction.
+Entropy Source Interface.
 =========================
 :author: Ben Marshall
 :email: ben.marshall@bristol.ac.uk
@@ -10,44 +10,49 @@ an entropy source.*
 
 == Overview
 
-The core implements the `pollentropy` instruction from the (draft)
-RISC-V cryptography extension <<rvcrypto>>.
-It implements it by translating it into a load word (`lw`) instruction
-to a parameterised address.
-The address may be changed at synthesis time only.
+The core implements the `pollentropy` and `getnoise` pseudo instructions
+from the (draft) RISC-V cryptography extension <<rvcrypto>>.
+These instructions are aliases for CSR access instructions.
 
 == Core Modifications
 
-=== Address parameter
+=== Decoder
 
-The memory address the instruction accesses is selected using a
-single parameter at the core top level:
-
-----
-parameter [31:0] POLLENTROPY_PADDR = 32'hXXXX_XXXX;
-----
-
-This should be read as "Poll Entropy Physical Address".
+No modifications to the decoder are needed.
 
 === Core Interfaces
 
-No modifications to the core top-level or internal interfaces are needed.
+A single new interface is added to the core, The `es` interface.
+It consists of the following signals. Input/Output are from the
+perspective of the _core_.
 
+* O: `es_entropy_req` - set high when reading from `mentropy`.
+* I: `es_entropy_opst[ 1:0]` - return sample status value.
+* I: `es_entropy_data[15:0]` - return sample randomness.
+* O: `es_noise_test` - Are we in noise test mode?
+* O: `es_noise_wr` - Write to `mnoise` CSR.
+* O: `es_noise_wdata[31:0]` - write data for `mnoise`.
+* I: `es_noise_rdata[31:0]` - read data from `mnoise`.
 
-=== Decoder
+=== CSR Module
 
-The decode module handles the translation into a load word instruction.
-When a `pollentropy` instruction is decoded, the following fields
-are set:
+The CSR module interfaces between normal CSR access requests from
+the core, and the `es` interface described above.
 
-- The execute stage functional unit (`fu`) is set to the `LSU`.
-- The micro-op is set to "Load Word".
-- The destination register is set as usual.
-- Execute stage `opr_a` is set to `32'h0`.
-- Execute stage `opr_b` is set to `POLLENTROPY_PADDR`.
-- All other execute stage operands are left un-modified.
-- The 5-bit `pollentropy` immediate must be `0`.
-  Any other value results in an invalid opcode exception.
+Two new CSRs are implemented:
+
+==== `0xF15` - `mentropy`
+
+Read only, and accessed with the `pollentropy` pseudo instruction
+via the `es_pollentropy_*` signals.
+
+==== `0x7A9` - `mnoise`
+
+Read/write and mostly vendor specific except for bit `31`, which indicates
+we are in noise-capture mode.
+
+The CSR module ensures that if `es_getnoise_noisetest` is set, then
+`pollentropy` always returns `SEED=0` and `OPST=BIST`.
 
 === Misc issues.
 

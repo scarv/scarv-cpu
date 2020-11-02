@@ -144,8 +144,7 @@ assign n_s2_fu[P_FU_CFU] =
 assign n_s2_fu[P_FU_LSU] = 
     dec_lb         || dec_lbu       || dec_lh          || dec_lhu        ||
     dec_lw         || dec_c_lw      || dec_c_lwsp      || dec_c_sw       ||
-    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ||
-    dec_pollentropy;
+    dec_c_swsp     || dec_sb        || dec_sh          || dec_sw         ;
 
 assign n_s2_fu[P_FU_CSR] =
     dec_csrrc      || dec_csrrci     || dec_csrrs      || dec_csrrsi     ||
@@ -288,8 +287,7 @@ wire [1:0] lsu_width =
     {2{dec_c_lwsp    }} & LSU_WORD |
     {2{dec_c_sw      }} & LSU_WORD |
     {2{dec_c_swsp    }} & LSU_WORD |
-    {2{dec_sw        }} & LSU_WORD |
-    {2{dec_pollentropy}}& LSU_WORD ;
+    {2{dec_sw        }} & LSU_WORD ;
 
 wire [OP:0] uop_lsu;
 
@@ -304,8 +302,7 @@ assign uop_lsu[LSU_LOAD] =
     dec_lhu         ||
     dec_lw          ||
     dec_c_lw        ||
-    dec_c_lwsp      ||
-    dec_pollentropy ;
+    dec_c_lwsp      ;
 
 assign uop_lsu[LSU_STORE] = 
     dec_sb          ||
@@ -620,7 +617,7 @@ assign n_s2_opr_src[DIS_OPRA_CSRI] = // Operand A sources CSR mask immediate
     dec_csrrci     || dec_csrrsi     || dec_csrrwi     ;
 
 wire opra_src_zero = 
-    dec_lui || dec_c_li || dec_c_lui || dec_pollentropy;
+    dec_lui || dec_c_li || dec_c_lui ;
 
 assign n_s2_opr_src[DIS_OPRB_RS2 ] = // Operand B sources RS2
     dec_add        || dec_c_add      || 
@@ -744,14 +741,13 @@ wire oprb_src_rs2  = n_s2_opr_src[DIS_OPRB_RS2 ];
 wire oprb_src_imm  = n_s2_opr_src[DIS_OPRB_IMM ];
 
 wire oprb_ld_en    = n_s2_valid && (
-    oprb_src_rs2 || oprb_src_imm || oprb_src_zero || dec_pollentropy
+    oprb_src_rs2 || oprb_src_imm || oprb_src_zero
 );
 
 assign n_s2_opr_b =
     {XLEN{oprb_src_zero   }} & {XLEN{1'b0}}     |
     {XLEN{oprb_src_rs2    }} & s1_rs2_rdata     |
-    {XLEN{oprb_src_imm    }} & n_s2_imm         |
-    {XLEN{dec_pollentropy }} & POLLENTROPY_PADDR;
+    {XLEN{oprb_src_imm    }} & n_s2_imm         ;
 
 // Operand C sourcing.
 wire oprc_src_rs2  = n_s2_opr_src[DIS_OPRC_RS2 ];

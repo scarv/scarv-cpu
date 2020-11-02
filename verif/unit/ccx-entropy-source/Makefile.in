@@ -1,0 +1,7 @@
+
+TEST_NAME = ccx-entropy-source
+TEST_SRC  = $(UNIT_ROOT)/ccx-entropy-source/test_entropy_source.c \
+            $(UNIT_ROOT)/ccx-entropy-source/test_entropy_source.S 
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

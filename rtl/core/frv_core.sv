@@ -55,6 +55,14 @@ input  wire [63:0]  ctr_instret     , // Instruction retired counter value.
 output wire         ctr_inhibit_cy  , // Stop cycle counter incrementing.
 output wire         ctr_inhibit_ir  , // Stop instret incrementing.
 
+output wire         es_entropy_req  , // set when reading from `mentropy`.
+input       [ 1:0]  es_entropy_opst , // return sample status value.
+input       [15:0]  es_entropy_data , // return sample randomness.
+output wire         es_noise_test   , // Are we in noise test mode?
+output wire         es_noise_wr     , // Write to `mnoise` CSR.
+output wire [31:0]  es_noise_wdata  , // write data for `mnoise`.
+input       [31:0]  es_noise_rdata  , // read data from `mnoise`.
+
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
 output wire [3:0]   imem_strb       , // Write strobe
@@ -200,6 +208,13 @@ frv_pipeline #(
 .ctr_instret    (ctr_instret    ), // The instret counter value.
 .inhibit_cy     (ctr_inhibit_cy ), // Stop cycle counter incrementing.
 .inhibit_ir     (ctr_inhibit_ir ), // Stop instret incrementing.
+.es_entropy_req (es_entropy_req ), // set when reading from `mentropy`.
+.es_entropy_opst(es_entropy_opst), // return sample status value.
+.es_entropy_data(es_entropy_data), // return sample randomness.
+.es_noise_test  (es_noise_test  ), // Are we in noise test mode?
+.es_noise_wr    (es_noise_wr    ), // Write to `mnoise` CSR.
+.es_noise_wdata (es_noise_wdata ), // write data for `mnoise`.
+.es_noise_rdata (es_noise_rdata ), // read data from `mnoise`.
 .imem_req      (imem_req      ), // Start memory request
 .imem_wen      (imem_wen      ), // Write enable
 .imem_strb     (imem_strb     ), // Write strobe

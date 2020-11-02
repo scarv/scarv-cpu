@@ -20,9 +20,6 @@ output reg  [63: 0] ctr_instret     , // The instret counter value.
 input  wire         inhibit_cy      , // Stop cycle counter incrementing.
 input  wire         inhibit_ir      , // Stop instret incrementing.
 
-input  wire [31:0]  trng_pollentropy, // Value returned when TRNG_ADDR read.
-output wire         trng_read       , // TRNG_ADDR has just been read.
-
 scarv_ccx_memif.RSP mmio              // MMIO memory request interface.
 
 );
@@ -43,9 +40,6 @@ localparam  MMIO_MTIMECMP_ADDR_HI = MMIO_MTIMECMP_ADDR+4;
 // Reset value of the MTIMECMP register.
 parameter   MMIO_MTIMECMP_RESET   = -1;
 
-// Base address of the TRNG MMIO register.
-localparam  MMIO_TRNG_ADDR        = MMIO_BASE_ADDR + 16;
-
 // Always accept requests instantly.
 assign mmio.gnt = 1'b1;
 
@@ -62,9 +56,6 @@ wire    addr_mtimecmp_lo = mmio.req &&
 
 wire    addr_mtimecmp_hi = mmio.req &&
     (mmio.addr& MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR_HI & MMIO_BASE_MASK);
-
-wire    addr_trng_poll   = mmio.req &&
-    (mmio.addr& MMIO_BASE_MASK)==(MMIO_TRNG_ADDR        & MMIO_BASE_MASK);
 
 reg  [63:0] mapped_mtime;
 reg  [63:0] mapped_mtimecmp;
@@ -122,18 +113,14 @@ wire [31:0] n_mmio_rdata =
     {32{addr_mtime_lo   }} & mapped_mtime    [31: 0] |
     {32{addr_mtime_hi   }} & mapped_mtime    [63:32] |
     {32{addr_mtimecmp_lo}} & mapped_mtimecmp [31: 0] |
-    {32{addr_mtimecmp_hi}} & mapped_mtimecmp [63:32] |
-    {32{addr_trng_poll  }} & trng_pollentropy[31: 0] ;
+    {32{addr_mtimecmp_hi}} & mapped_mtimecmp [63:32] ;
         
 wire        n_mmio_error = mmio.req && !(
     addr_mtime_lo       ||
     addr_mtime_hi       ||
     addr_mtimecmp_lo    ||
-    addr_mtimecmp_hi    ||
-    addr_trng_poll   
+    addr_mtimecmp_hi
 );
-
-assign      trng_read = mmio.req && mmio.gnt && addr_trng_poll;
 
 always @(posedge f_clk) begin
     if(!g_resetn) begin

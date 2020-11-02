@@ -79,16 +79,20 @@ wire         cpu_ctr_inhibit_cy  ; // Stop cycle counter incrementing.
 wire         cpu_ctr_inhibit_ir  ; // Stop instret incrementing.
 
 //
+// Entropy Source - see i_entropy_source
+wire         es_entropy_req      ; // set when reading from `mentropy`.
+wire [ 1:0]  es_entropy_opst     ; // return sample status value.
+wire [15:0]  es_entropy_data     ; // return sample randomness.
+wire         es_noise_test       ; // Are we in noise test mode?
+wire         es_noise_wr         ; // Write to `mnoise` CSR.
+wire [31:0]  es_noise_wdata      ; // write data for `mnoise`.
+wire [31:0]  es_noise_rdata      ; // read data from `mnoise`.
+
+//
 // CPU memory interfaces.
 
 scarv_ccx_memif #() cpu_imem();
 scarv_ccx_memif #() cpu_dmem();
-
-//
-// TRNG wires
-// TODO: Implement CCX level TRNG.
-wire [31: 0] trng_pollentropy   ; // Value read by pollentropy instruciton.
-wire         trng_read          ; // pollentropy access just happened.
 
 //
 // Interconnect interfaces and wires
@@ -133,6 +137,13 @@ frv_core #(
 .ctr_instret      (cpu_ctr_instret        ), // Instruction retired counter.
 .ctr_inhibit_cy   (cpu_ctr_inhibit_cy     ), // Stop cycle counter increment.
 .ctr_inhibit_ir   (cpu_ctr_inhibit_ir     ), // Stop instret incrementing.
+.es_entropy_req   (es_entropy_req         ), // set to reading from `mentropy`.
+.es_entropy_opst  (es_entropy_opst        ), // return sample status value.
+.es_entropy_data  (es_entropy_data        ), // return sample randomness.
+.es_noise_test    (es_noise_test          ), // Are we in noise test mode?
+.es_noise_wr      (es_noise_wr            ), // Write to `mnoise` CSR.
+.es_noise_wdata   (es_noise_wdata         ), // write data for `mnoise`.
+.es_noise_rdata   (es_noise_rdata         ), // read data from `mnoise`.
 .imem_req         (cpu_imem.req           ), // Start memory request
 .imem_wen         (cpu_imem.wen           ), // Write enable
 .imem_strb        (cpu_imem.strb          ), // Write strobe
@@ -202,9 +213,25 @@ scarv_ccx_mmio #(
 .ctr_instret        (cpu_ctr_instret    ), // The instret counter value.
 .inhibit_cy         (cpu_ctr_inhibit_cy ), // Stop cycle counter incrementing.
 .inhibit_ir         (cpu_ctr_inhibit_ir ), // Stop instret incrementing.
-.trng_pollentropy   (trng_pollentropy   ), // Value read by pollentropy instr.
-.trng_read          (trng_read          ), // pollentropy just happened.
 .mmio               (if_mmio            )  // MMIO memory request interface.
+);
+
+//
+// instance: entropy_source
+//
+//  The entropy source / TRNG instance. Take care about which one is being
+//  used!
+//
+entropy_source i_entropy_source(
+.g_clk              (f_clk              ), // global clock
+.g_resetn           (g_resetn           ), // synchronous reset
+.es_entropy_req     (es_entropy_req     ), // set when reading from `mentropy`.
+.es_entropy_opst    (es_entropy_opst    ), // return sample status value.
+.es_entropy_data    (es_entropy_data    ), // return sample randomness.
+.es_noise_test      (es_noise_test      ), // Are we in noise test mode?
+.es_noise_wr        (es_noise_wr        ), // Write to `mnoise` CSR.
+.es_noise_wdata     (es_noise_wdata     ), // write data for `mnoise`.
+.es_noise_rdata     (es_noise_rdata     )  // read data from `mnoise`.
 );
 
 //

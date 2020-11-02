@@ -18,6 +18,14 @@ input       [XL:0] csr_wdata        , // Data to be written to a CSR
 output wire [XL:0] csr_rdata        , // CSR read data
 output wire        csr_error        , // Raise invalid opcode exception.
 
+output wire        es_entropy_req   , // set when reading from `mentropy`.
+input       [ 1:0] es_entropy_opst  , // return sample status value.
+input       [15:0] es_entropy_data  , // return sample randomness.
+output reg         es_noise_test    , // Are we in noise test mode?
+output wire        es_noise_wr      , // Write to `mnoise` CSR.
+output wire [31:0] es_noise_wdata   , // write data for `mnoise`.
+input       [31:0] es_noise_rdata   , // read data from `mnoise`.
+
 output wire [XL:0] csr_mepc         , // Current EPC.
 output wire [XL:0] csr_mtvec        , // Current MTVEC address.
 output wire        vector_intrs     , // Vector interrupt mode (if set)
@@ -95,6 +103,9 @@ localparam CSR_ADDR_MHARTID     = 12'hF14;
 
 localparam CSR_ADDR_UXCRYPTO    = 12'h800;
 localparam CSR_ADDR_LKGCFG      = 12'h801;
+
+localparam CSR_ADDR_MENTROPY    = 12'hF15;
+localparam CSR_ADDR_MNOISE      = 12'h7A9;
 
 
 //
@@ -501,6 +512,51 @@ wire [31:0] reg_mcountin = {
     mcountin_cy
 };
 
+//
+// MENTROPY and MNOISE
+// -------------------------------------------------------------------------
+
+// See scalar crypto entropy source section for these encodings.
+localparam POLLENTROPY_BIST = 2'b00;
+localparam POLLENTROPY_ES16 = 2'b01;
+
+// Are we writing to mnoise?
+assign es_noise_wr     = csr_en && csr_wr  && csr_addr == CSR_ADDR_MNOISE;
+
+assign es_noise_wdata  = 
+    csr_wr_set ? {es_noise_test, es_noise_rdata[30:0]} |  csr_wdata :
+    csr_wr_clr ? {es_noise_test, es_noise_rdata[30:0]} & ~csr_wdata :
+                                                          csr_wdata ;
+
+// Tell entropy source we have just polled it's output data.
+assign es_entropy_req  = read_mentropy;
+
+// Zero sampled entropy data IFF this is not true.
+wire   pollentropy_valid_sample =  es_entropy_req &&
+                                  !es_noise_test  &&
+                                   es_entropy_opst == POLLENTROPY_ES16;
+
+//
+// Keep track of the "NOISE_TEST" field of `mentropy` here. The external
+// module we hook into can also track it, but don't trust it too.
+// Lets the CPU stop access to "intermediate" samples via es_entropy_data.
+always @(posedge g_clk) begin
+    if(!g_resetn)        es_noise_test <= 1'b0;
+    else if(es_noise_wr) es_noise_test <= es_noise_wdata[31];
+end
+
+// read data from mnoise.
+wire [31:0] mnoise_rdata    = {
+    es_noise_test       ,
+    es_noise_rdata[30:0]
+};
+
+// read data from mentropy.
+wire [31:0] mentropy_rdata  = {
+    es_noise_test ? POLLENTROPY_BIST : es_entropy_opst  ,
+    14'b0                                               ,
+    pollentropy_valid_sample ? es_entropy_data : 16'b0
+};
 
 //
 // CSR read responses.
@@ -532,6 +588,8 @@ wire   read_minstret  = csr_en && csr_addr == CSR_ADDR_MINSTRET ;
 wire   read_mcycleh   = csr_en && csr_addr == CSR_ADDR_MCYCLEH  ;
 wire   read_minstreth = csr_en && csr_addr == CSR_ADDR_MINSTRETH;
 wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
+wire   read_mentropy  = csr_en && csr_addr == CSR_ADDR_MENTROPY ;
+wire   read_mnoise    = csr_en && csr_addr == CSR_ADDR_MNOISE   ;
 
 wire   valid_addr     = 
     read_mstatus   ||
@@ -559,7 +617,9 @@ wire   valid_addr     =
     read_minstret  ||
     read_mcycleh   ||
     read_minstreth ||
-    read_mcountin  ;
+    read_mcountin  ||
+    read_mentropy  ||
+    read_mnoise    ;
 
 wire invalid_addr = !valid_addr;
 
@@ -595,7 +655,9 @@ assign csr_rdata =
     {32{read_minstret }} & ctr_instret  [31: 0] |
     {32{read_mcycleh  }} & ctr_cycle    [63:32] |
     {32{read_minstreth}} & ctr_instret  [63:32] |
-    {32{read_mcountin }} & reg_mcountin         ;
+    {32{read_mcountin }} & reg_mcountin         |
+    {32{read_mentropy }} & mentropy_rdata       |
+    {32{read_mnoise   }} & mnoise_rdata         ;
 
 endmodule
 

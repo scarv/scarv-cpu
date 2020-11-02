@@ -64,6 +64,14 @@ output wire         int_trap_ack    , // WB stage acknowledges the taken trap.
 output wire         inhibit_cy      , // Stop cycle counter incrementing.
 output wire         inhibit_ir      , // Stop instret incrementing.
 
+output wire         es_entropy_req  , // set when reading from `mentropy`.
+input       [ 1:0]  es_entropy_opst , // return sample status value.
+input       [15:0]  es_entropy_data , // return sample randomness.
+output wire         es_noise_test   , // Are we in noise test mode?
+output wire         es_noise_wr     , // Write to `mnoise` CSR.
+output wire [31:0]  es_noise_wdata  , // write data for `mnoise`.
+input       [31:0]  es_noise_rdata  , // read data from `mnoise`.
+
 output wire         imem_req        , // Start memory request
 output wire         imem_wen        , // Write enable
 output wire [3:0]   imem_strb       , // Write strobe
@@ -623,6 +631,13 @@ frv_csrs #(
 .csr_error        (csr_error        ), // Raise invalid opcode trap - bad CSR
 .csr_mepc         (csr_mepc         ), // Current MEPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
+.es_entropy_req   (es_entropy_req   ), // set when reading from `mentropy`.
+.es_entropy_opst  (es_entropy_opst  ), // return sample status value.
+.es_entropy_data  (es_entropy_data  ), // return sample randomness.
+.es_noise_test    (es_noise_test    ), // Are we in noise test mode?
+.es_noise_wr      (es_noise_wr      ), // Write to `mnoise` CSR.
+.es_noise_wdata   (es_noise_wdata   ), // write data for `mnoise`.
+.es_noise_rdata   (es_noise_rdata   ), // read data from `mnoise`.
 .vector_intrs     (vector_intrs     ), // Vectored interrupt mode?
 .exec_mret        (exec_mret        ), // MRET instruction executed.
 .mstatus_mie      (mstatus_mie      ), // Global interrupt enable.

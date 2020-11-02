@@ -58,6 +58,10 @@ and **M**ultiply extensions.
 It's a micro-controller, with no cache, branch prediction or
 virtual memory.
 
+It also implements the draft version of the RISC-V Scalar Cryptography
+Instruction Set, currently in development
+[here](https://github.com/riscv/riscv-crypto).
+
 ![Pipeline Diagram](docs/scarv-cpu-uarch.png)
 
 ## Documentation
@@ -70,8 +74,7 @@ the pipeline structure.
 - Implementation Documentation:
   - [Instruction Table](docs/instr-table.md)
   - [Pipeline Structure](docs/pipeline.md)
-  - [Leakage Fence Instruction Implementation](docs/leakage-fence.md)
-  - [Random Number Generator Interface](docs/rng-interface.md)
+  - [Entropy Source Interface](docs/rng-interface.md)
 
 ## Quickstart
 
@@ -84,16 +87,15 @@ the pipeline structure.
 
   - [SymbiYosys](https://symbiyosys.readthedocs.io/en/latest/index.html)
 
-  - [A Toolchain](https://github.com/scarv/riscv-gnu-toolchain) which
-    supports the
-    [XCrypto](https://github.com/scarv/xcrypto)
-    instruction set extension.
+  - [A Toolchain](https://github.com/riscv/riscv-crypto) which
+    supports the work-in-progress cryptography ISE
 
 - Checkout the repository and required submodules.
 
     ```sh
     $> git clone git@github.com:scarv-cpu/scarv-cpu.git
     $> cd scarv-cpu/
+    $> git checkout riscv/crypto-ise
     $> git submodule update --init --remote
     ```
 
@@ -110,12 +112,6 @@ the pipeline structure.
     $> source bin/conf.sh
     ```
 
-- Build the verilator simulation model:
-
-    ```sh
-    $> make verilator_build
-    ```
-
 - Run the basic RISC-V compliance tests:
 
     ```sh
@@ -126,7 +122,7 @@ the pipeline structure.
 - Run the standard Yosys Synthesis flow:
 
     ```sh
-    $> make synthesise
+    $> make synth-core
     ```
 
 <!--- -------------------------------------------------------------------- --->

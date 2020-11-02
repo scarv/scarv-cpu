@@ -1,4 +1,5 @@
 -F $(SCARV_CPU)/flow/verilator/manifest-core-rtl.txt
+$(SCARV_CPU)/rtl/peripherals/entropy_source_lfsr.sv
 $(SCARV_CPU)/rtl/mem/scarv_dual_ram.sv
 $(SCARV_CPU)/rtl/mem/scarv_single_rom.sv
 $(SCARV_CPU)/rtl/ccx/scarv_ccx_memif.sv

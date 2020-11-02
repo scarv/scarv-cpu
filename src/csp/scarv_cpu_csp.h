@@ -131,6 +131,33 @@ DECL_CSR_ACCESS(mcounteren,0x306)
 DECL_CSR_ACCESS(mcountinhibit,0x320)
 DECL_CSR_ACCESS(mscratch,0x340)
 
+//
+// Entropy Source
+// ------------------------------------------------------------
+
+#define SCARV_CPU_POLLENTROPY_BIST 0
+#define SCARV_CPU_POLLENTROPY_ES16 1
+#define SCARV_CPU_POLLENTROPY_WAIT 2
+#define SCARV_CPU_POLLENTROPY_DEAD 3
+
+#define SCARV_CPU_MNOISE_NOISETEST (1 << 31)
+
+inline volatile uint32_t scarv_cpu_pollentropy() {
+    uint32_t rd;
+    asm volatile ("csrrs %0, 0xF15, x0" : "=r"(rd));
+    return rd;
+}
+
+inline volatile uint32_t scarv_cpu_getnoise_rd() {
+    uint32_t rd;
+    asm volatile ("csrrs %0, 0x7A9, x0" : "=r"(rd));
+    return rd;
+}
+
+inline volatile void scarv_cpu_getnoise_wr(uint32_t wd) {
+    asm volatile ("csrw 0x7A9, %0" : :  "r"(wd));
+}
+
 #endif
 
 //! @}
