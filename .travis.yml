@@ -33,6 +33,7 @@ jobs:
     - make run-unit-ccx-mtime-write
     - make run-unit-ccx-timer
     - make run-unit-ccx-interrupts
+    - make run-unit-ccx-entropy-source
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
