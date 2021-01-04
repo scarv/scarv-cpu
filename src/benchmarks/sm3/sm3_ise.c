@@ -24,14 +24,14 @@ static inline uint32_t rv32b_andn(uint32_t x, uint32_t y) {
 static inline uint32_t sm3_p0(uint32_t rs1)
 {
 	uint32_t rd;
-    asm ("ssm3.p0 %0, %1" :"=r"(rd) : "r"(rs1));
+    asm ("sm3p0 %0, %1" :"=r"(rd) : "r"(rs1));
     return rd;
 }
 
 static inline uint32_t sm3_p1(uint32_t rs1)
 {
 	uint32_t rd;
-    asm ("ssm3.p1 %0, %1" :"=r"(rd) : "r"(rs1));
+    asm ("sm3p1 %0, %1" :"=r"(rd) : "r"(rs1));
     return rd;
 }
 

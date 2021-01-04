@@ -84,24 +84,24 @@ wire dec_c_add      = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd4 && d_data[12:
 wire dec_c_swsp     = d_data[1:0] == 2'd2 && d_data[15:13] == 3'd6;
 
 // TODO: Correct decode of crypto extension instructions.
-wire dec_ssm4_ed        = ZKSM4    && (d_data & 32'h3e00707f) == 32'h800302b;
-wire dec_ssm4_ks        = ZKSM4    && (d_data & 32'h3e00707f) == 32'ha00302b;
-wire dec_saes32_encsm   = ZKAES    && (d_data & 32'h3e00707f) == 32'h202b;
-wire dec_saes32_encs    = ZKAES    && (d_data & 32'h3e00707f) == 32'h200202b;
-wire dec_saes32_decsm   = ZKAES    && (d_data & 32'h3e00707f) == 32'h400202b;
-wire dec_saes32_decs    = ZKAES    && (d_data & 32'h3e00707f) == 32'h600202b;
-wire dec_ssha256_sig0   = ZKSHA256 && (d_data & 32'hfff0707f) == 32'he00702b;
-wire dec_ssha256_sig1   = ZKSHA256 && (d_data & 32'hfff0707f) == 32'he10702b;
-wire dec_ssha256_sum0   = ZKSHA256 && (d_data & 32'hfff0707f) == 32'he20702b;
-wire dec_ssha256_sum1   = ZKSHA256 && (d_data & 32'hfff0707f) == 32'he30702b;
-wire dec_ssm3_p0        = ZKSM3    && (d_data & 32'hfff0707f) == 32'he80702b;
-wire dec_ssm3_p1        = ZKSM3    && (d_data & 32'hfff0707f) == 32'he90702b;
-wire dec_ssha512_sig0l  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1000702b;
-wire dec_ssha512_sig0h  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1200702b;
-wire dec_ssha512_sig1l  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1400702b;
-wire dec_ssha512_sig1h  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1600702b;
-wire dec_ssha512_sum0r  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1800702b;
-wire dec_ssha512_sum1r  = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h1a00702b;
+wire dec_sm4ed       = ZKSM4    && (d_data & 32'h3e007fff) == 32'h30000033; 
+wire dec_sm4ks       = ZKSM4    && (d_data & 32'h3e007fff) == 32'h34000033; 
+wire dec_sm3p0       = ZKSM3    && (d_data & 32'hfff0707f) == 32'h10801013; 
+wire dec_sm3p1       = ZKSM3    && (d_data & 32'hfff0707f) == 32'h10901013; 
+wire dec_sha256sum0  = ZKSHA256 && (d_data & 32'hfff0707f) == 32'h10001013; 
+wire dec_sha256sum1  = ZKSHA256 && (d_data & 32'hfff0707f) == 32'h10101013; 
+wire dec_sha256sig0  = ZKSHA256 && (d_data & 32'hfff0707f) == 32'h10201013; 
+wire dec_sha256sig1  = ZKSHA256 && (d_data & 32'hfff0707f) == 32'h10301013; 
+wire dec_aes32esmi   = ZKAES    && (d_data & 32'h3e007fff) == 32'h36000033; 
+wire dec_aes32esi    = ZKAES    && (d_data & 32'h3e007fff) == 32'h32000033; 
+wire dec_aes32dsmi   = ZKAES    && (d_data & 32'h3e007fff) == 32'h3e000033; 
+wire dec_aes32dsi    = ZKAES    && (d_data & 32'h3e007fff) == 32'h3a000033; 
+wire dec_sha512sum0r = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h50000033; 
+wire dec_sha512sum1r = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h52000033; 
+wire dec_sha512sig0l = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h54000033; 
+wire dec_sha512sig0h = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h5c000033; 
+wire dec_sha512sig1l = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h56000033; 
+wire dec_sha512sig1h = ZKSHA512 && (d_data & 32'hfe00707f) == 32'h5e000033; 
 
 // TODO: Correct decode of borrowed bitmanip instructions.
 wire dec_rol    = (ZBB || ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h60001033;
@@ -113,10 +113,10 @@ wire dec_xnor   = (ZBB || ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h40004033;
 wire dec_pack   = (ZBB || ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h8004033;
 wire dec_packu  = (ZBB || ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h48004033;
 wire dec_packh  = (ZBB || ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h8007033;
-wire dec_grev   = (       ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h68005033;
+wire dec_grev   = (       ZBP         ) && (d_data&32'hfe00707f)==32'h68005033;
 wire dec_grevi  = (       ZBP || ZKBIT) && (d_data&32'hfc00707f)==32'h68005013;
-wire dec_shfl   = (       ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h8001033;
-wire dec_unshfl = (       ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h8005033;
+wire dec_shfl   = (       ZBP         ) && (d_data&32'hfe00707f)==32'h8001033;
+wire dec_unshfl = (       ZBP         ) && (d_data&32'hfe00707f)==32'h8005033;
 wire dec_shfli  = (       ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h8001013;
 wire dec_unshfli= (       ZBP || ZKBIT) && (d_data&32'hfe00707f)==32'h8005013;
 wire dec_clmul  = (ZBC ||        ZKBIT) && (d_data&32'hfe00707f)==32'ha001033;
@@ -159,13 +159,13 @@ wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_c_or      ||dec_c_and     ||dec_c_j       ||dec_c_beqz    ||dec_c_bnez
 ||dec_c_slli    ||dec_c_lwsp    ||dec_c_jr      ||dec_c_mv
 ||dec_c_ebreak  ||dec_c_jalr    ||dec_c_add     ||dec_c_swsp    ||
-dec_saes32_encs     ||
-dec_saes32_encsm    || dec_saes32_decs     || dec_saes32_decsm    ||
-dec_ssha256_sig0    || dec_ssha256_sig1    || dec_ssha256_sum0    ||
-dec_ssha256_sum1    || dec_ssha512_sum0r   || dec_ssha512_sum1r   ||
-dec_ssha512_sig0l   || dec_ssha512_sig0h   || dec_ssha512_sig1l   ||
-dec_ssha512_sig1h   || dec_ssm3_p0         || dec_ssm3_p1         ||
-dec_ssm4_ks         || dec_ssm4_ed         || 
+dec_aes32esi      ||
+dec_aes32esmi     || dec_aes32dsi      || dec_aes32dsmi     ||
+dec_sha256sig0    || dec_sha256sig1    || dec_sha256sum0    ||
+dec_sha256sum1    || dec_sha512sum0r   || dec_sha512sum1r   ||
+dec_sha512sig0l   || dec_sha512sig0h   || dec_sha512sig1l   ||
+dec_sha512sig1h   || dec_sm3p0         || dec_sm3p1         ||
+dec_sm4ks         || dec_sm4ed         || 
 dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
 dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
 dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||
