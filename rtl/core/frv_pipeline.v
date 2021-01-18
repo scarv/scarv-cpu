@@ -160,7 +160,7 @@ parameter AES_MIX_FAST = 1'b1;
 parameter BITMANIP_BASELINE   = 1'b1;
 
 parameter MASKING_ISE_TRNG    = 1'b0; // Use a TRNG (1) or a PRNG (0)
-parameter MASKING_ISE_TI      = 1'b1; // Threshold implementation (1) or (0)
+parameter MASKING_ISE_DOM     = 1'b1; // DOM implementation (1) or (0)
 parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
@@ -688,7 +688,7 @@ frv_pipeline_execute #(
 .AES_MIX_FAST       (AES_MIX_FAST       ),
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ),
 .MASKING_ISE_TRNG   (MASKING_ISE_TRNG   ),
-.MASKING_ISE_TI     (MASKING_ISE_TI     ),
+.MASKING_ISE_DOM    (MASKING_ISE_DOM    ),
 .MASKING_ISE_FAST   (MASKING_ISE_FAST   ),
 .MASK_REV_EN        (MASK_REV_EN        )
 ) i_pipeline_s2_execute (

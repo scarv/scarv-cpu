@@ -1,4 +1,3 @@
-
 //
 // module: frv_masked_shuffle
 //
@@ -34,9 +33,8 @@ assign o        = en ? rev_out ^ const_out: i;
 
 endmodule
 
-
 //
-// module: frv_masked_alu
+// module frv_masked_alu
 //
 //  Responsible for performing masking operations.
 //
@@ -90,8 +88,8 @@ output wire [XL:0] rd_s1              // Output share 1
 // Masking ISE - Use a TRNG (1) or a PRNG (0)
 parameter MASKING_ISE_TRNG    = 1'b0;
 
-// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
-parameter MASKING_ISE_TI      = 1'b1;
+// Masking ISE - Use a DOM Implementation (1) or not (0)
+parameter MASKING_ISE_DOM      = 1'b1;
 
 // Use a fast implementaiton of the masking ISE instructions.
 parameter MASKING_ISE_FAST    = 1'b1;
@@ -101,18 +99,28 @@ parameter ENABLE_FAFF = 1;
 parameter ENABLE_FMUL = 1;
 
 // PRNG for masking, mask refreshing
-wire          prng_req;
-reg  [31:0]   prng;
-wire        n_prng_lsb = prng[31] ~^ prng[21] ~^ prng[ 1] ~^ prng[ 0];
-wire [31:0] n_prng     = {prng[31-1:0], n_prng_lsb};
+wire          prng0_req;
+reg  [31:0]   prng0;
+wire        n_prng0_lsb =  prng0[31] ~^ prng0[21] ~^ prng0[ 1] ~^ prng0[ 0];
+wire [31:0] n_prng0     = {prng0[31-1:0], n_prng0_lsb};
 // Process for updating the LFSR.
 always @(posedge g_clk) begin
-    if(!g_resetn)      prng <= 32'h6789ABCD;
-    else if(prng_req )  prng <= n_prng;
+    if(!g_resetn)       prng0 <= 32'h6789ABCD;
+    else if(prng0_req ) prng0 <= n_prng0;
 end
-assign prng_req = ready || (prng_update && (!op_b2a));
+assign prng0_req = ready || prng_update;
 
-wire [XL:0] gs_0;
+wire          prng1_req;
+reg  [31:0]   prng1;
+wire        n_prng1_lsb =  prng1[31] ~^ prng1[21] ~^ prng1[ 1] ~^ prng1[ 0];
+wire [31:0] n_prng1     = {prng1[31-1:0], n_prng1_lsb};
+// Process for updating the LFSR.
+always @(posedge g_clk) begin
+    if(!g_resetn)       prng1 <= 32'h87654321;
+    else if(prng1_req ) prng1 <= n_prng1;
+end
+assign prng1_req = ready || prng_update;
+
 wire [XL:0] mxor0, mxor1;
 wire [XL:0] mand0, mand1;
 
@@ -127,13 +135,12 @@ wire        mlogic_rdy;
 
 // BOOL NOT: Boolean masked NOT 
 wire [XL:0] mnot0, mnot1;
-wire        mnot_rdy = op_b_not;
-assign mnot0 =  rs1_s0;
-assign mnot1 = ~rs1_s1;
+wire        mnot_rdy = valid & op_b_not;
+assign mnot0 =  rs1_s0 ^ prng0;
+assign mnot1 = ~rs1_s1 ^ prng0;
 
-wire        nrs2_opt= (op_b_ior||op_b_sub);
-wire [XL:0] nrs2_s0 =  rs2_s0;
-wire [XL:0] nrs2_s1 = ~rs2_s1;
+//wire [XL:0] nrs2_s0 =  rs2_s0;
+//wire [XL:0] nrs2_s1 = ~rs2_s1;
 
 // B2A PRE: reuse the boolean masked add/sub to execute Boolean masking to arithmetic masking instruction
 // Expected:rs0 ^ rs1 = rd0 - rd1
@@ -143,8 +150,21 @@ wire [XL:0] nrs2_s1 = ~rs2_s1;
 //rd0 = s0 ^ s1;         rd1 = prng
 wire [XL:0] b2a_a0 = rs1_s0;
 wire [XL:0] b2a_a1 = rs1_s1;
-wire [XL:0] b2a_b0 = prng;
-wire [XL:0] b2a_b1 = {XLEN{1'b0}};
+wire [XL:0] b2a_b0 = {XLEN{1'b0}};
+
+// keep b2a_b1 unchanging during B2A process
+wire [XL:0] b2a_b1;
+wire [XL:0] b2a_b1_lat;
+wire        b2a_ini = op_b2a && mlogic_ena;
+FF_Nb #(.Nb(32)) ff_b2a_b1(
+    .g_resetn(g_resetn  ), 
+    .g_clk(   g_clk     ), 
+    .ena(     b2a_ini   ), 
+    .din(     b2a_b1    ), 
+    .dout(    b2a_b1_lat)
+);
+wire [XL:0] b2a_gs = (n_prng0 ^ n_prng1);
+assign      b2a_b1 = {mlogic_ena} ? b2a_gs : b2a_b1_lat;
 
 // A2B PRE: reuse the boolean masked add/sub to execute arithmetic masking to Boolean masking instruction
 // expected:rs0 - rs1 = rd0 ^ rd1
@@ -156,35 +176,36 @@ wire [XL:0] b2a_b1 = {XLEN{1'b0}};
 // Refreshing the share 1 before converting to avoid collision
 wire [XL:0] a2b_a0 = rs1_s0;
 wire [XL:0] a2b_a1 = {XLEN{1'b0}};
-wire [XL:0] a2b_b0 = prng;
-wire [XL:0] a2b_b1 = ~rs1_s1 ^ prng;  // the NOT operation to perform BoolSub
-
+wire [XL:0] a2b_b0 = {XLEN{1'b0}};
+wire [XL:0] a2b_b1 = ~rs1_s1;  // the NOT operation to perform BoolSub
 
 // Operand multiplexing 
+wire        nrs2_opt = (op_b_ior || op_b_sub);
 wire [XL:0] op_a0, op_a1, op_b0, op_b1;
 
 assign op_a0 =  rs1_s0;
-assign op_a1 =  op_b_ior ? mnot1   :
-                op_b2a   ? b2a_a1  :
-                op_a2b   ? a2b_a1  :
-                           rs1_s1  ;
+assign op_a1 =  op_b_ior ?~rs1_s1:
+                op_b2a   ? b2a_a1:
+                op_a2b   ? a2b_a1:
+                           rs1_s1;
 
-assign op_b0 =  op_b2a   ? b2a_b0  :
-                op_a2b   ? a2b_b0  :
-                           rs2_s0  ;
-assign op_b1 =  nrs2_opt ? nrs2_s1 :
-                op_b2a   ? b2a_b1  : 
-                op_a2b   ? a2b_b1  :
-                           rs2_s1  ; 
+assign op_b0 =  op_b2a   ? b2a_b0:
+                op_a2b   ? a2b_b0:
+                           rs2_s0;
+assign op_b1 =  nrs2_opt ?~rs2_s1:
+                op_b2a   ? b2a_b1: 
+                op_a2b   ? a2b_b1:
+                           rs2_s1; 
 
 // BOOL XOR; BOOL AND: Boolean masked logic executes BoolXor; BoolAnd;
-msklogic #(
-    .MASKING_ISE_TI(MASKING_ISE_TI)
-) msklogic_ins (
+msklogic 
+#(  .MASKING_ISE_DOM(MASKING_ISE_DOM)) 
+msklogic_ins (
     .g_resetn(  g_resetn),
     .g_clk(     g_clk), 
     .ena(       mlogic_ena), 
-    .i_gs(      n_prng), 
+    .i_gs0(     prng0), 
+    .i_gs1(     prng1), 
     .i_a0(      op_a0), 
     .i_a1(      op_a1), 
     .i_b0(      op_b0),
@@ -193,7 +214,6 @@ msklogic #(
     .o_xor1(    mxor1), 
     .o_and0(    mand0),
     .o_and1(    mand1),  
-    .o_gs(      gs_0),
     .rdy(       mlogic_rdy)
 );
 
@@ -206,14 +226,15 @@ wire [31:0] s_mand1 = {mand1[31:1],u_1};
 
 // BOOL ADD/SUB ITERATION and BOOL ADD/SUB POST 
 mskaddsub   
-#(  .MASKING_ISE_TI(MASKING_ISE_TI))
+#(  .MASKING_ISE_DOM(MASKING_ISE_DOM))
 mskaddsub_ins(
     .g_resetn(  g_resetn),
     .g_clk(     g_clk),    
     .flush(     flush),
     .ena(       addsub_ena), 
     .sub(       sub),
-    .i_gs(      gs_0), 
+    .i_gs0(   n_prng0), 
+    .i_gs1(   n_prng1), 
     .mxor0(     mxor0),
     .mxor1(     mxor1), 
     .mand0(   s_mand0),
@@ -224,9 +245,9 @@ mskaddsub_ins(
 
 // Control unit for Boolean masked calculations
 wire dologic     = (!flush) && (op_b_xor || op_b_and || op_b_ior);
-wire op_b_addsub = (!flush) && (op_b_add || op_b_sub || op_b2a   || op_a2b  );
+wire op_b_addsub = (!flush) && (op_b_add || op_b_sub || op_b2a || op_a2b  );
 
-mskalu_ctl mskaluctl_ins (
+frv_masked_alu_ctl frv_masked_aluctl_ins (
     .g_resetn   (g_resetn               ),
     .g_clk      (g_clk                  ),
     .flush      (flush                  ),
@@ -248,17 +269,17 @@ wire [XL:0] mior1 = ~mand1;
 // to avoid unintentionally unmasking the output of masked add/sub module
 wire op_b2a_latched;  //prevent any glitches on the op_b2a  
 FF_Nb ff_dob2a(
-    .g_resetn(  g_resetn        ), 
-    .g_clk(     g_clk           ), 
-    .ena(       valid           ), 
-    .din(       op_b2a          ), 
-    .dout(      op_b2a_latched  )
+    .g_resetn(g_resetn      ), 
+    .g_clk(   g_clk         ), 
+    .ena(     valid         ), 
+    .din(     op_b2a        ), 
+    .dout(    op_b2a_latched)
 );
-
-wire [XL:0] madd0_gated = (op_b2a_latched)? madd0 : prng;
-wire [XL:0] madd1_gated = (op_b2a_latched)? madd1 : prng;
+wire [XL:0] madd0_gated = (op_b2a_latched)? madd0 : prng0;
+wire [XL:0] madd1_gated = (op_b2a_latched)? madd1 : prng0;
 wire [XL:0] mb2a0 = madd0_gated ^ madd1_gated;   
-wire [XL:0] mb2a1 = prng;
+wire [XL:0] mb2a1 = b2a_b1;
+
 
 // SHIFT/ ROTATE: Boolean masked shift/rotate
 // Share 0 input gets reversed, so pick shamt from high 5 bits of rs2_s0
@@ -266,13 +287,13 @@ wire [4:0] shamt = rs2_s0[4:0];
     //op_shr ? {rs2_s0[27],rs2_s0[28],rs2_s0[29],rs2_s0[30],rs2_s0[31]} : 5'b0;
 
 wire op_shr  = op_b_srli || op_b_slli || op_b_rori;
-wire shr_rdy = op_shr;
+wire shr_rdy = valid & op_shr;
 
 wire [XL:0]  mshr0, mshr1;
 shfrot shfrpt_ins0(
     .s(      rs1_s0     ), 
     .shamt(  shamt      ), // Shift amount 
-    .rp (    prng       ), // random padding
+    .rp (    prng0       ), // random padding
     .srli(op_b_srli     ), // Shift  right
     .slli(op_b_slli     ), // Shift  left
     .rori(op_b_rori     ), // Rotate right
@@ -282,7 +303,7 @@ shfrot shfrpt_ins0(
 shfrot shfrpt_ins1(
     .s(      rs1_s1     ), 
     .shamt(  shamt      ), // Shift amount 
-    .rp (    prng       ), // random padding
+    .rp (    prng0       ), // random padding
     .srli(op_b_srli     ), // Shift  right
     .slli(op_b_slli     ), // Shift  left
     .rori(op_b_rori     ), // Rotate right
@@ -297,38 +318,10 @@ wire op_msk = opmask | remask;
 wire [XL:0] rmask0, rmask1;
 wire        msk_rdy;
 
-generate 
-    if (MASKING_ISE_TI == 1'b1) begin : masking_TI
-
-        wire [XL:0] bm_a0 = rs1_s0 ^ prng;
-
-        reg  [XL:0] m_a0_reg;
-        always @(posedge g_clk) 
-            if (!g_resetn)          m_a0_reg <= {XLEN{1'b0}};
-            else if (opmask|remask) m_a0_reg <= bm_a0;
-
-        wire [XL:0] xm_a0 = m_a0_reg;
-
-        wire [XL:0] brm_a0 = xm_a0 ^ rs1_s1;
-
-        assign      rmask0 = (opmask)? m_a0_reg: brm_a0;
-        assign      rmask1 = (opmask | remask)? prng : {XLEN{1'b0}};
-
-        reg  mask_done;
-        always @(posedge g_clk) 
-            if (!g_resetn)                {mask_done} <= 1'd0;
-            else if (op_msk & ~mask_done) {mask_done} <= 1'b1;
-            else                          {mask_done} <= 1'd0;
-        assign msk_rdy = mask_done;
-
-    end else begin                    : masking_non_TI
-
-        assign rmask0  =            rs1_s0 ^ prng;
-        assign rmask1  = (remask)? (rs1_s1 ^ prng):
-                         /* mask*/           prng;
-        assign msk_rdy = op_msk;
-    end
-endgenerate
+assign rmask0  =            rs1_s0 ^ prng0;
+assign rmask1  = (remask)? (rs1_s1 ^ prng0):
+                 /* mask*/           prng0;
+assign msk_rdy = valid & op_msk;
 
 // ARITH ADD/SUB: arithmetic masked add and subtraction 
 wire [XL:0]  amsk0, amsk1;
@@ -337,7 +330,7 @@ arithmask arithmask_ins(
     .i_a1(rs1_s1),
     .i_b0(rs2_s0),
     .i_b1(rs2_s1),
-    .i_gs(  prng),
+    .i_gs(  prng0),
     .mask(      op_a_mask  ),
     .remask(    op_a_remask),
     .doadd(     op_a_add   ),
@@ -346,7 +339,7 @@ arithmask arithmask_ins(
     .o_r1( amsk1)
 );
 wire         op_amsk  = op_a_mask || op_a_remask ||op_a_add || op_a_sub;
-wire         amsk_rdy = op_amsk;
+wire         amsk_rdy = valid & op_amsk;
 // FAFF: Boolean masked affine transformation in field gf(2^8) for AES
 wire [XL:0]  mfaff0, mfaff1;
 wire [XL:0]  mfmul0, mfmul1;
@@ -356,7 +349,7 @@ mskfaff makfaff_ins(
     .i_a0(rs1_s0),
     .i_a1(rs1_s1),
     .i_mt({rs2_s1, rs2_s0}),
-    .i_gs(prng),
+    .i_gs(prng0),
     .o_r0(mfaff0),
     .o_r1(mfaff1)
 ); 
@@ -367,13 +360,20 @@ end endgenerate
 
 // FMUL: Boolean masked multiplication in field gf(2^8) for AES
 generate if(ENABLE_FMUL) begin: FMUL_ENABLED
-mskfmul mskfmul_ins(	
+
+wire mskfmul_ena=op_f_mul || op_f_sqr;
+mskfmul
+#(  .MASKING_ISE_DOM(MASKING_ISE_DOM)) 
+mskfmul_ins(	
+    .g_resetn(g_resetn),
+    .g_clk(   g_clk), 
+    .ena(mskfmul_ena), 
     .i_a0(rs1_s0),
     .i_a1(rs1_s1),
     .i_b0(rs2_s0),
     .i_b1(rs2_s1),
     .i_sqr(op_f_sqr),
-    .i_gs(prng),
+    .i_gs(prng0),
     .o_r0(mfmul0),
     .o_r1(mfmul1)
 );
@@ -382,9 +382,11 @@ end else begin : FMUL_DISABLED
     assign mfmul1 = 32'b0;
 end endgenerate
 
+wire mskfield_rdy = valid & (op_f_mul|| op_f_aff || op_f_sqr);
+
 // OUTPUT MUX: gather and multiplexing results
-assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
-               {XLEN{op_b_xor}} &  (n_prng ^ mxor0) |
+assign rd_s0 = {XLEN{op_b_not}} &  mnot0 |
+               {XLEN{op_b_xor}} &  mxor0 |
                {XLEN{op_b_and}} &  mand0 |
                {XLEN{op_b_ior}} &  mior0 |
                {XLEN{op_shr  }} &  mshr0 |
@@ -398,8 +400,8 @@ assign rd_s0 = {XLEN{op_b_not}} &  (n_prng ^ mnot0) |
                {XLEN{op_f_sqr}} &  mfmul0|
                {XLEN{op_f_aff}} &  mfaff0;
 
-assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
-               {XLEN{op_b_xor}} &  (n_prng ^ mxor1) |
+assign rd_s1 = {XLEN{op_b_not}} &  mnot1 |
+               {XLEN{op_b_xor}} &  mxor1 |
                {XLEN{op_b_and}} &  mand1 |
                {XLEN{op_b_ior}} &  mior1 |
                {XLEN{op_shr  }} &  mshr1 |
@@ -413,16 +415,14 @@ assign rd_s1 = {XLEN{op_b_not}} &  (n_prng ^ mnot1) |
                {XLEN{op_f_sqr}} &  mfmul1|
                {XLEN{op_f_aff}} &  mfaff1;
 
-
 assign ready = mnot_rdy || (dologic && mlogic_rdy) ||
                madd_rdy || shr_rdy || msk_rdy      ||
-               amsk_rdy || op_f_mul|| op_f_aff || op_f_sqr;
-assign mask  = prng;
-
+               amsk_rdy || mskfield_rdy;
+assign mask  = prng0;
 endmodule
 
 
-module mskalu_ctl(
+module frv_masked_alu_ctl(
 input  wire      g_resetn, g_clk, flush,
 input  wire      valid,
 input  wire      dologic, doaddsub, mlogic_rdy, madd_rdy, 
@@ -460,6 +460,249 @@ assign    addsub_ena =  doaddsub_valid && ((mlogic_rdy && (ctl_state == S_IDL)) 
 
 endmodule
 
+module FF_Nb #(parameter Nb=1, parameter EDG=1) (
+  input wire  g_resetn, g_clk,
+  input wire  ena,
+  input wire  [Nb-1:0] din,
+  output reg  [Nb-1:0] dout
+);
+
+generate 
+  if (EDG == 1'b1) begin : posedge_ff
+    always @(posedge g_clk) begin
+      if (!g_resetn)    dout <= {Nb{1'b0}};
+      else if (ena)     dout <= din;
+    end
+  end else begin         : negedge_ff
+    always @(negedge g_clk) begin
+      if (!g_resetn)    dout <= {Nb{1'b0}};
+      else if (ena)     dout <= din;
+    end
+  end
+endgenerate
+
+endmodule
+
+module msklogic(
+  input wire         g_resetn, g_clk, ena, 
+  input wire  [31:0] i_gs0,
+  input wire  [31:0] i_gs1,
+  input wire  [31:0] i_a0,  i_a1, 
+  input wire  [31:0] i_b0,  i_b1,
+  output wire [31:0] o_xor0, o_xor1,
+  output wire [31:0] o_and0, o_and1,
+  output wire        rdy
+);
+
+// Masking ISE - Use a DOM Implementation (1) or not (0)
+parameter MASKING_ISE_DOM     = 1'b1;
+
+generate 
+  if (MASKING_ISE_DOM == 1'b1) begin : masking_DOM
+
+    wire [31:0] i_t0 = i_gs1 & i_a0;
+    wire [31:0] i_t1 = i_gs1 & i_a1;
+    wire [31:0] i_t2 = i_gs1 ^ i_b0;
+    wire [31:0] i_t3 = i_gs1 ^ i_b1;
+
+    wire [31:0] t0,t1;
+    wire [31:0] t2,t3;
+//    FF_Nb #(.Nb(32), .EDG(1'b0))
+//      ff_t0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t0), .dout(t0));
+//    FF_Nb #(.Nb(32), .EDG(1'b0)) 
+//      ff_t1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t1), .dout(t1));
+    FF_Nb #(.Nb(32), .EDG(1'b0)) 
+      ff_t2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t2), .dout(t2));
+    FF_Nb #(.Nb(32), .EDG(1'b0)) 
+      ff_t3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t3), .dout(t3));
+    assign o_and0 = i_gs0 ^ i_t0 ^ (i_a0 & (i_b0 ^ t3));
+    assign o_and1 = i_gs0 ^ i_t1 ^ (i_a1 & (i_b1 ^ t2));
+    assign o_xor0 = i_gs1 ^ i_a0 ^ i_b0;
+    assign o_xor1 = i_gs1 ^ i_a1 ^ i_b1;
+  end else begin                    : masking
+    assign o_and0 = i_gs0 ^ (i_a0 & i_b1) ^ (i_a0 | ~i_b0);
+    assign o_and1 = i_gs0 ^ (i_a1 & i_b1) ^ (i_a1 | ~i_b0);  
+    assign o_xor0 = i_gs1 ^ i_a0 ^ i_b0;
+    assign o_xor1 = i_gs1 ^ i_a1 ^ i_b1;  
+  end
+endgenerate
+
+  assign rdy = ena;
+
+endmodule
+
+
+
+module mskaddsub(
+    input wire         g_resetn, g_clk, flush, ena,
+    input wire         sub,  // active to perform a-b
+    input wire  [31:0] i_gs0,
+    input wire  [31:0] i_gs1,
+    input wire  [31:0] mxor0, mxor1,
+    input wire  [31:0] mand0, mand1,
+    output wire [31:0] o_s0, o_s1,
+    output wire        rdy
+);
+
+// Masking ISE - Use a DOM Implementation (1) or not (0)
+parameter MASKING_ISE_DOM     = 1'b1;
+
+wire [31:0] p0, p1;
+wire [31:0] g0, g1;
+
+wire [31:0] p0_i, p1_i;
+wire [31:0] g0_i, g1_i;
+
+reg  [ 2:0] seq_cnt;
+always @(posedge g_clk)
+  if (!g_resetn)    seq_cnt <=3'd1;
+  else if (flush)   seq_cnt <=3'd1;
+  else if (rdy)     seq_cnt <=3'd1;
+  else if (ena)     seq_cnt <=seq_cnt + 1'b1;
+
+wire ini = ena && (seq_cnt == 3'd1);
+
+assign p0_i = (ini)?   mxor0: p0;
+assign p1_i = (ini)?   mxor1: p1;
+assign g0_i = (ini)?   mand0: g0;
+assign g1_i = (ini)?   mand1: g1;
+seq_process 
+#(  .MASKING_ISE_DOM(MASKING_ISE_DOM))
+seqproc_ins(
+    .g_resetn(  g_resetn),
+    .g_clk(     g_clk),
+    .ena(       ena), 
+    .i_gs0(     i_gs0), 
+    .i_gs1(     i_gs1),
+    .seq(       seq_cnt),  
+    .i_pk0(     p0_i),
+    .i_pk1(     p1_i),  
+    .i_gk0(     g0_i),
+    .i_gk1(     g1_i),   
+    .o_pk0(     p0),
+    .o_pk1(     p1), 
+    .o_gk0(     g0),
+    .o_gk1(     g1));
+
+wire [31:0] o_s0_gated = mxor0 ^ {g0[30:0],1'b0};
+wire [31:0] o_s1_gated = mxor1 ^ {g1[30:0],sub};
+
+assign o_s0 = (rdy || seq_cnt == 3'd1) ? o_s0_gated : 32'b0;
+assign o_s1 = (rdy || seq_cnt == 3'd1) ? o_s1_gated : 32'b0;
+assign rdy  = (seq_cnt==3'd6);
+
+endmodule
+
+module seq_process(
+  input wire         g_resetn, g_clk, ena,
+  input wire  [31:0] i_gs0,
+  input wire  [31:0] i_gs1,
+  input wire  [ 2:0] seq,
+
+  input wire  [31:0] i_pk0, i_pk1,
+  input wire  [31:0] i_gk0, i_gk1,
+  output wire [31:0] o_pk0, o_pk1,
+  output wire [31:0] o_gk0, o_gk1
+
+//  output wire [31:0] o_gs
+);
+
+// Masking ISE - Use a DOM Implementation (1) or not (0)
+parameter MASKING_ISE_DOM     = 1'b0;
+
+reg [31:0] gkj0, gkj1;
+reg [31:0] pkj0, pkj1;
+
+always @(*) begin
+  case (seq)
+    3'b001: begin
+              gkj0 = {i_gk0[30:0],1'd0};
+              gkj1 = {i_gk1[30:0],1'd0};
+              pkj0 = {i_pk0[30:0],1'd0};
+              pkj1 = {i_pk1[30:0],1'd0};
+            end
+   3'b010 : begin
+              gkj0 = {i_gk0[29:0],2'd0};
+              gkj1 = {i_gk1[29:0],2'd0};                  
+              pkj0 = {i_pk0[29:0],2'd0};
+              pkj1 = {i_pk1[29:0],2'd0};
+            end
+   3'b011 : begin
+              gkj0 = {i_gk0[27:0],4'd0};
+              gkj1 = {i_gk1[27:0],4'd0};                  
+              pkj0 = {i_pk0[27:0],4'd0};
+              pkj1 = {i_pk1[27:0],4'd0};
+            end
+   3'b100 : begin
+              gkj0 = {i_gk0[23:0],8'd0};
+              gkj1 = {i_gk1[23:0],8'd0};                  
+              pkj0 = {i_pk0[23:0],8'd0};
+              pkj1 = {i_pk1[23:0],8'd0};
+            end
+   3'b101 : begin
+              gkj0 = {i_gk0[15:0],16'd0};
+              gkj1 = {i_gk1[15:0],16'd0};                  
+              pkj0 = {32'd0};
+              pkj1 = {32'd0};
+            end
+   default: begin
+              gkj0 = {32'd0};
+              gkj1 = {32'd0};                  
+              pkj0 = {32'd0};
+              pkj1 = {32'd0};
+            end
+   endcase
+end
+
+generate 
+    if (MASKING_ISE_DOM == 1'b1) begin : masking_DOM
+        wire [31:0] i_tg0 =             (gkj0 & i_pk0);
+        wire [31:0] i_tg1 = i_gs0^i_gk0^(gkj0 & i_pk1);
+        wire [31:0] i_tg2 = i_gs0^i_gk1^(gkj1 & i_pk0);
+        wire [31:0] i_tg3 =             (gkj1 & i_pk1);
+
+        wire [31:0] tg0,tg1;
+        wire [31:0] tg2,tg3;
+        FF_Nb #(.Nb(32)) ff_tg0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg0), .dout(tg0));
+        FF_Nb #(.Nb(32)) ff_tg1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg1), .dout(tg1));
+        FF_Nb #(.Nb(32)) ff_tg2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg2), .dout(tg2));
+        FF_Nb #(.Nb(32)) ff_tg3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg3), .dout(tg3));
+
+//        wire [31:0] gk0, gk1;
+//        FF_Nb #(.Nb(32)) ff_gk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_gk0), .dout(gk0));
+//        FF_Nb #(.Nb(32)) ff_gk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_gk1), .dout(gk1));
+
+        assign o_gk0 = tg0^tg1;
+        assign o_gk1 = tg2^tg3;
+
+
+        wire [31:0] i_tp0 =         (i_pk0 & pkj0);
+        wire [31:0] i_tp1 = i_gs1 ^ (i_pk0 & pkj1);
+        wire [31:0] i_tp2 = i_gs1 ^ (i_pk1 & pkj0);
+        wire [31:0] i_tp3 =         (i_pk1 & pkj1);
+
+        wire [31:0] tp0,tp1;
+        wire [31:0] tp2,tp3;
+        FF_Nb #(.Nb(32)) ff_tp0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp0), .dout(tp0));
+        FF_Nb #(.Nb(32)) ff_tp1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp1), .dout(tp1));
+        FF_Nb #(.Nb(32)) ff_tp2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp2), .dout(tp2));
+        FF_Nb #(.Nb(32)) ff_tp3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp3), .dout(tp3));
+        assign o_pk0 = tp0^tp1;
+        assign o_pk1 = tp2^tp3;
+
+    end else begin                    : masking
+        wire [31:0] pk0 = i_gs1 ^ (i_pk0 & pkj1) ^ (i_pk0 | ~pkj0);
+        wire [31:0] pk1 = i_gs1 ^ (i_pk1 & pkj1) ^ (i_pk1 | ~pkj0);  
+        FF_Nb #(.Nb(32)) ff_pk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk0), .dout(o_pk0));
+        FF_Nb #(.Nb(32)) ff_pk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk1), .dout(o_pk1));
+
+        wire [31:0] gk0 = i_gk0 ^ (gkj0 & i_pk1) ^ (gkj0 | ~i_pk0);
+        wire [31:0] gk1 = i_gk1 ^ (gkj1 & i_pk1) ^ (gkj1 | ~i_pk0);
+        FF_Nb #(.Nb(32)) ff_gk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(gk0), .dout(o_gk0));
+        FF_Nb #(.Nb(32)) ff_gk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(gk1), .dout(o_gk1));    
+    end
+endgenerate
+endmodule
 
 //Arithmetic masking operations
 module arithmask(
@@ -498,93 +741,6 @@ assign amadd1 = {opr_lhs_1,1'b1} + {opr_rhs_1,ci};
 
 assign o_r0 = amadd0[32:1];
 assign o_r1 = amadd1[32:1];
-
-endmodule
-
-
-//Boolean masked multiplication in field gf(2^8) for AES
-module mskfmul(	
-input  [31:0] i_a0,
-input  [31:0] i_a1,
-input  [31:0] i_b0,
-input  [31:0] i_b1,
-input         i_sqr,
-input  [31:0] i_gs,
-output [31:0] o_r0,
-output [31:0] o_r1
-);
-
-wire [31:0] c_b0a0, c_b1a1, c_b100,c_b000; // controlled for selecting squaring or multiplying operation
-assign c_b0a0 =   (i_sqr)?  i_a0:        //do square 
-             /*multiply*/   i_b0;
-assign c_b1a1 =   (i_sqr)?  i_a1:        //do square 
-             /*multiply*/   i_b1;
-assign c_b100 =   (i_sqr)? 32'd0:        //do square 
-             /*multiply*/   i_b1;
-assign c_b000 =   (i_sqr)? 32'd0:        //do square 
-             /*multiply*/   i_b0;
-
-wire [31:0] m00, m11, m01, m10;
-
-gf256_mul mult0_b0 (.i_a(i_a0[ 7: 0]), .i_b(c_b0a0[ 7: 0]), .o_r(m00[ 7: 0]));
-gf256_mul mult1_b0 (.i_a(i_a1[ 7: 0]), .i_b(c_b1a1[ 7: 0]), .o_r(m11[ 7: 0]));
-gf256_mul mult2_b0 (.i_a(i_a0[ 7: 0]), .i_b(c_b100[ 7: 0]), .o_r(m01[ 7: 0]));
-gf256_mul mult3_b0 (.i_a(i_a1[ 7: 0]), .i_b(c_b000[ 7: 0]), .o_r(m10[ 7: 0]));
-
-gf256_mul mult0_b1 (.i_a(i_a0[15: 8]), .i_b(c_b0a0[15: 8]), .o_r(m00[15: 8]));
-gf256_mul mult1_b1 (.i_a(i_a1[15: 8]), .i_b(c_b1a1[15: 8]), .o_r(m11[15: 8]));
-gf256_mul mult2_b1 (.i_a(i_a0[15: 8]), .i_b(c_b100[15: 8]), .o_r(m01[15: 8]));
-gf256_mul mult3_b1 (.i_a(i_a1[15: 8]), .i_b(c_b000[15: 8]), .o_r(m10[15: 8]));
-
-gf256_mul mult0_b2 (.i_a(i_a0[23:16]), .i_b(c_b0a0[23:16]), .o_r(m00[23:16]));
-gf256_mul mult1_b2 (.i_a(i_a1[23:16]), .i_b(c_b1a1[23:16]), .o_r(m11[23:16]));
-gf256_mul mult2_b2 (.i_a(i_a0[23:16]), .i_b(c_b100[23:16]), .o_r(m01[23:16]));
-gf256_mul mult3_b2 (.i_a(i_a1[23:16]), .i_b(c_b000[23:16]), .o_r(m10[23:16]));
-
-gf256_mul mult0_b3 (.i_a(i_a0[31:24]), .i_b(c_b0a0[31:24]), .o_r(m00[31:24]));
-gf256_mul mult1_b3 (.i_a(i_a1[31:24]), .i_b(c_b1a1[31:24]), .o_r(m11[31:24]));
-gf256_mul mult2_b3 (.i_a(i_a0[31:24]), .i_b(c_b100[31:24]), .o_r(m01[31:24]));
-gf256_mul mult3_b3 (.i_a(i_a1[31:24]), .i_b(c_b000[31:24]), .o_r(m10[31:24]));
-
-(* keep="true" *)
-wire [31:0] refresh = i_gs ^ m01 ^ m10;
- 
-assign o_r0 = m00 ^ i_gs;
-assign o_r1 = m11 ^ refresh;
-
-endmodule
-
-//Boolean masked affine transformation in field gf(2^8) for AES
-/* 
-   i_a0, i_a1: 2 shares of 4-byte input
-   i_mt      : 8 8-bit rows of 64-bit affine matrix. 
-   i_gs      : guard share for refreshing
-   o_r0, o_r1: 2 shares of 4-byte output
-*/
-module mskfaff(	
-input  [31:0] i_a0,
-input  [31:0] i_a1,
-input  [63:0] i_mt,
-input  [31:0] i_gs,
-output [31:0] o_r0,
-output [31:0] o_r1
-);
-
-wire [31:0] r0, r1;
-gf256_aff atr0_b0 (.i_a(i_a0[ 7: 0]), .i_m(i_mt), .o_r(r0[ 7: 0]));
-gf256_aff atr1_b0 (.i_a(i_a1[ 7: 0]), .i_m(i_mt), .o_r(r1[ 7: 0]));
-
-gf256_aff atr0_b1 (.i_a(i_a0[15: 8]), .i_m(i_mt), .o_r(r0[15: 8]));
-gf256_aff atr1_b1 (.i_a(i_a1[15: 8]), .i_m(i_mt), .o_r(r1[15: 8]));
-
-gf256_aff atr0_b2 (.i_a(i_a0[23:16]), .i_m(i_mt), .o_r(r0[23:16]));
-gf256_aff atr1_b2 (.i_a(i_a1[23:16]), .i_m(i_mt), .o_r(r1[23:16]));
-
-gf256_aff atr0_b3 (.i_a(i_a0[31:24]), .i_m(i_mt), .o_r(r0[31:24]));
-gf256_aff atr1_b3 (.i_a(i_a1[31:24]), .i_m(i_mt), .o_r(r1[31:24]));
- 
-assign o_r0 = i_gs ^ r0;
-assign o_r1 = i_gs ^ r1;
 
 endmodule
 // Shift/rotate module to operate on each sharing with random pading
@@ -680,254 +836,169 @@ assign r = l16;
 
 endmodule
 
-
-module msklogic(
-  input wire         g_resetn, g_clk, ena, 
-  input wire  [31:0] i_gs,
-  input wire  [31:0] i_a0,  i_a1, 
-  input wire  [31:0] i_b0,  i_b1,
-  output wire [31:0] o_xor0, o_xor1,
-  output wire [31:0] o_and0, o_and1,
-  output wire [31:0] o_gs,
-  output wire        rdy
+//Boolean masked affine transformation in field gf(2^8) for AES
+/* 
+   i_a0, i_a1: 2 shares of 4-byte input
+   i_mt      : 8 8-bit rows of 64-bit affine matrix. 
+   i_gs      : guard share for refreshing
+   o_r0, o_r1: 2 shares of 4-byte output
+*/
+module mskfaff(	
+input  [31:0] i_a0,
+input  [31:0] i_a1,
+input  [63:0] i_mt,
+input  [31:0] i_gs,
+output [31:0] o_r0,
+output [31:0] o_r1
 );
 
-// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
-parameter MASKING_ISE_TI      = 1'b0;
+wire [31:0] r0, r1;
+gf256_aff atr0_b0 (.i_a(i_a0[ 7: 0]), .i_m(i_mt), .o_r(r0[ 7: 0]));
+gf256_aff atr1_b0 (.i_a(i_a1[ 7: 0]), .i_m(i_mt), .o_r(r1[ 7: 0]));
 
-(* keep="true" *) 
-wire [31:0] gs;
-assign      gs = i_gs; 
-assign    o_gs = i_a1; 
+gf256_aff atr0_b1 (.i_a(i_a0[15: 8]), .i_m(i_mt), .o_r(r0[15: 8]));
+gf256_aff atr1_b1 (.i_a(i_a1[15: 8]), .i_m(i_mt), .o_r(r1[15: 8]));
 
-generate 
-    if (MASKING_ISE_TI == 1'b1) begin : masking_TI_comb
-        wire [31:0] p0 = i_a0 ^ i_b0;
-        wire [31:0] p1 = i_a1 ^ i_b1;
+gf256_aff atr0_b2 (.i_a(i_a0[23:16]), .i_m(i_mt), .o_r(r0[23:16]));
+gf256_aff atr1_b2 (.i_a(i_a1[23:16]), .i_m(i_mt), .o_r(r1[23:16]));
 
-        FF_Nb #(.Nb(32)) ff_p0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(p0), .dout(o_xor0));
-        FF_Nb #(.Nb(32)) ff_p1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(p1), .dout(o_xor1));
+gf256_aff atr0_b3 (.i_a(i_a0[31:24]), .i_m(i_mt), .o_r(r0[31:24]));
+gf256_aff atr1_b3 (.i_a(i_a1[31:24]), .i_m(i_mt), .o_r(r1[31:24]));
+ 
+assign o_r0 = i_gs ^ r0;
+assign o_r1 = i_gs ^ r1;
 
-        wire [31:0] i_t0 = i_gs ^ (i_a0 & i_b0);
-        wire [31:0] i_t1 = i_gs ^ (i_a0 & i_b1);
-        wire [31:0] i_t2 = (i_a1 & i_b0);
-        wire [31:0] i_t3 = (i_a1 & i_b1);
-
-        wire [31:0] t0,t1;
-        wire [31:0] t2,t3;
-        FF_Nb #(.Nb(32)) ff_t0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t0), .dout(t0));
-        FF_Nb #(.Nb(32)) ff_t1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t1), .dout(t1));
-        FF_Nb #(.Nb(32)) ff_t2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t2), .dout(t2));
-        FF_Nb #(.Nb(32)) ff_t3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_t3), .dout(t3));
-
-        assign o_and0 = t0 ^ t2;
-        assign o_and1 = t1 ^ t3;
-    end else begin                    : masking_non_TI_comb
-        assign o_xor0 = i_a0 ^ i_b0;
-        assign o_xor1 = i_a1 ^ i_b1;  
-    
-        assign o_and0 = i_gs ^ (i_a0 & i_b1) ^ (i_a0 | ~i_b0);
-        assign o_and1 = i_gs ^ (i_a1 & i_b1) ^ (i_a1 | ~i_b0);  
-    end
-endgenerate
-
-generate 
-    if (MASKING_ISE_TI == 1'b1) begin: masking_TI_ff
-        FF_Nb  ff_msklogic_rdy(.g_resetn(g_resetn), .g_clk(g_clk), .ena(1'b1), .din(ena), .dout(rdy));
-    end else begin                   : masking_non_TI_ff
-        assign rdy = ena;
-    end
-endgenerate
 endmodule
 
-module mskaddsub(
-    input wire         g_resetn, g_clk, flush, ena,
-    input wire         sub,  // active to perform a-b
-    input wire  [31:0] i_gs,
-    input wire  [31:0] mxor0, mxor1,
-    input wire  [31:0] mand0, mand1,
-    output wire [31:0] o_s0, o_s1,
-    output wire        rdy
-);
+/* affine transformation in GF(2^8)
+  i_a : 8-bit input
+  i_b : 8 8-bit rows of 64-bit affine matrix. 
+  o_r : 8-bit output
+*/
+module gf256_aff(i_a,i_m,o_r);
+input[ 7:0] i_a;
+input[63:0] i_m;
+output[7:0] o_r;
+/*
+wire [7:0] r7 = i_m[63:56];
+wire [7:0] r6 = i_m[55:48];
+wire [7:0] r5 = i_m[47:40];
+wire [7:0] r4 = i_m[39:32];
+wire [7:0] r3 = i_m[31:24];
+wire [7:0] r2 = i_m[23:16];
+wire [7:0] r1 = i_m[15: 8];
+wire [7:0] r0 = i_m[ 7: 0];
 
-// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
-parameter MASKING_ISE_TI      = 1'b0;
+wire [7:0] m7 = i_a & r7;
+wire [7:0] m6 = i_a & r6;
+wire [7:0] m5 = i_a & r5;
+wire [7:0] m4 = i_a & r4;
+wire [7:0] m3 = i_a & r3;
+wire [7:0] m2 = i_a & r2;
+wire [7:0] m1 = i_a & r1;
+wire [7:0] m0 = i_a & r0;
 
-wire [31:0] gs;
-wire [31:0] p0, p1;
-wire [31:0] g0, g1;
+assign o_r[0] = ^m0;
+assign o_r[1] = ^m1;
+assign o_r[2] = ^m2;
+assign o_r[3] = ^m3;
+assign o_r[4] = ^m4;
+assign o_r[5] = ^m5;
+assign o_r[6] = ^m6;
+assign o_r[7] = ^m7;
+*/
 
-wire [31:0] gs_i;
-wire [31:0] p0_i, p1_i;
-wire [31:0] g0_i, g1_i;
+wire [7:0] c7 = i_m[63:56];
+wire [7:0] c6 = i_m[55:48];
+wire [7:0] c5 = i_m[47:40];
+wire [7:0] c4 = i_m[39:32];
+wire [7:0] c3 = i_m[31:24];
+wire [7:0] c2 = i_m[23:16];
+wire [7:0] c1 = i_m[15: 8];
+wire [7:0] c0 = i_m[ 7: 0];
 
-reg  [ 2:0] seq_cnt;
-always @(posedge g_clk)
-  if (!g_resetn)    seq_cnt <=3'd1;
-  else if (flush)   seq_cnt <=3'd1;
-  else if (rdy)     seq_cnt <=3'd1;
-  else if (ena)     seq_cnt <=seq_cnt + 1'b1;
+wire [7:0] m7 = {8{i_a[7]}} & c7;
+wire [7:0] m6 = {8{i_a[6]}} & c6;
+wire [7:0] m5 = {8{i_a[5]}} & c5;
+wire [7:0] m4 = {8{i_a[4]}} & c4;
+wire [7:0] m3 = {8{i_a[3]}} & c3;
+wire [7:0] m2 = {8{i_a[2]}} & c2;
+wire [7:0] m1 = {8{i_a[1]}} & c1;
+wire [7:0] m0 = {8{i_a[0]}} & c0;
 
-wire ini = ena && (seq_cnt == 3'd1);
+assign o_r = m0^m1^m2^m3^m4^m5^m6^m7;
 
-wire [31:0] o_s0_gated;
-wire [31:0] o_s1_gated;
-
-assign o_s0 = (rdy || seq_cnt == 3'd1) ? o_s0_gated : 32'b0;
-assign o_s1 = (rdy || seq_cnt == 3'd1) ? o_s1_gated : 32'b0;
-
-assign gs_i = (ini)?   i_gs : gs;
-assign p0_i = (ini)?   mxor0: p0;
-assign p1_i = (ini)?   mxor1: p1;
-assign g0_i = (ini)?   mand0: g0;
-assign g1_i = (ini)?   mand1: g1;
-seq_process 
-#(  .MASKING_ISE_TI(MASKING_ISE_TI))
-seqproc_ins(
-    .g_resetn(  g_resetn),
-    .g_clk(     g_clk),
-    .ena(       ena), 
-    .i_gs(      gs_i), 
-    .seq(       seq_cnt),  
-    .i_pk0(     p0_i),
-    .i_pk1(     p1_i),  
-    .i_gk0(     g0_i),
-    .i_gk1(     g1_i),   
-    .o_pk0(     p0),
-    .o_pk1(     p1), 
-    .o_gk0(     g0),
-    .o_gk1(     g1),  
-    .o_gs(      gs));
-
-postprocess posproc_ins(
-    .sub(       sub),
-    .i_pk0(     mxor0),
-    .i_pk1(     mxor1), 
-    .i_gk0(     g0),
-    .i_gk1(     g1),
-    .o_s0(      o_s0_gated),
-    .o_s1(      o_s1_gated));
-
-assign rdy = (seq_cnt==3'd6);
 endmodule
 
-module seq_process(
-  input wire         g_resetn, g_clk, ena,
-  input wire  [31:0] i_gs,
-  input wire  [ 2:0] seq,
-
-  input wire  [31:0] i_pk0, i_pk1,
-  input wire  [31:0] i_gk0, i_gk1,
-  output wire [31:0] o_pk0, o_pk1,
-  output wire [31:0] o_gk0, o_gk1,
-
-  output wire [31:0] o_gs
+//Boolean masked multiplication in field gf(2^8) for AES
+module mskfmul(	
+input         g_resetn, 
+input         g_clk, 
+input         ena,
+input  [31:0] i_a0,
+input  [31:0] i_a1,
+input  [31:0] i_b0,
+input  [31:0] i_b1,
+input         i_sqr,
+input  [31:0] i_gs,
+output [31:0] o_r0,
+output [31:0] o_r1
 );
 
-// Masking ISE - Use a Threshold Implementation (1) or non-TI (0)
-parameter MASKING_ISE_TI      = 1'b0;
+parameter MASKING_ISE_DOM      = 1'b1;
 
-(* keep="true" *)  
-wire [31:0] gs;
-assign      gs = i_gs;
-assign    o_gs = i_pk0;
+wire [31:0] c_b0a0, c_b1a1, c_b100,c_b000; // controlled for selecting squaring or multiplying operation
+assign c_b0a0 =   (i_sqr)?  i_a0:        //do square 
+             /*multiply*/   i_b0;
+assign c_b1a1 =   (i_sqr)?  i_a1:        //do square 
+             /*multiply*/   i_b1;
+assign c_b100 =   (i_sqr)? 32'd0:        //do square 
+             /*multiply*/   i_b1;
+assign c_b000 =   (i_sqr)? 32'd0:        //do square 
+             /*multiply*/   i_b0;
 
-reg [31:0] gkj0, gkj1;
-reg [31:0] pkj0, pkj1;
+wire [31:0] m00, m11, m01, m10;
 
-always @(*) begin
-  case (seq)
-      3'b001: begin
-                  gkj0 = {i_gk0[30:0],1'd0};
-                  gkj1 = {i_gk1[30:0],1'd0};
-                  pkj0 = {i_pk0[30:0],1'd0};
-                  pkj1 = {i_pk1[30:0],1'd0};
-               end
-      3'b010 : begin
-                  gkj0 = {i_gk0[29:0],2'd0};
-                  gkj1 = {i_gk1[29:0],2'd0};                  
-                  pkj0 = {i_pk0[29:0],2'd0};
-                  pkj1 = {i_pk1[29:0],2'd0};
-               end
-      3'b011 : begin
-                  gkj0 = {i_gk0[27:0],4'd0};
-                  gkj1 = {i_gk1[27:0],4'd0};                  
-                  pkj0 = {i_pk0[27:0],4'd0};
-                  pkj1 = {i_pk1[27:0],4'd0};
-               end
-      3'b100 : begin
-                  gkj0 = {i_gk0[23:0],8'd0};
-                  gkj1 = {i_gk1[23:0],8'd0};                  
-                  pkj0 = {i_pk0[23:0],8'd0};
-                  pkj1 = {i_pk1[23:0],8'd0};
-               end
-      3'b101 : begin
-                  gkj0 = {i_gk0[15:0],16'd0};
-                  gkj1 = {i_gk1[15:0],16'd0};                  
-                  pkj0 = {32'd0};
-                  pkj1 = {32'd0};
-               end
-      default: begin
-                  gkj0 = {32'd0};
-                  gkj1 = {32'd0};                  
-                  pkj0 = {32'd0};
-                  pkj1 = {32'd0};
-               end
-   endcase
-end
+gf256_mul mult0_b0 (.i_a(i_a0[ 7: 0]), .i_b(c_b0a0[ 7: 0]), .o_r(m00[ 7: 0]));
+gf256_mul mult1_b0 (.i_a(i_a1[ 7: 0]), .i_b(c_b1a1[ 7: 0]), .o_r(m11[ 7: 0]));
+gf256_mul mult2_b0 (.i_a(i_a0[ 7: 0]), .i_b(c_b100[ 7: 0]), .o_r(m01[ 7: 0]));
+gf256_mul mult3_b0 (.i_a(i_a1[ 7: 0]), .i_b(c_b000[ 7: 0]), .o_r(m10[ 7: 0]));
+
+gf256_mul mult0_b1 (.i_a(i_a0[15: 8]), .i_b(c_b0a0[15: 8]), .o_r(m00[15: 8]));
+gf256_mul mult1_b1 (.i_a(i_a1[15: 8]), .i_b(c_b1a1[15: 8]), .o_r(m11[15: 8]));
+gf256_mul mult2_b1 (.i_a(i_a0[15: 8]), .i_b(c_b100[15: 8]), .o_r(m01[15: 8]));
+gf256_mul mult3_b1 (.i_a(i_a1[15: 8]), .i_b(c_b000[15: 8]), .o_r(m10[15: 8]));
+
+gf256_mul mult0_b2 (.i_a(i_a0[23:16]), .i_b(c_b0a0[23:16]), .o_r(m00[23:16]));
+gf256_mul mult1_b2 (.i_a(i_a1[23:16]), .i_b(c_b1a1[23:16]), .o_r(m11[23:16]));
+gf256_mul mult2_b2 (.i_a(i_a0[23:16]), .i_b(c_b100[23:16]), .o_r(m01[23:16]));
+gf256_mul mult3_b2 (.i_a(i_a1[23:16]), .i_b(c_b000[23:16]), .o_r(m10[23:16]));
+
+gf256_mul mult0_b3 (.i_a(i_a0[31:24]), .i_b(c_b0a0[31:24]), .o_r(m00[31:24]));
+gf256_mul mult1_b3 (.i_a(i_a1[31:24]), .i_b(c_b1a1[31:24]), .o_r(m11[31:24]));
+gf256_mul mult2_b3 (.i_a(i_a0[31:24]), .i_b(c_b100[31:24]), .o_r(m01[31:24]));
+gf256_mul mult3_b3 (.i_a(i_a1[31:24]), .i_b(c_b000[31:24]), .o_r(m10[31:24]));
 
 generate 
-    if (MASKING_ISE_TI == 1'b1) begin : masking_TI
-        wire [31:0] i_tg0 = i_gk0 ^ (gkj0 & i_pk0);
-        wire [31:0] i_tg1 = i_gk1 ^ (gkj1 & i_pk0);
-        wire [31:0] i_tg2 =         (gkj0 & i_pk1);
-        wire [31:0] i_tg3 =         (gkj1 & i_pk1);
+  if (MASKING_ISE_DOM == 1'b1) begin : DOM_masking
+    wire [31:0] reshare0 = m01^i_gs;
+    wire [31:0] reshare1 = m10^i_gs;
+    wire [31:0] integr0, integr1; 
 
-        wire tg0,tg1;
-        wire tg2,tg3;
-        FF_Nb #(.Nb(32)) ff_tg0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg0), .dout(tg0));
-        FF_Nb #(.Nb(32)) ff_tg1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg1), .dout(tg1));
-        FF_Nb #(.Nb(32)) ff_tg2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg2), .dout(tg2));
-        FF_Nb #(.Nb(32)) ff_tg3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg3), .dout(tg3));
+    FF_Nb #(.Nb(32), .EDG(1'b0)) 
+      ff_p0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(reshare0), .dout(integr0));
+    FF_Nb #(.Nb(32), .EDG(1'b0)) 
+      ff_p1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(reshare1), .dout(integr1));
 
-        assign o_gk0 = tg0 ^ tg2;
-        assign o_gk1 = tg1 ^ tg3;
-
-        wire [31:0] i_tp0 = i_gs ^ (i_pk0 & pkj0);
-        wire [31:0] i_tp1 = i_gs ^ (i_pk0 & pkj1);
-        wire [31:0] i_tp2 =        (i_pk1 & pkj0);
-        wire [31:0] i_tp3 =        (i_pk1 & pkj1);
-
-        wire [31:0] tp0,tp1;
-        wire [31:0] tp2,tp3;
-        FF_Nb #(.Nb(32)) ff_tp0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp0), .dout(tp0));
-        FF_Nb #(.Nb(32)) ff_tp1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp1), .dout(tp1));
-        FF_Nb #(.Nb(32)) ff_tp2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp2), .dout(tp2));
-        FF_Nb #(.Nb(32)) ff_tp3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tp3), .dout(tp3));
-        assign o_pk0 = tp0 ^ tp2;
-        assign o_pk1 = tp1 ^ tp3;
-    end else begin                    : masking_non_TI
-        wire [31:0] pk0 = i_gs ^ (i_pk0 & pkj1) ^ (i_pk0 | ~pkj0);
-        wire [31:0] pk1 = i_gs ^ (i_pk1 & pkj1) ^ (i_pk1 | ~pkj0);  
-        FF_Nb #(.Nb(32)) ff_pk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk0), .dout(o_pk0));
-        FF_Nb #(.Nb(32)) ff_pk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(pk1), .dout(o_pk1));
-
-        wire [31:0] gk0 = i_gk0 ^ (gkj0 & i_pk1) ^ (gkj0 | ~i_pk0);
-        wire [31:0] gk1 = i_gk1 ^ (gkj1 & i_pk1) ^ (gkj1 | ~i_pk0);
-        FF_Nb #(.Nb(32)) ff_gk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(gk0), .dout(o_gk0));
-        FF_Nb #(.Nb(32)) ff_gk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(gk1), .dout(o_gk1));    
-    end
+    assign o_r0 = m00 ^ integr0;
+    assign o_r1 = m11 ^ integr1;
+  end else begin                    : masking
+    (* keep="true" *)
+    wire [31:0] refresh = i_gs ^ m01 ^ m10;
+    assign o_r0 = m00 ^ i_gs;
+    assign o_r1 = m11 ^ refresh;
+  end
 endgenerate
-endmodule
-
-module postprocess(
-  input wire         sub,
-  input wire  [31:0] i_pk0, i_pk1,
-  input wire  [31:0] i_gk0, i_gk1,
-  output wire [31:0] o_s0 , o_s1
-);
-assign o_s0 = i_pk0 ^ {i_gk0[30:0],1'b0};
-assign o_s1 = i_pk1 ^ {i_gk1[30:0],sub};
 endmodule
 
 
@@ -1087,76 +1158,3 @@ assign o_r[7] = T95;
 
 endmodule
 
-/* affine transformation in GF(2^8)
-  i_a : 8-bit input
-  i_b : 8 8-bit rows of 64-bit affine matrix. 
-  o_r : 8-bit output
-*/
-module gf256_aff(i_a,i_m,o_r);
-input[ 7:0] i_a;
-input[63:0] i_m;
-output[7:0] o_r;
-/*
-wire [7:0] r7 = i_m[63:56];
-wire [7:0] r6 = i_m[55:48];
-wire [7:0] r5 = i_m[47:40];
-wire [7:0] r4 = i_m[39:32];
-wire [7:0] r3 = i_m[31:24];
-wire [7:0] r2 = i_m[23:16];
-wire [7:0] r1 = i_m[15: 8];
-wire [7:0] r0 = i_m[ 7: 0];
-
-wire [7:0] m7 = i_a & r7;
-wire [7:0] m6 = i_a & r6;
-wire [7:0] m5 = i_a & r5;
-wire [7:0] m4 = i_a & r4;
-wire [7:0] m3 = i_a & r3;
-wire [7:0] m2 = i_a & r2;
-wire [7:0] m1 = i_a & r1;
-wire [7:0] m0 = i_a & r0;
-
-assign o_r[0] = ^m0;
-assign o_r[1] = ^m1;
-assign o_r[2] = ^m2;
-assign o_r[3] = ^m3;
-assign o_r[4] = ^m4;
-assign o_r[5] = ^m5;
-assign o_r[6] = ^m6;
-assign o_r[7] = ^m7;
-*/
-
-wire [7:0] c7 = i_m[63:56];
-wire [7:0] c6 = i_m[55:48];
-wire [7:0] c5 = i_m[47:40];
-wire [7:0] c4 = i_m[39:32];
-wire [7:0] c3 = i_m[31:24];
-wire [7:0] c2 = i_m[23:16];
-wire [7:0] c1 = i_m[15: 8];
-wire [7:0] c0 = i_m[ 7: 0];
-
-wire [7:0] m7 = {8{i_a[7]}} & c7;
-wire [7:0] m6 = {8{i_a[6]}} & c6;
-wire [7:0] m5 = {8{i_a[5]}} & c5;
-wire [7:0] m4 = {8{i_a[4]}} & c4;
-wire [7:0] m3 = {8{i_a[3]}} & c3;
-wire [7:0] m2 = {8{i_a[2]}} & c2;
-wire [7:0] m1 = {8{i_a[1]}} & c1;
-wire [7:0] m0 = {8{i_a[0]}} & c0;
-
-assign o_r = m0^m1^m2^m3^m4^m5^m6^m7;
-
-endmodule
-
-module FF_Nb #(parameter Nb=1) (
-  input wire  g_resetn, g_clk,
-  input wire  ena,
-  input wire  [Nb-1:0] din,
-  output reg  [Nb-1:0] dout
-);
-
-always @(posedge g_clk) begin
-  if (!g_resetn)    dout <= {Nb{1'b0}};
-  else if (ena)     dout <= din;
-end
-
-endmodule
