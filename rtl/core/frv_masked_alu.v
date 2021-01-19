@@ -149,7 +149,6 @@ assign mnot1 = ~rs1_s1 ^ prng0;
 // a0 = rs0;  a1=rs1;     b0 = prng ; b1=0
 //rd0 = s0 ^ s1;         rd1 = prng
 wire [XL:0] b2a_a0 = rs1_s0;
-wire [XL:0] b2a_a1 = rs1_s1;
 wire [XL:0] b2a_b0 = {XLEN{1'b0}};
 
 // keep b2a_b1 unchanging during B2A process
@@ -173,29 +172,22 @@ assign      b2a_b1 = {mlogic_ena} ? b2a_gs : b2a_b1_lat;
 // a0 = rs0;  a1= 0;      b0 = prng; b1= rs1 ^ prng
 //rd0 = s0;              rd1 = s1
 
-// Refreshing the share 1 before converting to avoid collision
-wire [XL:0] a2b_a0 = rs1_s0;
-wire [XL:0] a2b_a1 = {XLEN{1'b0}};
-wire [XL:0] a2b_b0 = {XLEN{1'b0}};
-wire [XL:0] a2b_b1 = ~rs1_s1;  // the NOT operation to perform BoolSub
-
 // Operand multiplexing 
 wire        nrs2_opt = (op_b_ior || op_b_sub);
 wire [XL:0] op_a0, op_a1, op_b0, op_b1;
 
 assign op_a0 =  rs1_s0;
-assign op_a1 =  op_b_ior ?~rs1_s1:
-                op_b2a   ? b2a_a1:
-                op_a2b   ? a2b_a1:
-                           rs1_s1;
+assign op_a1 =  op_b_ior ?~rs1_s1       :
+                op_b2a   ? rs1_s1       :
+                op_a2b   ? {XLEN{1'b0}} :
+                           rs1_s1       ;
 
-assign op_b0 =  op_b2a   ? b2a_b0:
-                op_a2b   ? a2b_b0:
-                           rs2_s0;
-assign op_b1 =  nrs2_opt ?~rs2_s1:
-                op_b2a   ? b2a_b1: 
-                op_a2b   ? a2b_b1:
-                           rs2_s1; 
+assign op_b0 =  {XLEN{!(op_b2a || op_a2b)}} & rs2_s0;
+
+assign op_b1 =  nrs2_opt ?~rs2_s1       :
+                op_b2a   ? b2a_b1       : 
+                op_a2b   ?~rs1_s1       :
+                           rs2_s1       ; 
 
 // BOOL XOR; BOOL AND: Boolean masked logic executes BoolXor; BoolAnd;
 msklogic 
@@ -553,14 +545,14 @@ wire [31:0] g0, g1;
 wire [31:0] p0_i, p1_i;
 wire [31:0] g0_i, g1_i;
 
-reg  [ 2:0] seq_cnt;
+reg  [ 5:0] seq_cnt;
 always @(posedge g_clk)
-  if (!g_resetn)    seq_cnt <=3'd1;
-  else if (flush)   seq_cnt <=3'd1;
-  else if (rdy)     seq_cnt <=3'd1;
-  else if (ena)     seq_cnt <=seq_cnt + 1'b1;
+  if (!g_resetn)    seq_cnt <=6'd1;
+  else if (flush)   seq_cnt <=6'd1;
+  else if (rdy)     seq_cnt <=6'd1;
+  else if (ena)     seq_cnt <=seq_cnt << 1;
 
-wire ini = ena && (seq_cnt == 3'd1);
+wire ini = ena && (seq_cnt[0]);
 
 assign p0_i = (ini)?   mxor0: p0;
 assign p1_i = (ini)?   mxor1: p1;
@@ -587,9 +579,9 @@ seqproc_ins(
 wire [31:0] o_s0_gated = mxor0 ^ {g0[30:0],1'b0};
 wire [31:0] o_s1_gated = mxor1 ^ {g1[30:0],sub};
 
-assign o_s0 = (rdy || seq_cnt == 3'd1) ? o_s0_gated : 32'b0;
-assign o_s1 = (rdy || seq_cnt == 3'd1) ? o_s1_gated : 32'b0;
-assign rdy  = (seq_cnt==3'd6);
+assign o_s0 = o_s0_gated;
+assign o_s1 = o_s1_gated;
+assign rdy  = seq_cnt[5];
 
 endmodule
 
@@ -597,14 +589,12 @@ module seq_process(
   input wire         g_resetn, g_clk, ena,
   input wire  [31:0] i_gs0,
   input wire  [31:0] i_gs1,
-  input wire  [ 2:0] seq,
+  input wire  [ 5:0] seq,
 
   input wire  [31:0] i_pk0, i_pk1,
   input wire  [31:0] i_gk0, i_gk1,
   output wire [31:0] o_pk0, o_pk1,
   output wire [31:0] o_gk0, o_gk1
-
-//  output wire [31:0] o_gs
 );
 
 // Masking ISE - Use a DOM Implementation (1) or not (0)
@@ -614,44 +604,27 @@ reg [31:0] gkj0, gkj1;
 reg [31:0] pkj0, pkj1;
 
 always @(*) begin
-  case (seq)
-    3'b001: begin
-              gkj0 = {i_gk0[30:0],1'd0};
-              gkj1 = {i_gk1[30:0],1'd0};
-              pkj0 = {i_pk0[30:0],1'd0};
-              pkj1 = {i_pk1[30:0],1'd0};
-            end
-   3'b010 : begin
-              gkj0 = {i_gk0[29:0],2'd0};
-              gkj1 = {i_gk1[29:0],2'd0};                  
-              pkj0 = {i_pk0[29:0],2'd0};
-              pkj1 = {i_pk1[29:0],2'd0};
-            end
-   3'b011 : begin
-              gkj0 = {i_gk0[27:0],4'd0};
-              gkj1 = {i_gk1[27:0],4'd0};                  
-              pkj0 = {i_pk0[27:0],4'd0};
-              pkj1 = {i_pk1[27:0],4'd0};
-            end
-   3'b100 : begin
-              gkj0 = {i_gk0[23:0],8'd0};
-              gkj1 = {i_gk1[23:0],8'd0};                  
-              pkj0 = {i_pk0[23:0],8'd0};
-              pkj1 = {i_pk1[23:0],8'd0};
-            end
-   3'b101 : begin
-              gkj0 = {i_gk0[15:0],16'd0};
-              gkj1 = {i_gk1[15:0],16'd0};                  
-              pkj0 = {32'd0};
-              pkj1 = {32'd0};
-            end
-   default: begin
-              gkj0 = {32'd0};
-              gkj1 = {32'd0};                  
-              pkj0 = {32'd0};
-              pkj1 = {32'd0};
-            end
-   endcase
+     gkj0 = {32{ seq[  0]}} & {i_gk0[30:0], 1'd0} |
+            {32{ seq[  1]}} & {i_gk0[29:0], 2'd0} |
+            {32{ seq[  2]}} & {i_gk0[27:0], 4'd0} |
+            {32{ seq[  3]}} & {i_gk0[23:0], 8'd0} |
+            {32{|seq[5:4]}} & {i_gk0[15:0],16'd0} ;
+
+     gkj1 = {32{ seq[  0]}} & {i_gk1[30:0], 1'd0} |
+            {32{ seq[  1]}} & {i_gk1[29:0], 2'd0} |
+            {32{ seq[  2]}} & {i_gk1[27:0], 4'd0} |
+            {32{ seq[  3]}} & {i_gk1[23:0], 8'd0} |
+            {32{|seq[5:4]}} & {i_gk1[15:0],16'd0} ;
+
+     pkj0 = {32{ seq[  0]}} & {i_pk0[30:0], 1'd0} |
+            {32{ seq[  1]}} & {i_pk0[29:0], 2'd0} |
+            {32{ seq[  2]}} & {i_pk0[27:0], 4'd0} |
+            {32{|seq[5:3]}} & {i_pk0[23:0], 8'd0} ;
+
+     pkj1 = {32{ seq[  0]}} & {i_pk1[30:0], 1'd0} |
+            {32{ seq[  1]}} & {i_pk1[29:0], 2'd0} |
+            {32{ seq[  2]}} & {i_pk1[27:0], 4'd0} |
+            {32{|seq[5:3]}} & {i_pk1[23:0], 8'd0} ;
 end
 
 generate 
@@ -668,13 +641,8 @@ generate
         FF_Nb #(.Nb(32)) ff_tg2(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg2), .dout(tg2));
         FF_Nb #(.Nb(32)) ff_tg3(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_tg3), .dout(tg3));
 
-//        wire [31:0] gk0, gk1;
-//        FF_Nb #(.Nb(32)) ff_gk0(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_gk0), .dout(gk0));
-//        FF_Nb #(.Nb(32)) ff_gk1(.g_resetn(g_resetn), .g_clk(g_clk), .ena(ena), .din(i_gk1), .dout(gk1));
-
         assign o_gk0 = tg0^tg1;
         assign o_gk1 = tg2^tg3;
-
 
         wire [31:0] i_tp0 =         (i_pk0 & pkj0);
         wire [31:0] i_tp1 = i_gs1 ^ (i_pk0 & pkj1);
