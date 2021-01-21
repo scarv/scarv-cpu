@@ -13,6 +13,7 @@ $XCRYPTO_RTL/xc_malu/xc_malu_pmul.v
 $XCRYPTO_RTL/xc_malu/xc_malu_muldivrem.v
 $XCRYPTO_RTL/b_bop/b_bop.v
 $XCRYPTO_RTL/b_lut/b_lut.v
+$SCARV_CPU/rtl/core/frv_lfsr32.v
 $SCARV_CPU/rtl/core/frv_alu.v
 $SCARV_CPU/rtl/core/frv_asi.v
 $SCARV_CPU/rtl/core/frv_bitwise.v
@@ -24,6 +25,15 @@ $SCARV_CPU/rtl/core/frv_gprs.v
 $SCARV_CPU/rtl/core/frv_interrupts.v
 $SCARV_CPU/rtl/core/frv_leak.v
 $SCARV_CPU/rtl/core/frv_lsu.v
+$SCARV_CPU/rtl/core/frv_masked_shuffle.v
+$SCARV_CPU/rtl/core/frv_gf256_mul.v
+$SCARV_CPU/rtl/core/frv_masked_fmul.v
+$SCARV_CPU/rtl/core/frv_gf256_aff.v
+$SCARV_CPU/rtl/core/frv_masked_faff.v
+$SCARV_CPU/rtl/core/frv_masked_shfrot.v
+$SCARV_CPU/rtl/core/frv_masked_arith.v
+$SCARV_CPU/rtl/core/frv_masked_barith.v
+$SCARV_CPU/rtl/core/frv_masked_bitwise.v
 $SCARV_CPU/rtl/core/frv_masked_alu.v
 $SCARV_CPU/rtl/core/frv_pipeline_decode.v
 $SCARV_CPU/rtl/core/frv_pipeline_execute.v

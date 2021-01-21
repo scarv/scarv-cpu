@@ -1,21 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Mon Jan 18 15:54:19 2021
+[*] Thu Jan 21 10:13:24 2021
 [*]
 [dumpfile] "/home/work/scarv/scarv-soc-masking-ise/extern/scarv-cpu/work/unit/masking-ise/masking-ise.vcd"
-[dumpfile_mtime] "Mon Jan 18 15:47:59 2021"
-[dumpfile_size] 8689375
+[dumpfile_mtime] "Thu Jan 21 10:12:20 2021"
+[dumpfile_size] 8537126
 [savefile] "/home/work/scarv/scarv-soc-masking-ise/extern/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 12053
-[size] 1920 1043
-[pos] -51 -51
-*-5.925536 12206 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 13933
+[size] 1920 1016
+[pos] -1 -1
+*-6.925536 13778 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
 [treeopen] TOP.frv_core.i_pipeline.i_gprs.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s2_execute.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.
@@ -465,6 +464,15 @@ TOP.frv_core.i_pipeline.s2_uop[4:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_valid
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_ready
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.t_addsub_ena
+@29
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.addsub_ena
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.t_mlogic_ena
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.mlogic_ena
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.ctrl_do_arith
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.ctrl_do_logic
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.masking_ise_implemented.i_frv_masked_alu.frv_masked_aluctl_ins.ctl_state[1:0]
 @200
 -
 @22
@@ -476,9 +484,6 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.fu_msk
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.imul_msub
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_flush
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_gpr_wide
-@22
-TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_mask[31:0]
-@28
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_op_a2b
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_op_a_add
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.msk_op_a_mask

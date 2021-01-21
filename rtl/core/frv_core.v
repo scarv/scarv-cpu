@@ -138,7 +138,6 @@ parameter BITMANIP_BASELINE   = 1'b1;
 
 parameter MASKING_ISE_TRNG    = 1'b0; // Use a TRNG (1) or a PRNG (0)
 parameter MASKING_ISE_DOM     = 1'b1; // DOM implementation (1) or (0)
-parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
 // Enable mask share 1 bit reversed storage representation.
@@ -227,8 +226,7 @@ frv_pipeline #(
 .BITMANIP_BASELINE  (BITMANIP_BASELINE  ), 
 .CSR_MIMPID         (CSR_MIMPID         ),
 .MASKING_ISE_TRNG   (MASKING_ISE_TRNG   ),
-.MASKING_ISE_DOM    (MASKING_ISE_DOM     ),
-.MASKING_ISE_FAST   (MASKING_ISE_FAST   ),
+.MASKING_ISE_DOM    (MASKING_ISE_DOM    ),
 .MASK_REV_EN        (MASK_REV_EN        )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock

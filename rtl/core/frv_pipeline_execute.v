@@ -116,7 +116,6 @@ parameter BITMANIP_BASELINE   = 1'b1;
 
 parameter MASKING_ISE_TRNG    = 1'b0; // Use a TRNG (1) or a PRNG (0)
 parameter MASKING_ISE_DOM     = 1'b1; // DOM implementation (1) or (0)
-parameter MASKING_ISE_FAST    = 1'b1; // Use fast masking ise implementation
 
 //
 // Enable mask share 1 bit reversed storage representation.
@@ -326,8 +325,6 @@ wire en_unshfl_opr_d = MASK_REV_EN;
 
 wire [XL:0] msk_rd_s0       ; // Outputs from masked ALU
 wire [XL:0] msk_rd_s1       ; // Outputs from masked ALU
-
-wire [XL:0] msk_mask        ; // The mask. Used for verification.
 
 wire en_shfl_msk_s1 = MASK_REV_EN;
 
@@ -551,8 +548,7 @@ generate if (XC_CLASS_MASK) begin : masking_ise_implemented
 
 frv_masked_alu #(
 .MASKING_ISE_TRNG(MASKING_ISE_TRNG),
-.MASKING_ISE_DOM (MASKING_ISE_DOM ),
-.MASKING_ISE_FAST(MASKING_ISE_FAST)
+.MASKING_ISE_DOM (MASKING_ISE_DOM )
 ) i_frv_masked_alu (
 .g_clk       (g_clk           ), // Global clock
 .g_resetn    (g_resetn        ), // Synchronous, active low reset.
@@ -584,14 +580,12 @@ frv_masked_alu #(
 .rs2_s0      (msk_rs2_s0      ), // RS2 Share 0
 .rs2_s1      (msk_rs2_s1      ), // RS2 Share 1
 .ready       (msk_ready       ), // Outputs ready
-.mask        (msk_mask        ), // Mask used to en-mask. For Verification.
 .rd_s0       (msk_rd_s0       ), // Output share 0
 .rd_s1       (msk_rd_s1       )  // Output share 1
 );
 
 end else begin: masking_ise_not_implemented
     
-    assign msk_mask = 32'b0;
     assign msk_rd_s0= 32'b0;
     assign msk_rd_s1= 32'b0;
     assign msk_ready= 1'b0;
@@ -894,7 +888,7 @@ always @(posedge g_clk) begin
     end
 end
 
-assign rvfi_s3_mask_data = msk_mask;
+assign rvfi_s3_mask_data = 32'b0 ;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
