@@ -424,6 +424,7 @@ assign trap_cause = // Cause of the trap.
                                   {1'b0,s4_rd}  ;
 
 assign trap_mtval =
+    cfu_ebreak      ? s4_pc                     :
     lsu_bus_error   ? s4_opr_b                  :
     trap_addr_align ? s4_opr_b                  :
                       32'b0                     ;
