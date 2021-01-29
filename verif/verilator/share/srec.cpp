@@ -91,6 +91,8 @@ srec_file::srec_file (
 
         file.close();
 
+    } else {
+        std::cerr<<">> [ERROR] Could not open " <<path << std::endl;
     }
 
 }

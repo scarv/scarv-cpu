@@ -1,0 +1,54 @@
+TARGET_SIM   ?= $(FRV_HOME)/work/verilator/frv_core/verilated-frv_core
+TARGET_FLAGS ?= $(RISCV_TARGET_FLAGS)
+ifeq ($(shell command -v $(TARGET_SIM) 2> /dev/null),)
+    $(error Target simulator executable '$(TARGET_SIM)` not found)
+endif
+
+RISCV_PREFIX   ?= riscv64-unknown-elf-
+RISCV_GCC      ?= $(RISCV_PREFIX)gcc
+RISCV_OBJDUMP  ?= $(RISCV_PREFIX)objdump
+RISCV_OBJCOPY  ?= $(RISCV_PREFIX)objcopy
+RISCV_READELF  ?= $(RISCV_PREFIX)readelf
+RISCV_GCC_OPTS ?= -static -mcmodel=medany -g -fvisibility=hidden -nostdlib -nostartfiles -DXLEN=$(XLEN) $(RVTEST_DEFINES)
+
+COMPILE_CMD=\
+	$$(RISCV_GCC) $(1) $$(RISCV_GCC_OPTS) \
+		-I$(ROOTDIR)/riscv-test-suite/env/ \
+		-I$(TARGETDIR)/$(RISCV_TARGET)/ \
+		-T$(TARGETDIR)/$(RISCV_TARGET)/env/linkmono.ld $$< \
+		-o $$@; \
+	$$(RISCV_OBJCOPY) -O binary $$@ $$@.bin
+
+OBJ_CMD = $$(RISCV_OBJDUMP) $$@ -z -D > $$@.objdump; \
+		  $$(RISCV_OBJDUMP) $$@ --source > $$@.debug; \
+		  $$(RISCV_READELF) -a $$@ > $$@.readelf; \
+          $$(RISCV_OBJCOPY) -O srec --srec-forceS3 $$@ $$@.srec
+
+
+COMPILE_TARGET=\
+		$(COMPILE_CMD); \
+        if [ $$$$? -ne 0 ] ; \
+            then \
+            echo "\e[31m$$(RISCV_GCC) failed for target $$(@) \e[39m" ; \
+            exit 1 ; \
+        fi ; \
+		$(OBJ_CMD); \
+        if [ $$$$? -ne 0 ] ; \
+            then \
+            echo "\e[31m $$(RISCV_OBJDUMP) failed for target $$(@) \e[39m" ; \
+            exit 1 ; \
+        fi ;
+
+RUN_CMD=\
+	$(TARGET_SIM) \
+        +TIMEOUT=100000 \
+        +IMEM=$(<).srec \
+        +PASS_ADDR=0x80000010 \
+        +SIG_START=0x`$(RISCV_READELF) --symbols $(<) | grep "begin_signature" | grep -o ":.*\t" | cut -c -10 | cut -c 3-`\
+        +SIG_END=0x`$(RISCV_READELF) --symbols $(<) | grep "end_signature" | grep -o ":.*\t" | cut -c -10 | cut -c 3-`\
+        +SIG_PATH=$(<:$.elf=$.signature.output) \
+        +WAVES=$(<:%.elf=%.vcd)
+
+RUN_TARGET=\
+	$(RUN_CMD)
+

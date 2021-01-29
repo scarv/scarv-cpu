@@ -1,11 +1,7 @@
 
-
-riscv-compliance-build:
+riscv-compliance-run:
 	$(MAKE) -C $(FRV_HOME)/external/riscv-compliance \
-        RISCV_TARGET=riscvOVPsim\
-        RISCV_DEVICE=rv32imc \
-        RISCV_PREFIX=$(RISCV)/bin/riscv64-unknown-elf-
-	$(FRV_HOME)/bin/riscv-compliance-srecs.sh
+        XLEN=32 \
+        RISCV_TARGET=scarv-cpu\
+        TARGETDIR=$(FRV_HOME)/flow/compliance
 
-riscv-compliance-run: build-frv_core
-	$(FRV_HOME)/flow/compliance/compliance.py $(COMPLIANCE_FLAGS)

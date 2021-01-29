@@ -307,6 +307,12 @@ int main(int argc, char** argv) {
               << " simulated clock cycles" << std::endl;
 
     if(dump_signature) {
+        if(SIG_START >= SIG_END){
+            std::cerr 
+                << ">> [ERROR] Signature begin >= signature end."
+                << std::endl;
+            return 1;
+        }
         dump_signature_file(tb.bus);
     }
 

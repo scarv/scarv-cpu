@@ -1,26 +1,24 @@
 [*]
-[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Wed Jul 29 09:22:37 2020
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Fri Jan 29 15:13:17 2021
 [*]
-[dumpfile] "/home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.vcd"
-[dumpfile_mtime] "Wed Jul 29 08:50:52 2020"
-[dumpfile_size] 54670150
-[savefile] "/home/work/scarv/skywater/scarv-cpu/flow/gtkwave/verilator.gtkw"
-[timestart] 407891
-[size] 1920 1025
+[dumpfile] "/home/work/scarv/scarv-cpu-sme/external/riscv-compliance/work/rv32i_m/I/beq-01.vcd"
+[dumpfile_mtime] "Fri Jan 29 15:13:08 2021"
+[dumpfile_size] 39687163
+[savefile] "/home/work/scarv/scarv-cpu-sme/flow/gtkwave/verilator.gtkw"
+[timestart] 1561
+[size] 1920 1016
 [pos] -1 -1
-*-7.321928 408261 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.898460 1737 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
 [treeopen] TOP.frv_core.i_pipeline.i_gprs.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.
-[treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [sst_width] 270
 [signals_width] 454
 [sst_expanded] 1
-[sst_vpaned_height] 292
+[sst_vpaned_height] 281
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -55,7 +53,7 @@ TOP.frv_core.rvfi_trap[0]
 TOP.frv_core.rvfi_valid[0]
 @1401200
 -RVFI
-@c00200
+@800200
 -Instruction Memory
 @28
 TOP.frv_core.imem_req
@@ -66,9 +64,9 @@ TOP.frv_core.imem_addr[31:0]
 TOP.frv_core.imem_error
 @22
 TOP.frv_core.imem_rdata[31:0]
-@1401200
+@1000200
 -Instruction Memory
-@800200
+@c00200
 -Data Memory
 @28
 TOP.frv_core.i_pipeline.dmem_req
@@ -85,18 +83,16 @@ TOP.frv_core.i_pipeline.dmem_wen
 TOP.frv_core.i_pipeline.dmem_rdata[31:0]
 @28
 TOP.frv_core.i_pipeline.dmem_error
-@1000200
+@1401200
 -Data Memory
 @800200
 -Trace
-@2022
-^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.gtkwl
-TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.trs_instr[31:0]
-TOP.frv_core.trs_pc[31:0]
+TOP.frv_core.trs_instr[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
 @8022
-TOP.frv_core.trs_pc[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
 @28
 TOP.frv_core.trs_valid
 TOP.frv_core.i_pipeline.cf_req
@@ -109,16 +105,16 @@ TOP.frv_core.i_pipeline.trap_cpu
 TOP.frv_core.i_pipeline.trap_int
 @1000200
 -Trace
-@800200
+@c00200
 -GPR
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.gpr_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.gpr_wdata[31:0]
 @28
 TOP.frv_core.i_pipeline.gpr_wen
-@1000200
+@1401200
 -GPR
 @c00200
 -Interrupts
@@ -150,17 +146,17 @@ TOP.frv_core.i_pipeline.hzd_rs1_s2
 TOP.frv_core.i_pipeline.fwd_rs1_rdata[31:0]
 TOP.frv_core.i_pipeline.fwd_rs2_rdata[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.fwd_s2_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.fwd_s2_wdata[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.fwd_s3_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.fwd_s3_wdata[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.fwd_s4_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.fwd_s4_wdata[31:0]
@@ -220,8 +216,6 @@ TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_rdata[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.program_counter[31:0]
 TOP.frv_core.i_pipeline.s1_data[31:0]
-@2022
-^3 /home/work/scarv/skywater/scarv-cpu/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_bubble
@@ -232,12 +226,12 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_data[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_error
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_flush
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_addr[4:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs1_rdata[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_addr[4:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_rs2_rdata[31:0]
@@ -304,13 +298,11 @@ TOP.frv_core.i_pipeline.s2_opr_a[31:0]
 TOP.frv_core.i_pipeline.s2_opr_b[31:0]
 TOP.frv_core.i_pipeline.s2_opr_c[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s2_rd[4:0]
 @28
 TOP.frv_core.i_pipeline.s2_size[1:0]
 TOP.frv_core.i_pipeline.s2_trap
-@22
-TOP.frv_core.i_pipeline.s2_uop[4:0]
 @c00200
 -ALI
 @28
@@ -332,21 +324,16 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_valid
 -Pipe - S3 Memory
 @28
 TOP.frv_core.i_pipeline.s3_busy
-@2022
-^1 /home/work/scarv/skywater/scarv-cpu/work/embench/src/ud/ud.gtkwl
-TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
+TOP.frv_core.i_pipeline.s3_instr[31:0]
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
 TOP.frv_core.i_pipeline.s3_opr_b[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s3_rd[4:0]
 @28
 TOP.frv_core.i_pipeline.s3_size[1:0]
 TOP.frv_core.i_pipeline.s3_trap
-@22
-TOP.frv_core.i_pipeline.s3_uop[4:0]
-@28
 TOP.frv_core.i_pipeline.s3_valid
 @800200
 -Data Memory
@@ -361,7 +348,7 @@ TOP.frv_core.i_pipeline.dmem_wdata[31:0]
 TOP.frv_core.i_pipeline.dmem_wen
 @200
 -
-@22
+@23
 TOP.frv_core.i_pipeline.dmem_rdata[31:0]
 @28
 TOP.frv_core.i_pipeline.dmem_error
@@ -382,9 +369,8 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_wen
 @200
 -
-@29
-TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_txn_done
 @28
+TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.dmem_txn_done
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.hold_lsu_req
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_a_error
 @22
@@ -417,14 +403,11 @@ TOP.frv_core.i_pipeline.s4_instr[31:0]
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
 TOP.frv_core.i_pipeline.s4_opr_b[31:0]
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.s4_rd[4:0]
 @28
 TOP.frv_core.i_pipeline.s4_size[1:0]
 TOP.frv_core.i_pipeline.s4_trap
-@22
-TOP.frv_core.i_pipeline.s4_uop[4:0]
-@28
 TOP.frv_core.i_pipeline.s4_valid
 @200
 -
@@ -437,7 +420,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.dmem_rdata[31:0]
 -
 -
 @2024
-^2 /home/work/scarv/skywater/scarv-cpu/flow/gtkwave/filter-gprs.txt
+^1 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_rd[4:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:0]
@@ -445,14 +428,22 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wen
 @200
 -
-@2022
-^4 /home/work/scarv/skywater/scarv-cpu/work/unit/mtime-write/mtime-write.gtkwl
-TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @22
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_valid
+@200
+-
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_cause[5:0]
+@28
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_cpu
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_int
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_pc[31:0]
+TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_target_addr[31:0]
 @1000200
 -Pipe - S4 - Writeback
 @c00200
