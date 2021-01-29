@@ -16,6 +16,7 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
+    - make build-frv_core
     - make riscv-compliance-run
   - name: "Unit Tests"
     script:
