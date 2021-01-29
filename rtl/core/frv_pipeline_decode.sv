@@ -139,7 +139,7 @@ assign n_s2_fu[P_FU_CFU] =
     dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
     dec_c_ebreak   || dec_ebreak     || dec_ecall      || dec_c_j        ||
     dec_c_jr       || dec_c_jal      || dec_jal        || dec_c_jalr     ||
-    dec_jalr       || dec_mret       ;
+    dec_jalr       || dec_mret       || dec_fence_i     ;
 
 assign n_s2_fu[P_FU_LSU] = 
     dec_lb         || dec_lbu       || dec_lh          || dec_lhu        ||
@@ -269,6 +269,7 @@ wire [OP:0] uop_cfu =
     {OP+1{dec_ecall     }} & CFU_ECALL |
     {OP+1{dec_c_j       }} & CFU_JALI  |
     {OP+1{dec_c_jr      }} & CFU_JALR  |
+    {OP+1{dec_fence_i   }} & CFU_JALI  |
     {OP+1{dec_c_jal     }} & CFU_JALI  |
     {OP+1{dec_jal       }} & CFU_JALI  |
     {OP+1{dec_c_jalr    }} & CFU_JALR  |
@@ -546,6 +547,7 @@ wire [31:0] n_s2_imm_pc =
     {32{dec_c_beqz    }} & imm_c_bz     |
     {32{dec_c_bnez    }} & imm_c_bz     |
     {32{dec_c_j       }} & imm_c_j      |
+    {32{dec_fence_i   }} & 32'd4        |
     {32{dec_c_jal     }} & imm_c_j      ;
 
 assign n_s2_imm = 
@@ -568,7 +570,6 @@ assign n_s2_imm =
     {32{dec_c_swsp    }} & imm_c_swsp   |
     {32{use_imm_csri  }} & {imm_csr_a, 15'b0, s1_data[19:15]} |
     {32{use_imm_csr   }} & {imm_csr_a, 20'b0} |
-    {32{dec_fence_i   }} & 32'd4        |
     {32{use_imm_shfi  }} & {27'b0, s1_data[24:20]} ;
 
 //
@@ -654,7 +655,7 @@ assign n_s2_opr_src[DIS_OPRB_IMM ] = // Operand B sources immediate
 
 wire   oprb_src_zero =  // Operand B sources zero
     dec_c_mv       || dec_auipc      || dec_c_jr        || dec_c_jalr    ||
-    dec_jal        ;
+    dec_jal        || dec_fence_i    ;
 
 assign n_s2_opr_src[DIS_OPRC_RS2 ] = // Operand C sources RS2
     dec_c_sw       || dec_c_swsp     || dec_sb         || dec_sh         ||
@@ -667,7 +668,7 @@ assign n_s2_opr_src[DIS_OPRC_CSRA] = // Operand C sources CSR address immediate
 assign n_s2_opr_src[DIS_OPRC_PCIM] = // Operand C sources PC+immediate
     dec_beq        || dec_c_beqz     || dec_bge        || dec_bgeu       ||
     dec_blt        || dec_bltu       || dec_bne        || dec_c_bnez     ||
-    dec_c_j        || dec_c_jal      || dec_jal         ;
+    dec_c_j        || dec_c_jal      || dec_jal        || dec_fence_i    ;
 
 //
 // Trap catching
