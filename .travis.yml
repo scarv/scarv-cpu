@@ -27,6 +27,8 @@ jobs:
     - make run-unit-core-ld-bus-error
     - make run-unit-core-mul-ld
     - make run-unit-core-st-bus-error
+    - make run-unit-core-sme-smectl
+    - make run-unit-core-sme-ldst
     - make run-unit-ccx-example
     - make run-unit-ccx-counters
     - make run-unit-ccx-mtime-read
@@ -56,7 +58,6 @@ jobs:
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/conf.sh
-    - make synth-core
   - name: "Benchmarks - Embench IoT"
     script:
     - source ./bin/install-verilator.sh
