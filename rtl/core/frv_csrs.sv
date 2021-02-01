@@ -26,6 +26,7 @@ output wire        es_noise_wr      , // Write to `mnoise` CSR.
 output wire [31:0] es_noise_wdata   , // write data for `mnoise`.
 input       [31:0] es_noise_rdata   , // read data from `mnoise`.
 
+output wire [XL:0] csr_smectl       , // Current value of SMECTL.
 output wire [XL:0] csr_mepc         , // Current EPC.
 output wire [XL:0] csr_mtvec        , // Current MTVEC address.
 output wire        vector_intrs     , // Vector interrupt mode (if set)
@@ -107,6 +108,7 @@ localparam CSR_ADDR_LKGCFG      = 12'h801;
 localparam CSR_ADDR_MENTROPY    = 12'hF15;
 localparam CSR_ADDR_MNOISE      = 12'h7A9;
 
+localparam CSR_ADDR_SMECTL      = 12'h006;
 
 //
 // Partial Bitmanip Extension Support
@@ -559,6 +561,56 @@ wire [31:0] mentropy_rdata  = {
 };
 
 //
+// SMECTL
+// ------------------------------------------------------------
+
+// Maximum number of shares supported by SME.
+parameter SME_SMAX = 3;
+
+reg  [ 3:0] smectl_d;
+reg         smectl_t;
+reg  [ 3:0] smectl_b;
+        
+wire [ 8:0] n_smectl = 
+            csr_wr_set ? reg_smectl[8:0] |  csr_wdata[8:0] :
+            csr_wr_clr ? reg_smectl[8:0] & ~csr_wdata[8:0] :
+                                            csr_wdata[8:0] ;
+
+wire        wen_smectl = csr_wr && csr_addr == CSR_ADDR_SMECTL;
+            
+wire        clamp_smectl_d =
+    $unsigned(n_smectl[8:5])>= $unsigned(SME_SMAX[3:0]);
+
+wire        clamp_smectl_b = (
+    $unsigned(n_smectl[3:0])>= $unsigned(n_smectl[8:5] )
+    ) && |n_smectl[8:5];
+
+wire        zero_smectl_b  = n_smectl[8:5] <= 4'h1;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        smectl_d <= 4'h0;
+        smectl_t <= 1'b0;
+        smectl_b <= 4'h0;
+    end else if(wen_smectl) begin
+        smectl_d <= clamp_smectl_d ?  SME_SMAX      : n_smectl[8:5];
+        smectl_t <= n_smectl[  4];                                 
+        smectl_b <= clamp_smectl_b ?  SME_SMAX-1    :
+                    zero_smectl_b  ?  4'b0000       :
+                                      n_smectl[3:0] ;
+    end
+end
+
+wire [31:0] reg_smectl = {
+    23'b0   ,
+    smectl_d,
+    smectl_t,
+    smectl_b
+};
+
+assign csr_smectl = reg_smectl;
+
+//
 // CSR read responses.
 // -------------------------------------------------------------------------
 
@@ -590,6 +642,7 @@ wire   read_minstreth = csr_en && csr_addr == CSR_ADDR_MINSTRETH;
 wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
 wire   read_mentropy  = csr_en && csr_addr == CSR_ADDR_MENTROPY ;
 wire   read_mnoise    = csr_en && csr_addr == CSR_ADDR_MNOISE   ;
+wire   read_smectl    = csr_en && csr_addr == CSR_ADDR_SMECTL   ;
 
 wire   valid_addr     = 
     read_mstatus   ||
@@ -619,7 +672,8 @@ wire   valid_addr     =
     read_minstreth ||
     read_mcountin  ||
     read_mentropy  ||
-    read_mnoise    ;
+    read_mnoise    ||
+    read_smectl    ;
 
 wire invalid_addr = !valid_addr;
 
@@ -657,7 +711,8 @@ assign csr_rdata =
     {32{read_minstreth}} & ctr_instret  [63:32] |
     {32{read_mcountin }} & reg_mcountin         |
     {32{read_mentropy }} & mentropy_rdata       |
-    {32{read_mnoise   }} & mnoise_rdata         ;
+    {32{read_mnoise   }} & mnoise_rdata         |
+    {32{read_smectl   }} & reg_smectl           ;
 
 endmodule
 

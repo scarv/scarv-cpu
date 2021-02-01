@@ -123,6 +123,8 @@ parameter  COMBINE_AES_SM4 =0 ; // Enable combined RV32 AES/SM4 module.
 // Value of the M-mode implementation id register
 parameter  CSR_MIMPID           = 32'b0;
 
+parameter SME_SMAX = 3; // Max shares supported by the SME implementation.
+
 // Common core parameters and constants
 `include "frv_common.svh"
 
@@ -149,6 +151,7 @@ wire [XL:0] csr_wdata  ; // Data to be written to a CSR
 wire [XL:0] csr_rdata  ; // CSR read data
 wire        csr_error  ; // Raise invalid opcode trap due to bad csr access.
 
+wire [XL:0] csr_smectl ; // Current SMECTL.
 wire [XL:0] csr_mepc   ; // Current MEPC.
 wire [XL:0] csr_mtvec  ; // Current MTVEC.
 wire        vector_intrs;// In vectored interrupt mode.
@@ -617,7 +620,8 @@ frv_pipeline_writeback #(
 //  Responsible for keeping control/status registers up to date.
 //
 frv_csrs #(
-.CSR_MIMPID         (CSR_MIMPID         )
+.CSR_MIMPID         (CSR_MIMPID         ),
+.SME_SMAX           (SME_SMAX           )
 ) i_csrs (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
@@ -629,6 +633,7 @@ frv_csrs #(
 .csr_wdata        (csr_wdata        ), // Data to be written to a CSR
 .csr_rdata        (csr_rdata        ), // CSR read data
 .csr_error        (csr_error        ), // Raise invalid opcode trap - bad CSR
+.csr_smectl       (csr_smectl       ), // Current SMECTL value.
 .csr_mepc         (csr_mepc         ), // Current MEPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
 .es_entropy_req   (es_entropy_req   ), // set when reading from `mentropy`.

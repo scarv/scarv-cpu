@@ -14,7 +14,7 @@
 // ----------- Timer Access Functions --------------
 
 //! System clock frequency
-const uint32_t scarv_cpu_freq;
+extern const uint32_t scarv_cpu_freq;
 
 /*!
 @brief Read the 64-bit value of the mtime register.

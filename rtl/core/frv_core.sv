@@ -118,6 +118,8 @@ parameter  CSR_MIMPID         = `SCARV_CPU_MIMPID;
 parameter  CSR_MIMPID         = 32'b0;
 `endif
 
+parameter SME_SMAX = 3; // Max shares supported by the SME implementation.
+
 // Common core parameters and constants
 `include "frv_common.svh"
 
@@ -160,7 +162,8 @@ frv_pipeline #(
 .ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
 .ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
 .COMBINE_AES_SM4(COMBINE_AES_SM4),
-.CSR_MIMPID         (CSR_MIMPID         )
+.CSR_MIMPID(CSR_MIMPID),
+.SME_SMAX  (SME_SMAX  )
 ) i_pipeline(
 .g_clk         (g_clk         ), // global clock
 .g_resetn      (g_resetn      ), // synchronous reset
