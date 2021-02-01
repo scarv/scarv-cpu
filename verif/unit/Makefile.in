@@ -194,7 +194,7 @@ include $(FRV_HOME)/verif/unit/core-example/Makefile.in
 include $(FRV_HOME)/verif/unit/core-mul-ld/Makefile.in
 include $(FRV_HOME)/verif/unit/core-ld-bus-error/Makefile.in
 include $(FRV_HOME)/verif/unit/core-st-bus-error/Makefile.in
-include $(FRV_HOME)/verif/unit/core-clmul/Makefile.in
+#include $(FRV_HOME)/verif/unit/core-clmul/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-smectl/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-ldst/Makefile.in
 

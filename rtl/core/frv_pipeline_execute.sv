@@ -13,6 +13,8 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [XL:0] s2_opr_a        , // Operand A
 input  wire [XL:0] s2_opr_b        , // Operand B
 input  wire [XL:0] s2_opr_c        , // Operand C
+input  wire [ 4:0] s2_rs1_addr     , // Source regsiter addresses.
+input  wire [ 4:0] s2_rs2_addr     , // Source regsiter addresses.
 input  wire [OP:0] s2_uop          , // Micro-op code
 input  wire [FU:0] s2_fu           , // Functional Unit
 input  wire        s2_trap         , // Raise a trap?
@@ -43,6 +45,8 @@ output reg  [XL:0] rvfi_s3_aux      , // Auxiliary needed information.
 output wire [ 4:0] s3_rd           , // Destination register address
 output wire [XL:0] s3_opr_a        , // Operand A
 output wire [XL:0] s3_opr_b        , // Operand B
+output wire [ 4:0] s3_rs1_addr     , // Source regsiter addresses.
+output wire [ 4:0] s3_rs2_addr     , // Source regsiter addresses.
 output wire [OP:0] s3_uop          , // Micro-op code
 output wire [FU:0] s3_fu           , // Functional Unit
 output wire        s3_trap         , // Raise a trap?
@@ -423,7 +427,7 @@ riscv_crypto_fu #(
 // Pipeline Register
 // -------------------------------------------------------------------------
 
-localparam RL = 42 + OP + FU;
+localparam RL = 10 + 42 + OP + FU;
 
 wire [ 4:0] n_s3_rd    = s2_rd   ; // Functional Unit
 wire [FU:0] n_s3_fu    = s2_fu   ; // Functional Unit
@@ -481,7 +485,9 @@ wire [RL-1:0] pipe_reg_in = {
     n_s3_fu           , // Functional Unit
     n_s3_trap         , // Raise a trap?
     n_s3_size         , // Size of the instruction.
-    n_s3_instr          // The instruction word
+    n_s3_instr        , // The instruction word
+    s2_rs1_addr       , 
+    s2_rs2_addr
 };
 
 
@@ -491,7 +497,9 @@ assign {
     s3_fu             , // Functional Unit
     s3_trap           , // Raise a trap?
     s3_size           , // Size of the instruction.
-    s3_instr            // The instruction word
+    s3_instr          , // The instruction word
+    s3_rs1_addr       , 
+    s3_rs2_addr
 } = pipe_reg_out;
 
 frv_pipeline_register #(

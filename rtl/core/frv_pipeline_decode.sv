@@ -43,6 +43,8 @@ output wire [ 4:0] s2_rd         , // Destination register address
 output wire [XL:0] s2_opr_a      , // Operand A
 output wire [XL:0] s2_opr_b      , // Operand B
 output wire [XL:0] s2_opr_c      , // Operand C
+output wire [ 4:0] s2_rs1_addr   , // Source regsiter addresses.
+output wire [ 4:0] s2_rs2_addr   , // Source regsiter addresses.
 output wire [OP:0] s2_uop        , // Micro-op code
 output wire [FU:0] s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
 output wire        s2_trap       , // Raise a trap?
@@ -783,7 +785,7 @@ wire       read_sme_share = sme_on && |smectl_b &&
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 40 + (1+OP) + (1+FU);
+localparam RL = 10 + 40 + (1+OP) + (1+FU);
 
 `ifdef RVFI
 always @(posedge g_clk) begin
@@ -815,7 +817,9 @@ wire [RL-1:0] p_in = {
  s1_bubble ?  bubble_fu : n_s2_fu   , // Functional Unit (alu/mem/jump/mul/csr)
  s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
 leak_stall || s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
- s1_bubble ? 32'b0      : n_s2_instr  // The instruction word
+ s1_bubble ? 32'b0      : n_s2_instr, // The instruction word
+ s1_bubble ?  5'b0      : s1_rs1_addr,
+ s1_bubble ?  5'b0      : s1_rs2_addr 
 };
 
 wire [RL-1:0] p_out;
@@ -826,7 +830,9 @@ assign {
  s2_fu         , // Functional Unit (alu/mem/jump/mul/csr)
  s2_trap       , // Raise a trap?
  s2_size       , // Size of the instruction.
- s2_instr        // The instruction word
+ s2_instr      , // The instruction word
+ s2_rs1_addr   ,
+ s2_rs2_addr    
 } = p_out;
 
 frv_pipeline_register #(

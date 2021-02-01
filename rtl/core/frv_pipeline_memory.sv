@@ -14,6 +14,8 @@ input  wire        flush           , // Flush this pipeline stage.
 input  wire [ 4:0] s3_rd           , // Destination register address
 input  wire [XL:0] s3_opr_a        , // Operand A
 input  wire [XL:0] s3_opr_b        , // Operand B
+input  wire [ 4:0] s3_rs1_addr     , // Source regsiter addresses.
+input  wire [ 4:0] s3_rs2_addr     , // Source regsiter addresses.
 input  wire [OP:0] s3_uop          , // Micro-op code
 input  wire [FU:0] s3_fu           , // Functional Unit
 input  wire        s3_trap         , // Raise a trap?
@@ -44,8 +46,10 @@ output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 input  wire        hold_lsu_req    , // Hold LSU requests for now.
 
 input  wire [XL:0] csr_smectl      , // SME CSR
-output wire [ 3:0] sme_bank_raddr  , // SME bank read address
 input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
+output wire        sme_instr_valid , // Accept new input instruction.
+input wire         sme_instr_ready , // Ready for new input instruction.
+output sme_instr_t sme_instr_in    , // Input instruction details.
 
 output wire        dmem_req        , // Start memory request
 output wire        dmem_wen        , // Write enable
@@ -192,10 +196,13 @@ wire [3:0] smectl_b = csr_smectl[3:0];
 
 // Do we need to source an SME share for storing to memory?
 wire       read_sme_share = sme_on && |smectl_b && 
-                            sme_is_share_reg(s3_opr_b[4:0]) &&
+                            sme_is_share_reg(s3_rs2_addr[4:0]) &&
                             lsu_valid && lsu_store;
 
-assign     sme_bank_raddr = {4{read_sme_share}} & s3_opr_b[3:0];
+wire       sme_rd_en             = sme_on;
+
+assign     sme_instr_in.rs1_addr = {4{sme_rd_en}} & s3_rs1_addr[3:0];
+assign     sme_instr_in.rs2_addr = {4{sme_rd_en}} & s3_rs2_addr[3:0];
 
 //
 // Submodule instances.

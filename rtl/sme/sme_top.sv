@@ -20,7 +20,6 @@ input               bank_wen    , // Write loaded data to bank.
 input  [       3:0] bank_waddr  , // Register of the bank to write.
 input  [      XL:0] bank_wdata  , // Write data being loaded into bank.
 
-input  [       3:0] bank_raddr  , // Read this bank address for stores.
 output [      XL:0] bank_rdata  , // Read data from bank[smectrl.t][smectl.b]
 
 input  [      XL:0] csr_smectl  , // Current SMECTL value.
@@ -80,6 +79,9 @@ localparam BI = $clog2(SMAX)-1;
 
 assign bank_rdata = s1_rs2[smectl_b[BI:0]]; // TODO: Leakage hazard.
 
+wire   [3:0] bank_rs1_addr = instr_in.rs1_addr;
+wire   [3:0] bank_rs2_addr = instr_in.rs2_addr;
+
 //
 // Note that the 0'th register file is the normal RISC-V GPRS, so we
 // need to instance SMAX-1 sme_regfile modules
@@ -99,9 +101,9 @@ sme_regfile i_rf (
 .g_clk      (g_clk              ), // Global clock
 .g_clk_req  (rf_clk_req[rf_i]   ), // Global clock request
 .g_resetn   (g_resetn           ), // Sychronous active low reset.
-.rs1_addr   (instr_in.rs1_addr  ), // Source register 1 address
+.rs1_addr   (bank_rs1_addr      ), // Source register 1 address
 .rs1_rdata  (s1_rs1[rf_i]       ), // Source register 1 read data
-.rs2_addr   (bank_raddr         ), // Source register 2 address
+.rs2_addr   (bank_rs2_addr      ), // Source register 2 address
 .rs2_rdata  (s1_rs2[rf_i]       ), // Source register 2 read data
 .rd_wen     (rf_wen             ), // Write enable
 .rd_addr    (rf_addr            ), // Write address

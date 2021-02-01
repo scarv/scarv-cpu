@@ -191,6 +191,8 @@ wire [ 4:0] s2_rd         ; // Destination register address
 wire [XL:0] s2_opr_a      ; // Operand A
 wire [XL:0] s2_opr_b      ; // Operand B
 wire [XL:0] s2_opr_c      ; // Operand C
+wire [ 4:0] s2_rs1_addr   ;
+wire [ 4:0] s2_rs2_addr   ;
 wire [OP:0] s2_uop        ; // Micro-op code
 wire [FU:0] s2_fu         ; // Functional Unit (alu/mem/jump/mul/csr)
 wire        s2_trap       ; // Raise a trap?
@@ -206,6 +208,8 @@ wire        fwd_s2_csr    ; // stage has CSR op in it.
 wire [ 4:0] s3_rd         ; // Destination register address
 wire [XL:0] s3_opr_a      ; // Operand A
 wire [XL:0] s3_opr_b      ; // Operand B
+wire [ 4:0] s3_rs1_addr   ;
+wire [ 4:0] s3_rs2_addr   ;
 wire [OP:0] s3_uop        ; // Micro-op code
 wire [FU:0] s3_fu         ; // Functional Unit
 wire        s3_trap       ; // Raise a trap?
@@ -316,12 +320,12 @@ wire [XL:0] fwd_rs2_rdata =
                   s1_rs2_rdata   ;
 
 //
-// Submodule Instances.
-// -------------------------------------------------------------------------
+// SME Handling
+// ------------------------------------------------------------
+
 wire          sme_clk_req       ;
 wire          sme_bank_wen      ; // Write loaded data to bank.
 wire   [XL:0] sme_bank_wdata    ; // Write data being loaded into bank.
-wire   [ 3:0] sme_bank_raddr    ; // Read address for current bank
 wire   [XL:0] sme_bank_rdata    ; // Read data from bank[smectl.t][bank_addr]
 wire          sme_instr_valid   ; // Accept new input instruction.
 wire          sme_instr_ready   ; // Ready for new input instruction.
@@ -329,6 +333,10 @@ sme_instr_t   sme_instr_in      ; // Input instruction details.
 wire          sme_result_valid  ; // Output result to host core ready.
 wire          sme_result_ready  ; // Host core ready for results.
 sme_result_t  sme_result_out    ; // The result of the instruction.
+
+//
+// Submodule Instances.
+// -------------------------------------------------------------------------
 
 //
 // instance: sme_top
@@ -346,7 +354,6 @@ sme_top #(
 .bank_wen       (sme_bank_wen       ), // Write loaded data to bank.
 .bank_waddr     (s4_rd[3:0]         ), // Bank register address.
 .bank_wdata     (sme_bank_wdata     ), // Write data being loaded into bank.
-.bank_raddr     (sme_bank_raddr     ), // bank_addr
 .bank_rdata     (sme_bank_rdata     ), // bank[smectl.t][bank_addr] rdata.
 .csr_smectl     (csr_smectl         ), // SMECTL CSR value.
 .instr_valid    (sme_instr_valid    ), // Accept new input instruction.
@@ -435,6 +442,8 @@ frv_pipeline_decode #(
 .s2_opr_a           (s2_opr_a           ), // Operand A
 .s2_opr_b           (s2_opr_b           ), // Operand B
 .s2_opr_c           (s2_opr_c           ), // Operand C
+.s2_rs1_addr        (s2_rs1_addr        ), // RS1 source address
+.s2_rs2_addr        (s2_rs2_addr        ), // RS2 source address
 .s2_uop             (s2_uop             ), // Micro-op code
 .s2_fu              (s2_fu              ), // Functional Unit
 .s2_trap            (s2_trap            ), // Raise a trap?
@@ -471,6 +480,8 @@ frv_pipeline_execute #(
 .s2_trap          (s2_trap          ), // Raise a trap?
 .s2_size          (s2_size          ), // Size of the instruction.
 .s2_instr         (s2_instr         ), // The instruction word
+.s2_rs1_addr      (s2_rs1_addr      ), // RS1 source address
+.s2_rs2_addr      (s2_rs2_addr      ), // RS2 source address
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
 .flush            (s2_flush         ), // Flush this pipeline stage.
@@ -492,6 +503,8 @@ frv_pipeline_execute #(
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
 .s3_opr_b         (s3_opr_b         ), // Operand B
+.s3_rs1_addr      (s3_rs1_addr      ), // RS1 source address
+.s3_rs2_addr      (s3_rs2_addr      ), // RS2 source address
 .s3_uop           (s3_uop           ), // Micro-op code
 .s3_fu            (s3_fu            ), // Functional Unit
 .s3_trap          (s3_trap          ), // Raise a trap?
@@ -515,6 +528,8 @@ frv_pipeline_memory #(
 .s3_rd            (s3_rd            ), // Destination register address
 .s3_opr_a         (s3_opr_a         ), // Operand A
 .s3_opr_b         (s3_opr_b         ), // Operand B
+.s3_rs1_addr      (s3_rs1_addr      ), // RS1 source address
+.s3_rs2_addr      (s3_rs2_addr      ), // RS2 source address
 .s3_uop           (s3_uop           ), // Micro-op code
 .s3_fu            (s3_fu            ), // Functional Unit
 .s3_trap          (s3_trap          ), // Raise a trap?
@@ -540,9 +555,11 @@ frv_pipeline_memory #(
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
-.sme_bank_raddr   (sme_bank_raddr   ), // bank_addr
 .sme_bank_rdata   (sme_bank_rdata   ), // bank[smectl.t][bank_addr] rdata.
 .csr_smectl       (csr_smectl       ), // SMECTL CSR value.
+.sme_instr_valid  (sme_instr_valid  ), // Accept new input instruction.
+.sme_instr_ready  (sme_instr_ready  ), // Ready for new input instruction.
+.sme_instr_in     (sme_instr_in     ), // Input instruction details.
 .dmem_req         (dmem_req         ), // Start memory request
 .dmem_wen         (dmem_wen         ), // Write enable
 .dmem_strb        (dmem_strb        ), // Write strobe
