@@ -8,6 +8,11 @@ $SCARV_CPU/rtl/core/riscv_crypto_fu_ssha256.sv
 $SCARV_CPU/rtl/core/riscv_crypto_fu_ssha512.sv
 $SCARV_CPU/rtl/core/riscv_crypto_fu_ssm3.sv
 $SCARV_CPU/rtl/core/riscv_crypto_fu_ssm4.sv
+
+$SCARV_CPU/rtl/sme/sme_pkg.sv
+$SCARV_CPU/rtl/sme/sme_regfile.sv
+$SCARV_CPU/rtl/sme/sme_top.sv
+
 $SCARV_CPU/rtl/core/frv_alu.sv
 $SCARV_CPU/rtl/core/frv_mdu.sv
 $SCARV_CPU/rtl/core/frv_core_fetch_buffer.sv

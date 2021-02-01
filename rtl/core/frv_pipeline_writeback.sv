@@ -1,4 +1,6 @@
 
+import sme_pkg::*;
+
 //
 // module: frv_pipeline_writeback
 //
@@ -80,6 +82,7 @@ output wire [XL:0] trap_pc         , // PC value associated with the trap.
 
 output wire        exec_mret       , // MRET instruction executed.
 
+input  wire [XL:0] csr_smectl      ,
 input  wire [XL:0] csr_mepc        ,
 input  wire [XL:0] csr_mtvec       ,
 input  wire        vector_intrs    , // Vector interrupt mode (if set)
@@ -87,6 +90,9 @@ input  wire        vector_intrs    , // Vector interrupt mode (if set)
 output wire [XL:0] trs_pc          , // Trace program counter.
 output wire [31:0] trs_instr       , // Trace instruction.
 output wire        trs_valid       , // Trace output valid.
+
+output wire        sme_bank_wen    , // Write loaded data to bank.
+output wire [XL:0] sme_bank_wdata  , // Write data being loaded into bank.
 
 output wire        csr_en          , // CSR Access Enable
 output wire        csr_wr          , // CSR Write Enable
@@ -340,13 +346,28 @@ wire [15: 0] rdata_h1 =
 //                             31....16,15.....8,7......0
 wire [XL:0] lsu_rdata       = {rdata_h1,rdata_b1,rdata_b0};
 
-wire        lsu_gpr_wen     = lsu_load;
+wire        lsu_gpr_wen     = lsu_load && !sme_load;
 
 wire [XL:0] lsu_gpr_wdata   = lsu_rdata;
 
 wire        lsu_bus_error   = fu_lsu && n_dmem_r_error;
 
 wire        lsu_trap        = lsu_bus_error;
+
+//
+// SME Writeback
+// ------------------------------------------------------------
+
+wire [3:0] smectl_b = csr_smectl[3:0];
+
+// Loaded data should go to an SME share register which is _not_ a GPR.
+wire sme_load = lsu_load                &&
+                sme_is_on(csr_smectl)   &&
+                |smectl_b               &&
+                sme_is_share_reg(s4_rd) ;
+
+assign sme_bank_wen     = sme_load  ;
+assign sme_bank_wdata   = lsu_rdata ;
 
 //
 // GPR writeback and forwarding

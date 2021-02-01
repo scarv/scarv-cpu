@@ -318,6 +318,44 @@ wire [XL:0] fwd_rs2_rdata =
 //
 // Submodule Instances.
 // -------------------------------------------------------------------------
+wire          sme_clk_req       ;
+wire          sme_bank_wen      ; // Write loaded data to bank.
+wire   [XL:0] sme_bank_wdata    ; // Write data being loaded into bank.
+wire   [ 3:0] sme_bank_raddr    ; // Read address for current bank
+wire   [XL:0] sme_bank_rdata    ; // Read data from bank[smectl.t][bank_addr]
+wire          sme_instr_valid   ; // Accept new input instruction.
+wire          sme_instr_ready   ; // Ready for new input instruction.
+sme_instr_t   sme_instr_in      ; // Input instruction details.
+wire          sme_result_valid  ; // Output result to host core ready.
+wire          sme_result_ready  ; // Host core ready for results.
+sme_result_t  sme_result_out    ; // The result of the instruction.
+
+//
+// instance: sme_top
+//
+//  Top level of the SME masked vector processor.
+//
+sme_top #(
+.SMAX           (SME_SMAX   ), // Max number of hardware shares supported.
+.LINEAR_FUS     (SME_SMAX   ), // How many linear ops to instance?
+.NONLINEAR_WIDTH( XLEN      )  // How wide is the nonlinear op data path?
+) i_sme (
+.g_clk          (g_clk              ), // Global clock
+.g_clk_req      (sme_clk_req        ), // Global clock request
+.g_resetn       (g_resetn           ), // Sychronous active low reset.
+.bank_wen       (sme_bank_wen       ), // Write loaded data to bank.
+.bank_waddr     (s4_rd[3:0]         ), // Bank register address.
+.bank_wdata     (sme_bank_wdata     ), // Write data being loaded into bank.
+.bank_raddr     (sme_bank_raddr     ), // bank_addr
+.bank_rdata     (sme_bank_rdata     ), // bank[smectl.t][bank_addr] rdata.
+.csr_smectl     (csr_smectl         ), // SMECTL CSR value.
+.instr_valid    (sme_instr_valid    ), // Accept new input instruction.
+.instr_ready    (sme_instr_ready    ), // Ready for new input instruction.
+.instr_in       (sme_instr_in       ), // Input instruction details.
+.result_valid   (sme_result_valid   ), // Output result to host core ready.
+.result_ready   (sme_result_ready   ), // Host core ready for results.
+.result_out     (sme_result_out     ) // The result of the instruction.
+);
 
 
 //
@@ -384,6 +422,7 @@ frv_pipeline_decode #(
 .cf_req             (cf_req             ), // Control flow change
 .cf_target          (cf_target          ), // Control flow change target
 .cf_ack             (cf_ack             ), // Acknowledge control flow change
+.csr_smectl         (csr_smectl         ), // SMECTL CSR value.
 `ifdef RVFI
 .rvfi_s2_rs1_addr   (rvfi_s2_rs1_addr   ),
 .rvfi_s2_rs2_addr   (rvfi_s2_rs2_addr   ),
@@ -501,6 +540,9 @@ frv_pipeline_memory #(
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
+.sme_bank_raddr   (sme_bank_raddr   ), // bank_addr
+.sme_bank_rdata   (sme_bank_rdata   ), // bank[smectl.t][bank_addr] rdata.
+.csr_smectl       (csr_smectl       ), // SMECTL CSR value.
 .dmem_req         (dmem_req         ), // Start memory request
 .dmem_wen         (dmem_wen         ), // Write enable
 .dmem_strb        (dmem_strb        ), // Write strobe
@@ -581,6 +623,8 @@ frv_pipeline_writeback #(
 .gpr_wen          (gpr_wen          ), // GPR write enable.
 .gpr_rd           (gpr_rd           ), // GPR destination register.
 .gpr_wdata        (gpr_wdata        ), // GPR write data [31: 0].
+.sme_bank_wen     (sme_bank_wen     ), // Write loaded data to bank.
+.sme_bank_wdata   (sme_bank_wdata   ), // Write data being loaded into bank.
 .int_trap_req     (int_trap_req     ), // Request WB stage trap an interrupt
 .int_trap_cause   (int_trap_cause   ), // Cause of interrupt
 .int_trap_ack     (int_trap_ack     ), // WB stage acknowledge the taken trap.
@@ -590,6 +634,7 @@ frv_pipeline_writeback #(
 .trap_mtval       (trap_mtval       ), // Value associated with the trap.
 .trap_pc          (trap_pc          ), // PC value associated with the trap.
 .exec_mret        (exec_mret        ), // MRET instruction executed.
+.csr_smectl       (csr_smectl       ), // SMECTL CSR value.
 .csr_mepc         (csr_mepc         ),
 .csr_mtvec        (csr_mtvec        ),
 .vector_intrs     (vector_intrs     ),

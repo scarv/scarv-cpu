@@ -1,20 +1,23 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Mon Feb  1 11:04:55 2021
+[*] Mon Feb  1 14:05:21 2021
 [*]
-[dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-smectl/core-sme-smectl.vcd"
-[dumpfile_mtime] "Mon Feb  1 11:04:28 2021"
-[dumpfile_size] 1705609
+[dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.vcd"
+[dumpfile_mtime] "Mon Feb  1 14:04:55 2021"
+[dumpfile_size] 5131143
 [savefile] "/home/work/scarv/scarv-cpu-sme/flow/gtkwave/verilator.gtkw"
-[timestart] 8049
+[timestart] 8790
 [size] 1920 1016
 [pos] -1 -1
-*-8.898460 8958 3286 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-11.898460 22446 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
 [treeopen] TOP.frv_core.i_pipeline.i_gprs.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
+[treeopen] TOP.frv_core.i_pipeline.i_sme.
+[treeopen] TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).
+[treeopen] TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).
 [sst_width] 270
 [signals_width] 454
 [sst_expanded] 1
@@ -90,7 +93,7 @@ TOP.frv_core.i_pipeline.dmem_error
 @22
 TOP.frv_core.trs_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-smectl/core-sme-smectl.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
@@ -214,7 +217,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s0_fetch.imem_rdata[31:0]
 -Instruction Memory Bus
 @1401200
 -Pipe - S0 - Fetch
-@c00200
+@800200
 -Pipe - S1 Decode
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.program_counter[31:0]
@@ -247,13 +250,23 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_b[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_c[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.flush
+@800201
+-SME
+@23
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.csr_smectl[31:0]
+@29
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.read_sme_share
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.sme_on
+@23
+TOP.frv_core.i_pipeline.i_pipeline_s1_decode.smectl_b[3:0]
+@1000201
+-SME
 @800200
 -Leakage Instructions
 @1000200
 -Leakage Instructions
-@1401200
 -Pipe - S1 Decode
-@800200
+@c00200
 -Pipe - S2 Execute
 @28
 TOP.frv_core.i_pipeline.s2_busy
@@ -261,7 +274,7 @@ TOP.frv_core.i_pipeline.s2_valid
 @22
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-smectl/core-sme-smectl.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @c00022
 TOP.frv_core.i_pipeline.s2_opr_a[31:0]
@@ -325,16 +338,15 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_ready
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_valid
 @1401200
 -ALI
-@1000200
 -Pipe - S2 Execute
-@c00200
+@800200
 -Pipe - S3 Memory
 @28
 TOP.frv_core.i_pipeline.s3_busy
 @22
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-smectl/core-sme-smectl.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
@@ -365,7 +377,7 @@ TOP.frv_core.i_pipeline.dmem_rdata[31:0]
 TOP.frv_core.i_pipeline.dmem_error
 @1000200
 -Data Memory
-@800200
+@c00200
 -LSU
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.g_clk
@@ -401,9 +413,9 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_wdata[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.lsu_word
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.n_lsu_finished
 TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
-@1000200
--LSU
 @1401200
+-LSU
+@1000200
 -Pipe - S3 Memory
 @c00200
 -Pipe - S4 - Writeback
@@ -413,7 +425,7 @@ TOP.frv_core.i_pipeline.s4_flush
 @22
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-smectl/core-sme-smectl.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
@@ -447,7 +459,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wen
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-smectl/core-sme-smectl.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
@@ -467,28 +479,33 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_target_addr[31:0]
 -Pipe - S4 - Writeback
 @800200
 -SME
-@800201
 -CSR - SMECTL
-@29
+@28
 TOP.frv_core.i_pipeline.i_csrs.read_smectl
 TOP.frv_core.i_pipeline.i_csrs.wen_smectl
-@23
+@22
 TOP.frv_core.i_pipeline.i_csrs.reg_smectl[31:0]
 TOP.frv_core.i_pipeline.i_csrs.n_smectl[8:0]
 TOP.frv_core.i_pipeline.i_csrs.smectl_d[3:0]
-@29
+@28
 TOP.frv_core.i_pipeline.i_csrs.smectl_t
-@23
+@22
 TOP.frv_core.i_pipeline.i_csrs.smectl_b[3:0]
-@29
+@28
 TOP.frv_core.i_pipeline.i_csrs.clamp_smectl_d
 TOP.frv_core.i_pipeline.i_csrs.clamp_smectl_b
 TOP.frv_core.i_pipeline.i_csrs.zero_smectl_b
-@1000201
+@1000200
 -CSR - SMECTL
+@22
+TOP.frv_core.i_pipeline.i_sme.bank_rdata[31:0]
+TOP.frv_core.i_pipeline.i_sme.bank_waddr[3:0]
+TOP.frv_core.i_pipeline.i_sme.bank_wdata[31:0]
+@28
+TOP.frv_core.i_pipeline.i_sme.bank_wen
 @1000200
 -SME
-@800200
+@c00200
 -CSR Bus
 @22
 TOP.frv_core.i_pipeline.csr_addr[11:0]
@@ -541,7 +558,7 @@ TOP.frv_core.i_pipeline.csr_wdata[31:0]
 TOP.frv_core.i_pipeline.csr_wr
 TOP.frv_core.i_pipeline.csr_wr_clr
 TOP.frv_core.i_pipeline.csr_wr_set
-@1000200
+@1401200
 -CSR Bus
 @c00200
 -MTVEC
@@ -679,5 +696,49 @@ TOP.frv_core.i_pipeline.i_gprs.gprs(30)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(31)[31:0]
 @1401200
 -GPRs
+@800200
+-SME Registers
+-Bank 1
+@22
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(3)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(4)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(5)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(6)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(7)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(8)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(9)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(10)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(11)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(12)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(13)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(14)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(15)[31:0]
+@1000200
+-Bank 1
+@800200
+-Bank 2
+@22
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(3)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(4)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(5)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(6)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(7)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(8)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(9)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(10)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(11)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(12)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(13)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(14)[31:0]
+TOP.frv_core.i_pipeline.i_sme.gen_regfile(2).i_rf.regs(15)[31:0]
+@1000200
+-Bank 2
+-SME Registers
 [pattern_trace] 1
 [pattern_trace] 0

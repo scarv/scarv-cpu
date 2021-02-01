@@ -126,6 +126,10 @@ void dut_wrapper::posedge_gclk () {
             }
         );
     }
+
+    // Randomise the entropy source inputs
+    this -> dut -> es_entropy_opst = 0x1;
+    this -> dut -> es_entropy_data = rand() % 0xFFFF;
 }
 
 

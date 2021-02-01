@@ -1,4 +1,5 @@
 
+import sme_pkg::*;
 
 //
 // module: frv_pipeline_decode
@@ -26,6 +27,8 @@ input  wire [XL:0] s1_rs2_rdata  ,
 input  wire        cf_req        , // Control flow change request
 input  wire [XL:0] cf_target     , // Control flow change target
 input  wire        cf_ack        , // Control flow change acknowledge.
+
+input  wire [XL:0] csr_smectl    , // Current value of SMECTL CSR
 
 `ifdef RVFI
 output reg  [ 4:0] rvfi_s2_rs1_addr,
@@ -759,10 +762,22 @@ wire oprc_ld_en    = n_s2_valid && (
     oprc_src_rs2  || oprc_src_csra || oprc_src_pcim
 );
 
-assign n_s2_opr_c = 
+assign n_s2_opr_c = read_sme_share ? {27'b0, s1_rs2_addr} :
     {XLEN{oprc_src_rs2    }} & s1_rs2_rdata   |
     {XLEN{oprc_src_csra   }} & csr_addr       |
     {XLEN{oprc_src_pcim   }} & pc_plus_imm    ;
+
+//
+// SME Signals
+// -------------------------------------------------------------------------
+
+wire       sme_on   = sme_is_on(csr_smectl);
+wire [3:0] smectl_b = csr_smectl[3:0];
+
+// Do we need to source an SME share for storing to memory?
+wire       read_sme_share = sme_on && |smectl_b && 
+                            sme_is_share_reg(s1_rs2_addr) &&
+                            n_s2_fu[P_FU_LSU] && uop_lsu[LSU_STORE];
 
 //
 // Pipeline Register.
