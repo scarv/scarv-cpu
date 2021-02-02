@@ -1,4 +1,6 @@
 
+import sme_pkg::*;
+
 //
 // module: frv_pipeline_execute
 //
@@ -22,6 +24,13 @@ input  wire [ 1:0] s2_size         , // Size of the instruction.
 input  wire [31:0] s2_instr        , // The instruction word
 output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
+
+input  wire [XL:0] csr_smectl      , // SME CSR
+input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
+output wire        sme_instr_valid , // Accept new input instruction.
+input wire         sme_instr_ready , // Ready for new input instruction.
+output sme_instr_t sme_instr_in    , // Input instruction details.
+
 
 input  wire        flush           , // Flush this pipeline stage.
 
@@ -72,6 +81,8 @@ parameter ZBB       = 1; // Support the ZBB Bitmanip Base instructions.
 parameter ZBP       = 1; // Support the ZBP Bitmanip permutation instructions.
 parameter ZBC       = 1; // Support the ZBC Bitmanip CLMUL instrs.
 parameter  COMBINE_AES_SM4 =0 ; // Enable combined RV32 AES/SM4 module.
+
+parameter SME_SMAX = 3; // Max shares supported by the SME implementation.
 
 wire pipe_progress = !s2_busy && s2_valid;
 
@@ -179,6 +190,55 @@ wire [XL:0] n_s3_opr_a_mul  = imul_rd;
 wire [XL:0] n_s3_opr_b_mul  = 32'b0;
 
 //
+// Functional Unit Interfacing: SME
+// -------------------------------------------------------------------------
+
+wire       sme_on   = sme_is_on(csr_smectl);
+wire [3:0] smectl_b = csr_smectl[3:0];
+
+wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]);
+wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]);
+wire    sme_rd_is_share  = sme_is_share_reg(s2_rd      [4:0]);
+
+// Do we need to source an SME share for storing to memory?
+wire    store_sme_share = sme_on && |smectl_b && 
+                         sme_rs2_is_share &&
+                         lsu_valid && lsu_store;
+
+assign  sme_instr_in.rs1_addr   = {4{sme_on && sme_rs1_is_share}} & s2_rs1_addr[3:0];
+assign  sme_instr_in.rs2_addr   = {4{sme_on && sme_rs2_is_share}} & s2_rs2_addr[3:0];
+assign  sme_instr_in.rd_addr    = s2_rd[3:0];
+
+assign  sme_instr_in.rs1_rdata  = s2_opr_a ;
+assign  sme_instr_in.rs2_rdata  = s2_opr_b ;
+
+
+assign  sme_instr_valid         =
+    sme_on && sme_rs1_is_share && sme_rs2_is_share && sme_rd_is_share && (
+    alu_op_xor  || alu_op_xnor || alu_op_and  || alu_op_andn   ||
+    alu_op_or   || alu_op_orn  || alu_op_sll  || alu_op_srl    ||
+    alu_op_ror  || alu_op_rol  || alu_op_add  || alu_op_sub    
+);
+
+// None of these do anything unless sme_instr_valid is also high.
+// See inside sme_alu for why/how.
+assign  sme_instr_in.shamt      = alu_shamt;
+assign  sme_instr_in.op_xor     = alu_op_xor || alu_op_xnor;
+assign  sme_instr_in.op_and     = alu_op_and || alu_op_andn;
+assign  sme_instr_in.op_or      = alu_op_or  || alu_op_orn ;
+assign  sme_instr_in.op_notrs2  = alu_op_xnor|| alu_op_andn || alu_op_orn;
+assign  sme_instr_in.op_shift   = alu_op_sll || alu_op_srl ;
+assign  sme_instr_in.op_rotate  = alu_op_ror || alu_op_rol ;
+assign  sme_instr_in.op_left    = alu_op_sll || alu_op_rol ;
+assign  sme_instr_in.op_right   = alu_op_srl || alu_op_ror ; 
+assign  sme_instr_in.op_add     = alu_op_add ;
+assign  sme_instr_in.op_sub     = alu_op_sub ;
+assign  sme_instr_in.op_mask    = 1'b0       ;
+assign  sme_instr_in.op_unmask  = 1'b0       ;
+assign  sme_instr_in.op_remask  = 1'b0       ;
+
+
+//
 // Functional Unit Interfacing: LSU
 // -------------------------------------------------------------------------
 
@@ -189,8 +249,8 @@ wire        lsu_ready  = lsu_valid      ; // Load/Store instruction complete.
 wire        lsu_load   = fu_lsu && s2_uop[LSU_LOAD ];
 wire        lsu_store  = fu_lsu && s2_uop[LSU_STORE];
 
-wire [XL:0] n_s3_opr_a_lsu = alu_add_out    ;
-wire [XL:0] n_s3_opr_b_lsu = s2_opr_c       ;
+wire [XL:0] n_s3_opr_a_lsu = alu_add_out     ;
+wire [XL:0] n_s3_opr_b_lsu = store_sme_share ? sme_bank_rdata : s2_opr_c ;
 
 //
 // Functional Unit Interfacing: CFU

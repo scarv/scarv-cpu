@@ -351,6 +351,7 @@ sme_state #(
 .g_clk          (g_clk              ), // Global clock
 .g_clk_req      (sme_clk_req        ), // Global clock request
 .g_resetn       (g_resetn           ), // Sychronous active low reset.
+.flush          (s2_flush           ), // Flush - aligned to execute stage.
 .bank_wen       (sme_bank_wen       ), // Write loaded data to bank.
 .bank_waddr     (s4_rd[3:0]         ), // Bank register address.
 .bank_wdata     (sme_bank_wdata     ), // Write data being loaded into bank.
@@ -467,7 +468,8 @@ frv_pipeline_execute #(
 .ZBB       (ZBB       ), // Support the ZBB Bitmanip Base instructions.
 .ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
 .ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
-.COMBINE_AES_SM4(COMBINE_AES_SM4) 
+.COMBINE_AES_SM4(COMBINE_AES_SM4),
+.SME_SMAX  (SME_SMAX  )  // Maximum hardware supported shares by SME.
 ) i_pipeline_s2_execute (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
@@ -484,6 +486,11 @@ frv_pipeline_execute #(
 .s2_rs2_addr      (s2_rs2_addr      ), // RS2 source address
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
+.sme_bank_rdata   (sme_bank_rdata   ), // bank[smectl.t][bank_addr] rdata.
+.csr_smectl       (csr_smectl       ), // SMECTL CSR value.
+.sme_instr_valid  (sme_instr_valid  ), // Accept new input instruction.
+.sme_instr_ready  (sme_instr_ready  ), // Ready for new input instruction.
+.sme_instr_in     (sme_instr_in     ), // Input instruction details.
 .flush            (s2_flush         ), // Flush this pipeline stage.
 .fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
 .fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.
@@ -555,11 +562,6 @@ frv_pipeline_memory #(
 .rvfi_s4_mem_wdata(rvfi_s4_mem_wdata), // Memory write data.
 `endif // RVFI
 .hold_lsu_req     (hold_lsu_req     ), // Disallow LSU requests when set.
-.sme_bank_rdata   (sme_bank_rdata   ), // bank[smectl.t][bank_addr] rdata.
-.csr_smectl       (csr_smectl       ), // SMECTL CSR value.
-.sme_instr_valid  (sme_instr_valid  ), // Accept new input instruction.
-.sme_instr_ready  (sme_instr_ready  ), // Ready for new input instruction.
-.sme_instr_in     (sme_instr_in     ), // Input instruction details.
 .dmem_req         (dmem_req         ), // Start memory request
 .dmem_wen         (dmem_wen         ), // Write enable
 .dmem_strb        (dmem_strb        ), // Write strobe

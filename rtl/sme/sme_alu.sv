@@ -51,7 +51,6 @@ input         op_remask , // remask rs1 based on smectl_t
 input  [XL:0] rs1 [SM:0], // RS1 as SMAX shares
 input  [XL:0] rs2 [SM:0], // RS2 as SMAX shares
         
-output [SM:0] done      , // Ouput i of SMAX is ready
 output [XL:0] rd  [SM:0]  // RD as SMAX shares
 
 );
@@ -200,7 +199,7 @@ assign      result_aaddsub[l] = arith_add_out;
 wire sel_result_xor = op_xor || op_mask_bool;
 wire sel_result_add = op_addsub_arith || op_mask_arith || op_remask_arith;
 
-wire [XL:0] n_rd_l = 
+assign rd[l]= 
     op_and              ? result_and[l]         :
     op_or               ? result_or [l]         :
     sel_result_xor      ? result_xor[l]         :
@@ -208,15 +207,6 @@ wire [XL:0] n_rd_l =
     op_shfrot           ? result_shift[l]       :
                           {XLEN{1'b0}}          ;
     
-always @(posedge g_clk) begin
-    if(!g_resetn || flush) begin
-        done <= 1'b0;
-    end else if(valid) begin
-        rd[l] <= n_rd_l;
-        done  <= valid && ready;
-    end
-end
-
 end endgenerate // g_linear_ops -------------------------------- END GENERATE
 
 assign ready = valid;

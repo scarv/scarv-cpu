@@ -45,12 +45,6 @@ output reg  [XL:0] rvfi_s4_mem_wdata, // Memory write data.
 
 input  wire        hold_lsu_req    , // Hold LSU requests for now.
 
-input  wire [XL:0] csr_smectl      , // SME CSR
-input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
-output wire        sme_instr_valid , // Accept new input instruction.
-input wire         sme_instr_ready , // Ready for new input instruction.
-output sme_instr_t sme_instr_in    , // Input instruction details.
-
 output wire        dmem_req        , // Start memory request
 output wire        dmem_wen        , // Write enable
 output wire [3:0]  dmem_strb       , // Write strobe
@@ -131,7 +125,7 @@ wire        lsu_load   = s3_uop[LSU_LOAD ];
 wire        lsu_store  = s3_uop[LSU_STORE];
 
 wire [XL:0] lsu_addr   = s3_opr_a; // Memory address to access.
-wire [XL:0] lsu_wdata  = read_sme_share ? sme_bank_rdata : s3_opr_b;
+wire [XL:0] lsu_wdata  = s3_opr_b;
 wire        lsu_byte   = s3_uop[2:1] == LSU_BYTE;
 wire        lsu_half   = s3_uop[2:1] == LSU_HALF;
 wire        lsu_word   = s3_uop[2:1] == LSU_WORD;
@@ -186,23 +180,6 @@ assign fwd_s3_rd    = s3_rd             ; // Stage destination reg.
 assign fwd_s3_wdata = s3_opr_a          ;
 assign fwd_s3_load  = fu_lsu && lsu_load; // Stage has load in it.
 assign fwd_s3_csr   = fu_csr            ; // Stage has CSR op in it.
-
-//
-// SME Handling
-// -------------------------------------------------------------------------
-
-wire       sme_on   = sme_is_on(csr_smectl);
-wire [3:0] smectl_b = csr_smectl[3:0];
-
-// Do we need to source an SME share for storing to memory?
-wire       read_sme_share = sme_on && |smectl_b && 
-                            sme_is_share_reg(s3_rs2_addr[4:0]) &&
-                            lsu_valid && lsu_store;
-
-wire       sme_rd_en             = sme_on;
-
-assign     sme_instr_in.rs1_addr = {4{sme_rd_en}} & s3_rs1_addr[3:0];
-assign     sme_instr_in.rs2_addr = {4{sme_rd_en}} & s3_rs2_addr[3:0];
 
 //
 // Submodule instances.

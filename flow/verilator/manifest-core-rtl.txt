@@ -11,6 +11,9 @@ $SCARV_CPU/rtl/core/riscv_crypto_fu_ssm4.sv
 
 $SCARV_CPU/rtl/sme/sme_pkg.sv
 $SCARV_CPU/rtl/sme/sme_regfile.sv
+$SCARV_CPU/rtl/sme/sme_lfsr32.sv
+$SCARV_CPU/rtl/sme/sme_dom_and.sv
+$SCARV_CPU/rtl/sme/sme_alu.sv
 $SCARV_CPU/rtl/sme/sme_state.sv
 
 $SCARV_CPU/rtl/core/frv_alu.sv
