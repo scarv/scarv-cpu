@@ -339,11 +339,11 @@ sme_result_t  sme_result_out    ; // The result of the instruction.
 // -------------------------------------------------------------------------
 
 //
-// instance: sme_top
+// instance: sme_state
 //
-//  Top level of the SME masked vector processor.
+//  Contains the share register banks for the SME implementation.
 //
-sme_top #(
+sme_state #(
 .SMAX           (SME_SMAX   ), // Max number of hardware shares supported.
 .LINEAR_FUS     (SME_SMAX   ), // How many linear ops to instance?
 .NONLINEAR_WIDTH( XLEN      )  // How wide is the nonlinear op data path?

@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Mon Feb  1 14:05:21 2021
+[*] Mon Feb  1 16:48:38 2021
 [*]
 [dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.vcd"
-[dumpfile_mtime] "Mon Feb  1 14:04:55 2021"
-[dumpfile_size] 5131143
+[dumpfile_mtime] "Mon Feb  1 15:03:47 2021"
+[dumpfile_size] 5074200
 [savefile] "/home/work/scarv/scarv-cpu-sme/flow/gtkwave/verilator.gtkw"
-[timestart] 8790
+[timestart] 22506
 [size] 1920 1016
 [pos] -1 -1
-*-11.898460 22446 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.898460 23097 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -21,7 +21,7 @@
 [sst_width] 270
 [signals_width] 454
 [sst_expanded] 1
-[sst_vpaned_height] 280
+[sst_vpaned_height] 291
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -250,16 +250,16 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_b[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_opr_c[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.flush
-@800201
+@800200
 -SME
-@23
+@22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.csr_smectl[31:0]
-@29
+@28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.read_sme_share
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.sme_on
-@23
+@22
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.smectl_b[3:0]
-@1000201
+@1000200
 -SME
 @800200
 -Leakage Instructions
@@ -503,6 +503,9 @@ TOP.frv_core.i_pipeline.i_sme.bank_waddr[3:0]
 TOP.frv_core.i_pipeline.i_sme.bank_wdata[31:0]
 @28
 TOP.frv_core.i_pipeline.i_sme.bank_wen
+@23
+TOP.frv_core.i_pipeline.i_sme.bank_rs1_addr[3:0]
+TOP.frv_core.i_pipeline.i_sme.bank_rs2_addr[3:0]
 @1000200
 -SME
 @c00200

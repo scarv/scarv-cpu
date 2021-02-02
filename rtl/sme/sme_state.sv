@@ -2,12 +2,11 @@
 import sme_pkg::*;
 
 //
-// module: sme_top
+// module: sme_state
 //
-//  Top level module of the SME design, instances the CSR control
-//  register, processing pipeline, register files and execution units.
+//  Contains the register files for the SME share storage.
 //
-module sme_top #(
+module sme_state #(
 parameter SMAX            = 4   , // Max number of hardware shares supported.
 parameter LINEAR_FUS      = 4   , // How many linear ops to instance?
 parameter NONLINEAR_WIDTH = XLEN  // How wide is the nonlinear op data path?
