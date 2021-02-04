@@ -28,10 +28,7 @@ input  [      XL:0] csr_smectl  , // Current SMECTL value.
 input               instr_valid , // Accept new input instruction.
 output              instr_ready , // Ready for new input instruction.
 input   sme_instr_t instr_in    , // Input instruction details.
-
-output              result_valid, // Output result to host core ready.
-input               result_ready, // Host core ready for results.
-output sme_result_t result_out    // The result of the instruction.
+output [      XL:0] instr_result  // 0'th share result.
 
 );
 
@@ -76,6 +73,8 @@ assign       s1_rs2[0] = instr_in.rs2_rdata;
 // ------------------------------------------------------------
 
 wire alu_rd_wen = instr_valid && instr_ready;
+
+assign instr_result = alu_rd[0];
 
 sme_alu #(
 .XLEN (32   ),

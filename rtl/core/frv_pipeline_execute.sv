@@ -30,7 +30,7 @@ input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
 output wire        sme_instr_valid , // Accept new input instruction.
 input wire         sme_instr_ready , // Ready for new input instruction.
 output sme_instr_t sme_instr_in    , // Input instruction details.
-
+input  wire [XL:0] sme_instr_result, // SME instruction 0'th result share.
 
 input  wire        flush           , // Flush this pipeline stage.
 
@@ -96,6 +96,7 @@ wire fu_lsu = s2_fu[P_FU_LSU];
 wire fu_cfu = s2_fu[P_FU_CFU];
 wire fu_csr = s2_fu[P_FU_CSR];
 wire fu_cry = s2_fu[P_FU_CRY];
+wire fu_sme = s2_fu[P_FU_SME];
 
 //
 // Functional Unit Interfacing: ALU
@@ -196,9 +197,26 @@ wire [XL:0] n_s3_opr_b_mul  = 32'b0;
 wire       sme_on   = sme_is_on(csr_smectl);
 wire [3:0] smectl_b = csr_smectl[3:0];
 
-wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]);
-wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]);
+wire       sme_mask      = sme_on && fu_sme && s2_uop==SME_MASK;
+wire       sme_unmask    = sme_on && fu_sme && s2_uop==SME_UNMASK;
+wire       sme_remask    = sme_on && fu_sme && s2_uop==SME_REMASK;
+wire       sme_maskop    = sme_mask || sme_unmask || sme_remask;
+
+wire       alu_nonlinear_op = alu_op_and || alu_op_andn ||
+                              alu_op_or  || alu_op_orn  ;
+
+wire       sme_wb_result =
+    sme_maskop ||
+    sme_on && sme_operands_ok && alu_nonlinear_op;
+
+wire [XL:0]n_s3_opr_a_sme= sme_instr_result;
+
+wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]) || sme_mask;
+wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]) || sme_mask;
 wire    sme_rd_is_share  = sme_is_share_reg(s2_rd      [4:0]);
+
+wire    sme_operands_ok  =
+    sme_rs1_is_share && sme_rd_is_share;
 
 // Do we need to source an SME share for storing to memory?
 wire    store_sme_share = sme_on && |smectl_b && 
@@ -212,13 +230,13 @@ assign  sme_instr_in.rd_addr    = s2_rd[3:0];
 assign  sme_instr_in.rs1_rdata  = s2_opr_a ;
 assign  sme_instr_in.rs2_rdata  = s2_opr_b ;
 
-
-assign  sme_instr_valid         =
-    sme_on && sme_rs1_is_share && sme_rs2_is_share && sme_rd_is_share && (
+wire    is_sme_op               = 
     alu_op_xor  || alu_op_xnor || alu_op_and  || alu_op_andn   ||
     alu_op_or   || alu_op_orn  || alu_op_sll  || alu_op_srl    ||
-    alu_op_ror  || alu_op_rol  || alu_op_add  || alu_op_sub    
-);
+    alu_op_ror  || alu_op_rol  || alu_op_add  || alu_op_sub    ||
+    sme_mask    || sme_unmask  || sme_remask  ;
+
+assign  sme_instr_valid         = is_sme_op && sme_on && sme_operands_ok;
 
 // None of these do anything unless sme_instr_valid is also high.
 // See inside sme_alu for why/how.
@@ -233,9 +251,9 @@ assign  sme_instr_in.op_left    = alu_op_sll || alu_op_rol ;
 assign  sme_instr_in.op_right   = alu_op_srl || alu_op_ror ; 
 assign  sme_instr_in.op_add     = alu_op_add ;
 assign  sme_instr_in.op_sub     = alu_op_sub ;
-assign  sme_instr_in.op_mask    = 1'b0       ;
-assign  sme_instr_in.op_unmask  = 1'b0       ;
-assign  sme_instr_in.op_remask  = 1'b0       ;
+assign  sme_instr_in.op_mask    = sme_mask   ;
+assign  sme_instr_in.op_unmask  = sme_unmask ;
+assign  sme_instr_in.op_remask  = sme_remask ;
 
 
 //
@@ -505,7 +523,7 @@ wire [5:0]  n_trap_cause =
     fu_lsu && lsu_a_error && lsu_store  ? TRAP_STALIGN  :
                                           6'b0          ;
 
-wire [XL:0] n_s3_opr_a = 
+wire [XL:0] n_s3_opr_a =  sme_wb_result ? n_s3_opr_a_sme :
     {XLEN{fu_alu}} & n_s3_opr_a_alu |
     {XLEN{fu_mul}} & n_s3_opr_a_mul |
     {XLEN{fu_lsu}} & n_s3_opr_a_lsu |
@@ -523,7 +541,7 @@ wire [XL:0] n_s3_opr_b =
     );
 
 wire opra_ld_en = p_valid && (
-    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_cry
+    fu_alu || fu_mul || fu_lsu || fu_cfu || fu_csr || fu_cry || fu_sme
 ); 
 
 wire oprb_ld_en = p_valid && (

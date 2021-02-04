@@ -75,4 +75,55 @@ volatile inline void sme_use_arithmetic(){
     );
 }
 
+#define SME_LOAD(var, src, s) {                         \
+    register int start;                                 \
+    asm volatile ("csrr %0, 0x006" : "=r"(start));      \
+    start &= ~0xF;                                      \
+    register int end = start + s;                       \
+    uint32_t * rdp = src ;                              \
+    for(int i = start; i < end; i++) {                  \
+        sme_ctlw(i);                                    \
+        var = *rdp++;                                   \
+    }                                                   \
+}
+
+#define SME_STORE(dest, var, s) {                       \
+    register int start;                                 \
+    asm volatile ("csrr %0, 0x006" : "=r"(start));      \
+    start &= ~0xF;                                      \
+    register int end = start + s;                       \
+    uint32_t * rdp = dest;                              \
+    for(int i = start; i < end; i++) {                  \
+        sme_ctlw(i);                                    \
+        *rdp++ = var;                                   \
+    }                                                   \
+}
+
+// En-mask the supplied variable.
+#define SME_MASK(rd, rs1) {                             \
+    asm volatile (                                      \
+        " .insn r CUSTOM_0, 1    , 0    , %0, %1 ,x0 ;" \
+        : "=r"(rd)                                      \
+        :  "r"(rs1)                                     \
+    );                                                  \
+}
+
+// Re-mask the supplied variable.
+#define SME_REMASK(rd, rs1) {                           \
+    asm volatile (                                      \
+        " .insn r CUSTOM_0, 2    , 0    , %0, %1 ,x0 ;" \
+        : "=r"(rd)                                      \
+        :  "r"(rs1)                                     \
+    );                                                  \
+}
+
+// Un-mask the supplied variable.
+#define SME_UNMASK(rd, rs1) {                           \
+    asm volatile (                                      \
+        " .insn r CUSTOM_0, 4    , 0    , %0, %1 ,x0 ;" \
+        : "=r"(rd)                                      \
+        :  "r"(rs1)                                     \
+    );                                                  \
+}
+
 #endif

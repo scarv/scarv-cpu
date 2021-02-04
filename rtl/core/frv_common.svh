@@ -25,9 +25,14 @@ localparam P_FU_LSU     = 2;    // Load store unit
 localparam P_FU_CFU     = 3;    // Control flow unit
 localparam P_FU_CSR     = 4;    // CSR accesses
 localparam P_FU_CRY     = 5;    // Crypto FU
+localparam P_FU_SME     = 6;    // SME Instruction
 
-localparam FU           = 5;    // Width-1 of functional unit specifier field
+localparam FU           = 6;    // Width-1 of functional unit specifier field
 localparam OP           = 5;    // Width-1 of micro-op specifier field.
+
+localparam SME_MASK     = {2'b00, 1'b0, 3'd1};
+localparam SME_REMASK   = {2'b00, 1'b0, 3'd2};
+localparam SME_UNMASK   = {2'b00, 1'b0, 3'd4};
 
 localparam ALU_ADD      = {2'b00, 4'b0000};
 localparam ALU_SUB      = {2'b00, 4'b0001};

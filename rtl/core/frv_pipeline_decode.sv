@@ -79,6 +79,7 @@ parameter ZBB       = 1; // Support the ZBB Bitmanip Base instructions.
 parameter ZBP       = 1; // Support the ZBP Bitmanip permutation instructions.
 parameter ZBC       = 1; // Support the ZBC Bitmanip CLMUL instrs.
 
+parameter SME_SMAX  = 3; // Max hardware supported shares for SME.
 
 // From (buffered) pipeline register of next stage.
 wire   p_s2_busy;
@@ -164,6 +165,8 @@ assign n_s2_fu[P_FU_CRY] =
     dec_sha512sig1h   || dec_sm3p0         || dec_sm3p1         ||
     dec_sm4ks         || dec_sm4ed         ;
 
+assign n_s2_fu[P_FU_SME] =
+    dec_mask          || dec_unmask        || dec_remask        ;
 
 //
 // Encoding field extraction
@@ -374,13 +377,20 @@ assign uop_csr[CSR_SET  ] = dec_csrrs || dec_csrrsi ;
 assign uop_csr[CSR_CLEAR] = dec_csrrc || dec_csrrci ;
 assign uop_csr[CSR_SWAP ] = dec_csrrw || dec_csrrwi ;
 
+wire [OP:0] uop_sme =
+    dec_mask    ? SME_MASK      :
+    dec_unmask  ? SME_UNMASK    :
+    dec_remask  ? SME_REMASK    :
+                  0             ;
+
 assign n_s2_uop =
     uop_alu |
     uop_cfu |
     uop_lsu |
     uop_mul |
     uop_csr |
-    uop_cry ;
+    uop_cry |
+    uop_sme ;
 
 //
 // Register Address Decoding
@@ -613,7 +623,8 @@ assign n_s2_opr_src[DIS_OPRA_RS1 ] = // Operand A sources RS1
     dec_clz     || dec_ctz     || dec_gorc    || dec_gorci   || dec_max     ||
     dec_maxu    || dec_min     || dec_minu    || dec_pcnt    || dec_sext_b  ||
     dec_sext_h  || dec_slo     || dec_sloi    || dec_sro     || dec_sroi    ||
-    dec_xperm_n || dec_xperm_b ;
+    dec_xperm_n || dec_xperm_b ||
+    dec_mask    || dec_remask  || dec_unmask  ;
 
 
 assign n_s2_opr_src[DIS_OPRA_PCIM] = // Operand A sources PC+immediate

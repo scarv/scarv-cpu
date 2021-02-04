@@ -330,9 +330,7 @@ wire   [XL:0] sme_bank_rdata    ; // Read data from bank[smectl.t][bank_addr]
 wire          sme_instr_valid   ; // Accept new input instruction.
 wire          sme_instr_ready   ; // Ready for new input instruction.
 sme_instr_t   sme_instr_in      ; // Input instruction details.
-wire          sme_result_valid  ; // Output result to host core ready.
-wire          sme_result_ready  ; // Host core ready for results.
-sme_result_t  sme_result_out    ; // The result of the instruction.
+wire   [XL:0] sme_instr_result  ; // Instruction result.
 
 //
 // Submodule Instances.
@@ -360,9 +358,7 @@ sme_state #(
 .instr_valid    (sme_instr_valid    ), // Accept new input instruction.
 .instr_ready    (sme_instr_ready    ), // Ready for new input instruction.
 .instr_in       (sme_instr_in       ), // Input instruction details.
-.result_valid   (sme_result_valid   ), // Output result to host core ready.
-.result_ready   (sme_result_ready   ), // Host core ready for results.
-.result_out     (sme_result_out     ) // The result of the instruction.
+.instr_result   (sme_instr_result   )  // Instruction result.
 );
 
 
@@ -413,7 +409,8 @@ frv_pipeline_decode #(
 .ZBB       (ZBB       ), // Support the ZBB Bitmanip Base instructions.
 .ZBP       (ZBP       ), // Support the ZBP Bitmanip permutation instructions.
 .ZBC       (ZBC       ), // Support the ZBC Bitmanip CLMUL instrs.
-.TRACE_INSTR_WORD   (TRACE_INSTR_WORD   )
+.TRACE_INSTR_WORD   (TRACE_INSTR_WORD   ),
+.SME_SMAX  (SME_SMAX  )  // Max supported hardware shares.
 ) i_pipeline_s1_decode (
 .g_clk              (g_clk              ), // global clock
 .g_resetn           (g_resetn           ), // synchronous reset
@@ -491,6 +488,7 @@ frv_pipeline_execute #(
 .sme_instr_valid  (sme_instr_valid  ), // Accept new input instruction.
 .sme_instr_ready  (sme_instr_ready  ), // Ready for new input instruction.
 .sme_instr_in     (sme_instr_in     ), // Input instruction details.
+.sme_instr_result (sme_instr_result ), // SME Instruction result.
 .flush            (s2_flush         ), // Flush this pipeline stage.
 .fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
 .fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.

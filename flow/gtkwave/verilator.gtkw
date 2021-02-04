@@ -1,25 +1,30 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Tue Feb  2 16:16:01 2021
+[*] Thu Feb  4 16:25:30 2021
 [*]
-[dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-xor/core-sme-xor.vcd"
-[dumpfile_mtime] "Tue Feb  2 16:15:08 2021"
-[dumpfile_size] 1451713
+[dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.vcd"
+[dumpfile_mtime] "Thu Feb  4 16:24:56 2021"
+[dumpfile_size] 6044060
 [savefile] "/home/work/scarv/scarv-cpu-sme/flow/gtkwave/verilator.gtkw"
-[timestart] 5318
+[timestart] 22681
 [size] 1920 1016
 [pos] -1 -1
-*-7.898460 5986 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.898460 23666 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
 [treeopen] TOP.frv_core.i_pipeline.i_gprs.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [treeopen] TOP.frv_core.i_pipeline.i_sme.
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(0).domain(0).
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).
 [sst_width] 270
-[signals_width] 420
+[signals_width] 510
 [sst_expanded] 1
-[sst_vpaned_height] 280
+[sst_vpaned_height] 291
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -91,7 +96,7 @@ TOP.frv_core.i_pipeline.dmem_error
 @22
 TOP.frv_core.trs_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-xor/core-sme-xor.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
@@ -222,7 +227,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.program_counter[31:0]
 TOP.frv_core.i_pipeline.s1_data[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-xor/core-sme-xor.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_bubble
@@ -275,7 +280,7 @@ TOP.frv_core.i_pipeline.s2_valid
 @22
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-xor/core-sme-xor.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @c00022
 TOP.frv_core.i_pipeline.s2_opr_a[31:0]
@@ -356,6 +361,11 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_rs2_is_share
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.smectl_b[3:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.store_sme_share
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_mask
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_remask
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_unmask
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.n_s3_opr_a_sme[31:0]
 @1000200
 -SME
 -Pipe - S2 Execute
@@ -366,7 +376,7 @@ TOP.frv_core.i_pipeline.s3_busy
 @22
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @2022
-^3 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
@@ -377,7 +387,6 @@ TOP.frv_core.i_pipeline.s3_rd[4:0]
 @28
 TOP.frv_core.i_pipeline.s3_size[1:0]
 TOP.frv_core.i_pipeline.s3_trap
-@29
 TOP.frv_core.i_pipeline.s3_valid
 @800200
 -Data Memory
@@ -438,7 +447,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s3_memory.i_lsu.pipe_prog
 -LSU
 @1000200
 -Pipe - S3 Memory
-@c00200
+@800200
 -Pipe - S4 - Writeback
 @28
 TOP.frv_core.i_pipeline.s4_busy
@@ -446,13 +455,15 @@ TOP.frv_core.i_pipeline.s4_flush
 @22
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @2022
-^3 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
 TOP.frv_core.i_pipeline.s4_opr_b[31:0]
 @2024
 ^2 /home/work/scarv/scarv-cpu-sme/flow/gtkwave/filter-gprs.txt
+TOP.frv_core.i_pipeline.s4_rd[4:0]
+@24
 TOP.frv_core.i_pipeline.s4_rd[4:0]
 @28
 TOP.frv_core.i_pipeline.s4_size[1:0]
@@ -480,7 +491,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wen
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @2022
-^3 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-ldst/core-sme-ldst.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
@@ -496,7 +507,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_int
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_pc[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_target_addr[31:0]
-@1401200
+@1000200
 -Pipe - S4 - Writeback
 @800200
 -SME
@@ -527,9 +538,7 @@ TOP.frv_core.i_pipeline.i_sme.bank_wen
 @22
 TOP.frv_core.i_pipeline.i_sme.bank_rs1_addr[3:0]
 TOP.frv_core.i_pipeline.i_sme.bank_rs2_addr[3:0]
-@1000200
--SME
-@800200
+@c00201
 -ALU
 @28
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.valid
@@ -548,6 +557,44 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs2(1)[31:0]
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs2(2)[31:0]
 @1000200
 -Shares
+@c00200
+-AND
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.u_rs1[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.u_rs2[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.u_rd[31:0]
+@200
+-
+@800200
+-Bit 2
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).q[2:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).x[2:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).y[2:0]
+@800200
+-D0
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).n_ands[2:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).ands[2:0]
+@1000200
+-D0
+@800200
+-D1
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(1).n_ands[2:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(1).ands[2:0]
+@1000200
+-D1
+@800200
+-D2
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(2).n_ands[2:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(2).ands[2:0]
+@1000200
+-D2
+-Bit 2
+@1401200
+-AND
 @800200
 -Operation
 @28
@@ -575,7 +622,10 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_unmask_bool
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_xor
 @1000200
 -Operation
+@1401201
 -ALU
+@1000200
+-SME
 @c00200
 -CSR Bus
 @22
@@ -769,6 +819,27 @@ TOP.frv_core.i_pipeline.i_gprs.gprs(31)[31:0]
 -GPRs
 @800200
 -SME Registers
+-Bank 0
+@22
+TOP.frv_core.i_pipeline.i_gprs.gprs(16)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(17)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(18)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(19)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(20)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(21)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(22)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(23)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(24)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(25)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(26)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(27)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(28)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(29)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(30)[31:0]
+TOP.frv_core.i_pipeline.i_gprs.gprs(31)[31:0]
+@1000200
+-Bank 0
+@800200
 -Bank 1
 @22
 TOP.frv_core.i_pipeline.i_sme.gen_regfile(1).i_rf.regs(0)[31:0]

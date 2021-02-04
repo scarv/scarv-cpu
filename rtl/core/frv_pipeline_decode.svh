@@ -140,6 +140,14 @@ wire dec_sloi   = ZBP && (d_data & 32'hfc00707f) == 32'h20001013;
 wire dec_sro    = ZBP && (d_data & 32'hfe00707f) == 32'h20005033;
 wire dec_sroi   = ZBP && (d_data & 32'hfc00707f) == 32'h20005013;
 
+wire [6:0] maj_op = d_data[ 6: 0];
+wire [2:0] f3     = d_data[14:12];
+wire [6:0] f7     = d_data[31:25];
+wire [4:0] rs2    = d_data[24:20];
+
+wire dec_mask   = SME_SMAX>0 && maj_op==7'hB && f3==3'd1 && f7==7'b0 && rs2==0;
+wire dec_remask = SME_SMAX>0 && maj_op==7'hB && f3==3'd2 && f7==7'b0 && rs2==0;
+wire dec_unmask = SME_SMAX>0 && maj_op==7'hB && f3==3'd4 && f7==7'b0 && rs2==0;
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge
@@ -166,6 +174,7 @@ dec_sha256sum1    || dec_sha512sum0r   || dec_sha512sum1r   ||
 dec_sha512sig0l   || dec_sha512sig0h   || dec_sha512sig1l   ||
 dec_sha512sig1h   || dec_sm3p0         || dec_sm3p1         ||
 dec_sm4ks         || dec_sm4ed         || 
+dec_mask          || dec_unmask        || dec_remask ||
 dec_ror     || dec_rol     || dec_rori    || dec_andn    || dec_orn     ||
 dec_xnor    || dec_pack    || dec_packu   || dec_packh   || dec_grev    ||
 dec_grevi   || dec_shfl    || dec_unshfl  || dec_shfli   || dec_unshfli ||

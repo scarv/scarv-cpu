@@ -1,0 +1,7 @@
+
+TEST_NAME = core-sme-srli
+TEST_SRC  = $(UNIT_ROOT)/core-sme-srli/test_sme_srli.c \
+            $(UNIT_ROOT)/core-sme-srli/test_sme_srli.S
+
+$(eval $(call add_core_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

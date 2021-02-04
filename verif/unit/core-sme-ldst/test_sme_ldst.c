@@ -7,8 +7,8 @@
 #define EXPECTED_SMAX  3
 #define NREGS         16
 
-uint32_t share_array_in [EXPECTED_SMAX-1][NREGS];
-uint32_t share_array_out[EXPECTED_SMAX-1][NREGS];
+uint32_t share_array_in [EXPECTED_SMAX][NREGS];
+uint32_t share_array_out[EXPECTED_SMAX][NREGS];
 
 void fill_array_with_randomness(
     uint32_t *  ain ,
@@ -23,14 +23,10 @@ void fill_array_with_randomness(
     }
 }
 
-extern void sme_load_all_shares(
+extern void sme_move_all_shares(
     uint32_t * sarry,
-    const size_t  n
-);
-
-extern void sme_store_all_shares(
-    uint32_t * sarry,
-    const size_t  n
+    const size_t  n ,
+    uint32_t * tarry
 );
 
 int test_main() {
@@ -44,15 +40,11 @@ int test_main() {
 
     // Fill the input array with random values.
     fill_array_with_randomness(&share_array_in[1][0], EXPECTED_SMAX*NREGS);
-
-    // Turn on SME with SMAX shares
-    sme_on(smax);
     
-    // Load all of the shares into the SME registers.
-    sme_load_all_shares(&share_array_in[1][0], smax);
-
-    // Store all of the shares into memory.
-    sme_store_all_shares(&share_array_out[1][0], smax);
+    // Move all of the shares into the SME registers and out agian to mem..
+    sme_move_all_shares(&share_array_in[1][0], smax, &share_array_out[1][0]);
+    
+    sme_off();
 
     // Check what we coppied out is what we coppied in.
     for(int bank = 1; bank < smax; bank ++) {
@@ -64,8 +56,6 @@ int test_main() {
             }
         }
     }
-    
-    sme_off();
 
     return 0;
 
