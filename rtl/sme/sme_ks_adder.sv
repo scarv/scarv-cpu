@@ -1,4 +1,6 @@
 
+import sme_pkg::*;
+
 module sme_ks_adder #(
 parameter D =  3, // Number of shares.
 parameter N = 32  // Width of the operation.
