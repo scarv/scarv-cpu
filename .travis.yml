@@ -44,20 +44,21 @@ jobs:
     - source ./bin/conf.sh
     - export DA_SUBSET_SIZE=8
     - make -j $(nproc) da-prove-random-subset
-  - name: "riscv-formal"
-    script:
-    - source ./bin/install-yosys.sh
-    - source ./bin/install-symbiyosys.sh
-    - source ./bin/install-boolector.sh
-    - source ./bin/conf.sh
-    - export RVF_SUBSET_SIZE=15
-    - make riscv-formal-clean
-    - make riscv-formal-prepare
-    - make riscv-formal-run-random-subset NJOBS=$(nproc)
-  - name: "Synthesis - Core"
-    script:
-    - source ./bin/install-yosys.sh
-    - source ./bin/conf.sh
+# - name: "riscv-formal"
+#   script:
+#   - source ./bin/install-yosys.sh
+#   - source ./bin/install-symbiyosys.sh
+#   - source ./bin/install-boolector.sh
+#   - source ./bin/conf.sh
+#   - export RVF_SUBSET_SIZE=15
+#   - make riscv-formal-clean
+#   - make riscv-formal-prepare
+#   - make riscv-formal-run-random-subset NJOBS=$(nproc)
+# - name: "Synthesis - Core"
+#   script:
+#   - source ./bin/install-yosys.sh
+#   - source ./bin/conf.sh
+#   - make synth-core
   - name: "Benchmarks - Embench IoT"
     script:
     - source ./bin/install-verilator.sh
