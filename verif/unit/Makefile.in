@@ -203,6 +203,9 @@ include $(FRV_HOME)/verif/unit/core-sme-and/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-or/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-slli/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-srli/Makefile.in
+include $(FRV_HOME)/verif/unit/core-sme-ror/Makefile.in
+include $(FRV_HOME)/verif/unit/core-sme-rori/Makefile.in
+include $(FRV_HOME)/verif/unit/core-sme-rol/Makefile.in
 
 #
 # Core-Complex level testbench.

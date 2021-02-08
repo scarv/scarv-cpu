@@ -99,6 +99,27 @@ volatile inline void sme_use_arithmetic(){
     }                                                   \
 }
 
+#define SME_ROR(dest, rs1, rs2)                         \
+asm (                                                   \
+    ".insn r OP, 5, 48, %0, %1, %2"                     \
+    : "=r"(rd)                                          \
+    : "r"(rs1), "r"(rs2)                                \
+);
+
+#define SME_ROL(dest, rs1, rs2)                         \
+asm (                                                   \
+    ".insn r OP, 1, 48, %0, %1, %2"                     \
+    : "=r"(rd)                                          \
+    : "r"(rs1), "r"(rs2)                                \
+);
+
+#define SME_RORI(dest, rs1, shamt)                      \
+asm (                                                   \
+    "rori %0, %1, %2"                                   \
+    : "=r"(rd)                                          \
+    : "r"(rs1), "i"(shamt)                              \
+);
+
 // En-mask the supplied variable.
 #define SME_MASK(rd, rs1) {                             \
     asm volatile (                                      \

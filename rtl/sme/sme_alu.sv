@@ -195,7 +195,8 @@ wire  [2*XLEN-1:0] shift_output= shift_value >> shamt;
 
 // (un)reverse bits if shifting left.
 wire  [2*XLEN-1:0] shift_result= op_right ? shift_output : {<<{shift_output}};
-assign result_shift[l] = shift_result[XL:0];
+assign result_shift[l]         = op_right || !op_rotate ? shift_result[      XL: 0] :
+                                            shift_result[2*XLEN-1:32] ;
 
 //
 // Add / subtract (arithmetic)
