@@ -67,14 +67,11 @@ wire        new_instr       = valid && ready;
 wire        op_addsub_arith =(op_add      || op_sub   ) &&  smectl_t;
 wire        op_addsub_bool  =(op_add      || op_sub   ) && !smectl_t;
 
-wire        op_mask_arith   = op_mask                   &&  smectl_t;
-wire        op_mask_bool    = op_mask                   && !smectl_t;
+wire        op_mask_bool    = op_mask                               ;
 
-wire        op_remask_arith = op_remask                 &&  smectl_t;
-wire        op_remask_bool  = op_remask                 && !smectl_t;
+wire        op_remask_bool  = op_remask                             ;
 
-wire        op_unmask_arith = op_unmask                 &&  smectl_t;
-wire        op_unmask_bool  = op_unmask                 && !smectl_t;
+wire        op_unmask_bool  = op_unmask                             ;
 
 wire        op_shfrot       = op_shift    || op_rotate;
 
@@ -125,8 +122,9 @@ logic [XL:0] result_xor         [SM:0];
 logic [XL:0] result_shift       [SM:0];
 logic [XL:0] result_and         [SM:0];
 logic [XL:0] result_or          [SM:0];
-
-logic [XL:0] result_aaddsub     [SM:0]; // Arithmetic add sub.
+logic [XL:0] result_baddsub     [SM:0]; // Binary masked add sub.
+logic [XL:0] result_mask        [SM:0];
+logic [XL:0] result_remask      [SM:0];
 
 wire dom_and_en = valid && (op_and || op_or);
 
@@ -148,6 +146,14 @@ sme_dom_and #(
 
 genvar l;
 generate for(l = 0; l < SMAX; l = l+1) begin : g_linear_ops // BEGIN GENERATE
+
+//
+// Masking / Remasking
+// ------------------------------------------------------------
+
+assign result_mask  [l] = l==0    ? rs1[0] ^ all_rng : rng[l];
+// TODO: Fix this, currently only re-masks even shares.
+assign result_remask[l] = l %2==0 ? rs1[l] ^ rng[0]  : rs1[l];
 
 //
 // Bitwise or/xor/nor/xnor
@@ -202,32 +208,29 @@ assign result_shift[l]         = op_right || !op_rotate ? shift_result[      XL:
 // Add / subtract (arithmetic)
 // ------------------------------------------------------------
 
-wire        add_rhs_rng   = op_mask_arith || op_remask_arith;
-
-wire [XL:0] arith_add_lhs =                    rs1[l] ;
-wire [XL:0] arith_add_rhs = op_sub          ? ~rs2[l] :
-                            add_rhs_rng     ?  rng[l] :
+wire [XL:0] bmask_add_lhs =                    rs1[l] ;
+wire [XL:0] bmask_add_rhs = op_sub          ? ~rs2[l] :
                                                rs2[l] ;
 
-wire [XL:0] arith_add_cin = {{XL{1'b0}}, op_sub};
+wire [XL:0] bmask_add_cin = {{XL{1'b0}}, op_sub};
 
-wire [XL:0] arith_add_out = arith_add_lhs + arith_add_rhs + arith_add_cin;
-assign      result_aaddsub[l] = arith_add_out;
+wire [XL:0] bmask_add_out = bmask_add_lhs + bmask_add_rhs + bmask_add_cin;
+assign      result_baddsub[l] = bmask_add_out;
 
 //
 // Result multiplexing
 // ------------------------------------------------------------
 
 wire sel_result_xor = op_xor || op_mask_bool;
-wire sel_result_add = op_addsub_arith || op_mask_arith || op_remask_arith;
+wire sel_result_add = op_addsub_bool;
 
 assign rd[l]= 
-    op_mask && l==0     ? rs1[0] ^ all_rng      :
-    op_mask && l!=0     ? rng[l]                :
+    op_remask_bool      ? result_remask[l]      :
+    op_mask             ? result_mask[l]        :
     op_and              ? result_and[l]         :
     op_or               ? result_or [l]         :
     sel_result_xor      ? result_xor[l]         :
-    sel_result_add      ? result_aaddsub[l]     :
+    sel_result_add      ? result_baddsub[l]     :
     op_shfrot           ? result_shift[l]       :
                           {XLEN{1'b0}}          ;
     

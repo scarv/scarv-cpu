@@ -1,0 +1,7 @@
+
+TEST_NAME = core-sme-remask
+TEST_SRC  = $(UNIT_ROOT)/core-sme-remask/test_sme_remask.c \
+            $(UNIT_ROOT)/core-sme-remask/test_sme_remask.S
+
+$(eval $(call add_core_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

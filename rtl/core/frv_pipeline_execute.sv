@@ -211,8 +211,8 @@ wire       sme_wb_result =
 
 wire [XL:0]n_s3_opr_a_sme= sme_instr_result;
 
-wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]) || sme_mask;
-wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]) || sme_mask;
+wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]) || sme_maskop;
+wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]) || sme_maskop;
 wire    sme_rd_is_share  = sme_is_share_reg(s2_rd      [4:0]);
 
 wire    sme_operands_ok  =
@@ -234,7 +234,7 @@ wire    is_sme_op               =
     alu_op_xor  || alu_op_xnor || alu_op_and  || alu_op_andn   ||
     alu_op_or   || alu_op_orn  || alu_op_sll  || alu_op_srl    ||
     alu_op_ror  || alu_op_rol  || alu_op_add  || alu_op_sub    ||
-    sme_mask    || sme_unmask  || sme_remask  ;
+    sme_maskop  ;
 
 assign  sme_instr_valid         = is_sme_op && sme_on && sme_operands_ok;
 
