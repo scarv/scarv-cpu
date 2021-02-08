@@ -13,6 +13,7 @@ $SCARV_CPU/rtl/sme/sme_pkg.sv
 $SCARV_CPU/rtl/sme/sme_regfile.sv
 $SCARV_CPU/rtl/sme/sme_lfsr32.sv
 $SCARV_CPU/rtl/sme/sme_dom_and.sv
+$SCARV_CPU/rtl/sme/sme_ks_adder.sv
 $SCARV_CPU/rtl/sme/sme_alu.sv
 $SCARV_CPU/rtl/sme/sme_state.sv
 
