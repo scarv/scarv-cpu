@@ -50,6 +50,9 @@ FLG_CORE =
 
 $(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE),$(FLG_CORE)))
 
+#
+# CCX level tesbench
+# ------------------------------------------------------------
 
 CMD_CCX  = $(SCARV_CPU)/flow/verilator/cmd-ccx-tb.txt
 TOP_CCX  = scarv_ccx_top_v
@@ -57,4 +60,27 @@ EXE_CCX  = $(call map_vl_exe,$(TOP_CCX))
 FLG_CCX  =
 
 $(eval $(call add_vl_target,$(TOP_CCX),$(CMD_CCX),$(FLG_CCX)))
+
+
+#
+# SME SBOX Middle Layer level tesbench
+# ------------------------------------------------------------
+
+CMD_SME_MID  = $(SCARV_CPU)/flow/verilator/manifest-sme-sbox-mid.txt
+TOP_SME_MID  = tb_sme_sboxes_sbox_inv_mid 
+EXE_SME_MID  = $(call map_vl_exe,$(TOP_SME_MID))
+FLG_SME_MID  =
+
+$(eval $(call add_vl_target,$(TOP_SME_MID),$(CMD_SME_MID),$(FLG_SME_MID)))
+
+#
+# SME AES SBOX tesbench
+# ------------------------------------------------------------
+
+CMD_SME_AES  = $(SCARV_CPU)/flow/verilator/manifest-sme-aes-sbox.txt
+TOP_SME_AES  = tb_sme_aes_sbox
+EXE_SME_AES  = $(call map_vl_exe,$(TOP_SME_AES))
+FLG_SME_AES  =
+
+$(eval $(call add_vl_target,$(TOP_SME_AES),$(CMD_SME_AES),$(FLG_SME_AES)))
 

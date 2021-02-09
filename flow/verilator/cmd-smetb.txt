@@ -1,0 +1,8 @@
+-cc
+-CFLAGS -O3
+-CFLAGS -g
+-CFLAGS -I -CFLAGS $(SCARV_CPU)/verif/verilator/share
+-I$(SCARV_CPU)/rtl/core
+--exe
+--trace
+-F $(SCARV_CPU)/flow/verilator/manifest-smetb.txt

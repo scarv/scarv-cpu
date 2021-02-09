@@ -1,0 +1,14 @@
+-cc
+-CFLAGS -O3
+-CFLAGS -g
+-CFLAGS -I -CFLAGS $(SCARV_CPU)/verif/verilator/share
+-I$(SCARV_CPU)/rtl/core
+-DRVFI
+--exe
+--trace
+$SCARV_CPU/rtl/core/riscv_crypto_fu_sboxes.sv
+$SCARV_CPU/rtl/sme/sme_pkg.sv
+$SCARV_CPU/rtl/sme/sme_dom_and.sv
+$SCARV_CPU/rtl/sme/sme_sboxes.sv
+$SCARV_CPU/verif/sme/tb_sme_sboxes_sbox_inv_mid.sv
+$SCARV_CPU/verif/sme/sme_sbox_mid_main.cpp
