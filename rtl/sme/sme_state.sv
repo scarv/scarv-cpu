@@ -25,10 +25,18 @@ output [      XL:0] bank_rdata  , // Read data from bank[smectrl.t][smectl.b]
 
 input  [      XL:0] csr_smectl  , // Current SMECTL value.
 
-input               instr_valid , // Accept new input instruction.
-output              instr_ready , // Ready for new input instruction.
-input   sme_instr_t instr_in    , // Input instruction details.
-output [      XL:0] instr_result  // 0'th share result.
+input   sme_data_t  input_data  , // Input oeprands.
+
+input               alu_valid   , // Accept new input instruction.
+output              alu_ready   , // Ready for new input instruction.
+input   sme_alu_t   alu_op      , // Input instruction details.
+
+input               cry_valid   , // Accept new input instruction.
+output              cry_ready   , // Ready for new input instruction.
+input   sme_cry_t   cry_op      , // Input instruction details.
+
+output [      XL:0] alu_result  , // ALU    0'th share result.
+output [      XL:0] cry_result    // Crypto 0'th share result.
 
 );
 
@@ -62,19 +70,22 @@ wire [3:0] smectl_b = csr_smectl[ 3:0]; // Current bank select for load/store.
 // inputs and outputs of the register files.
 logic [XL:0] s1_rs1 [SM:0];
 logic [XL:0] s1_rs2 [SM:0];
-logic [XL:0] alu_rd [SM:0];
 
 // Zeroth share comes from GPRs.
-assign       s1_rs1[0] = instr_in.rs1_rdata;
-assign       s1_rs2[0] = instr_in.rs2_rdata;
+assign       s1_rs1[0] = input_data.rs1_rdata;
+assign       s1_rs2[0] = input_data.rs2_rdata;
 
 //
 // ALU Instance
 // ------------------------------------------------------------
 
-wire alu_rd_wen = instr_valid && instr_ready;
+logic [XL:0] rng[SM:0];
 
-assign instr_result = alu_rd[0];
+logic [XL:0] alu_rd [SM:0];
+
+wire alu_rd_wen     = alu_valid && alu_ready;
+
+assign alu_result   = alu_rd[0];
 
 sme_alu #(
 .XLEN (32   ),
@@ -86,25 +97,59 @@ sme_alu #(
 .smectl_t           (smectl_t           ), // Masking type 0=bool, 1=arithmetic
 .smectl_d           (smectl_d           ), // Current number of shares to use.
 .flush              (flush              ), // Flush current operation
-.valid              (instr_valid        ),
-.ready              (instr_ready        ),
-.shamt              (instr_in.shamt     ), // Shift amount for shift/rotate.
-.op_xor             (instr_in.op_xor    ),
-.op_and             (instr_in.op_and    ),
-.op_or              (instr_in.op_or     ),
-.op_notrs2          (instr_in.op_notrs2 ), // invert 0'th share of rs2.
-.op_shift           (instr_in.op_shift  ),
-.op_rotate          (instr_in.op_rotate ),
-.op_left            (instr_in.op_left   ),
-.op_right           (instr_in.op_right  ),
-.op_add             (instr_in.op_add    ),
-.op_sub             (instr_in.op_sub    ),
-.op_mask            (instr_in.op_mask   ), // Enmask 0'th element of rs1
-.op_unmask          (instr_in.op_unmask ), // Unmask rs1
-.op_remask          (instr_in.op_remask ), // remask rs1 based on smectl_t
+.rng                (rng                ), // Randomness
+.valid              (alu_valid          ),
+.ready              (alu_ready          ),
+.shamt              (input_data.shamt   ), // Shift amount for shift/rotate.
+.op_xor             (alu_op.op_xor      ),
+.op_and             (alu_op.op_and      ),
+.op_or              (alu_op.op_or       ),
+.op_notrs2          (alu_op.op_notrs2   ), // invert 0'th share of rs2.
+.op_shift           (alu_op.op_shift    ),
+.op_rotate          (alu_op.op_rotate   ),
+.op_left            (alu_op.op_left     ),
+.op_right           (alu_op.op_right    ),
+.op_add             (alu_op.op_add      ),
+.op_sub             (alu_op.op_sub      ),
+.op_mask            (alu_op.op_mask     ), // Enmask 0'th element of rs1
+.op_unmask          (alu_op.op_unmask   ), // Unmask rs1
+.op_remask          (alu_op.op_remask   ), // remask rs1 based on smectl_t
 .rs1                (s1_rs1             ), // RS1 as SMAX shares
 .rs2                (s1_rs2             ), // RS2 as SMAX shares
 .rd                 (alu_rd             )  // RD as SMAX shares
+);
+
+
+//
+// Crypto Instance
+// ------------------------------------------------------------
+
+logic [XL:0] cry_rd [SM:0];
+
+wire cry_rd_wen     = cry_valid && cry_ready;
+
+assign cry_result   = cry_rd[0];
+
+sme_crypto #(
+.XLEN(32    ),
+.SMAX(SMAX  )
+) i_sme_crypto (
+.g_clk          (g_clk              ), // Global clock
+.g_clk_req      (g_clk_req          ), // Global clock request
+.g_resetn       (g_resetn           ), // Sychronous active low reset.
+.smectl_d       (smectl_d           ), // Current number of shares to use.
+.rng            (rng                ), // RNG outputs.
+.flush          (flush              ), // Flush operation, discard results.
+.valid          (cry_valid          ),
+.ready          (cry_ready          ),
+.op_aeses       (cry_op.op_aeses    ),
+.op_aesesm      (cry_op.op_aesesm   ),
+.op_aesds       (cry_op.op_aesds    ),
+.op_aesdsm      (cry_op.op_aesdsm   ),
+.bs             (cry_op.bs          ), // AES byte select.
+.rs1            (s1_rs1             ), // RS1 as SMAX shares
+.rs2            (s1_rs2             ), // RS2 as SMAX shares
+.rd             (cry_rd             )  // RD as SMAX shares
 );
 
 //
@@ -115,8 +160,11 @@ localparam BI = $clog2(SMAX)-1;
 
 assign bank_rdata = s1_rs2[smectl_b[BI:0]]; // TODO: Leakage hazard.
 
-wire   [3:0] bank_rs1_addr = instr_in.rs1_addr;
-wire   [3:0] bank_rs2_addr = instr_in.rs2_addr;
+wire   [3:0] bank_rs1_addr = input_data.rs1_addr;
+wire   [3:0] bank_rs2_addr = input_data.rs2_addr;
+
+wire [XL:0] result_wdata[SM:0];
+assign      result_wdata = alu_rd_wen ? alu_rd : cry_rd;
 
 //
 // Note that the 0'th register file is the normal RISC-V GPRS, so we
@@ -129,9 +177,9 @@ generate for(rf_i = 1; rf_i < SMAX; rf_i = rf_i + 1) begin: gen_regfile
 wire bank_write         = bank_wen  && smectl_b == rf_i;
 
 // Write enable for _this_ registerfile.
-wire        rf_wen      = alu_rd_wen || bank_write;
-wire [ 3:0] rf_addr     = bank_wen  ? bank_waddr : instr_in.rd_addr;
-wire [XL:0] rf_wdata    = bank_wen  ? bank_wdata : alu_rd[rf_i];
+wire        rf_wen      = cry_rd_wen || alu_rd_wen || bank_write;
+wire [ 3:0] rf_addr     = bank_wen  ? bank_waddr : input_data.rd_addr;
+wire [XL:0] rf_wdata    = bank_wen  ? bank_wdata : result_wdata[rf_i];
 
 sme_regfile i_rf (
 .g_clk      (g_clk              ), // Global clock

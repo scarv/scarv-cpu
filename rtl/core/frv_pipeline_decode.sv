@@ -172,9 +172,11 @@ assign n_s2_fu[P_FU_SME] =
 // Encoding field extraction
 // -------------------------------------------------------------------------
 
+wire rd_in_rs1 = dec_aes32esi || dec_aes32esmi || dec_aes32dsi || dec_aes32dsmi;
+
 wire [4:0] dec_rs1_32 = s1_data[19:15];
 wire [4:0] dec_rs2_32 = s1_data[24:20];
-wire [4:0] dec_rd_32  = s1_data[11:7];
+wire [4:0] dec_rd_32  = rd_in_rs1 ? dec_rs1_32 : s1_data[11:7];
 
 wire       instr_16bit= s1_data[ 1:0] != 2'b11;
 wire       instr_32bit= s1_data[ 1:0] == 2'b11;

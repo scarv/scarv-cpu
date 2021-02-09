@@ -27,10 +27,15 @@ input  wire        s2_valid        , // Is this input valid?
 
 input  wire [XL:0] csr_smectl      , // SME CSR
 input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
-output wire        sme_instr_valid , // Accept new input instruction.
-input wire         sme_instr_ready , // Ready for new input instruction.
-output sme_instr_t sme_instr_in    , // Input instruction details.
-input  wire [XL:0] sme_instr_result, // SME instruction 0'th result share.
+output  sme_data_t sme_input_data  , // Input oeprands.
+output             sme_alu_valid   , // Accept new input instruction.
+input              sme_alu_ready   , // Ready for new input instruction.
+output  sme_alu_t  sme_alu_op      , // Input instruction details.
+output             sme_cry_valid   , // Accept new input instruction.
+input              sme_cry_ready   , // Ready for new input instruction.
+output  sme_cry_t  sme_cry_op      , // Input instruction details.
+input  [      XL:0]sme_alu_result  , // ALU    0'th share result.
+input  [      XL:0]sme_cry_result  , // Crypto 0'th share result.
 
 input  wire        flush           , // Flush this pipeline stage.
 
@@ -209,7 +214,7 @@ wire       sme_wb_result =
     sme_maskop ||
     sme_on && sme_operands_ok && alu_nonlinear_op;
 
-wire [XL:0]n_s3_opr_a_sme= sme_instr_result;
+wire [XL:0]n_s3_opr_a_sme= sme_alu_result;
 
 wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]) || sme_maskop;
 wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]) || sme_maskop;
@@ -223,37 +228,58 @@ wire    store_sme_share = sme_on && |smectl_b &&
                          sme_rs2_is_share &&
                          lsu_valid && lsu_store;
 
-assign  sme_instr_in.rs1_addr   = {4{sme_on && sme_rs1_is_share}} & s2_rs1_addr[3:0];
-assign  sme_instr_in.rs2_addr   = {4{sme_on && sme_rs2_is_share}} & s2_rs2_addr[3:0];
-assign  sme_instr_in.rd_addr    = s2_rd[3:0];
+assign  sme_input_data.rs1_addr   = {4{sme_on && sme_rs1_is_share}} & s2_rs1_addr[3:0];
+assign  sme_input_data.rs2_addr   = {4{sme_on && sme_rs2_is_share}} & s2_rs2_addr[3:0];
+assign  sme_input_data.rd_addr    = s2_rd[3:0];
 
-assign  sme_instr_in.rs1_rdata  = s2_opr_a ;
-assign  sme_instr_in.rs2_rdata  = s2_opr_b ;
+assign  sme_input_data.rs1_rdata  = s2_opr_a ;
+assign  sme_input_data.rs2_rdata  = s2_opr_b ;
+assign  sme_input_data.shamt      = alu_shamt;
 
-wire    is_sme_op               = 
+wire    is_sme_alu_op             = 
     alu_op_xor  || alu_op_xnor || alu_op_and  || alu_op_andn   ||
     alu_op_or   || alu_op_orn  || alu_op_sll  || alu_op_srl    ||
     alu_op_ror  || alu_op_rol  || alu_op_add  || alu_op_sub    ||
     sme_maskop  ;
 
-assign  sme_instr_valid         = is_sme_op && sme_on && sme_operands_ok;
+assign  sme_alu_valid             = is_sme_alu_op && sme_on && sme_operands_ok;
 
-// None of these do anything unless sme_instr_valid is also high.
+// None of these do anything unless sme_alu_valid is also high.
 // See inside sme_alu for why/how.
-assign  sme_instr_in.shamt      = alu_shamt;
-assign  sme_instr_in.op_xor     = alu_op_xor || alu_op_xnor;
-assign  sme_instr_in.op_and     = alu_op_and || alu_op_andn;
-assign  sme_instr_in.op_or      = alu_op_or  || alu_op_orn ;
-assign  sme_instr_in.op_notrs2  = alu_op_xnor|| alu_op_andn || alu_op_orn;
-assign  sme_instr_in.op_shift   = alu_op_sll || alu_op_srl ;
-assign  sme_instr_in.op_rotate  = alu_op_ror || alu_op_rol ;
-assign  sme_instr_in.op_left    = alu_op_sll || alu_op_rol ;
-assign  sme_instr_in.op_right   = alu_op_srl || alu_op_ror ; 
-assign  sme_instr_in.op_add     = alu_op_add ;
-assign  sme_instr_in.op_sub     = alu_op_sub ;
-assign  sme_instr_in.op_mask    = sme_mask   ;
-assign  sme_instr_in.op_unmask  = sme_unmask ;
-assign  sme_instr_in.op_remask  = sme_remask ;
+assign  sme_alu_op.op_xor     = alu_op_xor || alu_op_xnor;
+assign  sme_alu_op.op_and     = alu_op_and || alu_op_andn;
+assign  sme_alu_op.op_or      = alu_op_or  || alu_op_orn ;
+assign  sme_alu_op.op_notrs2  = alu_op_xnor|| alu_op_andn || alu_op_orn;
+assign  sme_alu_op.op_shift   = alu_op_sll || alu_op_srl ;
+assign  sme_alu_op.op_rotate  = alu_op_ror || alu_op_rol ;
+assign  sme_alu_op.op_left    = alu_op_sll || alu_op_rol ;
+assign  sme_alu_op.op_right   = alu_op_srl || alu_op_ror ; 
+assign  sme_alu_op.op_add     = alu_op_add ;
+assign  sme_alu_op.op_sub     = alu_op_sub ;
+assign  sme_alu_op.op_mask    = sme_mask   ;
+assign  sme_alu_op.op_unmask  = sme_unmask ;
+assign  sme_alu_op.op_remask  = sme_remask ;
+
+//
+// Crypto SME stuff
+
+wire    is_sme_cry_op             = 
+    cry_op_saes32_encs  || cry_op_saes32_encsm  ||
+    cry_op_saes32_decs  || cry_op_saes32_decsm  ;
+
+assign sme_cry_valid          = is_sme_cry_op && sme_on && sme_operands_ok;
+
+assign sme_cry_op.bs          = cry_bs[1:0]         ;
+assign sme_cry_op.op_aeses    = cry_op_saes32_encs  ;
+assign sme_cry_op.op_aesesm   = cry_op_saes32_encsm ;
+assign sme_cry_op.op_aesds    = cry_op_saes32_decs  ;
+assign sme_cry_op.op_aesdsm   = cry_op_saes32_decsm ;
+
+//
+// SME based Stalling
+
+wire    sme_busy    = sme_alu_valid && !sme_alu_ready ||
+                      sme_cry_valid && !sme_cry_ready ;
 
 
 //
@@ -355,7 +381,7 @@ wire cry_op_ssm3_p1       = fu_cry && s2_uop == CRY_SSM3_P1       && ZKSM3;
 wire        cry_ready            ; // Outputs ready.
 wire [XL:0] cry_rd               ;
 
-wire [XL:0] n_s3_opr_a_cry       = cry_rd;
+wire [XL:0] n_s3_opr_a_cry       = sme_cry_valid ? sme_cry_result : cry_rd;
 wire [XL:0] n_s3_opr_b_cry       = {XLEN{1'b0}};
 
 //
@@ -377,6 +403,7 @@ wire   p_valid   = s2_valid && !s2_busy;
 
 // Is this stage currently busy?
 assign s2_busy = p_busy                    ||
+                 sme_busy                  ||
                  lsu_valid  && !lsu_ready  ||
                  cry_valid  && !cry_ready  ||
                  imul_valid && !imul_ready ;

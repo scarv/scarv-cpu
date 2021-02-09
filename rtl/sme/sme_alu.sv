@@ -29,6 +29,7 @@ input         g_resetn  , // Sychronous active low reset.
 
 input         smectl_t  , // Masking type. 0=bool, 1=arithmetic
 input  [ 3:0] smectl_d  , // Current number of shares to use.
+output [XL:0] rng[SM:0] , // RNG outputs.
 
 input         flush     , // Flush current operation, discard results.
 
@@ -81,7 +82,6 @@ wire        and_clk_req;
 // Randomness sources
 // ============================================================
 
-wire [XL:0] rng [SM:0];
 wire [SM:0] rng_taps = {SMAX{1'b0}};
 
 reg  [XL:0] all_rng; // Stores XOR of all 1..SMAX prng outputs for en-mask.

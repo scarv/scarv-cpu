@@ -323,14 +323,19 @@ wire [XL:0] fwd_rs2_rdata =
 // SME Handling
 // ------------------------------------------------------------
 
-wire          sme_clk_req       ;
-wire          sme_bank_wen      ; // Write loaded data to bank.
-wire   [XL:0] sme_bank_wdata    ; // Write data being loaded into bank.
-wire   [XL:0] sme_bank_rdata    ; // Read data from bank[smectl.t][bank_addr]
-wire          sme_instr_valid   ; // Accept new input instruction.
-wire          sme_instr_ready   ; // Ready for new input instruction.
-sme_instr_t   sme_instr_in      ; // Input instruction details.
-wire   [XL:0] sme_instr_result  ; // Instruction result.
+wire           sme_clk_req      ;
+wire           sme_bank_wen     ; // Write loaded data to bank.
+wire    [XL:0] sme_bank_wdata   ; // Write data being loaded into bank.
+wire    [XL:0] sme_bank_rdata   ; // Read data from bank[smectl.t][bank_addr]
+wire           sme_alu_valid    ; // Accept new input instruction.
+wire           sme_alu_ready    ; // Ready for new input instruction.
+    sme_data_t sme_input_data   ; // Input oeprands.
+     sme_alu_t sme_alu_op       ; // Input instruction details.
+wire           sme_cry_valid    ; // Accept new input instruction.
+wire           sme_cry_ready    ; // Ready for new input instruction.
+     sme_cry_t sme_cry_op       ; // Input instruction details.
+wire    [XL:0] sme_alu_result   ; // ALU    0'th share result.
+wire    [XL:0] sme_cry_result   ; // Crypto 0'th share result.
 
 //
 // Submodule Instances.
@@ -355,10 +360,15 @@ sme_state #(
 .bank_wdata     (sme_bank_wdata     ), // Write data being loaded into bank.
 .bank_rdata     (sme_bank_rdata     ), // bank[smectl.t][bank_addr] rdata.
 .csr_smectl     (csr_smectl         ), // SMECTL CSR value.
-.instr_valid    (sme_instr_valid    ), // Accept new input instruction.
-.instr_ready    (sme_instr_ready    ), // Ready for new input instruction.
-.instr_in       (sme_instr_in       ), // Input instruction details.
-.instr_result   (sme_instr_result   )  // Instruction result.
+.input_data     (sme_input_data     ), // SME input data / registers.
+.alu_valid      (sme_alu_valid      ), // Accept new input instruction.
+.alu_ready      (sme_alu_ready      ), // Ready for new input instruction.
+.alu_op         (sme_alu_op         ), // Input instruction details.
+.cry_valid      (sme_cry_valid      ), // Accept new input instruction.
+.cry_ready      (sme_cry_ready      ), // Ready for new input instruction.
+.cry_op         (sme_cry_op         ), // Input instruction details.
+.alu_result     (sme_alu_result     ), // ALU    0'th share result.
+.cry_result     (sme_cry_result     )  // Crypto 0'th share result.
 );
 
 
@@ -485,10 +495,15 @@ frv_pipeline_execute #(
 .s2_valid         (s2_valid         ), // Is this input valid?
 .sme_bank_rdata   (sme_bank_rdata   ), // bank[smectl.t][bank_addr] rdata.
 .csr_smectl       (csr_smectl       ), // SMECTL CSR value.
-.sme_instr_valid  (sme_instr_valid  ), // Accept new input instruction.
-.sme_instr_ready  (sme_instr_ready  ), // Ready for new input instruction.
-.sme_instr_in     (sme_instr_in     ), // Input instruction details.
-.sme_instr_result (sme_instr_result ), // SME Instruction result.
+.sme_input_data   (sme_input_data   ), // SME input data / registers.
+.sme_alu_valid    (sme_alu_valid    ), // Accept new input instruction.
+.sme_alu_ready    (sme_alu_ready    ), // Ready for new input instruction.
+.sme_alu_op       (sme_alu_op       ), // Input instruction details.
+.sme_cry_valid    (sme_cry_valid    ), // Accept new input instruction.
+.sme_cry_ready    (sme_cry_ready    ), // Ready for new input instruction.
+.sme_cry_op       (sme_cry_op       ), // Input instruction details.
+.sme_alu_result   (sme_alu_result   ), // ALU    0'th share result.
+.sme_cry_result   (sme_cry_result   ), // Crypto 0'th share result.
 .flush            (s2_flush         ), // Flush this pipeline stage.
 .fwd_s2_rd        (fwd_s2_rd        ), // Writeback stage destination reg.
 .fwd_s2_wdata     (fwd_s2_wdata     ), // Write data for writeback stage.
