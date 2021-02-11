@@ -6,7 +6,6 @@
 #include "sme_aes.h"
 
 #define EXPECTED_SMAX  3
-#define NREGS         16
 
 uint32_t ck [4] = {
     0x16157e2b, // From FIPS 197 sec A1
@@ -82,6 +81,8 @@ int test_main() {
     if(ct[2] != 0x978511DC){test_fail();}
     if(ct[3] != 0x320B6A19){test_fail();}
 
+    __putstr("SMAX:                      : ");
+    __puthex32(smax       );__putchar('\n');
     __putstr("Key Expansion cycles/instrs: ");
     __puthex32(cyc_key_exp);__putchar('/');
     __puthex32(ins_key_exp);__putchar('\n');

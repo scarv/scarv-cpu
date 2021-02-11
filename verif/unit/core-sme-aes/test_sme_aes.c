@@ -6,7 +6,6 @@
 #include "sme_aes.h"
 
 #define EXPECTED_SMAX  3
-#define NREGS         16
 
 uint32_t ck [4] = {
     0x16157e2b, // From FIPS 197 sec A1
