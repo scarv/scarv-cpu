@@ -61,6 +61,29 @@ assign      ready = valid && aes_any && aes_ready;
 `define DBG(W,VAR) wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2];
 
 //
+// Multiply by 2 in GF(2^8) modulo 8'h1b
+function [7:0] xtime2;
+    input [7:0] a;
+
+    xtime2  = {a[6:0],1'b0} ^ (a[7] ? 8'h1b : 8'b0 );
+
+endfunction
+
+//
+// Paired down multiply by X in GF(2^8)
+function [7:0] xtimeN;
+    input[7:0] a;
+    input[3:0] b;
+
+    xtimeN = 
+        (b[0] ?                         a   : 0) ^
+        (b[1] ? xtime2(                 a)  : 0) ^
+        (b[2] ? xtime2(xtime2(          a)) : 0) ^
+        (b[3] ? xtime2(xtime2(xtime2(   a))): 0) ;
+
+endfunction
+
+//
 // AES Instructions
 // ------------------------------------------------------------
 
@@ -90,15 +113,27 @@ assign rd = aes_result;
 genvar a;
 generate for(a=0; a < SMAX; a=a+1) begin : g_aes
 
-    assign aes_sbox_in[a] = bs == 0 ? rs2[a][ 7: 0]  :
-                            bs == 1 ? rs2[a][15: 8]  :
-                            bs == 2 ? rs2[a][23:16]  :
-                          /*bs == 3*/ rs2[a][31:24]  ;
+    assign aes_sbox_in[a] = bs == 2'd0 ? rs2[a][ 7: 0]  :
+                            bs == 2'd1 ? rs2[a][15: 8]  :
+                            bs == 2'd2 ? rs2[a][23:16]  :
+                          /*bs == 2'd3*/ rs2[a][31:24]  ;
 
-    assign aes_result[a] = rs1[a] ^ (
-        {24'b0, aes_sbox_out[a]} << {bs, 3'b0} |
-        {24'b0, aes_sbox_out[a]} >> {bs, 3'b0} 
-    );
+    wire [7:0] mix_b3 =           xtimeN(aes_sbox_out[a], aes_dec ? 11 : 3)  ;
+    wire [7:0] mix_b2 = aes_dec ? xtimeN(aes_sbox_out[a], 13) : aes_sbox_out[a];
+    wire [7:0] mix_b1 = aes_dec ? xtimeN(aes_sbox_out[a],  9) : aes_sbox_out[a];
+    wire [7:0] mix_b0 =           xtimeN(aes_sbox_out[a], aes_dec ? 14 : 2)  ;
+
+    wire [31:0] result_mix  = {mix_b3, mix_b2, mix_b1, mix_b0};
+
+    wire [31:0] result      = aes_mix ? result_mix : {24'b0, aes_sbox_out[a]};
+
+    wire [31:0] rotated     =
+        bs == 2'd0 ? {result                      } :
+        bs == 2'd1 ? {result[23:0], result[31:24] } :
+        bs == 2'd2 ? {result[15:0], result[31:16] } :
+     /* bs == 2'd3*/ {result[ 7:0], result[31: 8] } ;
+
+    assign aes_result[a] = rotated ^ rs1[a];
 
 end endgenerate
 
@@ -122,4 +157,5 @@ sme_sbox_aes #(
 .sbox_out(aes_sbox_out  )  // SMAX share output
 );
 
+`undef DBG
 endmodule

@@ -15,6 +15,7 @@ input  wire [ 4:0] s2_rd           , // Destination register address
 input  wire [XL:0] s2_opr_a        , // Operand A
 input  wire [XL:0] s2_opr_b        , // Operand B
 input  wire [XL:0] s2_opr_c        , // Operand C
+input  wire        s2_opr_b_imm    , // Operand B is an immediate
 input  wire [ 4:0] s2_rs1_addr     , // Source regsiter addresses.
 input  wire [ 4:0] s2_rs2_addr     , // Source regsiter addresses.
 input  wire [OP:0] s2_uop          , // Micro-op code
@@ -221,7 +222,7 @@ wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]) || sme_maskop;
 wire    sme_rd_is_share  = sme_is_share_reg(s2_rd      [4:0]);
 
 wire    sme_operands_ok  =
-    sme_rs1_is_share && sme_rd_is_share;
+    (s2_opr_b_imm || sme_rs2_is_share) && sme_rs1_is_share && sme_rd_is_share;
 
 // Do we need to source an SME share for storing to memory?
 wire    store_sme_share = sme_on && |smectl_b && 

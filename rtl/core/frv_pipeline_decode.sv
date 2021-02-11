@@ -43,6 +43,7 @@ output wire [ 4:0] s2_rd         , // Destination register address
 output wire [XL:0] s2_opr_a      , // Operand A
 output wire [XL:0] s2_opr_b      , // Operand B
 output wire [XL:0] s2_opr_c      , // Operand C
+output wire        s2_opr_b_imm  , // Operand B is an immediate
 output wire [ 4:0] s2_rs1_addr   , // Source regsiter addresses.
 output wire [ 4:0] s2_rs2_addr   , // Source regsiter addresses.
 output wire [OP:0] s2_uop        , // Micro-op code
@@ -798,7 +799,7 @@ wire       read_sme_share = sme_on && |smectl_b &&
 // Pipeline Register.
 // -------------------------------------------------------------------------
 
-localparam RL = 10 + 40 + (1+OP) + (1+FU);
+localparam RL = 11 + 40 + (1+OP) + (1+FU);
 
 `ifdef RVFI
 always @(posedge g_clk) begin
@@ -832,7 +833,8 @@ wire [RL-1:0] p_in = {
 leak_stall || s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
  s1_bubble ? 32'b0      : n_s2_instr, // The instruction word
  s1_bubble ?  5'b0      : s1_rs1_addr,
- s1_bubble ?  5'b0      : s1_rs2_addr 
+ s1_bubble ?  5'b0      : s1_rs2_addr,
+ s1_bubble ?  1'b0      : oprb_src_imm
 };
 
 wire [RL-1:0] p_out;
@@ -845,7 +847,8 @@ assign {
  s2_size       , // Size of the instruction.
  s2_instr      , // The instruction word
  s2_rs1_addr   ,
- s2_rs2_addr    
+ s2_rs2_addr   ,
+ s2_opr_b_imm
 } = p_out;
 
 frv_pipeline_register #(

@@ -191,6 +191,7 @@ wire [ 4:0] s2_rd         ; // Destination register address
 wire [XL:0] s2_opr_a      ; // Operand A
 wire [XL:0] s2_opr_b      ; // Operand B
 wire [XL:0] s2_opr_c      ; // Operand C
+wire        s2_opr_b_imm  ; // Operand B is an immediate.
 wire [ 4:0] s2_rs1_addr   ;
 wire [ 4:0] s2_rs2_addr   ;
 wire [OP:0] s2_uop        ; // Micro-op code
@@ -450,6 +451,7 @@ frv_pipeline_decode #(
 .s2_opr_a           (s2_opr_a           ), // Operand A
 .s2_opr_b           (s2_opr_b           ), // Operand B
 .s2_opr_c           (s2_opr_c           ), // Operand C
+.s2_opr_b_imm       (s2_opr_b_imm       ), // Operand B is an immediate.
 .s2_rs1_addr        (s2_rs1_addr        ), // RS1 source address
 .s2_rs2_addr        (s2_rs2_addr        ), // RS2 source address
 .s2_uop             (s2_uop             ), // Micro-op code
@@ -484,6 +486,7 @@ frv_pipeline_execute #(
 .s2_opr_a         (s2_opr_a         ), // Operand A
 .s2_opr_b         (s2_opr_b         ), // Operand B
 .s2_opr_c         (s2_opr_c         ), // Operand C
+.s2_opr_b_imm     (s2_opr_b_imm     ), // Operand B is an immediate.
 .s2_uop           (s2_uop           ), // Micro-op code
 .s2_fu            (s2_fu            ), // Functional Unit
 .s2_trap          (s2_trap          ), // Raise a trap?

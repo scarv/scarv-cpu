@@ -3,18 +3,33 @@
 
 // $SCARV_CPU/src/csp/scarv_cpu_sme.h
 #include "scarv_cpu_sme.h"
+#include "sme_aes.h"
 
 #define EXPECTED_SMAX  3
 #define NREGS         16
+#define NVECS         1
 
-typedef unsigned int uint_xlen_t ;
+uint32_t ck [4] = {
+    0x16157e2b, // From FIPS 197 sec A1
+    0xa6d2ae28,
+    0x8815f7ab,
+    0x3c4fcf09
+};
 
-uint_xlen_t result [EXPECTED_SMAX];
+// From FIPS 197 sec A1
+uint32_t expected_final_rk_word = 0xa60c63b6;
 
-static inline uint_xlen_t _aes32esi (uint_xlen_t rs1, uint_xlen_t rs2, int bs) {__asm__("aes32esi  %0, %1, %2" : "+r"(rs1) : "r"(rs2), "i"(bs)); return rs1;}
-static inline uint_xlen_t _aes32esmi(uint_xlen_t rs1, uint_xlen_t rs2, int bs) {__asm__("aes32esmi %0, %1, %2" : "+r"(rs1) : "r"(rs2), "i"(bs)); return rs1;}
-static inline uint_xlen_t _aes32dsi (uint_xlen_t rs1, uint_xlen_t rs2, int bs) {__asm__("aes32dsi  %0, %1, %2" : "+r"(rs1) : "r"(rs2), "i"(bs)); return rs1;}
-static inline uint_xlen_t _aes32dsmi(uint_xlen_t rs1, uint_xlen_t rs2, int bs) {__asm__("aes32dsmi %0, %1, %2" : "+r"(rs1) : "r"(rs2), "i"(bs)); return rs1;}
+// From FIPS 197 appendix B.
+uint32_t pt [4] = {
+    0xa8f64332,
+    0x8d305a88,
+    0xa2983131,
+    0x340737e0
+};
+
+uint32_t ct [4];
+
+sme_aes128_ctx_t ctx;
 
 int test_main() {
 
@@ -25,24 +40,32 @@ int test_main() {
     // Don't bother if we get an unexpected SMAX value.
     if(EXPECTED_SMAX != smax) {test_fail();}
 
-    register uint_xlen_t rs1 asm("x16") = 0;
-    register uint_xlen_t rs2 asm("x17") = 0;
-    register uint_xlen_t dut asm("x18") = 0;
-    register uint_xlen_t rd  asm("x19") = 0;
+    //
+    // Key Expansion
 
-    sme_on(smax);
+    sme_aes128_enc_key_exp(ctx.rk, ck);
 
-    SME_MASK(rs1, rs1)
-    SME_MASK(rs2, rs2)
+    uint32_t unmasked_rk [44];
 
-    rs1 = _aes32esi(rs1, rs2, 0);
-    rs1 = _aes32esi(rs1, rs2, 1);
-    rs1 = _aes32esi(rs1, rs2, 2);
-    rs1 = _aes32esi(rs1, rs2, 3);
+    for(int i = 0; i < 44; i ++) {
+        uint32_t k = 0;
+        for(int s = 0; s < smax; s ++) {
+            k ^= ctx.rk[s][i];
+        }
+        unmasked_rk[i] = k;
 
-    SME_STORE(result, rs1, smax)
+        //__puthex32(k); __putchar('\n');
+    }
 
-    sme_off();
+    // Check final word of expanded key. Not a great check but good enough.
+    if(unmasked_rk[43] != expected_final_rk_word) {
+        test_fail();
+    }
+
+    //
+    // Block Encrypt.
+
+    sme_aes128_enc_block(ct, pt, ctx.rk);
 
     return 0;
 

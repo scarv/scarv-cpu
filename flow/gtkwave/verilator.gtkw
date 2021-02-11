@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Tue Feb  9 16:39:18 2021
+[*] Thu Feb 11 13:18:40 2021
 [*]
 [dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.vcd"
-[dumpfile_mtime] "Tue Feb  9 16:38:57 2021"
-[dumpfile_size] 1777637
+[dumpfile_mtime] "Thu Feb 11 13:15:49 2021"
+[dumpfile_size] 37511464
 [savefile] "/home/work/scarv/scarv-cpu-sme/flow/gtkwave/verilator.gtkw"
-[timestart] 1894
+[timestart] 59794
 [size] 1920 1016
 [pos] -1 -1
-*-6.898460 2166 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.898460 59906 57786 412026 358366 356466 59846 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
@@ -20,10 +20,11 @@
 [treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(0).domain(0).
 [treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).
 [treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.
 [sst_width] 270
 [signals_width] 510
 [sst_expanded] 1
-[sst_vpaned_height] 291
+[sst_vpaned_height] 280
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -363,6 +364,11 @@ TOP.frv_core.i_pipeline.s2_rd[4:0]
 @28
 TOP.frv_core.i_pipeline.s2_size[1:0]
 TOP.frv_core.i_pipeline.s2_trap
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.cfu_always_take
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.cfu_cond
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.cfu_cond_taken
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.alu_cmp_eq
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.cond_bne
 @c00200
 -ALI
 @28
@@ -406,12 +412,28 @@ TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_operands_ok
 @200
 -
 @28
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_alu_valid
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_alu_ready
+@22
+TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_alu_result[31:0]
+@200
+-
+@28
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_cry_valid
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_cry_ready
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.is_sme_cry_op
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_cry_op[5:0]
 TOP.frv_core.i_pipeline.i_pipeline_s2_execute.sme_cry_result[31:0]
+@200
+-
+@22
+TOP.frv_core.i_pipeline.i_sme.dbg_s1_rs1[31:0]
+TOP.frv_core.i_pipeline.i_sme.dbg_s1_rs2[31:0]
+TOP.frv_core.i_pipeline.i_sme.dbg_alu_rd[31:0]
+TOP.frv_core.i_pipeline.i_sme.dbg_cry_rd[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.dbg_aes_sbox_in[7:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.dbg_aes_sbox_out[7:0]
 @1000200
 -SME
 @22
@@ -560,6 +582,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trap_target_addr[31:0]
 -Pipe - S4 - Writeback
 @800200
 -SME
+@c00200
 -CSR - SMECTL
 @28
 TOP.frv_core.i_pipeline.i_csrs.read_smectl
@@ -576,7 +599,7 @@ TOP.frv_core.i_pipeline.i_csrs.smectl_b[3:0]
 TOP.frv_core.i_pipeline.i_csrs.clamp_smectl_d
 TOP.frv_core.i_pipeline.i_csrs.clamp_smectl_b
 TOP.frv_core.i_pipeline.i_csrs.zero_smectl_b
-@1000200
+@1401200
 -CSR - SMECTL
 @22
 TOP.frv_core.i_pipeline.i_sme.bank_rdata[31:0]
@@ -585,20 +608,61 @@ TOP.frv_core.i_pipeline.i_sme.bank_wdata[31:0]
 @28
 TOP.frv_core.i_pipeline.i_sme.bank_wen
 @22
+>-7
 TOP.frv_core.i_pipeline.i_sme.bank_rs1_addr[3:0]
+>0
 TOP.frv_core.i_pipeline.i_sme.bank_rs2_addr[3:0]
 @c00200
 -ALU
 @28
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.valid
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.ready
+@24
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.shamt[4:0]
 @800200
 -Shares
 @22
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rd(0)[31:0]
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rd(1)[31:0]
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rd(2)[31:0]
+@c00022
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+@28
+(0)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(1)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(2)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(3)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(4)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(5)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(6)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(7)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(8)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(9)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(10)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(11)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(12)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(13)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(14)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(15)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(16)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(17)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(18)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(19)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(20)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(21)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(22)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(23)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(24)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(25)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(26)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(27)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(28)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(29)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(30)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+(31)TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(0)[31:0]
+@1401200
+-group_end
+@22
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(1)[31:0]
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs1(2)[31:0]
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.rs2(0)[31:0]
@@ -676,7 +740,9 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_xor
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.ready
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.valid
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_any
+@25
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_ctr[1:0]
+@28
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_dec
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_mix
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_ready
@@ -684,7 +750,6 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_ready
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.bs[1:0]
 @28
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.flush
-TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.n_aes_ctr[1:0]
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.new_instr
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.op_aesds
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.op_aesdsm
@@ -859,7 +924,7 @@ TOP.frv_core.i_interrupts.ti_pending
 TOP.frv_core.i_interrupts.ex_pending
 @1401200
 -Interrupts
-@c00200
+@800200
 -GPRs
 @22
 TOP.frv_core.i_pipeline.i_gprs.gprs(0)[31:0]
@@ -894,7 +959,7 @@ TOP.frv_core.i_pipeline.i_gprs.gprs(28)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(29)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(30)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(31)[31:0]
-@1401200
+@1000200
 -GPRs
 @800200
 -SME Registers
