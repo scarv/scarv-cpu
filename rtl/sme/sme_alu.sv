@@ -144,6 +144,29 @@ sme_dom_and #(
 .rd         (result_and )  // RD as SMAX shares
 );
 
+//
+// Un-masking
+// ------------------------------------------------------------
+
+logic       unmask_en  ;
+always @(negedge g_clk) unmask_en <= op_unmask_bool && valid;
+
+logic [XL:0] gated_shares [SM:0];
+logic [XL:0] result_unmask;
+genvar u;
+generate for(u = 0; u < SMAX; u=u+1) begin: g_unmasking
+    assign gated_shares[u] = {XLEN{unmask_en}} & rs1[u];
+end endgenerate
+
+always_comb begin
+    integer i;
+    result_unmask = gated_shares[0];
+    for(i=1; i < SMAX; i = i + 1) begin
+        result_unmask = result_unmask ^ gated_shares[i];
+    end
+end
+
+
 genvar l;
 generate for(l = 0; l < SMAX; l = l+1) begin : g_linear_ops // BEGIN GENERATE
 
@@ -154,6 +177,7 @@ generate for(l = 0; l < SMAX; l = l+1) begin : g_linear_ops // BEGIN GENERATE
 assign result_mask  [l] = l==0    ? rs1[0] ^ all_rng : rng[l];
 // TODO: Fix this, currently only re-masks even shares.
 assign result_remask[l] = l %2==0 ? rs1[l] ^ rng[0]  : rs1[l];
+
 
 //
 // Bitwise or/xor/nor/xnor
@@ -227,6 +251,7 @@ wire sel_result_add = op_addsub_bool;
 
 assign rd[l]= 
     op_remask_bool      ? result_remask[l]      :
+    op_unmask_bool&&l==0? result_unmask         :
     op_mask             ? result_mask[l]        :
     op_and              ? result_and[l]         :
     op_or               ? result_or [l]         :

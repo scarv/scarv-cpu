@@ -32,6 +32,9 @@ implementation.*
 - [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=riscv%2Fcrypto-ise)](https://travis-ci.org/scarv/scarv-cpu/branches)
   [`riscv/crypto-ise`](https://github.com/scarv/scarv-cpu/tree/riscv/crypto-ise) - 
   Main branch for RISC-V Crypto ISE implementation.
+- [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fsme)](https://travis-ci.org/scarv/scarv-cpu/branches)
+  [`scarv/sme`](https://github.com/scarv/scarv-cpu/tree/scarv/sme) - 
+  Main branch for Scalable Masking Extensions work.
 - [![Build Status](https://travis-ci.org/scarv/scarv-cpu.svg?branch=scarv%2Fskywater%2Fmain)](https://travis-ci.org/scarv/scarv-cpu/branches)
   [`scarv/skywater/main`](https://github.com/scarv/scarv-cpu/tree/scarv/skywater/main) - 
   Main branch for Skywater tapeout project.

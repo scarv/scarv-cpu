@@ -64,8 +64,13 @@ int test_main() {
 
     //
     // Block Encrypt.
-
     sme_aes128_enc_block(ct, pt, ctx.rk);
+
+    // Expected answers from FIPS 197 Appendix B.
+    if(ct[0] != 0x1D842539){test_fail();}
+    if(ct[1] != 0xFB09DC02){test_fail();}
+    if(ct[2] != 0x978511DC){test_fail();}
+    if(ct[3] != 0x320B6A19){test_fail();}
 
     return 0;
 
