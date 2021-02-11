@@ -62,6 +62,13 @@ inline uint64_t scarv_cpu_rdcycle() {
     return ((uint64_t)hi1 << 32) | lo2;
 }
 
+//! Read the current cycle count
+inline uint32_t scarv_cpu_rdcycle_lo() {
+    uint32_t lo1;
+    asm volatile ("rdcycle  %0" : "=r"(lo1) : );
+    return lo1;
+}
+
 //! Read the current instructions retired count
 inline uint64_t scarv_cpu_rdinstret() {
     uint32_t lo1, lo2, hi1;
@@ -71,6 +78,13 @@ inline uint64_t scarv_cpu_rdinstret() {
         asm volatile ("rdinstret  %0" : "=r"(lo2) : );
     } while(lo2 < lo1);
     return ((uint64_t)hi1 << 32) | lo2;
+}
+
+//! Read the current instructions retired count
+inline uint32_t scarv_cpu_rdinstret_lo() {
+    uint32_t lo1;
+    asm volatile ("rdinstret  %0" : "=r"(lo1) : );
+    return lo1;
 }
 
 // ----------- CSR Constant Codes ------------------

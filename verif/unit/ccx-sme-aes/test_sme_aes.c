@@ -41,8 +41,13 @@ int test_main() {
 
     //
     // Key Expansion
-
+    uint32_t cyc_key_exp_start = scarv_cpu_rdcycle_lo();
+    uint32_t ins_key_exp_start = scarv_cpu_rdinstret_lo();
     sme_aes128_enc_key_exp(ctx.rk, ck);
+    uint32_t cyc_key_exp_end   = scarv_cpu_rdcycle_lo();
+    uint32_t ins_key_exp_end   = scarv_cpu_rdinstret_lo();
+    uint32_t cyc_key_exp = cyc_key_exp_end - cyc_key_exp_start;
+    uint32_t ins_key_exp = ins_key_exp_end - ins_key_exp_start;
 
     uint32_t unmasked_rk [44];
 
@@ -63,13 +68,26 @@ int test_main() {
 
     //
     // Block Encrypt.
+    uint32_t cyc_block_start = scarv_cpu_rdcycle_lo();
+    uint32_t ins_block_start = scarv_cpu_rdinstret_lo();
     sme_aes128_enc_block(ct, pt, ctx.rk);
+    uint32_t cyc_block_end   = scarv_cpu_rdcycle_lo();
+    uint32_t ins_block_end   = scarv_cpu_rdinstret_lo();
+    uint32_t cyc_block = cyc_block_end - cyc_block_start;
+    uint32_t ins_block = ins_block_end - ins_block_start;
 
     // Expected answers from FIPS 197 Appendix B.
     if(ct[0] != 0x1D842539){test_fail();}
     if(ct[1] != 0xFB09DC02){test_fail();}
     if(ct[2] != 0x978511DC){test_fail();}
     if(ct[3] != 0x320B6A19){test_fail();}
+
+    __putstr("Key Expansion cycles/instrs: ");
+    __puthex32(cyc_key_exp);__putchar('/');
+    __puthex32(ins_key_exp);__putchar('\n');
+    __putstr("Block Encrypt cycles/instrs: ");
+    __puthex32(cyc_block);__putchar('/');
+    __puthex32(ins_block);__putchar('\n');
 
     return 0;
 

@@ -1,0 +1,8 @@
+
+TEST_NAME = ccx-sme-aes
+TEST_SRC  = $(UNIT_ROOT)/ccx-sme-aes/test_sme_aes.c \
+            $(UNIT_ROOT)/ccx-sme-aes/test_sme_aes.S \
+            $(SCARV_CPU)/src/sme/sme_aes.S
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

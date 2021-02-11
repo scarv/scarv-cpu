@@ -1,8 +1,4 @@
 
-#ifndef SME_SMAX
-#define SME_SMAX 3
-#endif
-
 .macro mask RD RS1
     .insn r CUSTOM_0, 1    , 0    , \RD, \RS1 ,x0 ;
 .endm
@@ -41,6 +37,8 @@ sme_aes128_enc_key_exp:
 
     li t0, 0x1E0                // D=max, bank=0
     csrrw x0, 0x006, t0         // Turn on SME with MAX shares and 0'th bank.
+    csrr  a5, 0x006
+    srli  a5, a5, 5             // a5 contains current number of shares
 
     lw   x16,  0*4(a1)          // Load un-masked cipher key.
     lw   x17,  1*4(a1)
@@ -58,7 +56,7 @@ sme_aes128_enc_key_exp:
 .aes128_enc_key_exp_l0:
 
     li t0, 0x1E0                // D=max, bank=0
-    ori t1, t0, SME_SMAX
+    or  t1, t0, a5          
     mv  t2, a0
     .aes128_key_exp_l1:
         csrrw x0, 0x006, t0         // Select i'th bank
@@ -119,14 +117,14 @@ sme_aes128_enc_block:
     sw      x21, 3*4(sp)
     sw      x22, 4*4(sp)
     sw      x23, 5*4(sp)
-    
-    lw a3, 1*4(a1)
-    lw a4, 2*4(a1)
-    lw a5, 3*4(a1)
-    lw a1, 0*4(a1)              // Load plaintext. a1 now available.
+
 
     li t0, 0x1E0                // D=max, bank=0
-    ori t1, t0, SME_SMAX        // Load 0'th round key.
+    csrrw x0, 0x006, t0         // Turn on SME with MAX shares and 0'th bank.
+    csrr  t1, 0x006
+    srli  t1, t1, 5             // t1 contains loop end var for share ld/st
+
+    or  t1, t1, t0              // Load 0'th round key.
     mv  t2, a2
     .aes128_enc_blk_ldkey0:
         csrrw x0, 0x006, t0     // Select i'th bank
@@ -138,17 +136,21 @@ sme_aes128_enc_block:
         addi t0, t0, 1
         bne  t0, t1, .aes128_enc_blk_ldkey0
 
-    xor x16, x16, a1            // 0'th add round key.
+    lw a3, 1*4(a1)
+    lw a4, 2*4(a1)
+    lw a5, 3*4(a1)
+    lw a1, 0*4(a1)              // Load plaintext. a1 now available.
+
     xor x17, x17, a3
     xor x18, x18, a4
     xor x19, x19, a5
+    xor x16, x16, a1            // 0'th add round key.
 
     addi a1, a2, 16*10          // Loop end pointer
 
 .aes128_enc_blk_l0:
     
     li  t0, 0x1E0               // D=max, bank=0
-    ori t1, t0, SME_SMAX        // Load 0'th round key.
     mv  t2, a2
     .aes128_enc_blk_ldkey1:
         csrrw x0, 0x006, t0     // Select i'th bank
@@ -182,7 +184,6 @@ sme_aes128_enc_block:
     aes32esmi x23, x18, 3        // x20-x23 contains new state
     
     li  t0, 0x1E0               // D=max, bank=0
-    ori t1, t0, SME_SMAX        // Load 0'th round key.
     mv  t2, a2
     .aes128_enc_blk_ldkey2:
         csrrw x0, 0x006, t0     // Select i'th bank
