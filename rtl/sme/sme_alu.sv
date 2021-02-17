@@ -217,14 +217,24 @@ wire  [2*XLEN-1:0] shift_input = {
     {            rs1[l]                }
 };
 
+wire [2*XLEN-1:0] shift_in_rev;
+wire [2*XLEN-1:0] shift_out_rev;
+
 // Reverse bits iff shifting right.
-wire  [2*XLEN-1:0] shift_value = op_right ? shift_input : {<<{shift_input}};
+wire  [2*XLEN-1:0] shift_value = op_right ? shift_input  : shift_in_rev;
 
 // Always shift right.
 wire  [2*XLEN-1:0] shift_output= shift_value >> shamt;
 
 // (un)reverse bits if shifting left.
-wire  [2*XLEN-1:0] shift_result= op_right ? shift_output : {<<{shift_output}};
+wire  [2*XLEN-1:0] shift_result= op_right ? shift_output : shift_out_rev;
+
+genvar i;
+for(i = 0; i<2*XLEN; i=i+1) begin
+    assign shift_in_rev [i] = shift_input  [2*XLEN-1-i];
+    assign shift_out_rev[i] = shift_output [2*XLEN-1-i];
+end 
+
 assign result_shift[l]         = 
     op_right || !op_rotate ? shift_result[      XL: 0] :
                              shift_result[2*XLEN-1:32] ;

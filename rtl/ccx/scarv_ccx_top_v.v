@@ -41,6 +41,8 @@ parameter   MMIO_SIZE   = 32'h0000_0100; //! Size in bytes of MMIO
 parameter   EXT_BASE    = 32'h1000_0000; //! Base address of EXT Mem.
 parameter   EXT_SIZE    = 32'h1000_0000; //! Size in bytes of EXT Mem.
 
+parameter   SME_SMAX    = 3; //! Maximum hardware shares for SME.
+
 // Reset value for the mtimecmp memory mapped register.
 parameter   MTIMECMP_RESET = 64'hFFFF_FFFF_FFFF_FFFF;
 
@@ -49,8 +51,8 @@ parameter   PC_RESET       = 32'b0;
 
 /* verilator lint_off WIDTH */
 //! Memory initialisation file for the ROM.
-parameter [255*8-1:0] ROM_INIT_FILE = "rom.hex";
-parameter [255*8-1:0] RAM_INIT_FILE = "ram.hex";
+parameter ROM_INIT_FILE = "rom.hex";
+parameter RAM_INIT_FILE = "ram.hex";
 /* verilator lint_on WIDTH */
 
 //
@@ -64,9 +66,14 @@ assign  if_ext_wen   = if_ext.wen   ;  // Write enable
 assign  if_ext_strb  = if_ext.strb  ;  // Write strobe
 assign  if_ext_wdata = if_ext.wdata ;  // Write data
 assign  if_ext_addr  = if_ext.addr  ;  // Read/Write address
-assign  if_ext.gnt   = if_ext_gnt   ;  // request accepted
-assign  if_ext.error = if_ext_error ;  // Error
-assign  if_ext.rdata = if_ext_rdata ;  // Read data
+
+// Using always block rather than assign statements because Vivado
+// complains otherwise.
+always @(*) begin
+    if_ext.gnt   = if_ext_gnt   ;  // request accepted
+    if_ext.error = if_ext_error ;  // Error
+    if_ext.rdata = if_ext_rdata ;  // Read data
+end
 
 //
 // Actual CCX Instance.
@@ -84,7 +91,8 @@ scarv_ccx_top #(
 .MTIMECMP_RESET (MTIMECMP_RESET ),
 .ROM_INIT_FILE  (ROM_INIT_FILE  ),
 .RAM_INIT_FILE  (RAM_INIT_FILE  ),
-.PC_RESET       (PC_RESET       )  //! Program counter reset value.
+.PC_RESET       (PC_RESET       ), //! Program counter reset value.
+.SME_SMAX       (SME_SMAX       )
 ) i_scarv_ccx_top (
 .f_clk         (f_clk         ), // Free-running clock.
 .g_resetn      (g_resetn      ), // Synchronous active low reset.

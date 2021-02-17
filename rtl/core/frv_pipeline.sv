@@ -1,4 +1,6 @@
 
+import sme_pkg::*;
+
 //
 // module: frv_pipeline
 //

@@ -11,14 +11,14 @@ parameter AW = 32, DW=32
 
 localparam SW       = (DW/8) - 1;
 
-logic           req   ; // Start memory request
-logic           wen   ; // Write enable
-logic [SW  :0]  strb  ; // Write strobe
-logic [DW-1:0]  wdata ; // Write data
-logic [AW-1:0]  addr  ; // Read/Write address
-logic           gnt   ; // request accepted
-logic           error ; // Error
-logic [DW-1:0]  rdata ; // Read data
+wire           req   ; // Start memory request
+wire           wen   ; // Write enable
+wire [SW  :0]  strb  ; // Write strobe
+wire [DW-1:0]  wdata ; // Write data
+wire [AW-1:0]  addr  ; // Read/Write address
+logic          gnt   ; // request accepted
+logic          error ; // Error
+logic[DW-1:0]  rdata ; // Read data
 
 modport REQ (
 output req   , // Start memory request

@@ -32,6 +32,8 @@ parameter   MMIO_SIZE   = 32'h0000_0100; //! Size in bytes of MMIO
 parameter   EXT_BASE    = 32'h1000_0000; //! Base address of EXT Mem.
 parameter   EXT_SIZE    = 32'h1000_0000; //! Size in bytes of EXT Mem.
 
+parameter   SME_SMAX    = 3; //! Maximum hardware shares for SME.
+
 // Reset value for the mtimecmp memory mapped register.
 parameter   MTIMECMP_RESET = 64'hFFFF_FFFF_FFFF_FFFF;
 
@@ -40,8 +42,8 @@ parameter   PC_RESET       = 32'b0;
 
 /* verilator lint_off WIDTH */
 //! Memory initialisation file for the ROM.
-parameter [255*8-1:0] ROM_INIT_FILE = "rom.hex";
-parameter [255*8-1:0] RAM_INIT_FILE = "ram.hex";
+parameter ROM_INIT_FILE = "rom.hex";
+parameter RAM_INIT_FILE = "ram.hex";
 /* verilator lint_on WIDTH */
 
 // Depth of the RAM in 32-bit words.
@@ -119,7 +121,8 @@ assign if_ram_b.error = 1'b0;
 // ------------------------------------------------------------
 
 frv_core #(
-.FRV_PC_RESET_VALUE(PC_RESET        )
+.FRV_PC_RESET_VALUE(PC_RESET        ),
+.SME_SMAX          (SME_SMAX        )
 ) i_scarv_cpu (
 .g_clk            (f_clk                  ), // global clock
 .g_resetn         (g_resetn               ), // synchronous reset

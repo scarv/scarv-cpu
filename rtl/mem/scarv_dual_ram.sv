@@ -2,7 +2,7 @@
 module scarv_dual_ram #(
 parameter   DEPTH = 4096    ,   // Depth of RAM in words
 parameter   WIDTH = 32      ,   // Width of a RAM word.
-parameter [255*8-1:0] INIT_FILE="" // Memory initialisaton file.
+parameter  INIT_FILE="" // Memory initialisaton file.
 )(
 input  wire         g_clk       ,
 input  wire         g_resetn    ,
