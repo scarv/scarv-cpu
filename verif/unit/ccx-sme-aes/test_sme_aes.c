@@ -5,7 +5,9 @@
 #include "scarv_cpu_sme.h"
 #include "sme_aes.h"
 
-#define EXPECTED_SMAX  3
+#ifndef SME_SMAX
+#define SME_SMAX  3
+#endif
 
 uint32_t ck [4] = {
     0x16157e2b, // From FIPS 197 sec A1
@@ -36,7 +38,7 @@ int test_main() {
     int smax = sme_get_smax();
     
     // Don't bother if we get an unexpected SMAX value.
-    if(EXPECTED_SMAX != smax) {test_fail();}
+    if(SME_SMAX != smax) {test_fail();}
 
     //
     // Key Expansion

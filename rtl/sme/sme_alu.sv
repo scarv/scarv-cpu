@@ -83,6 +83,21 @@ wire        add_clk_req;
 
 assign      g_clk_req       = and_clk_req || add_clk_req;
 
+(*keep*)reg[XL:0] dbg_rs1;
+(*keep*)reg[XL:0] dbg_rs2;
+(*keep*)reg[XL:0] dbg_rd ;
+always_comb begin :dbg
+    integer d;
+    dbg_rs1     = rs1[0];
+    dbg_rs2     = rs2[0];
+    dbg_rd      = rd [0];
+    for(d = 1; d < SMAX; d = d + 1) begin
+        dbg_rs1     = dbg_rs1 ^ rs1[d];
+        dbg_rs2     = dbg_rs2 ^ rs2[d];
+        dbg_rd      = dbg_rd  ^ rd [d];
+    end
+end
+
 //
 // 32-bit KS masked Adder
 // ============================================================
@@ -188,8 +203,8 @@ generate for(l = 0; l < SMAX; l = l+1) begin : g_linear_ops // BEGIN GENERATE
 // ------------------------------------------------------------
 
 assign result_mask  [l] = l==0    ? rs1[0] ^ all_rng : rng[l];
-// TODO: Fix this, currently only re-masks even shares.
-assign result_remask[l] = l %2==0 ? rs1[l] ^ rng[0]  : rs1[l];
+assign result_remask[l] = l < SMAX-1 || SMAX%2==0 ? rs1[l] ^ rng[0] :
+                                                    rs1[l]          ;
 
 
 //
@@ -216,7 +231,7 @@ else       assign result_or[l] =  result_and[l];
 
 //
 // XOR - each share xor'd individually
-assign result_xor[l] = rs1[l] ^ (op_mask_bool ? rng[l] : bitwise_rs2[l]);
+assign result_xor[l] = rs1[l] ^ bitwise_rs2[l];
 
 //
 // Shift and rotate
@@ -269,7 +284,6 @@ assign      result_baddsub[l] = bmask_add_out;
 // Result multiplexing
 // ------------------------------------------------------------
 
-wire sel_result_xor = op_xor || op_mask_bool;
 wire sel_result_add = op_addsub;
 
 assign rd[l]= 
@@ -279,7 +293,7 @@ assign rd[l]=
     op_and              ? result_and[l]         :
     op_or               ? result_or [l]         :
     op_addsub           ? result_add[l]         :
-    sel_result_xor      ? result_xor[l]         :
+    op_xor              ? result_xor[l]         :
     sel_result_add      ? result_baddsub[l]     :
     op_shfrot           ? result_shift[l]       :
                           {XLEN{1'b0}}          ;

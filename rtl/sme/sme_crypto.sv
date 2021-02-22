@@ -61,8 +61,6 @@ wire        new_instr       = valid && ready;
 
 assign      ready = valid && aes_any && aes_ready;
 
-`define DBG(W,VAR) wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2]^VAR[3];
-
 //
 // Multiply by 2 in GF(2^8) modulo 8'h1b
 function [7:0] xtime2;
@@ -102,12 +100,6 @@ wire       aes_mix  = op_aesesm|| op_aesdsm ;
 
 wire [7:0] aes_sbox_in  [SM:0];
 wire [7:0] aes_sbox_out [SM:0];
-
-`DBG(31,rs1)
-`DBG(31,rs2)
-`DBG(7,aes_sbox_in)
-`DBG(7,aes_sbox_out)
-`DBG(31,aes_result)
 
 wire [XL:0] aes_result[SM:0];
 
@@ -160,5 +152,5 @@ sme_sbox_aes #(
 .sbox_out(aes_sbox_out  )  // SMAX share output
 );
 
-`undef DBG
 endmodule
+

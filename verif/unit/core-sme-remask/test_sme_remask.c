@@ -41,7 +41,7 @@ int test_main() {
     sme_off();
 
     int unmasked = 0;
-    for( int i =0; i < smax; i++) {
+    for( int i =0; i < SME_SMAX; i++) {
         unmasked ^= rd[i];
     }
 

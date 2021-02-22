@@ -49,8 +49,6 @@ localparam RM    = RMAX-1;
 
 localparam SM   = SMAX-1;
 
-`define DBG(W,VAR) (*keep*)wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2];
-
 logic [SM:0] rf_clk_req;
 logic        alu_clk_req;
 
@@ -150,11 +148,6 @@ sme_alu #(
 // ------------------------------------------------------------
 
 logic [XL:0] cry_rd [SM:0];
-
-`DBG(XL,s1_rs1)
-`DBG(XL,s1_rs2)
-`DBG(XL,cry_rd)
-`DBG(XL,alu_rd)
 
 wire cry_rd_wen     = cry_valid && cry_ready;
 

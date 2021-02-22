@@ -8,31 +8,8 @@
 #define SME_SMAX  3
 #endif
 
-#define FUNC(A,B) (A^B)
-
-uint32_t lhs[SME_SMAX];
-uint32_t rhs[SME_SMAX];
-uint32_t rd [SME_SMAX];
-
-void fill_array_with_randomness(
-    uint32_t *  ain ,
-    size_t      alen
-){
-    for(size_t i = 0; i < alen; i++) {
-        // Awful hacky way to get some random ish values. Not how
-        // pollentropy is supposed to be used!
-        uint32_t sample  = scarv_cpu_pollentropy() << 16;
-                 sample ^= scarv_cpu_pollentropy()      ;
-        ain[i] = sample;
-    }
-}
-
-extern void sme_xor(
-    uint32_t * lhs,
-    uint32_t * rhs,
-    uint32_t * rd ,
-    const size_t  n
-);
+uint32_t expected;
+uint32_t rd_shares [SME_SMAX];
 
 int test_main() {
 
@@ -43,33 +20,33 @@ int test_main() {
     // Don't bother if we get an unexpected SMAX value.
     if(SME_SMAX != smax) {test_fail();}
 
-    // Fill the input arrays with random values.
-    fill_array_with_randomness(&lhs[0], SME_SMAX);
-    fill_array_with_randomness(&rhs[0], SME_SMAX);
+    register int rs1 asm ("x16") = scarv_cpu_pollentropy();
+    register int rs2 asm ("x17") = scarv_cpu_pollentropy();
+    register int rd  asm ("x18") ;
+
+    expected = rs1 ^ rs2;
 
     // Turn on SME with SMAX shares
     sme_on(smax);
-    
-    // Do the secure XOR
-    sme_xor(lhs, rhs, rd, smax);
+
+    SME_MASK(rs1, rs1);
+    SME_MASK(rs2, rs2);
+
+    rd = rs1 ^ rs2;
+
+    SME_STORE(rd_shares, rd, SME_SMAX);
     
     // Turn off SME
     sme_off();
 
-    // Check the results are all correct.
-    for(int i = 0; i < smax; i ++) {
-        if(rd[i] != FUNC(lhs[i] , rhs[i])) {
-            __puthex32(    i );
-            __putchar(' ');
-            __puthex32(lhs[i]);
-            __putchar('^');
-            __puthex32(rhs[i]);
-            __putchar(' ' );
-            __puthex32(rd [i]);
-            test_fail();
-        }
+    int got = 0;
+    for( int i =0; i < smax; i++) {
+        got ^= rd_shares[i];
     }
 
+    if(got != expected) {
+        test_fail();
+    }
 
     return 0;
 

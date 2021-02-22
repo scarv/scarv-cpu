@@ -37,8 +37,6 @@
 
 */
 
-`define DBG(W,VAR) wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2];
-
 //
 //    The shared non-linear middle part for AES, AES^-1, and SM4.
 module sme_sbox_inv_mid#(
@@ -520,6 +518,4 @@ always_comb begin
 end
 
 endmodule
-
-`undef DBG
 
