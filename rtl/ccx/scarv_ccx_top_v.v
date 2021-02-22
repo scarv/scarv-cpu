@@ -55,6 +55,9 @@ parameter ROM_INIT_FILE = "rom.hex";
 parameter RAM_INIT_FILE = "ram.hex";
 /* verilator lint_on WIDTH */
 
+// Use a BRAM/DMEM friendly register file?
+parameter BRAM_REGFILE = 0;
+
 //
 // External memory interface un-packing
 // ------------------------------------------------------------
@@ -92,6 +95,7 @@ scarv_ccx_top #(
 .ROM_INIT_FILE  (ROM_INIT_FILE  ),
 .RAM_INIT_FILE  (RAM_INIT_FILE  ),
 .PC_RESET       (PC_RESET       ), //! Program counter reset value.
+.BRAM_REGFILE   (BRAM_REGFILE   ),
 .SME_SMAX       (SME_SMAX       )
 ) i_scarv_ccx_top (
 .f_clk         (f_clk         ), // Free-running clock.

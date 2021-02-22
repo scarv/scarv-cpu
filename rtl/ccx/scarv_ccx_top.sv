@@ -52,6 +52,8 @@ localparam RAM_DEPTH = RAM_SIZE / 4;
 // Depth of the RAM in 32-bit words.
 localparam ROM_DEPTH = ROM_SIZE / 4;
 
+// Use a BRAM/DMEM friendly register file?
+parameter BRAM_REGFILE = 0;
 
 //
 // CPU <-> Other modules wiring.
@@ -122,7 +124,8 @@ assign if_ram_b.error = 1'b0;
 
 frv_core #(
 .FRV_PC_RESET_VALUE(PC_RESET        ),
-.SME_SMAX          (SME_SMAX        )
+.SME_SMAX          (SME_SMAX        ),
+.BRAM_REGFILE      (BRAM_REGFILE    )
 ) i_scarv_cpu (
 .g_clk            (f_clk                  ), // global clock
 .g_resetn         (g_resetn               ), // synchronous reset
