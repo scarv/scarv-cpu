@@ -98,6 +98,18 @@ always_comb begin :dbg
     end
 end
 
+logic [XL:0] bitwise_rs1        [SM:0];
+logic [XL:0] bitwise_rs2        [SM:0];
+logic [XL:0] result_xor         [SM:0];
+logic [XL:0] result_shift       [SM:0];
+logic [XL:0] result_and         [SM:0];
+logic [XL:0] result_add         [SM:0];
+logic [XL:0] result_or          [SM:0];
+logic [XL:0] result_baddsub     [SM:0]; // Binary masked add sub.
+logic [XL:0] result_mask        [SM:0];
+logic [XL:0] result_remask      [SM:0];
+
+
 //
 // 32-bit KS masked Adder
 // ============================================================
@@ -141,17 +153,6 @@ end
 // ============================================================
 
 wire logic_and_not;
-
-logic [XL:0] bitwise_rs1        [SM:0];
-logic [XL:0] bitwise_rs2        [SM:0];
-logic [XL:0] result_xor         [SM:0];
-logic [XL:0] result_shift       [SM:0];
-logic [XL:0] result_and         [SM:0];
-logic [XL:0] result_add         [SM:0];
-logic [XL:0] result_or          [SM:0];
-logic [XL:0] result_baddsub     [SM:0]; // Binary masked add sub.
-logic [XL:0] result_mask        [SM:0];
-logic [XL:0] result_remask      [SM:0];
 
 wire dom_and_en = (valid && (op_and || op_or))  ||
                    adder_valid                  ;

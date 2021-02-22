@@ -4,76 +4,62 @@
 //
 //  General purpose registers
 //
-module frv_gprs (
+module frv_gprs #(
+parameter XLEN          = 32,
+parameter BRAM_REGFILE  =  1
+)(
 
-input  wire         g_clk   , //
-input  wire         g_resetn, //
+input  wire             g_clk   , //
+input  wire             g_resetn, //
 
-input  wire [ 4:0]  rs1_addr, // Source register 1 address
-output wire [31:0]  rs1_data, // Source register 1 read data
+input  wire [     4:0]  rs1_addr, // Source register 1 address
+output wire [XLEN-1:0]  rs1_data, // Source register 1 read data
 
-input  wire [ 4:0]  rs2_addr, // Source register 2 address
-output wire [31:0]  rs2_data, // Source register 2 read data
+input  wire [     4:0]  rs2_addr, // Source register 2 address
+output wire [XLEN-1:0]  rs2_data, // Source register 2 read data
 
-input  wire        rd_wen   , // Destination write enable
-input  wire [ 4:0] rd_addr  , // Destination address
-input  wire [31:0] rd_wdata   // Destination write data [31:0]
+input  wire            rd_wen   , // Destination write enable
+input  wire [     4:0] rd_addr  , // Destination address
+input  wire [XLEN-1:0] rd_wdata   // Destination write data [31:0]
 
 );
 
-// Use an FPGA BRAM style register file.
-parameter BRAM_REGFILE = 0;
+localparam XL = XLEN-1;
 
-reg [31:0] gprs_even [15:0];
-reg [31:0] gprs_odd  [15:0];
+generate if (BRAM_REGFILE) begin : fpga_regfile // Use DMEM based regfile.
 
-// Used for debugging.
-wire [31:0] gprs      [31:0];
+    reg  [XL:0] regs  [31:0];
 
-assign rs1_data = gprs[rs1_addr];
-assign rs2_data = gprs[rs2_addr];
+    assign  rs1_data    = |rs1_addr ? regs[rs1_addr] : {XLEN{1'b0}};
+    assign  rs2_data    = |rs2_addr ? regs[rs2_addr] : {XLEN{1'b0}};
 
-wire        rd_odd       =  rd_addr[0];
-wire        rd_even      = !rd_addr[0];
 
-wire [ 3:0] rd_top       =  rd_addr[4:1];
-
-wire        rd_wen_even  = rd_even && rd_wen;
-wire        rd_wen_odd   = rd_odd && rd_wen;
-
-wire [31:0] rd_wdata_odd = rd_wdata;
-
-genvar i ;
-generate for(i = 0; i < 16; i = i+1) begin
-
-    if(i == 0) begin
-
-        always @(*) gprs_even[i] = 0;
-        
-        assign gprs[2*i+0] = 32'b0;
-        assign gprs[2*i+1] = gprs_odd [i];
-        
-        always @(posedge g_clk) if(rd_wen_odd && rd_top == i) begin
-
-            gprs_odd[i] <= rd_wdata_odd;
-
+    always @(posedge g_clk) begin
+        if(rd_wen && |rd_addr) begin
+            regs[rd_addr] <= rd_wdata;
         end
+    end
 
-    end else begin
-        
-        assign gprs[2*i+0] = gprs_even[i];
-        assign gprs[2*i+1] = gprs_odd [i];
+end else begin : ff_regfile                     // Use FF based regfile
 
-        always @(posedge g_clk) if(rd_wen_even && rd_top == i) begin
+    wire [XL:0] regs[31:0];
 
-            gprs_even[i] <= rd_wdata;
+    assign  rs1_data    = regs[rs1_addr];
+    assign  rs2_data    = regs[rs2_addr];
+    
+    assign regs[0]      = 0;
 
-        end
+    genvar i;
+    for(i = 1; i < 32; i = i + 1) begin
 
-        always @(posedge g_clk) if(rd_wen_odd && rd_top == i) begin
+        reg [XL:0] r;
 
-            gprs_odd[i] <= rd_wdata_odd;
+        assign regs[i] = r;
 
+        always @(posedge g_clk) begin
+            if(rd_wen && (rd_addr == i)) begin
+                r <= rd_wdata;
+            end
         end
 
     end
