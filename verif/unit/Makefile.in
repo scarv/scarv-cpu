@@ -20,6 +20,7 @@ UNIT_CFLAGS    += -I$(FRV_HOME)/src/csp
 UNIT_CFLAGS    += -I$(FRV_HOME)/src/sme
 UNIT_CFLAGS    += -L$(FRV_HOME)/src/share/
 UNIT_CFLAGS    += -march=rv32imc -mabi=ilp32
+UNIT_CFLAGS    += -DSME_SMAX=$(SME_SMAX)
 CORE_LINK_LD   += $(UNIT_ROOT)/share/core-link.ld
 CCX_LINK_LD    += $(FRV_HOME)/src/share/ccx-link-app.ld
 

@@ -4,11 +4,14 @@
 // $SCARV_CPU/src/csp/scarv_cpu_sme.h
 #include "scarv_cpu_sme.h"
 
-#define EXPECTED_SMAX  3
+#ifndef SME_SMAX
+#define SME_SMAX  3
+#endif
+
 #define NREGS         16
 
-uint32_t share_array_in [EXPECTED_SMAX][NREGS];
-uint32_t share_array_out[EXPECTED_SMAX][NREGS];
+uint32_t share_array_in [SME_SMAX][NREGS];
+uint32_t share_array_out[SME_SMAX][NREGS];
 
 void fill_array_with_randomness(
     uint32_t *  ain ,
@@ -36,10 +39,10 @@ int test_main() {
     int smax = sme_get_smax();
     
     // Don't bother if we get an unexpected SMAX value.
-    if(EXPECTED_SMAX != smax) {test_fail();}
+    if(SME_SMAX != smax) {test_fail();}
 
     // Fill the input array with random values.
-    fill_array_with_randomness(&share_array_in[1][0], EXPECTED_SMAX*NREGS);
+    fill_array_with_randomness(&share_array_in[1][0], SME_SMAX*NREGS);
     
     // Move all of the shares into the SME registers and out agian to mem..
     sme_move_all_shares(&share_array_in[1][0], smax, &share_array_out[1][0]);

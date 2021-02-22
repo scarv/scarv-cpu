@@ -139,7 +139,7 @@ logic [XL:0] result_mask        [SM:0];
 logic [XL:0] result_remask      [SM:0];
 
 wire dom_and_en = (valid && (op_and || op_or))  ||
-                   op_addsub                    ;
+                   adder_valid                  ;
 
 //
 // Instance DOM AND

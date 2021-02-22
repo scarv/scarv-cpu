@@ -4,10 +4,11 @@
 // $SCARV_CPU/src/csp/scarv_cpu_sme.h
 #include "scarv_cpu_sme.h"
 
-int test_main() {
+#ifndef SME_SMAX
+#define SME_SMAX  3
+#endif
 
-    // This is tied to a hardware parameter.
-    const int expected_smax = 3;
+int test_main() {
 
     //
     // Testcase - Can SME be turned off correctly?
@@ -24,7 +25,7 @@ int test_main() {
     __putstr("1\n");
     int smax = sme_get_smax();
     rv       = sme_ctlr();
-    if(smax != expected_smax) {test_fail();}
+    if(smax != SME_SMAX) {test_fail();}
     if(rv   != 0) {test_fail();}
 
     //
@@ -32,7 +33,7 @@ int test_main() {
     __putstr("2\n");
     sme_on(smax);
     rv       = sme_ctlr();
-    if(rv   != expected_smax << 5) {test_fail();}
+    if(rv   != SME_SMAX << 5) {test_fail();}
 
     //
     // Testcase - Can we turn SME off again?
@@ -67,7 +68,7 @@ int test_main() {
         rv += 1;
     }
     rv      = sme_ctlr();
-    if(rv != ((expected_smax<<5) | (expected_smax-1))) {test_fail();}
+    if(rv != ((SME_SMAX<<5) | (SME_SMAX-1))) {test_fail();}
 
     //
     // Testcase - Can SME be turned off correctly?

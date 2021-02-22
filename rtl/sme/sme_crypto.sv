@@ -61,7 +61,7 @@ wire        new_instr       = valid && ready;
 
 assign      ready = valid && aes_any && aes_ready;
 
-`define DBG(W,VAR) wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2];
+`define DBG(W,VAR) wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2]^VAR[3];
 
 //
 // Multiply by 2 in GF(2^8) modulo 8'h1b

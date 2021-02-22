@@ -86,7 +86,7 @@ output         g_clk_req , // Global clock request
 input          g_resetn  , // Sychronous active low reset.
 
 input          en        , // Enable.
-input  [2*D-1:0] rng,// Extra randomness.
+input  [RM :0] rng,// Extra randomness.
               
 input  [D-1:0] rs1, // RS1 as SMAX shares
 input  [D-1:0] rs2, // RS2 as SMAX shares

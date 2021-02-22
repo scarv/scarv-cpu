@@ -4,14 +4,15 @@
 // $SCARV_CPU/src/csp/scarv_cpu_sme.h
 #include "scarv_cpu_sme.h"
 
-#define EXPECTED_SMAX  3
-#define NREGS         16
+#ifndef SME_SMAX
+#define SME_SMAX  3
+#endif
 
 #define FUNC(A,B) (A^B)
 
-uint32_t lhs[EXPECTED_SMAX];
-uint32_t rhs[EXPECTED_SMAX];
-uint32_t rd [EXPECTED_SMAX];
+uint32_t lhs[SME_SMAX];
+uint32_t rhs[SME_SMAX];
+uint32_t rd [SME_SMAX];
 
 void fill_array_with_randomness(
     uint32_t *  ain ,
@@ -40,11 +41,11 @@ int test_main() {
     int smax = sme_get_smax();
     
     // Don't bother if we get an unexpected SMAX value.
-    if(EXPECTED_SMAX != smax) {test_fail();}
+    if(SME_SMAX != smax) {test_fail();}
 
     // Fill the input arrays with random values.
-    fill_array_with_randomness(&lhs[0], EXPECTED_SMAX);
-    fill_array_with_randomness(&rhs[0], EXPECTED_SMAX);
+    fill_array_with_randomness(&lhs[0], SME_SMAX);
+    fill_array_with_randomness(&rhs[0], SME_SMAX);
 
     // Turn on SME with SMAX shares
     sme_on(smax);

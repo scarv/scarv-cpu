@@ -4,13 +4,12 @@
 // $SCARV_CPU/src/csp/scarv_cpu_sme.h
 #include "scarv_cpu_sme.h"
 
-#define EXPECTED_SMAX  3
-#define NREGS         16
-
-#define FUNC(A,B) (A&B)
+#ifndef SME_SMAX
+#define SME_SMAX  3
+#endif
 
 uint32_t rs1;
-uint32_t rd [EXPECTED_SMAX];
+uint32_t rd [SME_SMAX];
 
 int test_main() {
 
@@ -18,7 +17,7 @@ int test_main() {
     sme_off();
     const int smax = sme_get_smax();
 
-    if(smax != EXPECTED_SMAX) {
+    if(smax != SME_SMAX) {
         test_fail(); // Quit if we don't get the expected number of shares.
     }
 
@@ -32,12 +31,16 @@ int test_main() {
     // En-mask the variable.
     SME_MASK(tmp,rs1);
 
-    SME_STORE(rd, tmp, EXPECTED_SMAX);
+    SME_STORE(rd, tmp, SME_SMAX);
 
     // Turn off SME.
     sme_off();
 
-    int unmasked = rd[0] ^ rd[1] ^ rd[2];
+    int unmasked = 0;
+    for( int i =0; i < smax; i++) {
+        unmasked ^= rd[i];
+    }
+
     if(unmasked != rs1) {
         test_fail();
     }

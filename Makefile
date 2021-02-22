@@ -20,6 +20,8 @@ AR              = $(RISCV)/bin/riscv64-unknown-elf-ar
 OBJDUMP         = $(RISCV)/bin/riscv64-unknown-elf-objdump
 OBJCOPY         = $(RISCV)/bin/riscv64-unknown-elf-objcopy
 
+SME_SMAX       ?= 3
+
 include $(FRV_HOME)/flow/verilator/Makefile.in
 include $(FRV_HOME)/flow/compliance/Makefile.in
 include $(FRV_HOME)/flow/riscv-formal/Makefile.in

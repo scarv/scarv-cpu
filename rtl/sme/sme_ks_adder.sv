@@ -90,7 +90,7 @@ always @(*) begin
   for (i = 1; i < D; i = i+1)  rd[i] = mxor[i] ^ {g[i][30:0],1'b0};
 end
 
-dom_and #(
+sme_dom_and #(
 .POSEDGE(1),      // using posedge FFs
 .D(D),            // Number of shares
 .N(N)             // Bit-width of the operation.
@@ -105,7 +105,7 @@ dom_and #(
 .rd         (p        )  // RD as SMAX shares
 );
 
-dom_and #(
+sme_dom_and #(
 .POSEDGE(1),      // using posedge FFs
 .D(D),            // Number of shares
 .N(N)             // Bit-width of the operation.
@@ -119,64 +119,6 @@ dom_and #(
 .rs2        (gj       ), // RS2 as SMAX shares
 .rd         (pigj     )  // RD as SMAX shares
 );
-
-endmodule
-
-
-module dom_and #(
-parameter POSEDGE=0,  // If 0, trigger on negedge, else posedge.
-parameter D      =2,  // Number of shares.
-parameter G      =D+D*(D-1)/2, // Number of guard shares.
-parameter N      =32  // Width of the operation.
-)(
-input          g_clk     ,     // Global clock
-output         g_clk_req ,     // Global clock request
-input          g_resetn  ,     // Sychronous active low reset.
-
-input          en        ,     // Enable.
-input  [N-1:0] rng [G-1:0],// Extra randomness.
-
-input  [N-1:0] rs1 [D-1:0],    // RS1 as SMAX shares
-input  [N-1:0] rs2 [D-1:0],    // RS2 as SMAX shares
-
-output [N-1:0] rd  [D-1:0]     // RD as SMAX shares
-);
-
-genvar s;
-genvar p; 
-generate for (s = 0; s < D; s = s+1) begin: domand_gen_shares
-  wire [N-1:0] x = rs1[s];
-
-  reg  [N-1:0] ands [D-1:0];  
-  reg  [N-1:0] rd_s;
-  for (p = 0; p < D; p = p+1) begin: domand_gen_products
-    wire [N-1:0] y = rs2[p];      
-
-    wire [N-1:0] p_ands;    
-    if(p == s) begin: p0
-      assign p_ands = (x & y)                   ;
-    end else if(p>s) begin : p1
-      assign p_ands = (x & y) ^ rng[s+p*(p-1)/2];
-    end else begin: p2
-      assign p_ands = (x & y) ^ rng[p+s*(s-1)/2];
-    end
-        
-    if(POSEDGE) begin
-      always @(posedge g_clk) if(en) ands[p] <= p_ands;
-    end else begin
-      always @(negedge g_clk) if(en) ands[p] <= p_ands;
-    end
-  end
-
-  integer i;
-  always @(*) begin
-    rd_s  = 0;
-    for (i = 0; i < D; i = i+1) begin rd_s = rd_s ^ ands[i]; end
-  end
-
-  assign rd[s]=rd_s;
-
-end endgenerate
 
 endmodule
 

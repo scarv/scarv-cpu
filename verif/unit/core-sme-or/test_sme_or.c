@@ -4,13 +4,12 @@
 // $SCARV_CPU/src/csp/scarv_cpu_sme.h
 #include "scarv_cpu_sme.h"
 
-#define EXPECTED_SMAX  3
-#define NREGS         16
-
-#define FUNC(A,B) (A^B)
+#ifndef SME_SMAX
+#define SME_SMAX  3
+#endif
 
 uint32_t expected;
-uint32_t rd_shares [EXPECTED_SMAX];
+uint32_t rd_shares [SME_SMAX];
 
 int test_main() {
 
@@ -19,7 +18,7 @@ int test_main() {
     int smax = sme_get_smax();
     
     // Don't bother if we get an unexpected SMAX value.
-    if(EXPECTED_SMAX != smax) {test_fail();}
+    if(SME_SMAX != smax) {test_fail();}
 
     register int rs1 asm ("x16") = scarv_cpu_pollentropy();
     register int rs2 asm ("x17") = scarv_cpu_pollentropy();
@@ -34,12 +33,15 @@ int test_main() {
 
     rd = rs1 | rs2;
 
-    SME_STORE(rd_shares, rd, EXPECTED_SMAX);
+    SME_STORE(rd_shares, rd, SME_SMAX);
     
     // Turn off SME
     sme_off();
 
-    int got = rd_shares[0] ^ rd_shares[1] ^ rd_shares[2];
+    int got = 0;
+    for( int i =0; i < smax; i++) {
+        got ^= rd_shares[i];
+    }
 
     if(got != expected) {
         test_fail();
