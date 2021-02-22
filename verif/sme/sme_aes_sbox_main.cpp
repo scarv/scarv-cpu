@@ -27,13 +27,13 @@ int main(int argc, char** argv) {
     top->g_resetn= 0;           // Set some inputs
 
     while (!Verilated::gotFinish() and main_time <= 10000) {
-        if (main_time > 10) {
+        if (main_time > 20) {
             top->g_resetn= 1;   // Deassert reset
         }
-        if ((main_time % 10) == 1) {
+        if ((main_time % 20) == 1) {
             top->g_clk = 1;       // Toggle clock - posedge
         }
-        if ((main_time % 10) == 6) {
+        if ((main_time % 20) == 10) {
             top->g_clk = 0;
         }
         top->eval();            // Evaluate model
