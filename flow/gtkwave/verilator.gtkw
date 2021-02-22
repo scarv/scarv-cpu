@@ -1,30 +1,28 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Thu Feb 11 13:18:40 2021
+[*] Mon Feb 22 09:49:57 2021
 [*]
-[dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.vcd"
-[dumpfile_mtime] "Thu Feb 11 13:15:49 2021"
-[dumpfile_size] 37511464
+[dumpfile] "/home/work/scarv/scarv-cpu-sme/work/unit/core-sme-add/core-sme-add.vcd"
+[dumpfile_mtime] "Mon Feb 22 09:48:26 2021"
+[dumpfile_size] 2221989
 [savefile] "/home/work/scarv/scarv-cpu-sme/flow/gtkwave/verilator.gtkw"
-[timestart] 59794
+[timestart] 2261
 [size] 1920 1016
 [pos] -1 -1
-*-6.898460 59906 57786 412026 358366 356466 59846 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.355452 2400 -1 412026 358366 356466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.frv_core.
 [treeopen] TOP.frv_core.i_pipeline.
 [treeopen] TOP.frv_core.i_pipeline.i_gprs.
 [treeopen] TOP.frv_core.i_pipeline.i_pipeline_s1_decode.i_decode_pipereg.
 [treeopen] TOP.frv_core.i_pipeline.i_sme.
+[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.
 [treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.
-[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(0).domain(0).
-[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).
-[treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).
 [treeopen] TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.
 [sst_width] 270
 [signals_width] 510
 [sst_expanded] 1
-[sst_vpaned_height] 280
+[sst_vpaned_height] 291
 @28
 TOP.frv_core.g_clk
 TOP.frv_core.g_resetn
@@ -96,7 +94,7 @@ TOP.frv_core.i_pipeline.dmem_error
 @22
 TOP.frv_core.trs_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-add/core-sme-add.gtkwl
 TOP.frv_core.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
@@ -263,7 +261,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s1_decode.program_counter[31:0]
 TOP.frv_core.i_pipeline.s1_data[31:0]
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-add/core-sme-add.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.n_s2_instr[31:0]
 @28
 TOP.frv_core.i_pipeline.i_pipeline_s1_decode.s1_bubble
@@ -316,7 +314,7 @@ TOP.frv_core.i_pipeline.s2_valid
 @22
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
+^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-add/core-sme-add.gtkwl
 TOP.frv_core.i_pipeline.s2_instr[31:0]
 @c00022
 TOP.frv_core.i_pipeline.s2_opr_a[31:0]
@@ -448,7 +446,7 @@ TOP.frv_core.i_pipeline.s3_busy
 @22
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
+^3 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
 TOP.frv_core.i_pipeline.s3_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s3_opr_a[31:0]
@@ -526,7 +524,7 @@ TOP.frv_core.i_pipeline.s4_flush
 @22
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
+^3 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
 TOP.frv_core.i_pipeline.s4_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.s4_opr_a[31:0]
@@ -562,7 +560,7 @@ TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.gpr_wen
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @2022
-^1 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
+^3 /home/work/scarv/scarv-cpu-sme/work/unit/core-sme-aes/core-sme-aes.gtkwl
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_instr[31:0]
 @22
 TOP.frv_core.i_pipeline.i_pipeline_s4_writeback.trs_pc[31:0]
@@ -612,13 +610,28 @@ TOP.frv_core.i_pipeline.i_sme.bank_wen
 TOP.frv_core.i_pipeline.i_sme.bank_rs1_addr[3:0]
 >0
 TOP.frv_core.i_pipeline.i_sme.bank_rs2_addr[3:0]
-@c00200
+@800200
 -ALU
 @28
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.valid
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.ready
 @24
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.shamt[4:0]
+@800200
+-Unmasking
+@22
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.gated_shares(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.gated_shares(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.gated_shares(2)[31:0]
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_unmask
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_unmask_bool
+@22
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.result_unmask[31:0]
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.unmask_en
+@1000200
+-Unmasking
 @800200
 -Shares
 @22
@@ -680,40 +693,68 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.u_rd[31:0]
 -
 @800200
 -Bit 2
-@28
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).q[2:0]
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).x[2:0]
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).y[2:0]
-@800200
 -D0
-@28
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).n_ands[2:0]
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(0).ands[2:0]
 @1000200
 -D0
 @800200
 -D1
-@28
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(1).n_ands[2:0]
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(1).ands[2:0]
 @1000200
 -D1
 @800200
 -D2
-@28
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(2).n_ands[2:0]
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_dom_and.gen_bits(2).domain(2).ands[2:0]
 @1000200
 -D2
 -Bit 2
 @1401200
 -AND
+@c00201
+-Adder
+@28
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.g_clk
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.en
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.ini
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.rdy
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.sub
+@22
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.g(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.g(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.g(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.gj(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.gj(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.gj(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.i[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.mand(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.mand(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.mand(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.mxor(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.mxor(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.mxor(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.p(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.p(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.p(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pi(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pi(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pi(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pigj(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pigj(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pigj(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pj(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pj(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.pj(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.r[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.rd(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.rd(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.rd(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.s_mand(0)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.s_mand(1)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.s_mand(2)[31:0]
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.i_ks_adder.seq_cnt[5:0]
+@1401201
+-Adder
 @800200
 -Operation
 @28
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_add
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_addsub_arith
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_addsub_bool
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_and
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_left
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_mask
@@ -722,17 +763,16 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_notrs2
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_or
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_remask
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_remask_bool
+TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_unmask_bool
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_right
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_rotate
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_shfrot
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_shift
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_sub
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_unmask
-TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_unmask_bool
 TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_xor
 @1000200
 -Operation
-@1401200
 -ALU
 @800200
 -Crypto
@@ -740,7 +780,7 @@ TOP.frv_core.i_pipeline.i_sme.i_sme_alu.op_xor
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.ready
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.valid
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_any
-@25
+@24
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_ctr[1:0]
 @28
 TOP.frv_core.i_pipeline.i_sme.i_sme_crypto.aes_dec
@@ -924,7 +964,7 @@ TOP.frv_core.i_interrupts.ti_pending
 TOP.frv_core.i_interrupts.ex_pending
 @1401200
 -Interrupts
-@800200
+@c00200
 -GPRs
 @22
 TOP.frv_core.i_pipeline.i_gprs.gprs(0)[31:0]
@@ -959,7 +999,7 @@ TOP.frv_core.i_pipeline.i_gprs.gprs(28)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(29)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(30)[31:0]
 TOP.frv_core.i_pipeline.i_gprs.gprs(31)[31:0]
-@1000200
+@1401200
 -GPRs
 @800200
 -SME Registers

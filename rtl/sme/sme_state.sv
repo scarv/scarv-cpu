@@ -44,6 +44,9 @@ output [      XL:0] cry_result    // Crypto 0'th share result.
 // Misc useful signals / parameters
 // ------------------------------------------------------------
 
+localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam RM    = RMAX-1;
+
 localparam SM   = SMAX-1;
 
 `define DBG(W,VAR) (*keep*)wire[W:0] dbg_``VAR = VAR[0]^VAR[1]^VAR[2];
@@ -54,7 +57,7 @@ logic        alu_clk_req;
 assign rf_clk_req[0] = 1'b0;
 
 // TODO: proper clock requests.
-assign g_clk_req = |rf_clk_req || alu_clk_req || 1'b1;
+assign g_clk_req = |rf_clk_req || alu_clk_req || rng_clk_req || 1'b1;
 
 //
 // smectl CSR register
@@ -63,6 +66,26 @@ assign g_clk_req = |rf_clk_req || alu_clk_req || 1'b1;
 wire [3:0] smectl_d = csr_smectl[ 8:5]; // Number of masks currently in use.
 wire       smectl_t = csr_smectl[   4]; // Current type of masking being used.
 wire [3:0] smectl_b = csr_smectl[ 3:0]; // Current bank select for load/store.
+
+//
+// Random Number Source
+// ------------------------------------------------------------
+
+wire [XL:0] rng[RM:0];  // RNG outputs.
+
+wire        rng_update = 1'b1;
+wire        rng_clk_req;
+
+sme_rng #(
+.XLEN(XLEN),
+.SMAX(SMAX) 
+) i_rng (
+.g_clk      (g_clk      ),
+.g_clk_req  (rng_clk_req),
+.g_resetn   (g_resetn   ), // Sychronous active low reset.
+.update     (rng_update ), // Update the internal RNG.
+.rng        (rng        )  // RNG outputs.
+);
 
 //
 // Share storage.

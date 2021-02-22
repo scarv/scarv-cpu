@@ -209,7 +209,8 @@ wire       sme_remask    = sme_on && fu_sme && s2_uop==SME_REMASK;
 wire       sme_maskop    = sme_mask || sme_unmask || sme_remask;
 
 wire       alu_nonlinear_op = alu_op_and || alu_op_andn ||
-                              alu_op_or  || alu_op_orn  ;
+                              alu_op_or  || alu_op_orn  ||
+                              alu_op_add || alu_op_sub  ;
 
 wire       sme_wb_result =
     sme_maskop ||

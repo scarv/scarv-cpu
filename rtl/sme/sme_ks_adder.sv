@@ -5,7 +5,7 @@ parameter G =  D+D*(D-1)/2, // Number of guard shares.
 parameter N = 32  // Width of the operation.
 )(
 input            g_clk       , // Global clock
-input            g_clk_req   , // Global clock request
+output           g_clk_req   , // Global clock request
 input            g_resetn    , // Sychronous active low reset. 
 
 input            en          , // Operation Enable.

@@ -28,7 +28,7 @@ input         g_clk_req , // Global clock request
 input         g_resetn  , // Sychronous active low reset.
 
 input  [ 3:0] smectl_d  , // Current number of shares to use.
-input  [XL:0] rng[SM:0] , // RNG outputs.
+input  [XL:0] rng[RM:0] , // RNG outputs.
 
 input         flush     , // Flush current operation, discard results.
 
@@ -50,6 +50,9 @@ output [XL:0] rd  [SM:0]  // RD as SMAX shares
 //
 // Misc useful signals / parameters
 // ------------------------------------------------------------
+
+localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam RM    = RMAX-1;
 
 localparam SM   = SMAX-1;
 localparam XL   = XLEN-1;

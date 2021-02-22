@@ -47,23 +47,30 @@ parameter SMAX=3
 input          g_clk        , // Global clock
 input          g_resetn     , // Sychronous active low reset.
 input          en           ,
-input   [31:0] rng[SMAX-1:0],
+input   [31:0] rng[RM    :0],
 input   [20:0] x  [SMAX-1:0], // 21 bits x 3 shares
 output  [17:0] y  [SMAX-1:0] 
 );
 
+    localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+    localparam RM    = RMAX-1;
     localparam SM = SMAX-1;
     
     // 3 shares / 21 bits.
     wire [SM:0] xs[20:0];
     wire [SM:0] ys[20:0];
-    wire [SM:0] rs[33:0];
+    wire [RM:0] rs[33:0];
 
     genvar i, s;
     generate for(i = 0; i < 34; i = i+1) begin
         for(s = 0; s < SMAX; s = s+1) begin
             if(i<18) begin assign  y[s][i] = ys[i][s]; end
             if(i<21) begin assign xs[i][s] =  x[s][i]; end
+        end 
+    end endgenerate
+    
+    generate for(i = 0; i < 34; i = i+1) begin
+        for(s = 0; s < RMAX; s = s+1) begin
             assign rs[i][s] = rng[s][i%32];
         end 
     end endgenerate
@@ -443,11 +450,13 @@ input  wire        g_clk              , // Global clock
 input  wire        g_resetn           , // Sychronous active low reset.
 input  wire        en                 , // Operation enable.
 input  wire        dec                , // Decrypt
-input  wire [31:0] rng      [SMAX-1:0], // Random bits
+input  wire [31:0] rng      [RM    :0], // Random bits
 input  wire [ 7:0] sbox_in  [SMAX-1:0], // SMAX share input
 output wire [ 7:0] sbox_out [SMAX-1:0]  // SMAX share output
 );
 
+localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam RM    = RMAX-1;
 localparam  SM = SMAX-1;
 
 wire [20:0] fwd_top [SM:0];

@@ -11,13 +11,17 @@ output         g_clk_req , // Global clock request
 input          g_resetn  , // Sychronous active low reset.
 
 input          en        , // Enable.
-input  [N-1:0] rng [D-1:0],// Extra randomness.
+input  [N-1:0] rng [RM :0],// Extra randomness.
 
-input  [N-1:0] rs1 [D-1:0], // RS1 as SMAX shares
-input  [N-1:0] rs2 [D-1:0], // RS2 as SMAX shares
+input  [N-1:0] rs1 [SM :0], // RS1 as SMAX shares
+input  [N-1:0] rs2 [SM :0], // RS2 as SMAX shares
 
-output [N-1:0] rd  [D-1:0]  // RD as SMAX shares
+output [N-1:0] rd  [SM :0]  // RD as SMAX shares
 );
+
+localparam RMAX  = D+D*(D-1)/2; // Number of guard shares.
+localparam RM    = RMAX-1;
+localparam SM    = D-1;
 
 // For debugging
 (*keep*) reg [N-1:0] u_rs1, u_rs2, u_rd;
@@ -34,48 +38,39 @@ always_comb begin
     end
 end
 
-genvar n;
-genvar i;
-genvar j;
-generate for (n = 0; n < N; n = n+1) begin: gen_bits
+genvar s;
+genvar p; 
+generate for (s = 0; s < D; s = s+1) begin: domand_gen_shares
+  wire [N-1:0] x = rs1[s];
 
-    // Shared representations of bit n of the inputs (x,y) and outputs (q).
-    logic [D-1:0] x, y, q; 
+  reg  [N-1:0] ands [D-1:0];  
+  reg  [N-1:0] rd_s;
+  for (p = 0; p < D; p = p+1) begin: domand_gen_products
+    wire [N-1:0] y = rs2[p];      
 
-    for (i = 0; i < D; i = i+1) begin : domain
-        // Pull relevant single bits out of the inputs to the top level module.
-        assign x[i] = rs1[i][n];
-        assign y[i] = rs2[i][n];
-
-        logic [D-1:0] n_ands;
-        logic [D-1:0]   ands;
-
-        always_comb begin
-            integer j;
-            for (j = 0; j < D; j = j+1) begin
-                if(j == i) begin
-                    n_ands[j] = (x[i] && y[j])                      ;
-                end else if($signed(j)>$signed(i)) begin
-                    n_ands[j] = (x[i] && y[j]) ^ rng[i+j*(j-1)/2][n];
-                end else begin // j<i                               
-                    n_ands[j] = (x[i] && y[j]) ^ rng[j+i*(i-1)/2][n];
-                end
-            end
-        end
-        
-        if(POSEDGE) begin
-            always_ff @(posedge g_clk) if(en) begin
-                ands <= n_ands;
-            end
-        end else begin
-            always_ff @(negedge g_clk) if(en) begin
-                ands <= n_ands;
-            end
-        end
-
-        assign q[i]     = ^ands;
-        assign rd[i][n] =  q[i];
+    wire [N-1:0] p_ands;    
+    if(p == s) begin: p0
+      assign p_ands = (x & y)                   ;
+    end else if(p>s) begin : p1
+      assign p_ands = (x & y) ^ rng[s+p*(p-1)/2];
+    end else begin: p2
+      assign p_ands = (x & y) ^ rng[p+s*(s-1)/2];
     end
+        
+    if(POSEDGE) begin
+      always @(posedge g_clk) if(en) ands[p] <= p_ands;
+    end else begin
+      always @(negedge g_clk) if(en) ands[p] <= p_ands;
+    end
+  end
+
+  integer i;
+  always @(*) begin
+    rd_s  = 0;
+    for (i = 0; i < D; i = i+1) begin rd_s = rd_s ^ ands[i]; end
+  end
+
+  assign rd[s]=rd_s;
 
 end endgenerate
 
@@ -91,7 +86,7 @@ output         g_clk_req , // Global clock request
 input          g_resetn  , // Sychronous active low reset.
 
 input          en        , // Enable.
-input  [D-1:0] rng,// Extra randomness.
+input  [2*D-1:0] rng,// Extra randomness.
               
 input  [D-1:0] rs1, // RS1 as SMAX shares
 input  [D-1:0] rs2, // RS2 as SMAX shares
@@ -99,17 +94,24 @@ input  [D-1:0] rs2, // RS2 as SMAX shares
 output [D-1:0] rd   // RD as SMAX shares
 );
 
-wire [0:0] i_rng [D-1:0];
+localparam RMAX  = D+D*(D-1)/2; // Number of guard shares.
+localparam RM    = RMAX-1;
+localparam SM    = D-1;
+
+wire [0:0] i_rng [RM :0];
 wire [0:0] i_rs1 [D-1:0];
 wire [0:0] i_rs2 [D-1:0];
 wire [0:0] i_rd  [D-1:0];
 
 genvar i;
 generate for(i = 0; i < D; i=i+1) begin
-    assign i_rng[i][0] = rng[i];
     assign i_rs1[i][0] = rs1[i];
     assign i_rs2[i][0] = rs2[i];
     assign rd   [i]    = i_rd[i][0];
+end endgenerate
+    
+generate for(i = 0; i < RMAX; i=i+1) begin
+    assign i_rng[i][0] = rng[i];
 end endgenerate
 
 sme_dom_and #(
