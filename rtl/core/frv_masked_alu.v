@@ -81,7 +81,7 @@ output wire [XL:0] rd_s1              // Output share 1
 parameter MASKING_ISE_TRNG    = 1'b0;
 
 // Masking ISE - Use a DOM Implementation (1) or not (0)
-parameter MASKING_ISE_DOM      = 1'b1;
+parameter MASKING_ISE_DOM     = 1'b1;
 
 // Enable finite-field instructions (or not).
 parameter ENABLE_FAFF = 1;
@@ -99,13 +99,15 @@ wire [XL:0]   prng1 ;
 wire [XL:0] n_prng0 ;
 wire [XL:0] n_prng1 ;
 
+wire xtap0, xtap1;
+
 frv_lfsr32 #(
 .RESET_VALUE(32'h6789ABCD)
 ) i_lfsr32_0(
 .g_clk      (g_clk      ), // Clock to update PRNG
 .g_resetn   (g_resetn   ), // Syncrhonous active low reset.
 .update     (prng_update), // Update PRNG with new value.
-.extra_tap  (1'b0       ), // Additional seed bit, possibly from TRNG.
+.extra_tap  (xtap0      ), // Additional seed bit, possibly from TRNG.
 .prng       (prng0      ), // Current PRNG value.
 .n_prng     (n_prng0    )  // Next    PRNG value.
 );
@@ -116,10 +118,35 @@ frv_lfsr32 #(
 .g_clk      (g_clk      ), // Clock to update PRNG
 .g_resetn   (g_resetn   ), // Syncrhonous active low reset.
 .update     (prng_update), // Update PRNG with new value.
-.extra_tap  (1'b0       ), // Additional seed bit, possibly from TRNG.
+.extra_tap  (xtap1      ), // Additional seed bit, possibly from TRNG.
 .prng       (prng1      ), // Current PRNG value.
 .n_prng     (n_prng1    )  // Next    PRNG value.
 );
+
+generate if(MASKING_ISE_TRNG) begin : TRNG_enabled
+
+wire [1:0] trng_bit, trng_rdy;
+frv_trng #(
+.Nb(2),                    // number of random bit
+.Ne(3),                    // number of entropy sources per bit
+.ORD(3)                    // filter order
+) i_trng_0(
+.g_clk      (g_clk      ), // Clock to update PRNG
+.g_resetn   (g_resetn   ), // Syncrhonous active low reset.
+.gen        (1'b1       ), // countinously generate random bits
+.rnb        (trng_bit   ),
+.rdy        (trng_rdy   )     
+);
+
+assign xtap0 = trng_rdy[0] & trng_bit[0];
+assign xtap1 = trng_rdy[1] & trng_bit[1];
+
+end else begin : TRNG_disabled
+
+assign xtap0    = 1'b0;
+assign xtap1    = 1'b0;
+
+end endgenerate
 
 //
 // Operand Setup
