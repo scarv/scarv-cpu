@@ -118,7 +118,7 @@ parameter  CSR_MIMPID         = `SCARV_CPU_MIMPID;
 parameter  CSR_MIMPID         = 32'b0;
 `endif
 
-parameter SME_SMAX = 3; // Max shares supported by the SME implementation.
+parameter SME_SMAX = 2; // Max shares supported by the SME implementation.
 
 // Common core parameters and constants
 `include "frv_common.svh"
