@@ -102,8 +102,6 @@ assign       s1_rs2[0] = input_data.rs2_rdata;
 // ALU Instance
 // ------------------------------------------------------------
 
-logic [XL:0] rng[SM:0];
-
 logic [XL:0] alu_rd [SM:0];
 
 wire alu_rd_wen     = alu_valid && alu_ready;

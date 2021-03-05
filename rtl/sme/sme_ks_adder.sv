@@ -5,7 +5,6 @@ parameter G =  D+D*(D-1)/2, // Number of guard shares.
 parameter N = 32  // Width of the operation.
 )(
 input            g_clk       , // Global clock
-output           g_clk_req   , // Global clock request
 input            g_resetn    , // Sychronous active low reset. 
 
 input            en          , // Operation Enable.
@@ -96,7 +95,6 @@ sme_dom_and #(
 .N(N)             // Bit-width of the operation.
 ) i_dom_and_pi_pj (
 .g_clk      (g_clk    ), // Global clock
-.g_clk_req  (         ), // Global clock request
 .g_resetn   (g_resetn ), // Sychronous active low reset.
 .en         (en       ), // Enable.
 .rng        (rng      ), // Extra randomness.
@@ -111,7 +109,6 @@ sme_dom_and #(
 .N(N)             // Bit-width of the operation.
 ) i_dom_and_pi_gj (
 .g_clk      (g_clk    ), // Global clock
-.g_clk_req  (         ), // Global clock request
 .g_resetn   (g_resetn ), // Sychronous active low reset.
 .en         (en       ), // Enable.
 .rng        (rng1     ), // Extra randomness.

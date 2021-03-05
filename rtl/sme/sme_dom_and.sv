@@ -7,7 +7,6 @@ parameter D      =3, // Number of shares.
 parameter N      =32  // Width of the operation.
 )(
 input          g_clk     , // Global clock
-output         g_clk_req , // Global clock request
 input          g_resetn  , // Sychronous active low reset.
 
 input          en        , // Enable.
@@ -82,7 +81,6 @@ parameter POSEDGE=0, // If 0, trigger on negedge, else posedge.
 parameter D      =3  // Number of shares.
 )(
 input          g_clk     , // Global clock
-output         g_clk_req , // Global clock request
 input          g_resetn  , // Sychronous active low reset.
 
 input          en        , // Enable.
@@ -118,7 +116,6 @@ sme_dom_and #(
 .POSEDGE(POSEDGE), .D(D), .N(1)
 ) i_and (
 .g_clk     (g_clk     ), // Global clock
-.g_clk_req (g_clk_req ), // Global clock request
 .g_resetn  (g_resetn  ), // Sychronous active low reset.
 .en        (en        ), // Enable.
 .rng       (i_rng     ),// Extra randomness.

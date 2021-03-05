@@ -81,7 +81,7 @@ wire        op_shfrot       = op_shift    || op_rotate;
 wire        and_clk_req;
 wire        add_clk_req;
 
-assign      g_clk_req       = and_clk_req || add_clk_req;
+assign      g_clk_req       = 1'b1;
 
 (*keep*)reg[XL:0] dbg_rs1;
 (*keep*)reg[XL:0] dbg_rs2;
@@ -122,7 +122,6 @@ sme_ks_adder #(
 .N(  32)  // Width of the operation.
 ) i_ks_adder (
 .g_clk       (g_clk       ), // Global clock
-.g_clk_req   (g_clk_req   ), // Global clock request
 .g_resetn    (g_resetn    ), // Sychronous active low reset. 
 .en          (adder_valid ), // Operation Enable.
 .sub         (op_sub      ), // Subtract when =1, add when =0.
@@ -164,7 +163,6 @@ sme_dom_and #(
 .N(XLEN)    // Bit-width of the operation.
 ) i_dom_and (
 .g_clk      (g_clk      ), // Global clock
-.g_clk_req  (and_clk_req), // Global clock request
 .g_resetn   (g_resetn   ), // Sychronous active low reset.
 .en         (dom_and_en ), // Enable.
 .rng        (rng        ), // Extra randomness.

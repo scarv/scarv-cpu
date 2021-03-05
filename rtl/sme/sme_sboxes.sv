@@ -77,7 +77,6 @@ output  [17:0] y  [SMAX-1:0]
             .POSEDGE(PE), .D(SMAX)                  \
         ) i_and_``RI  (                             \
             .g_clk      (g_clk          ),          \
-            .g_clk_req  (               ),          \
             .g_resetn   (g_resetn       ),          \
             .en         (en             ),          \
             .rng        (rs[RI]         ),          \
