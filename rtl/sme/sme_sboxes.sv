@@ -248,18 +248,21 @@ output  [ 7:0] y [SMAX-1:0]
 );
     localparam SM = SMAX-1;
 
-(*keep*) reg [ 17:0] u_x;
-(*keep*) reg [  7:0] u_y;
+//(*keep*) reg [ 17:0] u_x;
+//(*keep*) reg [  7:0] u_y;
 
-always_comb begin
-    integer d;
-    u_x= x[0];
-    u_y= y[0];
-    for (d=1; d<SMAX; d=d+1) begin
-        u_x = u_x ^ x[d];
-        u_y = u_y ^ y[d];
-    end
-end
+//always_comb begin
+//    integer d;
+//    u_x= x[0];
+//    u_y= y[0];
+//    for (d=1; d<SMAX; d=d+1) begin
+//        u_x = u_x ^ x[d];
+//        u_y = u_y ^ y[d];
+//    end
+//end
+    
+    // used to invert a variable by toglging the 0'th share bit
+    wire [SM:0] inv = {{SM{1'b0}}, 1'b1};
 
     // 3 shares / 21 bits.
     wire [SM:0] xs[17:0];
@@ -273,45 +276,45 @@ end
         end 
     end endgenerate
 
-    (*keep*)wire dbg_t0  = ^t0  ;wire [SM:0] t0   = xs[11] ^ xs[12];
-    (*keep*)wire dbg_t1  = ^t1  ;wire [SM:0] t1   = xs[ 0] ^ xs[ 6];
-    (*keep*)wire dbg_t2  = ^t2  ;wire [SM:0] t2   = xs[14] ^ xs[16];
-    (*keep*)wire dbg_t3  = ^t3  ;wire [SM:0] t3   = xs[15] ^ xs[ 5];
-    (*keep*)wire dbg_t4  = ^t4  ;wire [SM:0] t4   = xs[ 4] ^ xs[ 8];
-    (*keep*)wire dbg_t5  = ^t5  ;wire [SM:0] t5   = xs[17] ^ xs[11];
-    (*keep*)wire dbg_t6  = ^t6  ;wire [SM:0] t6   = xs[12] ^ t5;
-    (*keep*)wire dbg_t7  = ^t7  ;wire [SM:0] t7   = xs[14] ^ t3;
-    (*keep*)wire dbg_t8  = ^t8  ;wire [SM:0] t8   = xs[ 1] ^ xs[ 9];
-    (*keep*)wire dbg_t9  = ^t9  ;wire [SM:0] t9   = xs[ 2] ^ xs[ 3];
-    (*keep*)wire dbg_t10 = ^t10 ;wire [SM:0] t10  = xs[ 3] ^ t4;
-    (*keep*)wire dbg_t11 = ^t11 ;wire [SM:0] t11  = xs[10] ^ t2;
-    (*keep*)wire dbg_t12 = ^t12 ;wire [SM:0] t12  = xs[16] ^ xs[ 1];
-    (*keep*)wire dbg_t13 = ^t13 ;wire [SM:0] t13  = xs[ 0] ^ t0;
-    (*keep*)wire dbg_t14 = ^t14 ;wire [SM:0] t14  = xs[ 2] ^ xs[11];
-    (*keep*)wire dbg_t15 = ^t15 ;wire [SM:0] t15  = xs[ 5] ^ t1;
-    (*keep*)wire dbg_t16 = ^t16 ;wire [SM:0] t16  = xs[ 6] ^ t0;
-    (*keep*)wire dbg_t17 = ^t17 ;wire [SM:0] t17  = xs[ 7] ^ t1;
-    (*keep*)wire dbg_t18 = ^t18 ;wire [SM:0] t18  = xs[ 8] ^ t8;
-    (*keep*)wire dbg_t19 = ^t19 ;wire [SM:0] t19  = xs[13] ^ t4;
-    (*keep*)wire dbg_t20 = ^t20 ;wire [SM:0] t20  = t0     ^ t1;
-    (*keep*)wire dbg_t21 = ^t21 ;wire [SM:0] t21  = t1     ^ t7;
-    (*keep*)wire dbg_t22 = ^t22 ;wire [SM:0] t22  = t3     ^ t12;
-    (*keep*)wire dbg_t23 = ^t23 ;wire [SM:0] t23  = t18    ^ t2;
-    (*keep*)wire dbg_t24 = ^t24 ;wire [SM:0] t24  = t15    ^ t9;
-    (*keep*)wire dbg_t25 = ^t25 ;wire [SM:0] t25  = t6     ^ t10;
-    (*keep*)wire dbg_t26 = ^t26 ;wire [SM:0] t26  = t7     ^ t9;
-    (*keep*)wire dbg_t27 = ^t27 ;wire [SM:0] t27  = t8     ^ t10;
-    (*keep*)wire dbg_t28 = ^t28 ;wire [SM:0] t28  = t11    ^ t14;
-    (*keep*)wire dbg_t29 = ^t29 ;wire [SM:0] t29  = t11    ^ t17;
+    wire [SM:0] t0   = xs[11] ^ xs[12];
+    wire [SM:0] t1   = xs[ 0] ^ xs[ 6];
+    wire [SM:0] t2   = xs[14] ^ xs[16];
+    wire [SM:0] t3   = xs[15] ^ xs[ 5];
+    wire [SM:0] t4   = xs[ 4] ^ xs[ 8];
+    wire [SM:0] t5   = xs[17] ^ xs[11];
+    wire [SM:0] t6   = xs[12] ^ t5;
+    wire [SM:0] t7   = xs[14] ^ t3;
+    wire [SM:0] t8   = xs[ 1] ^ xs[ 9];
+    wire [SM:0] t9   = xs[ 2] ^ xs[ 3];
+    wire [SM:0] t10  = xs[ 3] ^ t4;
+    wire [SM:0] t11  = xs[10] ^ t2;
+    wire [SM:0] t12  = xs[16] ^ xs[ 1];
+    wire [SM:0] t13  = xs[ 0] ^ t0;
+    wire [SM:0] t14  = xs[ 2] ^ xs[11];
+    wire [SM:0] t15  = xs[ 5] ^ t1;
+    wire [SM:0] t16  = xs[ 6] ^ t0;
+    wire [SM:0] t17  = xs[ 7] ^ t1;
+    wire [SM:0] t18  = xs[ 8] ^ t8;
+    wire [SM:0] t19  = xs[13] ^ t4;
+    wire [SM:0] t20  = t0     ^ t1;
+    wire [SM:0] t21  = t1     ^ t7;
+    wire [SM:0] t22  = t3     ^ t12;
+    wire [SM:0] t23  = t18    ^ t2;
+    wire [SM:0] t24  = t15    ^ t9;
+    wire [SM:0] t25  = t6     ^ t10;
+    wire [SM:0] t26  = t7     ^ t9;
+    wire [SM:0] t27  = t8     ^ t10;
+    wire [SM:0] t28  = t11    ^ t14;
+    wire [SM:0] t29  = t11    ^ t17;
 
-    (*keep*) wire dbg_y0 = ^y0;assign ys[0] = y0; wire [SM:0] y0 = t6  ^~ t23;
-    (*keep*) wire dbg_y1 = ^y1;assign ys[1] = y1; wire [SM:0] y1 = t13 ^~ t27;
-    (*keep*) wire dbg_y2 = ^y2;assign ys[2] = y2; wire [SM:0] y2 = t25 ^  t29;
-    (*keep*) wire dbg_y3 = ^y3;assign ys[3] = y3; wire [SM:0] y3 = t20 ^  t22;
-    (*keep*) wire dbg_y4 = ^y4;assign ys[4] = y4; wire [SM:0] y4 = t6  ^  t21;
-    (*keep*) wire dbg_y5 = ^y5;assign ys[5] = y5; wire [SM:0] y5 = t19 ^~ t28;
-    (*keep*) wire dbg_y6 = ^y6;assign ys[6] = y6; wire [SM:0] y6 = t16 ^~ t26;
-    (*keep*) wire dbg_y7 = ^y7;assign ys[7] = y7; wire [SM:0] y7 = t6  ^  t24;
+    assign ys[0] = y0; wire [SM:0] y0 = t6  ^ t23 ^ inv;
+    assign ys[1] = y1; wire [SM:0] y1 = t13 ^ t27 ^ inv;
+    assign ys[2] = y2; wire [SM:0] y2 = t25 ^ t29      ;
+    assign ys[3] = y3; wire [SM:0] y3 = t20 ^ t22      ;
+    assign ys[4] = y4; wire [SM:0] y4 = t6  ^ t21      ;
+    assign ys[5] = y5; wire [SM:0] y5 = t19 ^ t28 ^ inv;
+    assign ys[6] = y6; wire [SM:0] y6 = t16 ^ t26 ^ inv;
+    assign ys[7] = y7; wire [SM:0] y7 = t6  ^ t24      ;
 
 endmodule
 
@@ -497,24 +500,24 @@ assign sbox_out = dec ? inv_bot : fwd_bot;
 
 
 // For debugging
-(*keep*) reg [ 20:0] u_fwd_top;
-(*keep*) reg [ 20:0] u_mid_in ;
-(*keep*) reg [ 17:0] u_mid_out;
-(*keep*) reg [  7:0] u_fwd_bot;
-
-always_comb begin
-    integer d;
-    u_fwd_top= fwd_top[0];
-    u_mid_in = mid_in [0];
-    u_mid_out= mid_out[0];
-    u_fwd_bot= fwd_bot[0];
-    for (d=1; d<SMAX; d=d+1) begin
-        u_fwd_top = u_fwd_top ^ fwd_top[d];
-        u_mid_in  = u_mid_in  ^ mid_in [d];
-        u_mid_out = u_mid_out ^ mid_out[d];
-        u_fwd_bot = u_fwd_bot ^ fwd_bot[d];
-    end
-end
+//(*keep*) reg [ 20:0] u_fwd_top;
+//(*keep*) reg [ 20:0] u_mid_in ;
+//(*keep*) reg [ 17:0] u_mid_out;
+//(*keep*) reg [  7:0] u_fwd_bot;
+//
+//always_comb begin
+//    integer d;
+//    u_fwd_top= fwd_top[0];
+//    u_mid_in = mid_in [0];
+//    u_mid_out= mid_out[0];
+//    u_fwd_bot= fwd_bot[0];
+//    for (d=1; d<SMAX; d=d+1) begin
+//        u_fwd_top = u_fwd_top ^ fwd_top[d];
+//        u_mid_in  = u_mid_in  ^ mid_in [d];
+//        u_mid_out = u_mid_out ^ mid_out[d];
+//        u_fwd_bot = u_fwd_bot ^ fwd_bot[d];
+//    end
+//end
 
 endmodule
 

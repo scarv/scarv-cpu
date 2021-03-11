@@ -59,6 +59,9 @@ always @(posedge g_clk) begin
     if(g_resetn && ctr%3==0) begin
         if(dut_out_y != grm_out_y) begin
             $display("ERROR");
+            $display("Input  %h %b", dut_in_x , dut_in_x );
+            $display("Expect %h %b", grm_out_y, grm_out_y);
+            $display("Got    %h %b", dut_out_y, dut_out_y);
             $finish;
         end
     end
