@@ -18,25 +18,37 @@ output [XL:0] rng[RM:0]   // RNG outputs.
 localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
 
+localparam KECCAK_LW = 8;
+localparam KS        = 25*KECCAK_LW-1;
+
+wire [KS:0] keccak_state;
+
 assign g_clk_req = update;
 
 wire [RM:0] trng_taps ;
 wire [RM:0] trng_ready;
 
-genvar prng;
-generate for(prng=0; prng<RMAX; prng = prng+1) begin: g_prngs
+genvar i, j;
+generate
+    for(i = 0; i < RMAX; i=i+1) begin
+        for(j = 0; j < XLEN; j=j+1) begin
+            assign rng[i][j] = keccak_state[i*XLEN+j];
+        end
+    end
+endgenerate
 
-    sme_lfsr32 #(
-        .RESET_VALUE(prng ^ (32'h3456_789A<<prng | 32'h3456_789A>>prng))
-    ) i_lfsr32 (
-        .g_clk    (g_clk            ), // Clock to update PRNG
-        .g_resetn (g_resetn         ), // Syncrhonous active low reset.
-        .update   (1'b1             ), // Update PRNG with new value.
-        .extra_tap(trng_taps[prng]  ), // Additional seed bit, from TRNG.
-        .prng     (rng[prng]        )  // Current PRNG value.
-    );
-
-end endgenerate // g_prngs
+//
+// Keccak Instance
+sme_keccak #(
+.LW     (KECCAK_LW  ),
+.TAPS   (RMAX       )
+) i_sme_keccak (
+.g_clk    (g_clk        ),
+.g_resetn (g_resetn     ),
+.update   (update       ),
+.taps     (trng_taps    ),
+.state    (keccak_state )    // Current state
+);
 
 
 //
