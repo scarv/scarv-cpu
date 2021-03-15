@@ -98,10 +98,9 @@ always @(*) begin : keccak_next
         end
     end
 
-    // Mix in tap bits instead of round constants. Each tap bit is xor'd
-    // into the LS bit of each lane.
-    for(x = 0; x < TAPS && x < 25; x = x+1) begin
-        cs[x][0] = cs[x][0] ^ taps[x];
+    // Mix in tap bits instead of round constants.
+    for(x = 0; x < TAPS && x < 25 && x<LW; x = x+1) begin
+        cs[x][x] = cs[x][x] ^ taps[x];
     end
 end
 
@@ -123,10 +122,13 @@ always @(posedge g_clk) begin : keccak_update
     end
 end
 
-genvar i;
-generate for(i = 0; i < LW*25; i=i+1) begin
-    assign state[i] = s[i/25][i%25];
-end endgenerate
+
+genvar i, j;
+generate
+    for(i = 0; i < 25; i=i+1) begin
+        assign state[i*LW+:LW] = s[i];
+    end
+endgenerate
 
 endmodule
 
