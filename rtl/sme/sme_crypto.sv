@@ -105,6 +105,8 @@ wire [XL:0] aes_result[SM:0];
 
 assign rd = aes_result;
 
+wire   aes_flush = new_instr;
+
 genvar a;
 generate for(a=0; a < SMAX; a=a+1) begin : g_aes
 
@@ -146,6 +148,7 @@ sme_sbox_aes #(
 .g_clk   (g_clk         ), // Global clock
 .g_resetn(g_resetn      ), // Sychronous active low reset.
 .en      (aes_any       ), // Operation enable.
+.flush   (aes_flush     ), // Flush SBox state bits.
 .dec     (aes_dec       ), // Decrypt
 .rng     (rng           ), // Random bits
 .sbox_in (aes_sbox_in   ), // SMAX share input

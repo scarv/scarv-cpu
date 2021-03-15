@@ -45,6 +45,7 @@ parameter SMAX=3
 input          g_clk        , // Global clock
 input          g_resetn     , // Sychronous active low reset.
 input          en           ,
+input          flush        ,
 input   [31:0] rng[RM    :0],
 input   [20:0] x  [SMAX-1:0], // 21 bits x 3 shares
 output  [17:0] y  [SMAX-1:0] 
@@ -77,7 +78,7 @@ output  [17:0] y  [SMAX-1:0]
             .POSEDGE(PE), .D(SMAX)                  \
         ) i_and_``RI  (                             \
             .g_clk      (g_clk          ),          \
-            .g_resetn   (g_resetn       ),          \
+            .g_resetn   (!flush         ),          \
             .en         (en             ),          \
             .rng        (rs[RI]         ),          \
             .rs1        (X              ),          \
@@ -460,6 +461,7 @@ parameter SMAX=3
 input  wire        g_clk              , // Global clock
 input  wire        g_resetn           , // Sychronous active low reset.
 input  wire        en                 , // Operation enable.
+input  wire        flush              , // Flush internal state bits.
 input  wire        dec                , // Decrypt
 input  wire [31:0] rng      [RM    :0], // Random bits
 input  wire [ 7:0] sbox_in  [SMAX-1:0], // SMAX share input
@@ -488,6 +490,7 @@ sme_sbox_inv_mid  #(.SMAX(SMAX)) i_mid (
 .g_clk      (g_clk      ),
 .g_resetn   (g_resetn   ),
 .en         (en         ),
+.flush      (flush      ),
 .rng        (rng        ),
 .x          (mid_in     ),
 .y          (mid_out    )

@@ -57,9 +57,11 @@ generate for (s = 0; s < D; s = s+1) begin: domand_gen_shares
     end
         
     if(POSEDGE) begin
-      always @(posedge g_clk) if(en) ands[p] <= p_ands;
+      always @(posedge g_clk) if(!g_resetn) ands[p] <= 'b0;
+                              else if(en) ands[p] <= p_ands;
     end else begin
-      always @(negedge g_clk) if(en) ands[p] <= p_ands;
+      always @(negedge g_clk) if(!g_resetn) ands[p] <= 'b0;
+                              else if(en) ands[p] <= p_ands;
     end
   end
 
