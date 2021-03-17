@@ -94,9 +94,24 @@ sme_rng #(
 logic [XL:0] s1_rs1 [SM:0];
 logic [XL:0] s1_rs2 [SM:0];
 
+logic [XL:0] s1_alu_rs1 [SM:0];
+logic [XL:0] s1_alu_rs2 [SM:0];
+
+logic [XL:0] s1_cry_rs1 [SM:0];
+logic [XL:0] s1_cry_rs2 [SM:0];
+
 // Zeroth share comes from GPRs.
 assign       s1_rs1[0] = input_data.rs1_rdata;
 assign       s1_rs2[0] = input_data.rs2_rdata;
+
+genvar i;
+generate for(i=0; i < SMAX; i = i+1) begin
+    assign s1_alu_rs1[i] = {XLEN{alu_valid}} & s1_rs1[i];
+    assign s1_alu_rs2[i] = {XLEN{alu_valid}} & s1_rs2[i];
+
+    assign s1_cry_rs1[i] = {XLEN{cry_valid}} & s1_rs1[i];
+    assign s1_cry_rs2[i] = {XLEN{cry_valid}} & s1_rs2[i];
+end endgenerate
 
 //
 // ALU Instance
