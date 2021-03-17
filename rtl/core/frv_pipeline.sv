@@ -329,6 +329,7 @@ wire [XL:0] fwd_rs2_rdata =
 wire           sme_clk_req      ;
 wire           sme_bank_wen     ; // Write loaded data to bank.
 wire    [XL:0] sme_bank_wdata   ; // Write data being loaded into bank.
+wire           sme_bank_read    ; // Set when reading share to store to mem.
 wire    [XL:0] sme_bank_rdata   ; // Read data from bank[smectl.t][bank_addr]
 wire           sme_alu_valid    ; // Accept new input instruction.
 wire           sme_alu_ready    ; // Ready for new input instruction.
@@ -361,6 +362,7 @@ sme_state #(
 .bank_wen       (sme_bank_wen       ), // Write loaded data to bank.
 .bank_waddr     (s4_rd[3:0]         ), // Bank register address.
 .bank_wdata     (sme_bank_wdata     ), // Write data being loaded into bank.
+.bank_read      (sme_bank_read      ), // Set when storing share to memory.
 .bank_rdata     (sme_bank_rdata     ), // bank[smectl.t][bank_addr] rdata.
 .csr_smectl     (csr_smectl         ), // SMECTL CSR value.
 .input_data     (sme_input_data     ), // SME input data / registers.
@@ -499,6 +501,7 @@ frv_pipeline_execute #(
 .s2_busy          (s2_busy          ), // Can this stage accept new inputs?
 .s2_valid         (s2_valid         ), // Is this input valid?
 .sme_bank_rdata   (sme_bank_rdata   ), // bank[smectl.t][bank_addr] rdata.
+.sme_bank_read    (sme_bank_read    ), // Set when storing share to memory.
 .csr_smectl       (csr_smectl       ), // SMECTL CSR value.
 .sme_input_data   (sme_input_data   ), // SME input data / registers.
 .sme_alu_valid    (sme_alu_valid    ), // Accept new input instruction.

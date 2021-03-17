@@ -27,6 +27,7 @@ output wire        s2_busy         , // Can this stage accept new inputs?
 input  wire        s2_valid        , // Is this input valid?
 
 input  wire [XL:0] csr_smectl      , // SME CSR
+output wire        sme_bank_read   , // Set when reading share to store to mem
 input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
 output  sme_data_t sme_input_data  , // Input oeprands.
 output             sme_alu_valid   , // Accept new input instruction.
@@ -229,6 +230,8 @@ wire    sme_operands_ok  =
 wire    store_sme_share = sme_on && |smectl_b && 
                          sme_rs2_is_share &&
                          lsu_valid && lsu_store;
+
+assign  sme_bank_read   = store_sme_share;
 
 assign  sme_input_data.rs1_addr   = {4{sme_on && sme_rs1_is_share}} & s2_rs1_addr[3:0];
 assign  sme_input_data.rs2_addr   = {4{sme_on && sme_rs2_is_share}} & s2_rs2_addr[3:0];

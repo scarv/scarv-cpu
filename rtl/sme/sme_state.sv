@@ -21,6 +21,7 @@ input               bank_wen    , // Write loaded data to bank.
 input  [       3:0] bank_waddr  , // Register of the bank to write.
 input  [      XL:0] bank_wdata  , // Write data being loaded into bank.
 
+input               bank_read   , // Used for storing share to memory.
 output [      XL:0] bank_rdata  , // Read data from bank[smectrl.t][smectl.b]
 
 input  [      XL:0] csr_smectl  , // Current SMECTL value.
@@ -194,7 +195,14 @@ sme_crypto #(
 
 localparam BI = $clog2(SMAX)-1;
 
-assign bank_rdata = s1_rs2[smectl_b[BI:0]]; // TODO: Leakage hazard.
+wire [XL:0] bank_rdata_sel[SM:0];
+genvar bs;
+generate for(bs=0; bs<SMAX;bs=bs+1) begin
+    assign bank_rdata_sel[bs] =
+        {XLEN{bank_read && smectl_b[BI:0] == bs}} & s1_rs2[bs];
+end endgenerate
+
+assign bank_rdata = bank_rdata_sel[smectl_b[BI:0]];
 
 wire   [3:0] bank_rs1_addr = input_data.rs1_addr;
 wire   [3:0] bank_rs2_addr = input_data.rs2_addr;

@@ -795,6 +795,9 @@ wire       read_sme_share = sme_on && |smectl_b &&
                             sme_is_share_reg(s1_rs2_addr) &&
                             n_s2_fu[P_FU_LSU] && uop_lsu[LSU_STORE];
 
+wire read_sme_rs1 = sme_on && sme_is_share_reg(s1_rs1_addr);
+wire read_sme_rs2 = sme_on && sme_is_share_reg(s1_rs2_addr);
+
 //
 // Pipeline Register.
 // -------------------------------------------------------------------------
@@ -832,8 +835,8 @@ wire [RL-1:0] p_in = {
  s1_bubble ?  1'b0      : n_s2_trap , // Raise a trap?
 leak_stall || s1_bubble ?  2'b0      : n_s2_size , // Size of the instruction.
  s1_bubble ? 32'b0      : n_s2_instr, // The instruction word
- s1_bubble ?  5'b0      : s1_rs1_addr,
- s1_bubble ?  5'b0      : s1_rs2_addr,
+ !read_sme_rs1 ?  5'b0      : s1_rs1_addr,
+ !read_sme_rs2 ?  5'b0      : s1_rs2_addr,
  s1_bubble ?  1'b0      : oprb_src_imm
 };
 
