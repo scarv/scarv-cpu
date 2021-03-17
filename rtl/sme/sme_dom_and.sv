@@ -23,19 +23,19 @@ localparam RM    = RMAX-1;
 localparam SM    = D-1;
 
 // For debugging
-(*keep*) reg [N-1:0] u_rs1, u_rs2, u_rd;
-
-always_comb begin
-    integer d;
-    u_rs1 = rs1[0];
-    u_rs2 = rs2[0];
-    u_rd  = rd [0];
-    for (d=1; d<D; d=d+1) begin
-        u_rs1 = u_rs1 ^ rs1[d];
-        u_rs2 = u_rs2 ^ rs2[d];
-        u_rd  = u_rd  ^ rd [d];
-    end
-end
+//(*keep*) reg [N-1:0] u_rs1, u_rs2, u_rd;
+//
+//always_comb begin
+//    integer d;
+//    u_rs1 = rs1[0];
+//    u_rs2 = rs2[0];
+//    u_rd  = rd [0];
+//    for (d=1; d<D; d=d+1) begin
+//        u_rs1 = u_rs1 ^ rs1[d];
+//        u_rs2 = u_rs2 ^ rs2[d];
+//        u_rd  = u_rd  ^ rd [d];
+//    end
+//end
 
 genvar s;
 genvar p; 
