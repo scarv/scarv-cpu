@@ -146,6 +146,11 @@ sme_aes128_enc_block:
     xor x19, x19, a5
     xor x16, x16, a1            // 0'th add round key.
 
+    mv a1, x0                   // Clear plaintex from non SME registers.
+    mv a3, x0
+    mv a4, x0
+    mv a5, x0
+
     addi a1, a2, 16*10          // Loop end pointer
 
 .aes128_enc_blk_l0:
@@ -161,7 +166,7 @@ sme_aes128_enc_block:
         addi t2, t2, 44*4
         addi t0, t0, 1
         bne  t0, t1, .aes128_enc_blk_ldkey1
-    nop;nop;nop;
+    xor x0,x0,x0; xor x0,x0,x0; xor x0,x0,x0;
 
     aes32esmi x20, x16, 0        // Even Round
     aes32esmi x20, x17, 1
@@ -194,7 +199,7 @@ sme_aes128_enc_block:
         addi t2, t2, 44*4
         addi t0, t0, 1
         bne  t0, t1, .aes128_enc_blk_ldkey2
-    nop;nop;nop;
+    xor x0,x0,x0; xor x0,x0,x0; xor x0,x0,x0;
 
     addi a2, a2, 32             // Increment round key pointer.
     beq  a1, a2, .aes128_enc_blk_final
@@ -220,7 +225,7 @@ sme_aes128_enc_block:
     aes32esmi x19, x22, 3        // x20-x23 contains new state
 
     j .aes128_enc_blk_l0
-    nop;nop;nop
+    xor x0,x0,x0; xor x0,x0,x0; xor x0,x0,x0;
 
 .aes128_enc_blk_final:
     aes32esi x16, x20, 0        // Odd Round [Final]
