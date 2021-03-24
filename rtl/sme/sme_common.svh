@@ -16,3 +16,14 @@
     generate for(GV = 0; GV < N; GV=GV+1) begin \
         `SME_A2P(PACKED, ARRAY, WIDTH, GV)          \
     end endgenerate
+
+//
+// Wrapper for testing if SME is turned on based on the value of smectl.
+`define SME_IS_ON(SMECTL) (|smectl[8:5])
+
+
+//
+// Is the supplied register address _potentially_ an SME share?
+// If we come up with a complex mapping between share registers and
+// addresses later, we only need to change this function.
+`define sme_is_share_reg(ADDR) (addr[4])

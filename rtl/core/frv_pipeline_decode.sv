@@ -1,5 +1,5 @@
 
-import sme_pkg::*;
+//import sme_pkg::*;
 
 //
 // module: frv_pipeline_decode
@@ -787,16 +787,16 @@ assign n_s2_opr_c = read_sme_share ? {27'b0, s1_rs2_addr} :
 // SME Signals
 // -------------------------------------------------------------------------
 
-wire       sme_on   = sme_is_on(csr_smectl);
-wire [3:0] smectl_b = csr_smectl[3:0];
+wire       sme_on   = |csr_smectl[8:5];
+wire [3:0] smectl_b =  csr_smectl[3:0];
 
 // Do we need to source an SME share for storing to memory?
 wire       read_sme_share = sme_on && |smectl_b && 
-                            sme_is_share_reg(s1_rs2_addr) &&
+                            s1_rs2_addr[4] &&
                             n_s2_fu[P_FU_LSU] && uop_lsu[LSU_STORE];
 
-wire read_sme_rs1 = sme_on && sme_is_share_reg(s1_rs1_addr);
-wire read_sme_rs2 = sme_on && sme_is_share_reg(s1_rs2_addr);
+wire read_sme_rs1 = sme_on && s1_rs1_addr[4];
+wire read_sme_rs2 = sme_on && s1_rs2_addr[4];
 
 //
 // Pipeline Register.

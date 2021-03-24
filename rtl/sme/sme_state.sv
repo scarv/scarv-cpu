@@ -1,5 +1,5 @@
 
-import sme_pkg::*;
+//import sme_pkg::*;
 
 `define SL(IDX) XLEN*IDX+:XLEN
 
@@ -9,9 +9,8 @@ import sme_pkg::*;
 //  Contains the register files for the SME share storage.
 //
 module sme_state #(
-parameter SMAX            = 4   , // Max number of hardware shares supported.
-parameter LINEAR_FUS      = 4   , // How many linear ops to instance?
-parameter NONLINEAR_WIDTH = XLEN  // How wide is the nonlinear op data path?
+parameter XLEN            = 32  ,
+parameter SMAX            = 4     // Max number of hardware shares supported.
 )(
 input               g_clk       , // Global clock
 output wire         g_clk_req   , // Global clock request
@@ -28,15 +27,15 @@ output [      XL:0] bank_rdata  , // Read data from bank[smectrl.t][smectl.b]
 
 input  [      XL:0] csr_smectl  , // Current SMECTL value.
 
-input   sme_data_t  input_data  , // Input oeprands.
+input sme_pkg::sme_data_t  input_data  , // Input oeprands.
 
 input               alu_valid   , // Accept new input instruction.
 output              alu_ready   , // Ready for new input instruction.
-input   sme_alu_t   alu_op      , // Input instruction details.
+input   sme_pkg::sme_alu_t   alu_op      , // Input instruction details.
 
 input               cry_valid   , // Accept new input instruction.
 output              cry_ready   , // Ready for new input instruction.
-input   sme_cry_t   cry_op      , // Input instruction details.
+input   sme_pkg::sme_cry_t   cry_op      , // Input instruction details.
 
 output [      XL:0] alu_result  , // ALU    0'th share result.
 output [      XL:0] cry_result    // Crypto 0'th share result.
@@ -47,9 +46,11 @@ output [      XL:0] cry_result    // Crypto 0'th share result.
 // Misc useful signals / parameters
 // ------------------------------------------------------------
 
-localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
-localparam RM    = RMAX-1;
-localparam RW    = RMAX*XLEN-1;
+parameter  XL   = XLEN-1;
+
+localparam RMAX = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam RM   = RMAX-1;
+localparam RW   = RMAX*XLEN-1;
 
 localparam SM   = SMAX-1;
 localparam SW   = SMAX*XLEN-1;

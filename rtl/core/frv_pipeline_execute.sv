@@ -1,5 +1,5 @@
 
-import sme_pkg::*;
+//import sme_pkg::*;
 
 //
 // module: frv_pipeline_execute
@@ -29,13 +29,13 @@ input  wire        s2_valid        , // Is this input valid?
 input  wire [XL:0] csr_smectl      , // SME CSR
 output wire        sme_bank_read   , // Set when reading share to store to mem
 input  wire [XL:0] sme_bank_rdata  , // SME bank read data (for stores).
-output  sme_data_t sme_input_data  , // Input oeprands.
+output sme_pkg::sme_data_t sme_input_data  , // Input oeprands.
 output             sme_alu_valid   , // Accept new input instruction.
 input              sme_alu_ready   , // Ready for new input instruction.
-output  sme_alu_t  sme_alu_op      , // Input instruction details.
+output  sme_pkg::sme_alu_t  sme_alu_op      , // Input instruction details.
 output             sme_cry_valid   , // Accept new input instruction.
 input              sme_cry_ready   , // Ready for new input instruction.
-output  sme_cry_t  sme_cry_op      , // Input instruction details.
+output  sme_pkg::sme_cry_t  sme_cry_op      , // Input instruction details.
 input  [      XL:0]sme_alu_result  , // ALU    0'th share result.
 input  [      XL:0]sme_cry_result  , // Crypto 0'th share result.
 
@@ -201,7 +201,7 @@ wire [XL:0] n_s3_opr_b_mul  = 32'b0;
 // Functional Unit Interfacing: SME
 // -------------------------------------------------------------------------
 
-wire       sme_on   = sme_is_on(csr_smectl);
+wire       sme_on   = |csr_smectl[8:5];
 wire [3:0] smectl_b = csr_smectl[3:0];
 
 wire       sme_mask      = sme_on && fu_sme && s2_uop==SME_MASK;
@@ -219,9 +219,9 @@ wire       sme_wb_result =
 
 wire [XL:0]n_s3_opr_a_sme= sme_alu_result;
 
-wire    sme_rs1_is_share = sme_is_share_reg(s2_rs1_addr[4:0]) || sme_maskop;
-wire    sme_rs2_is_share = sme_is_share_reg(s2_rs2_addr[4:0]) || sme_maskop;
-wire    sme_rd_is_share  = sme_is_share_reg(s2_rd      [4:0]);
+wire    sme_rs1_is_share = s2_rs1_addr[4] || sme_maskop;
+wire    sme_rs2_is_share = s2_rs2_addr[4] || sme_maskop;
+wire    sme_rd_is_share  = s2_rd      [4] ;
 
 wire    sme_operands_ok  =
     (s2_opr_b_imm || sme_rs2_is_share) && sme_rs1_is_share && sme_rd_is_share;

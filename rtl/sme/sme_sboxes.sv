@@ -69,9 +69,9 @@ output  [SMAX*18-1:0] y
         end 
     end endgenerate
     
-    generate for(i = 0; i < 32; i = i+1) begin
+    generate for(i = 0; i < 34; i = i+1) begin
         for(s = 0; s < RMAX; s = s+1) begin
-            assign rs[i][s] = rng[s*32+i];
+            assign rs[i][s] = rng[(s*32+i) % RW];
         end 
     end endgenerate
 

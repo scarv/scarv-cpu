@@ -1,5 +1,5 @@
 
-import sme_pkg::*;
+//import sme_pkg::*;
 
 //
 // module: frv_pipeline_writeback
@@ -370,9 +370,9 @@ wire [3:0] smectl_b = csr_smectl[3:0];
 
 // Loaded data should go to an SME share register which is _not_ a GPR.
 wire sme_load = lsu_load                &&
-                sme_is_on(csr_smectl)   &&
+                |csr_smectl[8:5]        &&
                 |smectl_b               &&
-                sme_is_share_reg(s4_rd) ;
+                s4_rd[4]                ;
 
 assign sme_bank_wen     = sme_load  ;
 assign sme_bank_wdata   = lsu_rdata ;

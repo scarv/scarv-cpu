@@ -12,23 +12,6 @@ parameter XLEN  = 32      ;
 parameter XL    = XLEN - 1;
 
 
-//
-// Wrapper for testing if SME is turned on based on the value of smectl.
-function sme_is_on;
-    input [XL:0] smectl;
-    sme_is_on = |smectl[8:5];
-endfunction
-
-
-//
-// Is the supplied register address _potentially_ an SME share?
-// If we come up with a complex mapping between share registers and
-// addresses later, we only need to change this function.
-function sme_is_share_reg;
-    input [4:0] addr;
-    sme_is_share_reg = addr[4];
-endfunction
-
 
 //
 // Holds all information on an instruction going _into_ the SME pipeline.

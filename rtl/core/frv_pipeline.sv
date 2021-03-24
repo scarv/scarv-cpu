@@ -1,5 +1,5 @@
 
-import sme_pkg::*;
+//import sme_pkg::*;
 
 //
 // module: frv_pipeline
@@ -333,11 +333,11 @@ wire           sme_bank_read    ; // Set when reading share to store to mem.
 wire    [XL:0] sme_bank_rdata   ; // Read data from bank[smectl.t][bank_addr]
 wire           sme_alu_valid    ; // Accept new input instruction.
 wire           sme_alu_ready    ; // Ready for new input instruction.
-    sme_data_t sme_input_data   ; // Input oeprands.
-     sme_alu_t sme_alu_op       ; // Input instruction details.
+sme_pkg::sme_data_t sme_input_data   ; // Input oeprands.
+sme_pkg::sme_alu_t sme_alu_op       ; // Input instruction details.
 wire           sme_cry_valid    ; // Accept new input instruction.
 wire           sme_cry_ready    ; // Ready for new input instruction.
-     sme_cry_t sme_cry_op       ; // Input instruction details.
+sme_pkg::sme_cry_t sme_cry_op       ; // Input instruction details.
 wire    [XL:0] sme_alu_result   ; // ALU    0'th share result.
 wire    [XL:0] sme_cry_result   ; // Crypto 0'th share result.
 
@@ -352,8 +352,7 @@ wire    [XL:0] sme_cry_result   ; // Crypto 0'th share result.
 //
 sme_state #(
 .SMAX           (SME_SMAX   ), // Max number of hardware shares supported.
-.LINEAR_FUS     (SME_SMAX   ), // How many linear ops to instance?
-.NONLINEAR_WIDTH( XLEN      )  // How wide is the nonlinear op data path?
+.XLEN           (XLEN       )
 ) i_sme (
 .g_clk          (g_clk              ), // Global clock
 .g_clk_req      (sme_clk_req        ), // Global clock request

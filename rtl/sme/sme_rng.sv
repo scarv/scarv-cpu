@@ -55,7 +55,7 @@ sme_keccak #(
 //
 // TRNG Instance
 
-`ifndef VERILATOR
+`ifdef SYNTH_TRNG
 
 sme_trng #(
 .Nb (RMAX),

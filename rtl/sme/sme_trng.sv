@@ -169,6 +169,8 @@ output ran_bit,
 output valid
 );
 
+`ifdef SYNTH_TRNG
+
 //free-running ring oscillator 1
 wire fro1_lut_nand_o;
 (* dont_touch = "true", ALLOW_COMBINATORIAL_LOOPS = "true", KEEP = "true" *) wire fro1_fb;
@@ -227,6 +229,13 @@ FDCE   #(.INIT(1'b0)) FDCE_extractor_ranbit_inst
 
 assign valid = extractor_valid_out;
 assign ran_bit = extractor_ranbit_out;
+
+`else
+
+assign valid=1'b0;
+assign ran_bit = 1'b0;
+
+`endif
 
 endmodule
 
