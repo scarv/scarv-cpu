@@ -141,7 +141,7 @@ asm (                                                   \
 // Un-mask the supplied variable.
 #define SME_UNMASK(rd, rs1) {                           \
     asm volatile (                                      \
-        " .insn r CUSTOM_0, 4    , 0    , %0, %1 ,x0 ;" \
+        " .insn r CUSTOM_0, 4    , 0    , %0, %1, %1 ;" \
         : "=r"(rd)                                      \
         :  "r"(rs1)                                     \
     );                                                  \

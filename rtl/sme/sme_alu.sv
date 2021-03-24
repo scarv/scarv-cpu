@@ -31,6 +31,8 @@ input         smectl_t  , // Masking type. 0=bool, 1=arithmetic
 input  [ 3:0] smectl_d  , // Current number of shares to use.
 input  [XL:0] rng[RM:0] , // RNG outputs.
 
+input  [XL:0] bank_rdata, // Used for un-masking one share at a time.
+
 input         flush     , // Flush current operation, discard results.
 
 input         valid     ,
@@ -147,11 +149,10 @@ always_comb begin
     end
 end
 
-//
-// Simple linear operations
-// ============================================================
 
-wire logic_and_not;
+//
+// Non-linear operations
+// ============================================================
 
 wire dom_and_en = (valid && (op_and || op_or))  ||
                    adder_valid                  ;
@@ -178,21 +179,13 @@ sme_dom_and #(
 logic       unmask_en  ;
 always @(negedge g_clk) unmask_en <= op_unmask_bool && valid;
 
-logic [XL:0] gated_shares [SM:0];
-logic [XL:0] result_unmask;
-genvar u;
-generate for(u = 0; u < SMAX; u=u+1) begin: g_unmasking
-    assign gated_shares[u] = {XLEN{unmask_en}} & rs1[u];
-end endgenerate
+wire  [XL:0] mask_to_remove = {XLEN{unmask_en}} & bank_rdata;
+wire  [XL:0] result_unmask  = rs1[0] ^ mask_to_remove;
 
-always_comb begin
-    integer i;
-    result_unmask = gated_shares[0];
-    for(i=1; i < SMAX; i = i + 1) begin
-        result_unmask = result_unmask ^ gated_shares[i];
-    end
-end
 
+//
+// Simple linear operations
+// ============================================================
 
 genvar l;
 generate for(l = 0; l < SMAX; l = l+1) begin : g_linear_ops // BEGIN GENERATE

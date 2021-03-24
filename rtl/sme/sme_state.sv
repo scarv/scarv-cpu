@@ -120,7 +120,7 @@ end endgenerate
 
 logic [XL:0] alu_rd [SM:0];
 
-wire alu_rd_wen     = alu_valid && alu_ready;
+wire alu_rd_wen     = alu_valid && alu_ready && !alu_op.op_unmask;
 
 assign alu_result   = alu_rd[0];
 
@@ -135,6 +135,7 @@ sme_alu #(
 .smectl_d           (smectl_d           ), // Current number of shares to use.
 .flush              (flush              ), // Flush current operation
 .rng                (rng                ), // Randomness
+.bank_rdata         (bank_rdata         ),
 .valid              (alu_valid          ),
 .ready              (alu_ready          ),
 .shamt              (input_data.shamt   ), // Shift amount for shift/rotate.
@@ -195,11 +196,12 @@ sme_crypto #(
 
 localparam BI = $clog2(SMAX)-1;
 
+wire bank_read_en = bank_read || (alu_op.op_unmask && alu_valid);
 wire [XL:0] bank_rdata_sel[SM:0];
 genvar bs;
 generate for(bs=0; bs<SMAX;bs=bs+1) begin
     assign bank_rdata_sel[bs] =
-        {XLEN{bank_read && smectl_b[BI:0] == bs}} & s1_rs2[bs];
+        {XLEN{(bank_read_en) && smectl_b[BI:0] == bs}} & s1_rs2[bs];
 end endgenerate
 
 assign bank_rdata = bank_rdata_sel[smectl_b[BI:0]];

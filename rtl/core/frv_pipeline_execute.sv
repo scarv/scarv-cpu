@@ -234,7 +234,10 @@ wire    store_sme_share = sme_on && |smectl_b &&
 assign  sme_bank_read   = store_sme_share;
 
 assign  sme_input_data.rs1_addr   = {4{sme_on && sme_rs1_is_share}} & s2_rs1_addr[3:0];
-assign  sme_input_data.rs2_addr   = {4{sme_on && sme_rs2_is_share}} & s2_rs2_addr[3:0];
+assign  sme_input_data.rs2_addr   =
+    sme_unmask  ? s2_rs1_addr[3:0]                                  :
+                {4{sme_on && sme_rs2_is_share}} & s2_rs2_addr[3:0]  ;
+
 assign  sme_input_data.rd_addr    = s2_rd[3:0];
 
 assign  sme_input_data.rs1_rdata  = s2_opr_a ;

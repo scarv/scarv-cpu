@@ -147,7 +147,7 @@ wire [4:0] rs2    = d_data[24:20];
 
 wire dec_mask   = SME_SMAX>0 && maj_op==7'hB && f3==3'd1 && f7==7'b0 && rs2==0;
 wire dec_remask = SME_SMAX>0 && maj_op==7'hB && f3==3'd2 && f7==7'b0 && rs2==0;
-wire dec_unmask = SME_SMAX>0 && maj_op==7'hB && f3==3'd4 && f7==7'b0 && rs2==0;
+wire dec_unmask = SME_SMAX>0 && maj_op==7'hB && f3==3'd4 && f7==7'b0;
 
 wire invalid_instr = !(dec_lui       ||dec_auipc     ||dec_jal
 ||dec_jalr      ||dec_beq       ||dec_bne       ||dec_blt       ||dec_bge

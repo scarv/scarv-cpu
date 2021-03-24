@@ -8,7 +8,7 @@
 .endm
 
 .macro unmask RD RS1
-    .insn r CUSTOM_0, 4    , 0    , \RD, \RS1 ,x0 ;
+    .insn r CUSTOM_0, 4    , 0    , \RD, \RS1 ,\RS1;
 .endm
 
 .data
@@ -248,10 +248,15 @@ sme_aes128_enc_block:
     aes32esi x19, x21, 2
     aes32esi x19, x22, 3        // x20-x23 contains new state
 
-    unmask   x16, x16
-    unmask   x17, x17
-    unmask   x18, x18
-    unmask   x19, x19
+    li  t0, 0x1E1               // D=max, bank=1
+    .aes128_enc_blk_unmask:
+        csrrw x0, 0x006, t0     // Select i'th bank
+        unmask   x16, x16
+        unmask   x17, x17
+        unmask   x18, x18
+        unmask   x19, x19
+        addi t0, t0, 1
+        bltu t0, t1, .aes128_enc_blk_unmask
 
     csrrw x0, 0x006, x0         // Turn off SME
 
