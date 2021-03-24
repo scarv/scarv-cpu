@@ -1,6 +1,8 @@
 
 import sme_pkg::*;
 
+`define SL(IDX) XLEN*IDX+:XLEN
+
 //
 // module: sme_state
 //
@@ -47,8 +49,10 @@ output [      XL:0] cry_result    // Crypto 0'th share result.
 
 localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
+localparam RW    = RMAX*XLEN-1;
 
 localparam SM   = SMAX-1;
+localparam SW   = SMAX*XLEN-1;
 
 logic [SM:0] rf_clk_req;
 logic        alu_clk_req;
@@ -70,7 +74,7 @@ wire [3:0] smectl_b = csr_smectl[ 3:0]; // Current bank select for load/store.
 // Random Number Source
 // ------------------------------------------------------------
 
-wire [XL:0] rng[RM:0];  // RNG outputs.
+wire [RW:0] rng      ;  // RNG outputs.
 
 wire        rng_update = 1'b1;
 wire        rng_clk_req;
@@ -92,37 +96,37 @@ sme_rng #(
 
 // Storage for the set of shares representing rs1/rs2/rd. I.e. the
 // inputs and outputs of the register files.
-logic [XL:0] s1_rs1 [SM:0];
-logic [XL:0] s1_rs2 [SM:0];
+logic [SW:0] s1_rs1;
+logic [SW:0] s1_rs2;
 
-logic [XL:0] s1_alu_rs1 [SM:0];
-logic [XL:0] s1_alu_rs2 [SM:0];
+logic [SW:0] s1_alu_rs1;
+logic [SW:0] s1_alu_rs2;
 
-logic [XL:0] s1_cry_rs1 [SM:0];
-logic [XL:0] s1_cry_rs2 [SM:0];
+logic [SW:0] s1_cry_rs1;
+logic [SW:0] s1_cry_rs2;
 
 // Zeroth share comes from GPRs.
-assign       s1_rs1[0] = input_data.rs1_rdata;
-assign       s1_rs2[0] = input_data.rs2_rdata;
+assign       s1_rs1[`SL(0)] = input_data.rs1_rdata;
+assign       s1_rs2[`SL(0)] = input_data.rs2_rdata;
 
 genvar i;
 generate for(i=0; i < SMAX; i = i+1) begin
-    assign s1_alu_rs1[i] = {XLEN{alu_valid}} & s1_rs1[i];
-    assign s1_alu_rs2[i] = {XLEN{alu_valid}} & s1_rs2[i];
+    assign s1_alu_rs1[`SL(i)] = {XLEN{alu_valid}} & s1_rs1[`SL(i)];
+    assign s1_alu_rs2[`SL(i)] = {XLEN{alu_valid}} & s1_rs2[`SL(i)];
 
-    assign s1_cry_rs1[i] = {XLEN{cry_valid}} & s1_rs1[i];
-    assign s1_cry_rs2[i] = {XLEN{cry_valid}} & s1_rs2[i];
+    assign s1_cry_rs1[`SL(i)] = {XLEN{cry_valid}} & s1_rs1[`SL(i)];
+    assign s1_cry_rs2[`SL(i)] = {XLEN{cry_valid}} & s1_rs2[`SL(i)];
 end endgenerate
 
 //
 // ALU Instance
 // ------------------------------------------------------------
 
-logic [XL:0] alu_rd [SM:0];
+logic [SW:0] alu_rd;
 
 wire alu_rd_wen     = alu_valid && alu_ready && !alu_op.op_unmask;
 
-assign alu_result   = alu_rd[0];
+assign alu_result   = alu_rd[`SL(0)];
 
 sme_alu #(
 .XLEN (32   ),
@@ -162,11 +166,11 @@ sme_alu #(
 // Crypto Instance
 // ------------------------------------------------------------
 
-logic [XL:0] cry_rd [SM:0];
+logic [SW:0] cry_rd;
 
 wire cry_rd_wen     = cry_valid && cry_ready;
 
-assign cry_result   = cry_rd[0];
+assign cry_result   = cry_rd[`SL(0)];
 
 sme_crypto #(
 .XLEN(32    ),
@@ -201,7 +205,7 @@ wire [XL:0] bank_rdata_sel[SM:0];
 genvar bs;
 generate for(bs=0; bs<SMAX;bs=bs+1) begin
     assign bank_rdata_sel[bs] =
-        {XLEN{(bank_read_en) && smectl_b[BI:0] == bs}} & s1_rs2[bs];
+        {XLEN{(bank_read_en) && smectl_b[BI:0] == bs}} & s1_rs2[`SL(bs)];
 end endgenerate
 
 assign bank_rdata = bank_rdata_sel[smectl_b[BI:0]];
@@ -209,8 +213,8 @@ assign bank_rdata = bank_rdata_sel[smectl_b[BI:0]];
 wire   [3:0] bank_rs1_addr = input_data.rs1_addr;
 wire   [3:0] bank_rs2_addr = input_data.rs2_addr;
 
-wire [XL:0] result_wdata[SM:0];
-assign      result_wdata = alu_rd_wen ? alu_rd : cry_rd;
+wire [SW:0] result_wdata    ;
+assign      result_wdata    = alu_rd_wen ? alu_rd : cry_rd;
 
 //
 // Note that the 0'th register file is the normal RISC-V GPRS, so we
@@ -225,16 +229,16 @@ wire bank_write         = bank_wen  && smectl_b == rf_i;
 // Write enable for _this_ registerfile.
 wire        rf_wen      = cry_rd_wen || alu_rd_wen || bank_write;
 wire [ 3:0] rf_addr     = bank_wen  ? bank_waddr : input_data.rd_addr;
-wire [XL:0] rf_wdata    = bank_wen  ? bank_wdata : result_wdata[rf_i];
+wire [XL:0] rf_wdata    = bank_wen  ? bank_wdata : result_wdata[`SL(rf_i)];
 
 sme_regfile i_rf (
 .g_clk      (g_clk              ), // Global clock
 .g_clk_req  (rf_clk_req[rf_i]   ), // Global clock request
 .g_resetn   (g_resetn           ), // Sychronous active low reset.
 .rs1_addr   (bank_rs1_addr      ), // Source register 1 address
-.rs1_rdata  (s1_rs1[rf_i]       ), // Source register 1 read data
+.rs1_rdata  (s1_rs1[`SL(rf_i)]  ), // Source register 1 read data
 .rs2_addr   (bank_rs2_addr      ), // Source register 2 address
-.rs2_rdata  (s1_rs2[rf_i]       ), // Source register 2 read data
+.rs2_rdata  (s1_rs2[`SL(rf_i)]  ), // Source register 2 read data
 .rd_wen     (rf_wen             ), // Write enable
 .rd_addr    (rf_addr            ), // Write address
 .rd_wdata   (rf_wdata           )  // Write data
@@ -243,4 +247,6 @@ sme_regfile i_rf (
 end endgenerate
 
 endmodule
+
+`undef SL
 

@@ -1,4 +1,6 @@
 
+export SYNTH_TOP?=frv_core
+
 # 1. Verilog output file
 # 2. Synthesis Script
 # 3. Log Output
@@ -55,3 +57,15 @@ SYNTH_LOG_OUT       = $(FRV_WORK)/synth/synth-crypto.log
 $(eval $(call add_synth_target,$(SYNTH_VERILOG_OUT),$(SYNTH_SCRIPT),$(SYNTH_LOG_OUT)))
 
 synth-crypto: $(SYNTH_VERILOG_OUT)
+
+#
+# Synth using any top module
+# ------------------------------------------------------------
+
+synth-with-top:
+	@echo "-----------------------------------"
+	@echo "TOP MODULE: $(SYNTH_TOP)"
+	@echo "-----------------------------------"
+	$(YOSYS_ROOT)/yosys -QT \
+        -l $(FRV_WORK)/synth/log-$(SYNTH_TOP).log \
+        $(FRV_HOME)/flow/yosys/synth-with-top.tcl

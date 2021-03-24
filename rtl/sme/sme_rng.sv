@@ -12,11 +12,12 @@ input       g_clk       ,
 output      g_clk_req   ,
 input       g_resetn    , // Sychronous active low reset.
 input       update      , // Update the internal RNG.
-output [XL:0] rng[RM:0]   // RNG outputs.
+output [RW:0] rng         // RNG outputs.
 );
 
-localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
-localparam RM    = RMAX-1;
+localparam RMAX = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam RM   = RMAX-1;
+localparam RW   = RMAX*XLEN-1;
 
 localparam KECCAK_LW = 8;
 localparam KS        = 25*KECCAK_LW-1;
@@ -32,7 +33,7 @@ genvar i, j;
 generate
     for(i = 0; i < RMAX; i=i+1) begin
         for(j = 0; j < XLEN; j=j+1) begin
-            assign rng[i][j] = keccak_state[i*XLEN+j];
+            assign rng[i*XLEN+j] = keccak_state[i*XLEN+j];
         end
     end
 endgenerate

@@ -1,4 +1,7 @@
 
+
+`define SL(IDX) XLEN*IDX+:XLEN
+
 //
 // module: sme_alu
 //
@@ -16,7 +19,7 @@
 //  - Rotate left
 //  - CLMUL?
 //  - MUL?
-//  - mask / re-mask / unmask
+//  - mask / re-mask
 //
 module sme_alu #(
 parameter XLEN            = 32  ,
@@ -29,7 +32,7 @@ input         g_resetn  , // Sychronous active low reset.
 
 input         smectl_t  , // Masking type. 0=bool, 1=arithmetic
 input  [ 3:0] smectl_d  , // Current number of shares to use.
-input  [XL:0] rng[RM:0] , // RNG outputs.
+input  [RW:0] rng       , // RNG outputs.
 
 input  [XL:0] bank_rdata, // Used for un-masking one share at a time.
 
@@ -51,10 +54,10 @@ input         op_sub    ,
 input         op_mask   , // Enmask 0'th element of rs1 based on smectl_t
 input         op_unmask , // Unmask rs1
 input         op_remask , // remask rs1 based on smectl_t
-input  [XL:0] rs1 [SM:0], // RS1 as SMAX shares
-input  [XL:0] rs2 [SM:0], // RS2 as SMAX shares
+input  [SW:0] rs1       , // RS1 as SMAX shares
+input  [SW:0] rs2       , // RS2 as SMAX shares
         
-output [XL:0] rd  [SM:0]  // RD as SMAX shares
+output [SW:0] rd          // RD as SMAX shares
 
 );
 
@@ -64,9 +67,11 @@ output [XL:0] rd  [SM:0]  // RD as SMAX shares
 
 localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
+localparam RW    = RMAX*XLEN-1;
 
 localparam SM   = SMAX-1;
 localparam XL   = XLEN-1;
+localparam SW   = SMAX*XLEN-1;
 
 wire        new_instr       = valid && ready;
 
@@ -85,31 +90,16 @@ wire        add_clk_req;
 
 assign      g_clk_req       = 1'b1;
 
-(*keep*)reg[XL:0] dbg_rs1;
-(*keep*)reg[XL:0] dbg_rs2;
-(*keep*)reg[XL:0] dbg_rd ;
-always_comb begin :dbg
-    integer d;
-    dbg_rs1     = rs1[0];
-    dbg_rs2     = rs2[0];
-    dbg_rd      = rd [0];
-    for(d = 1; d < SMAX; d = d + 1) begin
-        dbg_rs1     = dbg_rs1 ^ rs1[d];
-        dbg_rs2     = dbg_rs2 ^ rs2[d];
-        dbg_rd      = dbg_rd  ^ rd [d];
-    end
-end
-
-logic [XL:0] bitwise_rs1        [SM:0];
-logic [XL:0] bitwise_rs2        [SM:0];
-logic [XL:0] result_xor         [SM:0];
-logic [XL:0] result_shift       [SM:0];
-logic [XL:0] result_and         [SM:0];
-logic [XL:0] result_add         [SM:0];
-logic [XL:0] result_or          [SM:0];
-logic [XL:0] result_baddsub     [SM:0]; // Binary masked add sub.
-logic [XL:0] result_mask        [SM:0];
-logic [XL:0] result_remask      [SM:0];
+logic [SW:0] bitwise_rs1    ;
+logic [SW:0] bitwise_rs2    ;
+logic [SW:0] result_xor     ;
+logic [SW:0] result_shift   ;
+logic [SW:0] result_and     ;
+logic [SW:0] result_add     ;
+logic [SW:0] result_or      ;
+logic [SW:0] result_baddsub ; // Binary masked add sub.
+logic [SW:0] result_mask    ;
+logic [SW:0] result_remask  ;
 
 
 //
@@ -127,10 +117,10 @@ sme_ks_adder #(
 .g_resetn    (g_resetn    ), // Sychronous active low reset. 
 .en          (adder_valid ), // Operation Enable.
 .sub         (op_sub      ), // Subtract when =1, add when =0.
-.rng         (rng         ), // Extra randomness.
-.mxor        (result_xor  ), // RS1 as SMAX shares
-.mand        (result_and  ), // RS2 as SMAX shares
-.rd          (result_add  ), // RD as SMAX shares
+.s_rng       (rng         ), // Extra randomness.
+.s_mxor      (result_xor  ), // RS1 as SMAX shares
+.s_mand      (result_and  ), // RS2 as SMAX shares
+.s_rd        (result_add  ), // RD as SMAX shares
 .rdy         (adder_ready ) 
 );
 
@@ -138,14 +128,14 @@ sme_ks_adder #(
 // Helper logic for en-masking
 // ============================================================
 
-reg  [XL:0] all_rng; // Stores XOR of all 1..SMAX prng outputs for en-mask.
+logic [XL:0] all_rng; // Stores XOR of all 1..SMAX prng outputs for en-mask.
 
 // For doing en-mask.
-always_comb begin
+always_comb begin : collapse_rng
     integer i;
     all_rng = 0;
     for (i = 1; i < SMAX; i = i+1) begin
-        all_rng = all_rng ^ rng[i];
+        all_rng = all_rng ^ rng[i*XLEN+:XLEN];
     end
 end
 
@@ -180,7 +170,7 @@ logic       unmask_en  ;
 always @(negedge g_clk) unmask_en <= op_unmask_bool && valid;
 
 wire  [XL:0] mask_to_remove = {XLEN{unmask_en}} & bank_rdata;
-wire  [XL:0] result_unmask  = rs1[0] ^ mask_to_remove;
+wire  [XL:0] result_unmask  = rs1[0*XLEN+:XLEN] ^ mask_to_remove;
 
 
 //
@@ -194,9 +184,13 @@ generate for(l = 0; l < SMAX; l = l+1) begin : g_linear_ops // BEGIN GENERATE
 // Masking / Remasking
 // ------------------------------------------------------------
 
-assign result_mask  [l] = l==0    ? rs1[0] ^ all_rng : rng[l];
-assign result_remask[l] = l < SMAX-1 || SMAX%2==0 ? rs1[l] ^ rng[0] :
-                                                    rs1[l]          ;
+assign result_mask  [`SL(l)] = 
+    l==0    ? rs1[`SL(0)] ^ all_rng :
+              rng[`SL(l)]           ;
+
+assign result_remask[`SL(l)] =
+    l < SMAX-1 || SMAX%2==0 ? rs1[`SL(l)] ^ rng[`SL(0)] :
+                              rs1[`SL(l)]               ;
 
 
 //
@@ -209,21 +203,21 @@ wire inv_rs2 = op_or ^  op_notrs2;
 //
 // Bitwise Linear operations - implement logic-and-not instructions by
 // inverting the 0th share iff it's that kind of instruction.
-if(l == 0) assign bitwise_rs1[l] = inv_rs1 ? ~rs1[l] : rs1[l];
-else       assign bitwise_rs1[l] =                     rs1[l];
+if(l == 0) assign bitwise_rs1[`SL(l)] = inv_rs1 ? ~rs1[`SL(l)] : rs1[`SL(l)];
+else       assign bitwise_rs1[`SL(l)] =                          rs1[`SL(l)];
 
-if(l == 0) assign bitwise_rs2[l] = inv_rs2 ? ~rs2[l] : rs2[l];
-else       assign bitwise_rs2[l] =                     rs2[l];
+if(l == 0) assign bitwise_rs2[`SL(l)] = inv_rs2 ? ~rs2[`SL(l)] : rs2[`SL(l)];
+else       assign bitwise_rs2[`SL(l)] =                          rs2[`SL(l)];
 
 //
 // OR - not dom and. Just invert the 0'th share.
-if(l == 0) assign result_or[l] = ~result_and[l];
-else       assign result_or[l] =  result_and[l];
+if(l == 0) assign result_or[`SL(l)] = ~result_and[`SL(l)];
+else       assign result_or[`SL(l)] =  result_and[`SL(l)];
 
 
 //
 // XOR - each share xor'd individually
-assign result_xor[l] = rs1[l] ^ bitwise_rs2[l];
+assign result_xor[`SL(l)] = rs1[`SL(l)] ^ bitwise_rs2[`SL(l)];
 
 //
 // Shift and rotate
@@ -233,8 +227,8 @@ assign result_xor[l] = rs1[l] ^ bitwise_rs2[l];
 // Shift and rotate based linear operations. Thing to shift/rotate in
 // rs1. Shamt in dedicated signal.
 wire  [2*XLEN-1:0] shift_input = {
-    {op_rotate ? rs1[l] : {XLEN{1'b0}} },
-    {            rs1[l]                }
+    {op_rotate ? rs1[`SL(l)] : {XLEN{1'b0}} },
+    {            rs1[`SL(l)]                }
 };
 
 wire [2*XLEN-1:0] shift_in_rev;
@@ -255,7 +249,7 @@ for(i = 0; i<2*XLEN; i=i+1) begin
     assign shift_out_rev[i] = shift_output [2*XLEN-1-i];
 end 
 
-assign result_shift[l]         = 
+assign result_shift[`SL(l)]         = 
     op_right || !op_rotate ? shift_result[      XL: 0] :
                              shift_result[2*XLEN-1:32] ;
 
@@ -263,14 +257,14 @@ assign result_shift[l]         =
 // Add / subtract (arithmetic)
 // ------------------------------------------------------------
 
-wire [XL:0] bmask_add_lhs =                    rs1[l] ;
-wire [XL:0] bmask_add_rhs = op_sub          ? ~rs2[l] :
-                                               rs2[l] ;
+wire [XL:0] bmask_add_lhs =                    rs1[`SL(l)] ;
+wire [XL:0] bmask_add_rhs = op_sub          ? ~rs2[`SL(l)] :
+                                               rs2[`SL(l)] ;
 
 wire [XL:0] bmask_add_cin = {{XL{1'b0}}, op_sub};
 
 wire [XL:0] bmask_add_out = bmask_add_lhs + bmask_add_rhs + bmask_add_cin;
-assign      result_baddsub[l] = bmask_add_out;
+assign      result_baddsub[`SL(l)] = bmask_add_out;
 
 //
 // Result multiplexing
@@ -278,22 +272,24 @@ assign      result_baddsub[l] = bmask_add_out;
 
 wire sel_result_add = op_addsub;
 
-assign rd[l]= 
-    op_remask_bool      ? result_remask[l]      :
-    op_unmask_bool&&l==0? result_unmask         :
-    op_mask             ? result_mask[l]        :
-    op_and              ? result_and[l]         :
-    op_or               ? result_or [l]         :
-    op_addsub           ? result_add[l]         :
-    op_xor              ? result_xor[l]         :
-    sel_result_add      ? result_baddsub[l]     :
-    op_shfrot           ? result_shift[l]       :
-                          {XLEN{1'b0}}          ;
-    
+assign rd[`SL(l)]= 
+    op_remask_bool      ? result_remask[`SL(l)]     :
+    op_unmask_bool&&l==0? result_unmask             :
+    op_mask             ? result_mask[`SL(l)]       :
+    op_and              ? result_and[`SL(l)]        :
+    op_or               ? result_or [`SL(l)]        :
+    op_addsub           ? result_add[`SL(l)]        :
+    op_xor              ? result_xor[`SL(l)]        :
+    sel_result_add      ? result_baddsub[`SL(l)]    :
+    op_shfrot           ? result_shift[`SL(l)]      :
+                          {XLEN{1'b0}}              ;
+
 end endgenerate // g_linear_ops -------------------------------- END GENERATE
 
 // Is the ALU finished with the current (possibly multi-cycle) operation?
 assign ready = op_addsub ? (adder_valid && adder_ready) : valid;
 
 endmodule
+
+`undef SL
 

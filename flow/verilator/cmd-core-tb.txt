@@ -3,6 +3,7 @@
 -CFLAGS -g
 -CFLAGS -I -CFLAGS $(SCARV_CPU)/verif/verilator/share
 -I$(SCARV_CPU)/rtl/core
+-I$(SCARV_CPU)/rtl/sme
 -DRVFI
 --exe
 --trace

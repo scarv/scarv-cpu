@@ -46,14 +46,15 @@ input          g_clk        , // Global clock
 input          g_resetn     , // Sychronous active low reset.
 input          en           ,
 input          flush        ,
-input   [31:0] rng[RM    :0],
-input   [20:0] x  [SMAX-1:0], // 21 bits x 3 shares
-output  [17:0] y  [SMAX-1:0] 
+input   [RW:0] rng          ,
+input   [SMAX*21-1:0] x     , // 21 bits x 3 shares
+output  [SMAX*18-1:0] y      
 );
 
     localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
     localparam RM    = RMAX-1;
     localparam SM = SMAX-1;
+    localparam RW    = 32*RMAX-1;
     
     // 3 shares / 21 bits.
     wire [SM:0] xs[20:0];
@@ -63,14 +64,14 @@ output  [17:0] y  [SMAX-1:0]
     genvar i, s;
     generate for(i = 0; i < 34; i = i+1) begin
         for(s = 0; s < SMAX; s = s+1) begin
-            if(i<18) begin assign  y[s][i] = ys[i][s]; end
-            if(i<21) begin assign xs[i][s] =  x[s][i]; end
+            if(i<18) begin assign  y[s*18+i] = ys[i][s]; end
+            if(i<21) begin assign xs[i][s] =  x[s*21+i]; end
         end 
     end endgenerate
     
     generate for(i = 0; i < 32; i = i+1) begin
         for(s = 0; s < RMAX; s = s+1) begin
-            assign rs[i][s] = rng[s][i];
+            assign rs[i][s] = rng[s*32+i];
         end 
     end endgenerate
 
@@ -169,8 +170,8 @@ endmodule
 module sme_sbox_aes_top #(
 parameter SMAX = 3
 )(
-input   [ 7:0] x [SMAX-1:0] ,
-output  [20:0] y [SMAX-1:0]
+input   [SMAX* 8-1:0] x,
+output  [SMAX*21-1:0] y
 );
     
     localparam SM = SMAX-1;
@@ -182,8 +183,8 @@ output  [20:0] y [SMAX-1:0]
     genvar i, s;
     generate for(i = 0; i < 21; i = i+1) begin
         for(s = 0; s < SMAX; s = s+1) begin
-            if(i< 8) begin assign xs[i][s] =  x[s][i]; end
-            if(i<21) begin assign  y[s][i] = ys[i][s]; end
+            if(i< 8) begin assign xs[i][s] =  x[s*8+i]; end
+            if(i<21) begin assign  y[s*21+i] = ys[i][s]; end
         end 
     end endgenerate
 
@@ -244,8 +245,8 @@ endmodule
 module sme_sbox_aes_out #(
 parameter SMAX = 3
 )(
-input   [17:0] x [SMAX-1:0],
-output  [ 7:0] y [SMAX-1:0]
+input   [SMAX*18-1:0] x,
+output  [SMAX* 8-1:0] y
 );
     localparam SM = SMAX-1;
 
@@ -272,8 +273,8 @@ output  [ 7:0] y [SMAX-1:0]
     genvar i, s;
     generate for(i = 0; i < 18; i = i+1) begin
         for(s = 0; s < SMAX; s = s+1) begin
-            if(i<18) begin assign xs[i][s] =  x[s][i]; end
-            if(i< 8) begin assign  y[s][i] = ys[i][s]; end
+            if(i<18) begin assign xs[i][s] =  x[s*18+i]; end
+            if(i< 8) begin assign  y[s*8+i] = ys[i][s]; end
         end 
     end endgenerate
 
@@ -324,8 +325,8 @@ endmodule
 module sme_sbox_aesi_top # (
 parameter SMAX = 3
 )(
-output  [20:0] y [SMAX-1:0],
-input   [ 7:0] x [SMAX-1:0]
+output  [SMAX*21-1:0] y,
+input   [SMAX* 8-1:0] x
 );
     localparam SM = SMAX-1;
 
@@ -335,8 +336,8 @@ input   [ 7:0] x [SMAX-1:0]
     genvar i, s;
     generate for(i = 0; i < 21; i = i+1) begin
         for(s = 0; s < SMAX; s = s+1) begin
-            if(i< 8) begin assign xs[i][s] =  x[s][i]; end
-            if(i<21) begin assign  y[s][i] = ys[i][s]; end
+            if(i< 8) begin assign xs[i][s] =  x[s*8+i]; end
+            if(i<21) begin assign  y[s*21+i] = ys[i][s]; end
         end 
     end endgenerate
 
@@ -396,8 +397,8 @@ endmodule
 module sme_sbox_aesi_out #(
 parameter SMAX=3
 )(
-output  [ 7:0] y [SMAX-1:0],
-input   [17:0] x [SMAX-1:0]
+output  [SMAX* 8-1:0] y,
+input   [SMAX*18-1:0] x
 );
     localparam SM = SMAX-1;
 
@@ -407,8 +408,8 @@ input   [17:0] x [SMAX-1:0]
     genvar i, s;
     generate for(i = 0; i < 21; i = i+1) begin
         for(s = 0; s < SMAX; s = s+1) begin
-            if(i<18) begin assign xs[i][s] =  x[s][i]; end
-            if(i< 8) begin assign  y[s][i] = ys[i][s]; end
+            if(i<18) begin assign xs[i][s] =  x[s*18+i]; end
+            if(i< 8) begin assign  y[s*8+i] = ys[i][s]; end
         end 
     end endgenerate
 
@@ -463,23 +464,24 @@ input  wire        g_resetn           , // Sychronous active low reset.
 input  wire        en                 , // Operation enable.
 input  wire        flush              , // Flush internal state bits.
 input  wire        dec                , // Decrypt
-input  wire [31:0] rng      [RM    :0], // Random bits
-input  wire [ 7:0] sbox_in  [SMAX-1:0], // SMAX share input
-output wire [ 7:0] sbox_out [SMAX-1:0]  // SMAX share output
+input  wire [RW:0] rng                , // Random bits
+input  wire [8*SMAX-1:0] sbox_in      , // SMAX share input
+output wire [8*SMAX-1:0] sbox_out       // SMAX share output
 );
 
 localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
+localparam RW    = 32*RMAX-1;
 localparam  SM = SMAX-1;
 
-wire [20:0] fwd_top [SM:0];
-wire [20:0] inv_top [SM:0];
+wire [SMAX*21-1:0] fwd_top ;
+wire [SMAX*21-1:0] inv_top ;
 
-wire [20:0] mid_in  [SM:0];
-wire [17:0] mid_out [SM:0];
+wire [SMAX*21-1:0] mid_in  ;
+wire [SMAX*18-1:0] mid_out ;
 
-wire [ 7:0] fwd_bot [SM:0];
-wire [ 7:0] inv_bot [SM:0];
+wire [SMAX* 8-1:0] fwd_bot ;
+wire [SMAX* 8-1:0] inv_bot ;
 
 sme_sbox_aes_top  #(.SMAX(SMAX)) i_top_fwd (.x(sbox_in),.y(fwd_top));
 sme_sbox_aesi_top #(.SMAX(SMAX)) i_top_inv (.x(sbox_in),.y(inv_top));

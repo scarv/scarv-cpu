@@ -1,4 +1,6 @@
 
+`define SL(IDX) XLEN*IDX+:XLEN
+
 //
 // module: sme_crypto
 //
@@ -28,7 +30,7 @@ input         g_clk_req , // Global clock request
 input         g_resetn  , // Sychronous active low reset.
 
 input  [ 3:0] smectl_d  , // Current number of shares to use.
-input  [XL:0] rng[RM:0] , // RNG outputs.
+input  [RW:0] rng       , // RNG outputs.
 
 input         flush     , // Flush current operation, discard results.
 
@@ -40,10 +42,10 @@ input         op_aesds  ,
 input         op_aesdsm ,
 
 input  [ 1:0] bs        , // AES byte select.
-input  [XL:0] rs1 [SM:0], // RS1 as SMAX shares
-input  [XL:0] rs2 [SM:0], // RS2 as SMAX shares
+input  [SW:0] rs1       , // RS1 as SMAX shares
+input  [SW:0] rs2       , // RS2 as SMAX shares
         
-output [XL:0] rd  [SM:0]  // RD as SMAX shares
+output [SW:0] rd          // RD as SMAX shares
 
 );
 
@@ -53,9 +55,11 @@ output [XL:0] rd  [SM:0]  // RD as SMAX shares
 
 localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
+localparam RW    = RMAX*XLEN-1;
 
 localparam SM   = SMAX-1;
 localparam XL   = XLEN-1;
+localparam SW   = SMAX*XLEN-1;
 
 wire        new_instr       = valid && ready;
 
@@ -98,10 +102,10 @@ wire       aes_any  = valid && (
 wire       aes_dec  = op_aesds || op_aesdsm ;
 wire       aes_mix  = op_aesesm|| op_aesdsm ;
 
-wire [7:0] aes_sbox_in  [SM:0];
-wire [7:0] aes_sbox_out [SM:0];
+wire [SMAX*8-1:0] aes_sbox_in ;
+wire [SMAX*8-1:0] aes_sbox_out;
 
-wire [XL:0] aes_result[SM:0];
+wire [SW:0] aes_result;
 
 assign rd = aes_result;
 
@@ -110,19 +114,25 @@ wire   aes_flush = new_instr;
 genvar a;
 generate for(a=0; a < SMAX; a=a+1) begin : g_aes
 
-    assign aes_sbox_in[a] = bs == 2'd0 ? rs2[a][ 7: 0]  :
-                            bs == 2'd1 ? rs2[a][15: 8]  :
-                            bs == 2'd2 ? rs2[a][23:16]  :
-                          /*bs == 2'd3*/ rs2[a][31:24]  ;
+    wire [XL:0] rs2_a = rs2[`SL(a)];
 
-    wire [7:0] mix_b3 =           xtimeN(aes_sbox_out[a], aes_dec ? 11 : 3)  ;
-    wire [7:0] mix_b2 = aes_dec ? xtimeN(aes_sbox_out[a], 13) : aes_sbox_out[a];
-    wire [7:0] mix_b1 = aes_dec ? xtimeN(aes_sbox_out[a],  9) : aes_sbox_out[a];
-    wire [7:0] mix_b0 =           xtimeN(aes_sbox_out[a], aes_dec ? 14 : 2)  ;
+    assign aes_sbox_in[a*8+:8] =
+        bs == 2'd0 ? rs2_a[ 7: 0]  :
+        bs == 2'd1 ? rs2_a[15: 8]  :
+        bs == 2'd2 ? rs2_a[23:16]  :
+      /*bs == 2'd3*/ rs2_a[31:24]  ;
+
+
+    wire [7:0] aes_sbox_out_a = aes_sbox_out[a*8+:8];
+
+    wire [7:0] mix_b3 =           xtimeN(aes_sbox_out_a, aes_dec ? 11 : 3)   ;
+    wire [7:0] mix_b2 = aes_dec ? xtimeN(aes_sbox_out_a, 13) : aes_sbox_out_a;
+    wire [7:0] mix_b1 = aes_dec ? xtimeN(aes_sbox_out_a,  9) : aes_sbox_out_a;
+    wire [7:0] mix_b0 =           xtimeN(aes_sbox_out_a, aes_dec ? 14 : 2)   ;
 
     wire [31:0] result_mix  = {mix_b3, mix_b2, mix_b1, mix_b0};
 
-    wire [31:0] result      = aes_mix ? result_mix : {24'b0, aes_sbox_out[a]};
+    wire [31:0] result      = aes_mix ? result_mix : {24'b0, aes_sbox_out_a};
 
     wire [31:0] rotated     =
         bs == 2'd0 ? {result                      } :
@@ -130,7 +140,7 @@ generate for(a=0; a < SMAX; a=a+1) begin : g_aes
         bs == 2'd2 ? {result[15:0], result[31:16] } :
      /* bs == 2'd3*/ {result[ 7:0], result[31: 8] } ;
 
-    assign aes_result[a] = rotated ^ rs1[a];
+    assign aes_result[`SL(a)] = rotated ^ rs1[`SL(a)];
 
 end endgenerate
 
@@ -156,4 +166,6 @@ sme_sbox_aes #(
 );
 
 endmodule
+
+`undef SL
 
