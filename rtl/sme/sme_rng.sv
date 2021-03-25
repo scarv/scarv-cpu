@@ -55,8 +55,6 @@ sme_keccak #(
 //
 // TRNG Instance
 
-`ifdef SYNTH_TRNG
-
 sme_trng #(
 .Nb (RMAX),
 .Ne (3   ),
@@ -68,12 +66,5 @@ sme_trng #(
 .rnb        (trng_taps  ),
 .rdy        (trng_ready )
 );
-
-`else
-
-assign trng_taps = {RMAX{1'b0}};
-assign trng_ready= {RMAX{1'b0}};
-
-`endif
 
 endmodule

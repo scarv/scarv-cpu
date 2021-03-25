@@ -62,7 +62,7 @@ end
 
 reg [ORD:0] bit_cnt;
 always @(posedge clk) begin
-    if		(rst)   bit_cnt <= 1'b1;    
+    if		(rst)   bit_cnt <= 'b1;    
     else if (val)   bit_cnt <= {bit_cnt[ORD-1:0], bit_cnt[ORD-1]};    
 end
 
@@ -169,7 +169,12 @@ output ran_bit,
 output valid
 );
 
-`ifdef SYNTH_TRNG
+`ifdef NO_SYNTH_FPGA_TRNG
+
+assign valid=1'b0;
+assign ran_bit = 1'b0;
+
+`else
 
 //free-running ring oscillator 1
 wire fro1_lut_nand_o;
@@ -229,11 +234,6 @@ FDCE   #(.INIT(1'b0)) FDCE_extractor_ranbit_inst
 
 assign valid = extractor_valid_out;
 assign ran_bit = extractor_ranbit_out;
-
-`else
-
-assign valid=1'b0;
-assign ran_bit = 1'b0;
 
 `endif
 

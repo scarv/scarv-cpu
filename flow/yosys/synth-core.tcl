@@ -1,6 +1,9 @@
 
 yosys -import
 
+# Don't synthesise the FPGA specific TRNG
+verilog_defines -DNO_SYNTH_FPGA_TRNG=1
+
 # Read in the design
 read_verilog -sv -I$::env(FRV_HOME)/rtl/sme  $::env(FRV_HOME)/rtl/sme/*.sv
 read_verilog -sv -I$::env(FRV_HOME)/rtl/core $::env(FRV_HOME)/rtl/core/*.sv
