@@ -22,23 +22,26 @@ output reg [N*D-1:0] s_rd       , // RD as SMAX shares
 output wire          rdy
 );
 
-wire [N-1:0] rng  [G-1:0]; // Extra randomness.
 wire [N-1:0] mxor [D-1:0]; // RS1 as SMAX shares
 wire [N-1:0] mand [D-1:0]; // RS2 as SMAX shares
 reg  [N-1:0] rd   [D-1:0]; // RD as SMAX shares
 
 genvar z;
-`SME_UNPACK(rng , s_rng , N, G, z)
-`SME_UNPACK(mxor, s_mxor, N, D, z)
-`SME_UNPACK(mand, s_mand, N, D, z)
-`SME_PACK(s_rd, rd, N, D, z)
+generate for (s = 0; s<D; s=s+1) begin
+    assign mxor[s     ]    = s_mxor[s*N+:N];
+    assign mand[s     ]    = s_mand[s*N+:N];
+    assign s_rd[s*N+:N]    = rd[s];
+end endgenerate
+//`SME_UNPACK(mxor, s_mxor, N, D, z)
+//`SME_UNPACK(mand, s_mand, N, D, z)
+//`SME_PACK(s_rd, rd, N, D, z)
 
-reg  [N*G-1:0] rng1; // reuse randomness.
-integer r;
-always @(*) begin
-  rng1[0] = s_rng[N*G-1];
-  for (r = 1; r < N*G; r = r+1)  rng1[r] = s_rng[r-1];
-end
+/* verilator lint_off WIDTH */
+localparam RNG_BITS = D*(D-'d1)/2;
+localparam AND_BITS = N * RNG_BITS;
+/* verilator lint_on WIDTH */
+wire [AND_BITS-1:0] rng_0 = s_rng[0*AND_BITS+:AND_BITS];
+wire [AND_BITS-1:0] rng_1 = s_rng[1*AND_BITS+:AND_BITS];
 
 wire  [D*N-1:0] pi   ;
 wire  [D*N-1:0] pj   ;
@@ -111,33 +114,56 @@ generate for(i=1; i <D; i=i+1) begin
 
 end endgenerate
 
+genvar a;
+genvar n;
+generate for(a = 0; a < N; a=a+1) begin
+
+wire [RNG_BITS-1:0] rng_0_a = rng_0[a*RNG_BITS+:RNG_BITS];
+wire [RNG_BITS-1:0] rng_1_a = rng_1[a*RNG_BITS+:RNG_BITS];
+
+wire [D-1:0] pi_slice  ;
+wire [D-1:0] pj_slice  ;
+wire [D-1:0] gj_slice  ;
+wire [D-1:0] p_slice   ;
+wire [D-1:0] pigj_slice;
+
+for(n=0; n<D; n=n+1) begin
+    assign pi_slice[n] = pi[n*N+a];
+    assign pj_slice[n] = pj[n*N+a];
+    assign gj_slice[n] = gj[n*N+a];
+    assign p[n*N+a] = p_slice[n];
+    assign pigj[n*N+a] = pigj_slice[n];
+end
+
 sme_dom_and #(
 .POSEDGE(1),      // using posedge FFs
 .D(D),            // Number of shares
-.N(N)             // Bit-width of the operation.
+.N(1)             // Bit-width of the operation.
 ) i_dom_and_pi_pj (
 .g_clk      (g_clk    ), // Global clock
 .g_resetn   (g_resetn ), // Sychronous active low reset.
 .en         (en       ), // Enable.
-.rng        (s_rng    ), // Extra randomness.
-.rs1        (pi      ), // RS1 as SMAX shares
-.rs2        (pj       ), // RS2 as SMAX shares
-.rd         (p        )  // RD as SMAX shares
+.rng        (rng_0_a  ), // Extra randomness.
+.rs1        (pi_slice ), // RS1 as SMAX shares
+.rs2        (pj_slice ), // RS2 as SMAX shares
+.rd         (p_slice  )  // RD as SMAX shares
 );
 
 sme_dom_and #(
 .POSEDGE(1),      // using posedge FFs
 .D(D),            // Number of shares
-.N(N)             // Bit-width of the operation.
+.N(1)             // Bit-width of the operation.
 ) i_dom_and_pi_gj (
-.g_clk      (g_clk    ), // Global clock
-.g_resetn   (g_resetn ), // Sychronous active low reset.
-.en         (en       ), // Enable.
-.rng        (rng1     ), // Extra randomness.
-.rs1        (pi       ), // RS1 as SMAX shares
-.rs2        (gj       ), // RS2 as SMAX shares
-.rd         (pigj     )  // RD as SMAX shares
+.g_clk      (g_clk     ), // Global clock
+.g_resetn   (g_resetn  ), // Sychronous active low reset.
+.en         (en        ), // Enable.
+.rng        (rng_1_a   ), // Extra randomness.
+.rs1        (pi_slice  ), // RS1 as SMAX shares
+.rs2        (gj_slice  ), // RS2 as SMAX shares
+.rd         (pigj_slice)  // RD as SMAX shares
 );
+
+end endgenerate
 
 endmodule
 

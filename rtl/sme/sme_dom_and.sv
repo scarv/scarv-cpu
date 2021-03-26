@@ -9,80 +9,56 @@ parameter N      =32  // Width of the operation.
 input          g_clk    , // Global clock
 input          g_resetn , // Sychronous active low reset.
 
-input          en       , // Enable.
-input  [N*RMAX-1:0] rng ,// Extra randomness.
+input            en       , // Enable.
+input  [RB   :0] rng ,// Extra randomness.
 
-input  [N*D-1:0] rs1 , // RS1 as SMAX shares
-input  [N*D-1:0] rs2 , // RS2 as SMAX shares
+input  [N*D-1:0] rs1 , // RS1 as SMAX shares ={{N{share0}, {N{share1}}
+input  [N*D-1:0] rs2 , // RS2 as SMAX shares ={{N{share0}, {N{share1}}
 
 output [N*D-1:0] rd    // RD as SMAX shares
 );
 
-localparam RMAX  = D+D*(D-1)/2; // Number of guard shares.
-localparam RM    = RMAX-1;
-localparam SM    = D-1;
+localparam RBITS_PER_SHARE  = D*(D-'d1)/2;
+localparam RBITS_TOTAL      = N * RBITS_PER_SHARE;
 
-wire [N-1:0] a_rng [RM:0];
-wire [N-1:0] a_rs1 [SM:0];
-wire [N-1:0] a_rs2 [SM:0];
-wire [N-1:0] a_rd  [SM:0];
+localparam RB               = RBITS_TOTAL     - 1;
+localparam RM               = RBITS_PER_SHARE - 1;
 
-genvar i;
-`SME_UNPACK(a_rng, rng, N, RMAX, i)
-`SME_UNPACK(a_rs1, rs1, N, D, i)
-`SME_UNPACK(a_rs2, rs2, N, D, i)
-`SME_PACK(rd, a_rd, N, D, i)
+//wire [N-1:0] dbg_rs1 = rs1[31:0] ^ rs1[63:32];
+//wire [N-1:0] dbg_rs2 = rs2[31:0] ^ rs2[63:32];
+//wire [N-1:0] dbg_rd  = rd [31:0] ^ rd [63:32];
 
-// For debugging
-//(*keep*) reg [N-1:0] u_rs1, u_rs2, u_rd;
-//
-//always_comb begin
-//    integer d;
-//    u_rs1 = a_rs1[0];
-//    u_rs2 = a_rs2[0];
-//    u_rd  = a_rd [0];
-//    for (d=1; d<D; d=d+1) begin
-//        u_rs1 = u_rs1 ^ a_rs1[d];
-//        u_rs2 = u_rs2 ^ a_rs2[d];
-//        u_rd  = u_rd  ^ a_rd [d];
-//    end
-//end
-
+genvar B;
 genvar s;
-genvar p; 
-generate for (s = 0; s < D; s = s+1) begin: domand_gen_shares
-  wire [N-1:0] x = a_rs1[s];
+generate for(B=0; B < N; B=B+1) begin
 
-  reg  [N-1:0] ands [D-1:0];  
-  reg  [N-1:0] rd_s;
-  for (p = 0; p < D; p = p+1) begin: domand_gen_products
-    wire [N-1:0] y = a_rs2[p];      
+    wire [RM :0] rng_slice = rng[B*RBITS_PER_SHARE+:RBITS_PER_SHARE];
+    wire [D-1:0] rs1_slice ;
+    wire [D-1:0] rs2_slice ;
+    wire [D-1:0] rd_slice  ;
 
-    wire [N-1:0] p_ands;    
-    if(p == s) begin: p0
-      assign p_ands = (x & y)                   ;
-    end else if(p>s) begin : p1
-      assign p_ands = (x & y) ^ a_rng[s+p*(p-1)/2];
-    end else begin: p2
-      assign p_ands = (x & y) ^ a_rng[p+s*(s-1)/2];
+    for(s=0; s<D; s=s+1) begin
+        assign rs1_slice[s] = rs1[s*N+B];
+        assign rs2_slice[s] = rs2[s*N+B];
+        assign rd[s*N+B]    = rd_slice[s];
     end
-        
-    if(POSEDGE) begin
-      always @(posedge g_clk) if(!g_resetn) ands[p] <= 'b0;
-                              else if(en) ands[p] <= p_ands;
-    end else begin
-      always @(negedge g_clk) if(!g_resetn) ands[p] <= 'b0;
-                              else if(en) ands[p] <= p_ands;
-    end
-  end
+    
+    //wire dbg_rs1_slice  = ^rs1_slice;
+    //wire dbg_rs2_slice  = ^rs2_slice;
+    //wire dbg_rd_slice   = ^rd_slice;
 
-  integer i;
-  always @(*) begin
-    rd_s  = 0;
-    for (i = 0; i < D; i = i+1) begin rd_s = rd_s ^ ands[i]; end
-  end
-
-  assign a_rd[s]=rd_s;
+    sme_dom_and1 #(
+        .POSEDGE(POSEDGE),
+        .D      (D      )
+    ) dom_and (
+        .g_clk(g_clk),
+        .g_resetn(g_resetn),
+        .en (en         ),
+        .rng(rng_slice  ),
+        .rs1(rs1_slice  ),
+        .rs2(rs2_slice  ),
+        .rd (rd_slice   )
+    );
 
 end endgenerate
 
@@ -91,50 +67,60 @@ endmodule
 // A version of sme_dom_and with non-array inputs.
 module sme_dom_and1#(
 parameter POSEDGE=0, // If 0, trigger on negedge, else posedge.
-parameter D      =3  // Number of shares.
+parameter D      =2  // Number of shares.
 )(
-input          g_clk     , // Global clock
-input          g_resetn  , // Sychronous active low reset.
+(* SILVER="clock"   *) input          g_clk     , // Global clock
+(* SILVER="control" *) input          g_resetn  , // Sychronous active low reset.
 
-input          en        , // Enable.
-input  [RM :0] rng,// Extra randomness.
+(* SILVER="control" *) input          en        , // Enable.
+(* SILVER="refresh" *) input  [RM :0] rng,// Extra randomness.
               
-input  [D-1:0] rs1, // RS1 as SMAX shares
-input  [D-1:0] rs2, // RS2 as SMAX shares
-              
-output [D-1:0] rd   // RD as SMAX shares
+(* SILVER="0_1,0_0" *) input  [D-1:0] rs1, // RS1 as SMAX shares
+(* SILVER="1_1,1_0" *) input  [D-1:0] rs2, // RS2 as SMAX shares
+
+(* SILVER="2_1,2_0" *) output [D-1:0] rd   // RD as SMAX shares
 );
 
-localparam RMAX  = D+D*(D-1)/2; // Number of guard shares.
+localparam RMAX  = D*(D-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
 localparam SM    = D-1;
 
-//wire [0:0] i_rng [RM :0];
-//wire [0:0] i_rs1 [D-1:0];
-//wire [0:0] i_rs2 [D-1:0];
-//wire [0:0] i_rd  [D-1:0];
-//
-//genvar i;
-//generate for(i = 0; i < D; i=i+1) begin
-//    assign i_rs1[i][0] = rs1[i];
-//    assign i_rs2[i][0] = rs2[i];
-//    assign rd   [i]    = i_rd[i][0];
-//end endgenerate
-//    
-//generate for(i = 0; i < RMAX; i=i+1) begin
-//    assign i_rng[i][0] = rng[i];
-//end endgenerate
+genvar i;
+genvar j;
+generate for(i = 0; i < D; i = i+1) begin : gen_i
+    
+    wire [SM:0] calculation;
+    wire [SM:0] rng_i;
+    reg  [SM:0] resharing;
 
-sme_dom_and #(
-.POSEDGE(POSEDGE), .D(D), .N(1)
-) i_and (
-.g_clk     (g_clk     ), // Global clock
-.g_resetn  (g_resetn  ), // Sychronous active low reset.
-.en        (en        ), // Enable.
-.rng       (  rng     ),// Extra randomness.
-.rs1       (  rs1     ), // RS1 as SMAX shares
-.rs2       (  rs2     ), // RS2 as SMAX shares
-.rd        (  rd      )  // RD as SMAX shares
-);
+    for(j = 0; j < D; j=j+1) begin : gen_j
+
+        assign calculation[j] = rs1[i] && rs2[j];
+
+        assign rng_i[j]       = i==j ? 1'b0                 :
+                                j> i ? rng[i+(j*(j-1))/2]   :
+                                       rng[j+(i*(i-1))/2]   ;
+
+    end
+
+    `ifdef SILVER
+        always @(posedge g_clk) begin
+            resharing <= calculation ^ rng_i;
+        end
+    `else
+        if(POSEDGE) begin
+            always @(posedge g_clk) begin
+                resharing <= calculation ^ rng_i;
+            end
+        end else begin
+            always @(negedge g_clk) begin
+                resharing <= calculation ^ rng_i;
+            end
+        end
+    `endif
+
+    assign rd[i] = ^resharing;
+
+end endgenerate
 
 endmodule

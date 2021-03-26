@@ -80,6 +80,8 @@ wire [RW:0] rng      ;  // RNG outputs.
 wire        rng_update = 1'b1;
 wire        rng_clk_req;
 
+wire [RW:0] alu_rng = alu_valid ? rng : 'b0;
+
 sme_rng #(
 .XLEN(XLEN),
 .SMAX(SMAX) 
@@ -139,7 +141,7 @@ sme_alu #(
 .smectl_t           (smectl_t           ), // Masking type 0=bool, 1=arithmetic
 .smectl_d           (smectl_d           ), // Current number of shares to use.
 .flush              (flush              ), // Flush current operation
-.rng                (rng                ), // Randomness
+.rng                (alu_rng            ), // Randomness
 .bank_rdata         (bank_rdata         ),
 .valid              (alu_valid          ),
 .ready              (alu_ready          ),
@@ -173,6 +175,11 @@ wire cry_rd_wen     = cry_valid && cry_ready;
 
 assign cry_result   = cry_rd[`SL(0)];
 
+localparam AND_GATES    = 34;
+/* verilator lint_off WIDTH */
+localparam CRY_RB       = AND_GATES *(SMAX*(SMAX-1)/2) - 1;
+/* verilator lint_on WIDTH */
+
 sme_crypto #(
 .XLEN(32    ),
 .SMAX(SMAX  )
@@ -181,7 +188,7 @@ sme_crypto #(
 .g_clk_req      (g_clk_req          ), // Global clock request
 .g_resetn       (g_resetn           ), // Sychronous active low reset.
 .smectl_d       (smectl_d           ), // Current number of shares to use.
-.rng            (rng                ), // RNG outputs.
+.rng            (rng[CRY_RB:0]      ), // RNG outputs.
 .flush          (flush              ), // Flush operation, discard results.
 .valid          (cry_valid          ),
 .ready          (cry_ready          ),

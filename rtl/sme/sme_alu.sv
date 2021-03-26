@@ -147,6 +147,10 @@ end
 wire dom_and_en = (valid && (op_and || op_or))  ||
                    adder_valid                  ;
 
+/* verilator lint_off WIDTH */
+localparam AB = (XLEN * (SMAX*(SMAX-1)/2))-1;
+/* verilator lint_on WIDTH */
+
 //
 // Instance DOM AND
 sme_dom_and #(
@@ -156,7 +160,7 @@ sme_dom_and #(
 .g_clk      (g_clk      ), // Global clock
 .g_resetn   (g_resetn   ), // Sychronous active low reset.
 .en         (dom_and_en ), // Enable.
-.rng        (rng        ), // Extra randomness.
+.rng        (rng[AB:0]  ), // Extra randomness.
 .rs1        (bitwise_rs1), // RS1 as SMAX shares
 .rs2        (bitwise_rs2), // RS2 as SMAX shares
 .rd         (result_and )  // RD as SMAX shares

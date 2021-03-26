@@ -51,10 +51,12 @@ input   [SMAX*21-1:0] x     , // 21 bits x 3 shares
 output  [SMAX*18-1:0] y      
 );
 
-    localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+    localparam AND_GATES = 34;
+
+    localparam RMAX  = SMAX*(SMAX-1)/2; // Number of guard shares.
     localparam RM    = RMAX-1;
-    localparam SM = SMAX-1;
-    localparam RW    = 32*RMAX-1;
+    localparam SM    = SMAX-1;
+    localparam RW    = AND_GATES*RMAX-1;
     
     // 3 shares / 21 bits.
     wire [SM:0] xs[20:0];
@@ -71,7 +73,7 @@ output  [SMAX*18-1:0] y
     
     generate for(i = 0; i < 34; i = i+1) begin
         for(s = 0; s < RMAX; s = s+1) begin
-            assign rs[i][s] = rng[(s*32+i) % RW];
+            assign rs[i][s] = rng[(s*32+i)];
         end 
     end endgenerate
 
@@ -469,9 +471,11 @@ input  wire [8*SMAX-1:0] sbox_in      , // SMAX share input
 output wire [8*SMAX-1:0] sbox_out       // SMAX share output
 );
 
-localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam AND_GATES = 34;
+
+localparam RMAX  = SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
-localparam RW    = 32*RMAX-1;
+localparam RW    = AND_GATES*RMAX-1;
 localparam  SM = SMAX-1;
 
 wire [SMAX*21-1:0] fwd_top ;

@@ -53,9 +53,11 @@ output [SW:0] rd          // RD as SMAX shares
 // Misc useful signals / parameters
 // ------------------------------------------------------------
 
-localparam RMAX  = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
+localparam AND_GATES = 34;
+
+localparam RMAX  = SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM    = RMAX-1;
-localparam RW    = RMAX*XLEN-1;
+localparam RW    = AND_GATES*RMAX-1;
 
 localparam SM   = SMAX-1;
 localparam XL   = XLEN-1;
