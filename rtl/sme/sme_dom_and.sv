@@ -1,5 +1,5 @@
 
-`include "sme_common.svh"
+//`include "sme_common.svh"
 
 module sme_dom_and #(
 parameter POSEDGE=0, // If 0, trigger on negedge, else posedge.
@@ -69,16 +69,16 @@ module sme_dom_and1#(
 parameter POSEDGE=0, // If 0, trigger on negedge, else posedge.
 parameter D      =2  // Number of shares.
 )(
-(* SILVER="clock"   *) input          g_clk     , // Global clock
-(* SILVER="control" *) input          g_resetn  , // Sychronous active low reset.
+input          g_clk     , // Global clock
+input          g_resetn  , // Sychronous active low reset.
 
-(* SILVER="control" *) input          en        , // Enable.
-(* SILVER="refresh" *) input  [RM :0] rng,// Extra randomness.
-              
-(* SILVER="0_1,0_0" *) input  [D-1:0] rs1, // RS1 as SMAX shares
-(* SILVER="1_1,1_0" *) input  [D-1:0] rs2, // RS2 as SMAX shares
+input          en        , // Enable.
+input  [RM :0] rng,// Extra randomness.
 
-(* SILVER="2_1,2_0" *) output [D-1:0] rd   // RD as SMAX shares
+input  [D-1:0] rs1, // RS1 as SMAX shares
+input  [D-1:0] rs2, // RS2 as SMAX shares
+
+output [D-1:0] rd   // RD as SMAX shares
 );
 
 localparam RMAX  = D*(D-1)/2; // Number of guard shares.

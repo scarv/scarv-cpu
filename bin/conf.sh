@@ -3,6 +3,9 @@ export FRV_HOME=`pwd`
 export FRV_WORK=$FRV_HOME/work
 export SCARV_CPU=$FRV_HOME
 
+export BOOST=/home/work/tools/boost_1_73_0
+export SILVER=/home/work/tools/SILVER
+
 if [[ -z "$RISCV" ]]; then
     export RISCV=/opt/eda/riscv/latest
 fi
@@ -29,6 +32,7 @@ if [[ -z "$YOSYS_ROOT" ]]; then
 fi
 
 export PATH=$RISCV:$BOOLECTOR_PATH:$PATH
+export LD_LIBRARY_PATH=$BOOST/install/lib:$SILVER/lib:$LD_LIBRARY_PATH
 
 echo "------------------------[CPU Project Setup]--------------------------"
 echo "\$FRV_HOME       = $FRV_HOME"
@@ -39,5 +43,8 @@ echo "\$VERILATOR_ROOT = $VERILATOR_ROOT"
 echo "\$YOSYS_ROOT     = $YOSYS_ROOT"
 echo "\$SYMBIYOSYS_BIN = $SYMBIYOSYS_BIN"
 echo "\$BOOLECTOR_PATH = $BOOLECTOR_PATH"
+echo "\$BOOST          = $BOOST"
+echo "\$SILVER         = $SILVER"
 echo "\$PATH           = $PATH"
+echo "\$LD_LIBRARY_PATH= $LD_LIBRARY_PATH"
 echo "---------------------------------------------------------------------"

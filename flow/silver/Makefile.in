@@ -1,0 +1,75 @@
+
+SILVER          ?= undefined/path/to/silver/executable
+SILVER_VERIFY    = $(SILVER)/bin/verify
+SILVER_CORES     = 12
+SILVER_ARGS      = --verbose 1 \
+                   --cores $(SILVER_CORES) \
+                   --verilog 1 \
+                   --verilog-libfile $(SILVER)/cell/Library.txt \
+                   --verilog-libname NANG45 \
+
+SILVER_RENAME    = $(FRV_HOME)/flow/silver/rename_escaped_identifiers.py
+
+export SILVER_YS        = $(FRV_HOME)/flow/silver/synth.tcl
+export SILVER_NETLIST   = $(FRV_HOME)/work/silver_tmp.v
+export SILVER_CIRCUIT   = $(FRV_HOME)/work/silver_circuit.nl
+
+SILVER_ALL=
+
+define silver_dir
+$(FRV_WORK)/silver/${1}
+endef
+
+define silver_map_v
+$(call silver_dir,${1})/${1}-input.v
+endef
+
+define silver_map_nl
+$(call silver_dir,${1})/${1}-netlist.v
+endef
+
+define silver_map_cir
+$(call silver_dir,${1})/${1}-netlist.nl
+endef
+
+#
+# 1. Top module
+# 2. Verilog Source files
+define add_silver
+
+$(call silver_map_nl,${1}) : ${2} $(SILVER_YS) $(SILVER_RENAME)
+	mkdir -p $(call silver_dir,${1})
+	cat ${2} > $(call silver_map_v,${1})
+	SILVER_VERILOG=$(call silver_map_v,${1}) \
+    SILVER_TOP=${1} \
+    SILVER_NETLIST=$(call silver_map_nl,${1}) \
+	$(YOSYS_ROOT)/yosys -QT \
+        -c $(SILVER_YS)
+	sed -i 's/(\\/( \\/' $(call silver_map_nl,${1})
+	python3 $(SILVER_RENAME) \
+        $(call silver_map_nl,${1}) $(call silver_map_nl,${1})
+
+silver-${1}: $(call silver_map_nl,${1})
+	$(SILVER_VERIFY) $(SILVER_ARGS) \
+        --verilog-design_file $${<} \
+        --verilog-module_name ${1} \
+        --insfile $(call silver_map_cir,${1})
+
+SILVER_ALL+=silver-${1}
+endef
+
+SILVER_VL= \
+    $(FRV_HOME)/rtl/sme/sme_dom_and.sv \
+    $(FRV_HOME)/rtl/sme/sme_sboxes.sv \
+    $(FRV_HOME)/flow/silver/wrappers.sv
+
+#
+# DOM AND
+# ------------------------------------------------------------
+
+$(eval $(call add_silver,sme_dom_and1_2share,$(SILVER_VL)))
+$(eval $(call add_silver,sme_dom_and1_3share,$(SILVER_VL)))
+
+$(eval $(call add_silver,sme_sbox_inv_mid_2share,$(SILVER_VL)))
+
+silver-all: $(SILVER_ALL)
