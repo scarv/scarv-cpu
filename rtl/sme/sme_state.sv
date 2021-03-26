@@ -77,7 +77,7 @@ wire [3:0] smectl_b = csr_smectl[ 3:0]; // Current bank select for load/store.
 
 wire [RW:0] rng      ;  // RNG outputs.
 
-wire        rng_update = 1'b1;
+wire        rng_update = |smectl_d;
 wire        rng_clk_req;
 
 wire [RW:0] alu_rng = alu_valid ? rng : 'b0;

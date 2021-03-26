@@ -27,14 +27,11 @@ wire [N-1:0] mand [D-1:0]; // RS2 as SMAX shares
 reg  [N-1:0] rd   [D-1:0]; // RD as SMAX shares
 
 genvar z;
-generate for (s = 0; s<D; s=s+1) begin
-    assign mxor[s     ]    = s_mxor[s*N+:N];
-    assign mand[s     ]    = s_mand[s*N+:N];
-    assign s_rd[s*N+:N]    = rd[s];
+generate for (z = 0; z<D; z=z+1) begin
+    assign mxor[z     ]    = s_mxor[z*N+:N];
+    assign mand[z     ]    = s_mand[z*N+:N];
+    assign s_rd[z*N+:N]    = rd[z];
 end endgenerate
-//`SME_UNPACK(mxor, s_mxor, N, D, z)
-//`SME_UNPACK(mand, s_mand, N, D, z)
-//`SME_PACK(s_rd, rd, N, D, z)
 
 /* verilator lint_off WIDTH */
 localparam RNG_BITS = D*(D-'d1)/2;
