@@ -105,6 +105,8 @@ parameter XC_CLASS_AES        = 1'b1;
 parameter XC_CLASS_SHA2       = 1'b1;
 parameter XC_CLASS_SHA3       = 1'b1;
 parameter XC_CLASS_MASK       = 1'b1;
+parameter XC_CLASS_MASK_FAFF  = 1'b1;
+parameter XC_CLASS_MASK_FMUL  = 1'b1;
 
 // Single cycle implementations of AES instructions?
 parameter AES_SUB_FAST = 1'b1;
@@ -547,6 +549,8 @@ frv_alu i_alu (
 generate if (XC_CLASS_MASK) begin : masking_ise_implemented
 
 frv_masked_alu #(
+.ENABLE_FAFF     (XC_CLASS_MASK_FAFF),
+.ENABLE_FMUL     (XC_CLASS_MASK_FMUL),
 .MASKING_ISE_TRNG(MASKING_ISE_TRNG),
 .MASKING_ISE_DOM (MASKING_ISE_DOM )
 ) i_frv_masked_alu (

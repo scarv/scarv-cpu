@@ -121,6 +121,8 @@ parameter XC_CLASS_SHA2       = 1'b0;
 parameter XC_CLASS_SHA3       = 1'b0;
 parameter XC_CLASS_LEAK       = 1'b1;
 parameter XC_CLASS_MASK       = 1'b1;
+parameter XC_CLASS_MASK_FAFF  = 1'b1;
+parameter XC_CLASS_MASK_FMUL  = 1'b1;
 
 // Randomise registers (if set) or zero them (if clear)
 parameter XC_CLASS_LEAK_STRONG= 1'b1 && XC_CLASS_LEAK;
@@ -219,6 +221,8 @@ frv_pipeline #(
 .XC_CLASS_SHA3      (XC_CLASS_SHA3      ),
 .XC_CLASS_LEAK      (XC_CLASS_LEAK      ),
 .XC_CLASS_MASK      (XC_CLASS_MASK      ),
+.XC_CLASS_MASK_FAFF (XC_CLASS_MASK_FAFF ),
+.XC_CLASS_MASK_FMUL (XC_CLASS_MASK_FMUL ),
 .XC_CLASS_LEAK_STRONG(XC_CLASS_LEAK_STRONG),
 .XC_CLASS_LEAK_BUBBLE(XC_CLASS_LEAK_BUBBLE),
 .AES_SUB_FAST       (AES_SUB_FAST       ),
