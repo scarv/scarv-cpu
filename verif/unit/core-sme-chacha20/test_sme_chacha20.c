@@ -29,13 +29,15 @@ int test_main() {
     // Don't bother if we get an unexpected SMAX value.
     if(SME_SMAX != smax) {test_fail();}
 
-    for(int i = 0; i < SME_SMAX; i++) {
-        for(int j = 0; j < 16; j++) {
-            input_m[i][j] = (i << 4) | j;
-        }
-    }
+    sme_chacha20_mask(input_m, input);
 
     sme_chacha20_block(output_m, input_m);
+
+    sme_chacha20_unmask(output, output_m);
+
+    for(int i = 0; i < 16; i ++) {
+        __puthex32(output[i]); __putchar('\n');
+    }
 
     return 0;
 
