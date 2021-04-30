@@ -211,6 +211,7 @@ include $(FRV_HOME)/verif/unit/core-sme-ror/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-rori/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-rol/Makefile.in
 include $(FRV_HOME)/verif/unit/core-sme-aes/Makefile.in
+include $(FRV_HOME)/verif/unit/core-sme-chacha20/Makefile.in
 
 #
 # Core-Complex level testbench.

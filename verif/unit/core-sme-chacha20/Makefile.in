@@ -1,0 +1,8 @@
+
+TEST_NAME = core-sme-chacha20
+TEST_SRC  = $(UNIT_ROOT)/core-sme-chacha20/test_sme_chacha20.c \
+            $(UNIT_ROOT)/core-sme-chacha20/test_sme_chacha20.S \
+            $(SCARV_CPU)/src/sme/sme_chacha20.S
+
+$(eval $(call add_core_unit_test,$(TEST_NAME),$(TEST_SRC)))
+
