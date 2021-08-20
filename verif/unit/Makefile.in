@@ -223,6 +223,7 @@ include $(FRV_HOME)/verif/unit/ccx-timer/Makefile.in
 include $(FRV_HOME)/verif/unit/ccx-interrupts/Makefile.in
 include $(FRV_HOME)/verif/unit/ccx-entropy-source/Makefile.in
 include $(FRV_HOME)/verif/unit/ccx-sme-aes/Makefile.in
+include $(FRV_HOME)/verif/unit/ccx-sme-chacha20/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)
