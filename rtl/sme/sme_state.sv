@@ -48,9 +48,12 @@ output [      XL:0] cry_result    // Crypto 0'th share result.
 
 parameter  XL   = XLEN-1;
 
+localparam KECCAK_LW = 16;
+localparam KS        = 25*KECCAK_LW-1;
+
 localparam RMAX = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM   = RMAX-1;
-localparam RW   = RMAX*XLEN-1;
+localparam RW   = KS    ;
 
 localparam SM   = SMAX-1;
 localparam SW   = SMAX*XLEN-1;
@@ -75,22 +78,24 @@ wire [3:0] smectl_b = csr_smectl[ 3:0]; // Current bank select for load/store.
 // Random Number Source
 // ------------------------------------------------------------
 
-wire [RW:0] rng      ;  // RNG outputs.
+wire [KS:0] rng_out  ;  // RNG outputs.
+wire [RW:0] rng      = rng_out[RW:0];
 
 wire        rng_update = |smectl_d;
 wire        rng_clk_req;
 
-wire [RW:0] alu_rng = alu_valid ? rng : 'b0;
+wire [KS:0] alu_rng = alu_valid ? rng : 'b0;
 
 sme_rng #(
 .XLEN(XLEN),
+.KECCAK_LW(KECCAK_LW),
 .SMAX(SMAX) 
 ) i_rng (
 .g_clk      (g_clk      ),
 .g_clk_req  (rng_clk_req),
 .g_resetn   (g_resetn   ), // Sychronous active low reset.
 .update     (rng_update ), // Update the internal RNG.
-.rng        (rng        )  // RNG outputs.
+.rng        (rng_out    )  // RNG outputs.
 );
 
 //
@@ -133,6 +138,7 @@ assign alu_result   = alu_rd[`SL(0)];
 
 sme_alu #(
 .XLEN (32   ),
+.KS   (KS   ), // Randomness bits (Keccak State)
 .SMAX (SMAX ) // Max number of hardware shares supported.
 ) i_sme_alu (
 .g_clk              (g_clk              ), // Global clock

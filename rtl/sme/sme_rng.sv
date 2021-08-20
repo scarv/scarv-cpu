@@ -6,20 +6,20 @@
 //
 module sme_rng #(
 parameter XLEN  =32,
-parameter SMAX  = 3 
+parameter SMAX  = 3 ,
+parameter KECCAK_LW = 8
 )(
 input       g_clk       ,
 output      g_clk_req   ,
 input       g_resetn    , // Sychronous active low reset.
 input       update      , // Update the internal RNG.
-output [RW:0] rng         // RNG outputs.
+output [KS:0] rng         // RNG outputs.
 );
 
 localparam RMAX = SMAX+SMAX*(SMAX-1)/2; // Number of guard shares.
 localparam RM   = RMAX-1;
 localparam RW   = RMAX*XLEN-1;
 
-localparam KECCAK_LW = 8;
 localparam KS        = 25*KECCAK_LW-1;
 
 wire [KS:0] keccak_state;

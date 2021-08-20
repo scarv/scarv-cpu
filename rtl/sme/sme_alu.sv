@@ -23,6 +23,7 @@
 //
 module sme_alu #(
 parameter XLEN            = 32  ,
+parameter KS              = 400 , // randomness bits (Keccak State)
 parameter SMAX            =  4    // Max number of hardware shares supported.
 )(
 
@@ -32,7 +33,7 @@ input         g_resetn  , // Sychronous active low reset.
 
 input         smectl_t  , // Masking type. 0=bool, 1=arithmetic
 input  [ 3:0] smectl_d  , // Current number of shares to use.
-input  [RW:0] rng       , // RNG outputs.
+input  [KS:0] rng       , // RNG outputs.
 
 input  [XL:0] bank_rdata, // Used for un-masking one share at a time.
 
@@ -110,6 +111,7 @@ wire    adder_valid = op_addsub && valid;
 wire    adder_ready;
 
 sme_ks_adder #(
+.KS(KS),
 .D(SMAX), // Number of shares.
 .N(  32)  // Width of the operation.
 ) i_ks_adder (

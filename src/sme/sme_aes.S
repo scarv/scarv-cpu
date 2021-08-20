@@ -78,10 +78,10 @@ sme_aes128_enc_key_exp:
     xor  x16, x16, a4           // Add round constant.
     rori x20, x19,  8           // x20 = x19 >>> 8
     
-    aes32esi x16, x20, 0        // Apply SBox
-    aes32esi x16, x20, 1        //
-    aes32esi x16, x20, 2        //
-    aes32esi x16, x20, 3        //
+    aes32esi x16, x16, x20, 0        // Apply SBox
+    aes32esi x16, x16, x20, 1        //
+    aes32esi x16, x16, x20, 2        //
+    aes32esi x16, x16, x20, 3        //
 
     xor  x17, x17, x16
     xor  x18, x18, x17
@@ -168,25 +168,25 @@ sme_aes128_enc_block:
         bne  t0, t1, .aes128_enc_blk_ldkey1
     xor x0,x0,x0; xor x0,x0,x0; xor x0,x0,x0;
 
-    aes32esmi x20, x16, 0        // Even Round
-    aes32esmi x20, x17, 1
-    aes32esmi x20, x18, 2
-    aes32esmi x20, x19, 3
-
-    aes32esmi x21, x17, 0
-    aes32esmi x21, x18, 1
-    aes32esmi x21, x19, 2
-    aes32esmi x21, x16, 3
-
-    aes32esmi x22, x18, 0
-    aes32esmi x22, x19, 1
-    aes32esmi x22, x16, 2
-    aes32esmi x22, x17, 3
-
-    aes32esmi x23, x19, 0
-    aes32esmi x23, x16, 1
-    aes32esmi x23, x17, 2
-    aes32esmi x23, x18, 3        // x20-x23 contains new state
+    aes32esmi x20, x20, x16, 0        // Even Round
+    aes32esmi x20, x20, x17, 1
+    aes32esmi x20, x20, x18, 2
+    aes32esmi x20, x20, x19, 3
+                        
+    aes32esmi x21, x21, x17, 0
+    aes32esmi x21, x21, x18, 1
+    aes32esmi x21, x21, x19, 2
+    aes32esmi x21, x21, x16, 3
+                        
+    aes32esmi x22, x22, x18, 0
+    aes32esmi x22, x22, x19, 1
+    aes32esmi x22, x22, x16, 2
+    aes32esmi x22, x22, x17, 3
+                        
+    aes32esmi x23, x23, x19, 0
+    aes32esmi x23, x23, x16, 1
+    aes32esmi x23, x23, x17, 2
+    aes32esmi x23, x23, x18, 3        // x20-x23 contains new state
     
     li  t0, 0x1E0               // D=max, bank=0
     mv  t2, a2
@@ -204,49 +204,49 @@ sme_aes128_enc_block:
     addi a2, a2, 32             // Increment round key pointer.
     beq  a1, a2, .aes128_enc_blk_final
     
-    aes32esmi x16, x20, 0        // Odd Round
-    aes32esmi x16, x21, 1
-    aes32esmi x16, x22, 2
-    aes32esmi x16, x23, 3
-
-    aes32esmi x17, x21, 0
-    aes32esmi x17, x22, 1
-    aes32esmi x17, x23, 2
-    aes32esmi x17, x20, 3
-
-    aes32esmi x18, x22, 0
-    aes32esmi x18, x23, 1
-    aes32esmi x18, x20, 2
-    aes32esmi x18, x21, 3
-
-    aes32esmi x19, x23, 0
-    aes32esmi x19, x20, 1
-    aes32esmi x19, x21, 2
-    aes32esmi x19, x22, 3        // x20-x23 contains new state
+    aes32esmi x16, x16, x20, 0        // Odd Round
+    aes32esmi x16, x16, x21, 1
+    aes32esmi x16, x16, x22, 2
+    aes32esmi x16, x16, x23, 3
+                   
+    aes32esmi x17, x17, x21, 0
+    aes32esmi x17, x17, x22, 1
+    aes32esmi x17, x17, x23, 2
+    aes32esmi x17, x17, x20, 3
+                   
+    aes32esmi x18, x18, x22, 0
+    aes32esmi x18, x18, x23, 1
+    aes32esmi x18, x18, x20, 2
+    aes32esmi x18, x18, x21, 3
+                   
+    aes32esmi x19, x19, x23, 0
+    aes32esmi x19, x19, x20, 1
+    aes32esmi x19, x19, x21, 2
+    aes32esmi x19, x19, x22, 3        // x20-x23 contains new state
 
     j .aes128_enc_blk_l0
     xor x0,x0,x0; xor x0,x0,x0; xor x0,x0,x0;
 
 .aes128_enc_blk_final:
-    aes32esi x16, x20, 0        // Odd Round [Final]
-    aes32esi x16, x21, 1
-    aes32esi x16, x22, 2
-    aes32esi x16, x23, 3
-
-    aes32esi x17, x21, 0
-    aes32esi x17, x22, 1
-    aes32esi x17, x23, 2
-    aes32esi x17, x20, 3
-
-    aes32esi x18, x22, 0
-    aes32esi x18, x23, 1
-    aes32esi x18, x20, 2
-    aes32esi x18, x21, 3
-
-    aes32esi x19, x23, 0
-    aes32esi x19, x20, 1
-    aes32esi x19, x21, 2
-    aes32esi x19, x22, 3        // x20-x23 contains new state
+    aes32esi x16, x16, x20, 0        // Odd Round [Final]
+    aes32esi x16, x16, x21, 1
+    aes32esi x16, x16, x22, 2
+    aes32esi x16, x16, x23, 3
+                  
+    aes32esi x17, x17, x21, 0
+    aes32esi x17, x17, x22, 1
+    aes32esi x17, x17, x23, 2
+    aes32esi x17, x17, x20, 3
+                  
+    aes32esi x18, x18, x22, 0
+    aes32esi x18, x18, x23, 1
+    aes32esi x18, x18, x20, 2
+    aes32esi x18, x18, x21, 3
+                  
+    aes32esi x19, x19, x23, 0
+    aes32esi x19, x19, x20, 1
+    aes32esi x19, x19, x21, 2
+    aes32esi x19, x19, x22, 3        // x20-x23 contains new state
 
     li  t0, 0x1E1               // D=max, bank=1
     .aes128_enc_blk_unmask:

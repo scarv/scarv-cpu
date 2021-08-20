@@ -350,6 +350,7 @@ wire    [XL:0] sme_cry_result   ; // Crypto 0'th share result.
 //
 //  Contains the share register banks for the SME implementation.
 //
+generate if (SME_SMAX>0) begin : g_sme
 sme_state #(
 .SMAX           (SME_SMAX   ), // Max number of hardware shares supported.
 .XLEN           (XLEN       )
@@ -374,6 +375,13 @@ sme_state #(
 .alu_result     (sme_alu_result     ), // ALU    0'th share result.
 .cry_result     (sme_cry_result     )  // Crypto 0'th share result.
 );
+end else begin : g_no_sme
+assign sme_bank_rdata = 'b0 ;// Read data from bank[smectrl.t][smectl.b]
+assign sme_alu_ready  = 'b0 ;// Ready for new input instruction.
+assign sme_cry_ready  = 'b0 ;// Ready for new input instruction.
+assign sme_alu_result = 'b0 ;// ALU    0'th share result.
+assign sme_cry_result = 'b0 ;// Crypto 0'th share result.
+end endgenerate
 
 
 //

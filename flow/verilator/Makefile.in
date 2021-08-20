@@ -34,7 +34,7 @@ $(call map_vl_exe,${1}) : ${2}
         -GSME_SMAX="4'd$(SME_SMAX)" \
         --Mdir $(call map_vl_mdir,${1}) \
         --top-module ${1} ${3}
-	$(MAKE) -C $(call map_vl_mdir,${1}) -f $(call map_vl_makefile,${1})
+	$(MAKE) -j$(nproc) -C $(call map_vl_mdir,${1}) -f $(call map_vl_makefile,${1})
 
 build-${1}: $(call map_vl_exe,${1})
 

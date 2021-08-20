@@ -103,7 +103,7 @@ wire fu_lsu = s2_fu[P_FU_LSU];
 wire fu_cfu = s2_fu[P_FU_CFU];
 wire fu_csr = s2_fu[P_FU_CSR];
 wire fu_cry = s2_fu[P_FU_CRY];
-wire fu_sme = s2_fu[P_FU_SME];
+wire fu_sme = s2_fu[P_FU_SME] && (SME_SMAX>0);
 
 //
 // Functional Unit Interfacing: ALU
@@ -201,7 +201,7 @@ wire [XL:0] n_s3_opr_b_mul  = 32'b0;
 // Functional Unit Interfacing: SME
 // -------------------------------------------------------------------------
 
-wire       sme_on   = |csr_smectl[8:5];
+wire       sme_on   = |csr_smectl[8:5] && (SME_SMAX>0);
 wire [3:0] smectl_b = csr_smectl[3:0];
 
 wire       sme_mask      = sme_on && fu_sme && s2_uop==SME_MASK;

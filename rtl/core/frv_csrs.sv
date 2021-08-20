@@ -567,6 +567,8 @@ wire [31:0] mentropy_rdata  = {
 // Maximum number of shares supported by SME.
 parameter SME_SMAX = 3;
 
+generate if(SME_SMAX>0) begin : g_sme
+
 reg  [ 3:0] smectl_d;
 reg         smectl_t;
 reg  [ 3:0] smectl_b;
@@ -609,6 +611,12 @@ wire [31:0] reg_smectl = {
 };
 
 assign csr_smectl = reg_smectl;
+
+end else begin : g_no_sme
+
+    assign csr_smectl = 'b0;
+
+end endgenerate
 
 //
 // CSR read responses.
@@ -712,7 +720,7 @@ assign csr_rdata =
     {32{read_mcountin }} & reg_mcountin         |
     {32{read_mentropy }} & mentropy_rdata       |
     {32{read_mnoise   }} & mnoise_rdata         |
-    {32{read_smectl   }} & reg_smectl           ;
+    {32{read_smectl   }} & csr_smectl           ;
 
 endmodule
 

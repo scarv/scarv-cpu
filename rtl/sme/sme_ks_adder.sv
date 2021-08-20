@@ -4,6 +4,7 @@
 `include "sme_common.svh"
 
 module sme_ks_adder #(
+parameter KS = 400, // Keccak state bits for RNG
 parameter D =  3, // Number of shares.
 parameter G =  D+D*(D-1)/2, // Number of guard shares.
 parameter N = 32  // Width of the operation.
@@ -13,7 +14,7 @@ input                g_resetn   , // Sychronous active low reset.
 
 input                en         , // Operation Enable.
 input                sub        , // Subtract when =1, add when =0.
-input      [N*G-1:0] s_rng      , // Extra randomness.
+input      [KS   :0] s_rng      , // Extra randomness.
 
 input      [N*D-1:0] s_mxor     , // RS1 as SMAX shares
 input      [N*D-1:0] s_mand     , // RS2 as SMAX shares

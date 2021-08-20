@@ -89,9 +89,9 @@ genvar i;
 genvar j;
 generate for(i = 0; i < D; i = i+1) begin : gen_i
     
-    wire [SM:0] calculation;
-    wire [SM:0] rng_i;
-    reg  [SM:0] resharing;
+    /*(* dont_touch = "true" *)*/ wire [SM:0] calculation;
+    /*(* dont_touch = "true" *)*/ wire [SM:0] rng_i;
+    /*(* dont_touch = "true" *)*/ reg  [SM:0] resharing;
 
     for(j = 0; j < D; j=j+1) begin : gen_j
 

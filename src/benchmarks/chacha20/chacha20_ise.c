@@ -3,7 +3,7 @@
 
 static inline uint32_t ROTL(uint32_t x, int y) {
     uint32_t rd;
-    asm ("roli %0, %1, %2" :"=r"(rd) :"r"(x), "i"(y));
+    asm ("rori %0, %1, 32-%2" :"=r"(rd) :"r"(x), "i"(y));
     return rd;
 }
 
