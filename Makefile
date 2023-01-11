@@ -1,6 +1,6 @@
 
 ifndef FRV_HOME
-    $(error "Please run 'source ./bin/source.me.sh' to setup the project workspace")
+    $(error "Please run 'source ./bin/conf.sh' to setup the project workspace")
 endif
 ifndef RISCV
     $(error "Please set the RISCV environment variable")
