@@ -62,6 +62,8 @@ assign mem_axi_wstrb    = mem_strb;
 assign mem_axi_awprot   = {INSTR_INTERFACE, 1'b0, 1'b0};
 assign mem_axi_arprot   = {INSTR_INTERFACE, 1'b0, 1'b0};
 
+wire axi_write_req_done;
+wire axi_read_req_done;
 
 //
 // Request channels
@@ -75,14 +77,16 @@ assign mem_gnt =
 // Write request channels
 // ------------------------------------------------------------
 
-wire axi_write_req_done = 
+reg     aw_done;
+reg     w_done;
+
+assign axi_write_req_done = 
     (aw_done || (mem_axi_awvalid && mem_axi_awready)) &&
     ( w_done || (mem_axi_wvalid  && mem_axi_wready )) ;
 
 //
 // AXI AW channel.
 
-reg     aw_done;
 wire    n_aw_done = !axi_write_req_done && 
                     (aw_done || (mem_axi_awvalid && mem_axi_awready));
 
@@ -99,7 +103,6 @@ end
 //
 // AXI W channel.
 
-reg     w_done;
 wire    n_w_done = !axi_write_req_done && 
                     (w_done || (mem_axi_wvalid && mem_axi_wready));
 
@@ -118,7 +121,7 @@ end
 // Read request channels
 // ------------------------------------------------------------
 
-wire axi_read_req_done = mem_axi_arvalid && mem_axi_arready;
+assign axi_read_req_done = mem_axi_arvalid && mem_axi_arready;
 
 assign mem_axi_arvalid = mem_req && !mem_wen;
 
